@@ -91,7 +91,11 @@ pub fn why(store: &Store, root: &Path, target: &str) -> Result<WhyAnswer> {
     let mut answer = WhyAnswer {
         schema: "reify.why/1",
         target: target.to_string(),
-        symbol: node.data.get("qualified").and_then(|v| v.as_str()).map(str::to_string),
+        symbol: node
+            .data
+            .get("qualified")
+            .and_then(|v| v.as_str())
+            .map(str::to_string),
         location: node.location(),
         kind: node
             .data
@@ -99,7 +103,11 @@ pub fn why(store: &Store, root: &Path, target: &str) -> Result<WhyAnswer> {
             .and_then(|v| v.as_str())
             .unwrap_or(node.kind.as_str())
             .to_string(),
-        signature: node.data.get("signature").and_then(|v| v.as_str()).map(str::to_string),
+        signature: node
+            .data
+            .get("signature")
+            .and_then(|v| v.as_str())
+            .map(str::to_string),
         documentation: node
             .data
             .get("doc")
@@ -252,8 +260,11 @@ pub fn impact(store: &Store, query: &str) -> Result<ImpactAnswer> {
 
     let origin_ids: HashSet<i64> = origins.iter().map(|n| n.id).collect();
     let mut seen: HashSet<i64> = origin_ids.clone();
-    let mut frontier: Vec<(Node, u32, String)> =
-        origins.iter().cloned().map(|n| (n, 0, String::new())).collect();
+    let mut frontier: Vec<(Node, u32, String)> = origins
+        .iter()
+        .cloned()
+        .map(|n| (n, 0, String::new()))
+        .collect();
 
     while let Some((node, depth, _)) = frontier.pop() {
         if depth >= IMPACT_MAX_DEPTH || answer.affected.len() >= IMPACT_MAX_NODES {
@@ -267,21 +278,31 @@ pub fn impact(store: &Store, query: &str) -> Result<ImpactAnswer> {
                 continue;
             }
             let reason = format!("calls {}", node.name);
-            answer.affected.push(affected(&dependant, depth + 1, reason, confidence));
+            answer
+                .affected
+                .push(affected(&dependant, depth + 1, reason, confidence));
             frontier.push((dependant, depth + 1, String::new()));
         }
         // Data coupling: anything else touching a table this symbol writes.
-        for (table, _, _) in
-            store.neighbors(node.id, Direction::Out, &[EdgeKind::Writes, EdgeKind::Reads])?
-        {
+        for (table, _, _) in store.neighbors(
+            node.id,
+            Direction::Out,
+            &[EdgeKind::Writes, EdgeKind::Reads],
+        )? {
             answer.tables.push(citation(&table));
-            for (other, edge, confidence) in
-                store.neighbors(table.id, Direction::In, &[EdgeKind::Reads, EdgeKind::Writes])?
-            {
+            for (other, edge, confidence) in store.neighbors(
+                table.id,
+                Direction::In,
+                &[EdgeKind::Reads, EdgeKind::Writes],
+            )? {
                 if origin_ids.contains(&other.id) || !seen.insert(other.id) {
                     continue;
                 }
-                let verb = if edge == EdgeKind::Reads { "reads" } else { "writes" };
+                let verb = if edge == EdgeKind::Reads {
+                    "reads"
+                } else {
+                    "writes"
+                };
                 answer.affected.push(affected(
                     &other,
                     depth + 1,
@@ -314,9 +335,9 @@ pub fn impact(store: &Store, query: &str) -> Result<ImpactAnswer> {
     answer.affected.truncate(IMPACT_MAX_NODES);
 
     if answer.affected.is_empty() {
-        answer
-            .unknowns
-            .push("no dependants found; the symbol may be an entry point, or called dynamically".into());
+        answer.unknowns.push(
+            "no dependants found; the symbol may be an entry point, or called dynamically".into(),
+        );
     }
     Ok(answer)
 }
@@ -510,7 +531,12 @@ pub fn conflicts(store: &Store) -> Result<Vec<StoredConflict>> {
     let mut out: Vec<StoredConflict> = store
         .nodes_of_kind(NodeKind::BusinessRule)?
         .into_iter()
-        .filter(|n| n.data.get("conflict").and_then(|v| v.as_bool()).unwrap_or(false))
+        .filter(|n| {
+            n.data
+                .get("conflict")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false)
+        })
         .map(|n| {
             let get = |key: &str| {
                 n.data
@@ -542,7 +568,11 @@ pub fn rules(store: &Store, min_confidence: f32) -> Result<Vec<Node>> {
         .into_iter()
         .filter(|n| !n.uid.starts_with("conflict:") && n.confidence >= min_confidence)
         .collect();
-    out.sort_by(|a, b| b.confidence.total_cmp(&a.confidence).then(a.uid.cmp(&b.uid)));
+    out.sort_by(|a, b| {
+        b.confidence
+            .total_cmp(&a.confidence)
+            .then(a.uid.cmp(&b.uid))
+    });
     Ok(out)
 }
 
@@ -688,7 +718,10 @@ class SalesOrder:
     fn why_resolves_a_line_to_its_innermost_symbol() {
         let (store, root) = indexed();
         let answer = why(&store, &root, "app/order.py:6").unwrap();
-        assert_eq!(answer.symbol.as_deref(), Some("SalesOrder.requires_approval"));
+        assert_eq!(
+            answer.symbol.as_deref(),
+            Some("SalesOrder.requires_approval")
+        );
         assert!(answer.location.starts_with("app/order.py:"));
         let _ = fs::remove_dir_all(&root);
     }
@@ -698,7 +731,10 @@ class SalesOrder:
         let (store, root) = indexed();
         let answer = why(&store, &root, "SalesOrder.requires_approval").unwrap();
         assert!(
-            answer.calls.iter().any(|c| c.what.contains("bypass_level_two")),
+            answer
+                .calls
+                .iter()
+                .any(|c| c.what.contains("bypass_level_two")),
             "calls: {:?}",
             answer.calls
         );
@@ -718,7 +754,10 @@ class SalesOrder:
         let (store, root) = indexed();
         let answer = why(&store, &root, "SalesOrder").unwrap();
         assert!(
-            answer.concepts.iter().any(|c| c.location.contains("SALES_ORDER")),
+            answer
+                .concepts
+                .iter()
+                .any(|c| c.location.contains("SALES_ORDER")),
             "concepts: {:?}",
             answer.concepts
         );
@@ -749,7 +788,10 @@ class SalesOrder:
         let (store, root) = indexed();
         let answer = impact(&store, "requires_approval").unwrap();
         assert!(
-            answer.affected.iter().any(|a| a.what == "go" && a.distance == 1),
+            answer
+                .affected
+                .iter()
+                .any(|a| a.what == "go" && a.distance == 1),
             "affected: {:?}",
             answer.affected
         );
@@ -767,7 +809,10 @@ class SalesOrder:
             "expected the report that reads the same table; got {:?}",
             answer.affected
         );
-        assert!(answer.tables.iter().any(|t| t.what.contains("approval_log")));
+        assert!(answer
+            .tables
+            .iter()
+            .any(|t| t.what.contains("approval_log")));
         let _ = fs::remove_dir_all(&root);
     }
 

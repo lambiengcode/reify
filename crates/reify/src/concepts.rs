@@ -33,12 +33,11 @@ const MAX_LINKS_PER_CONCEPT: usize = 24;
 /// Words that carry no domain meaning in any of the supported languages.
 const STOPWORDS: &[&str] = &[
     // English
-    "the", "and", "for", "with", "from", "this", "that", "are", "was", "were", "has",
-    "have", "not", "all", "any", "can", "may", "must", "shall", "will", "should", "into",
-    "out", "new", "get", "set", "add", "list", "item", "data", "name", "type", "value",
-    // Vietnamese
-    "của", "và", "các", "cho", "một", "này", "đó", "là", "có", "không", "được", "khi",
-    "với", "trong", "theo", "từ", "đến", "hoặc",
+    "the", "and", "for", "with", "from", "this", "that", "are", "was", "were", "has", "have", "not",
+    "all", "any", "can", "may", "must", "shall", "will", "should", "into", "out", "new", "get",
+    "set", "add", "list", "item", "data", "name", "type", "value", // Vietnamese
+    "của", "và", "các", "cho", "một", "này", "đó", "là", "có", "không", "được", "khi", "với",
+    "trong", "theo", "từ", "đến", "hoặc",
 ];
 
 /// One business concept and every surface form it appears under.
@@ -208,8 +207,7 @@ impl Glossary {
         }
         let text = std::fs::read_to_string(path)
             .with_context(|| format!("reading glossary {}", path.display()))?;
-        Glossary::parse(&text)
-            .with_context(|| format!("parsing glossary {}", path.display()))
+        Glossary::parse(&text).with_context(|| format!("parsing glossary {}", path.display()))
     }
 
     pub fn parse(text: &str) -> Result<Glossary> {
@@ -535,7 +533,10 @@ mod tests {
     fn grounding() -> TermIndex {
         let mut idx = TermIndex::default();
         idx.add("StrategicAccount", "sym:crm.py#StrategicAccount");
-        idx.add("bypassLevelTwoApproval", "sym:order.py#bypassLevelTwoApproval");
+        idx.add(
+            "bypassLevelTwoApproval",
+            "sym:order.py#bypassLevelTwoApproval",
+        );
         idx.add("customer_group", "db:customer_group");
         idx.add("SalesOrder", "sym:order.py#SalesOrder");
         idx
@@ -546,7 +547,10 @@ mod tests {
         let idx = grounding();
         let mut words = BTreeSet::new();
         words.insert("strategic".to_string());
-        assert_eq!(idx.matching_all(&words), vec!["sym:crm.py#StrategicAccount"]);
+        assert_eq!(
+            idx.matching_all(&words),
+            vec!["sym:crm.py#StrategicAccount"]
+        );
     }
 
     #[test]
@@ -556,7 +560,10 @@ mod tests {
             .iter()
             .map(|s| s.to_string())
             .collect();
-        assert_eq!(idx.matching_all(&words), vec!["sym:crm.py#StrategicAccount"]);
+        assert_eq!(
+            idx.matching_all(&words),
+            vec!["sym:crm.py#StrategicAccount"]
+        );
 
         // "approval account" shares no single symbol, so it must match nothing.
         let words: BTreeSet<String> = ["approval", "account"]
@@ -596,8 +603,14 @@ mod tests {
     fn ungrounded_ui_strings_are_not_promoted_to_concepts() {
         // This is what keeps a 12k-row translation file from producing 12k concepts.
         let rows = vec![
-            ("Please wait while loading".to_string(), "Vui lòng đợi".to_string()),
-            ("Strategic Account".to_string(), "khách hàng chiến lược".to_string()),
+            (
+                "Please wait while loading".to_string(),
+                "Vui lòng đợi".to_string(),
+            ),
+            (
+                "Strategic Account".to_string(),
+                "khách hàng chiến lược".to_string(),
+            ),
         ];
         let concepts = from_translations("vie", &rows, &grounding());
         assert_eq!(concepts.len(), 1, "only the grounded row survives");
@@ -611,7 +624,10 @@ mod tests {
             .iter()
             .map(|s| s.to_string())
             .collect();
-        assert!(idx.matching_all(&words).is_empty(), "strict matching vetoes");
+        assert!(
+            idx.matching_all(&words).is_empty(),
+            "strict matching vetoes"
+        );
         assert_eq!(
             idx.matching_grounded(&words, 2),
             vec!["sym:crm.py#StrategicAccount"]
@@ -663,7 +679,10 @@ mod tests {
         let c = &merged[0];
         assert_eq!(c.status, Status::Confirmed, "human curation must win");
         assert_eq!(c.bridge, Bridge::Declared);
-        assert_eq!(c.labels["vie"], "khách hàng chiến lược", "and still gain the label");
+        assert_eq!(
+            c.labels["vie"], "khách hàng chiến lược",
+            "and still gain the label"
+        );
         assert!(c.db.contains("CUSTOMER_GROUP=7"));
     }
 
@@ -705,8 +724,12 @@ db = ["CUSTOMER_GROUP=7"]
             ..Concept::default()
         };
         let sets = c.label_word_sets();
-        assert!(sets.iter().any(|s| s.contains("strategic") && !s.contains("khách")));
-        assert!(sets.iter().any(|s| s.contains("khách") && !s.contains("strategic")));
+        assert!(sets
+            .iter()
+            .any(|s| s.contains("strategic") && !s.contains("khách")));
+        assert!(sets
+            .iter()
+            .any(|s| s.contains("khách") && !s.contains("strategic")));
     }
 
     #[test]
@@ -725,7 +748,11 @@ db = ["CUSTOMER_GROUP=7"]
             ..Concept::default()
         }];
         let batch = stage(&concepts, &grounding());
-        assert_eq!(batch.edges.len(), 1, "the English surface form must ground it");
+        assert_eq!(
+            batch.edges.len(),
+            1,
+            "the English surface form must ground it"
+        );
         assert_eq!(batch.edges[0].dst, "sym:crm.py#StrategicAccount");
     }
 
@@ -762,10 +789,16 @@ db = ["CUSTOMER_GROUP=7"]
     #[test]
     fn translation_csv_handles_both_two_and_three_column_shapes() {
         let two = parse_translation_csv("Strategic Account,khách hàng chiến lược\n");
-        assert_eq!(two, vec![("Strategic Account".into(), "khách hàng chiến lược".into())]);
+        assert_eq!(
+            two,
+            vec![("Strategic Account".into(), "khách hàng chiến lược".into())]
+        );
 
         let three = parse_translation_csv("Selling,Strategic Account,khách hàng chiến lược\n");
-        assert_eq!(three, vec![("Strategic Account".into(), "khách hàng chiến lược".into())]);
+        assert_eq!(
+            three,
+            vec![("Strategic Account".into(), "khách hàng chiến lược".into())]
+        );
     }
 
     #[test]
@@ -776,8 +809,14 @@ db = ["CUSTOMER_GROUP=7"]
 
     #[test]
     fn translation_language_is_read_from_the_filename() {
-        assert_eq!(translation_language("erpnext/translations/vi.csv").as_deref(), Some("vie"));
-        assert_eq!(translation_language("locale/ja_JP.csv").as_deref(), Some("jpn"));
+        assert_eq!(
+            translation_language("erpnext/translations/vi.csv").as_deref(),
+            Some("vie")
+        );
+        assert_eq!(
+            translation_language("locale/ja_JP.csv").as_deref(),
+            Some("jpn")
+        );
         assert_eq!(translation_language("data/customers.csv"), None);
     }
 
@@ -800,8 +839,10 @@ db = ["CUSTOMER_GROUP=7"]
 
     #[test]
     fn snake_case_and_camel_case_reduce_to_the_same_words() {
-        let expected: BTreeSet<String> =
-            ["customer", "group"].iter().map(|s| s.to_string()).collect();
+        let expected: BTreeSet<String> = ["customer", "group"]
+            .iter()
+            .map(|s| s.to_string())
+            .collect();
         assert_eq!(meaningful_words("customer_group"), expected);
         assert_eq!(meaningful_words("customerGroup"), expected);
         assert_eq!(meaningful_words("Customer Group"), expected);

@@ -192,8 +192,8 @@ impl Store {
             std::fs::create_dir_all(parent)
                 .with_context(|| format!("creating store directory {}", parent.display()))?;
         }
-        let conn = Connection::open(&path)
-            .with_context(|| format!("opening store {}", path.display()))?;
+        let conn =
+            Connection::open(&path).with_context(|| format!("opening store {}", path.display()))?;
         conn.pragma_update(None, "journal_mode", "WAL")?;
         conn.pragma_update(None, "synchronous", "NORMAL")?;
         conn.pragma_update(None, "foreign_keys", "ON")?;
@@ -477,9 +477,8 @@ impl Store {
     pub fn put_refs(&mut self, refs: &[(String, String, String, EdgeKind)]) -> Result<()> {
         let tx = self.conn.transaction()?;
         {
-            let mut stmt = tx.prepare(
-                "INSERT INTO refs(from_uid, name, path, kind) VALUES (?1, ?2, ?3, ?4)",
-            )?;
+            let mut stmt =
+                tx.prepare("INSERT INTO refs(from_uid, name, path, kind) VALUES (?1, ?2, ?3, ?4)")?;
             for (from_uid, name, path, kind) in refs {
                 stmt.execute(params![from_uid, name, path, kind.as_str()])?;
             }
@@ -524,9 +523,9 @@ impl Store {
     /// `(name, uid)` for every symbol and database object, to rebuild the grounding
     /// index the concept layer needs.
     pub fn groundable_names(&self) -> Result<Vec<(String, String)>> {
-        let mut stmt = self.conn.prepare(
-            "SELECT name, uid FROM nodes WHERE kind IN ('Symbol', 'DatabaseObject')",
-        )?;
+        let mut stmt = self
+            .conn
+            .prepare("SELECT name, uid FROM nodes WHERE kind IN ('Symbol', 'DatabaseObject')")?;
         let rows = stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?;
         rows.map(|r| r.map_err(Into::into)).collect()
     }
@@ -606,8 +605,7 @@ impl Store {
                                   THEN excluded.status ELSE nodes.status END,
                     confidence = MAX(excluded.confidence, nodes.confidence)",
             )?;
-            let mut insert_search =
-                tx.prepare("INSERT INTO search(uid, body) VALUES (?1, ?2)")?;
+            let mut insert_search = tx.prepare("INSERT INTO search(uid, body) VALUES (?1, ?2)")?;
             let mut clear_search = tx.prepare("DELETE FROM search WHERE uid = ?1")?;
 
             for n in &batch.nodes {
@@ -634,8 +632,7 @@ impl Store {
         }
 
         {
-            let mut lookup =
-                tx.prepare("SELECT id FROM nodes WHERE uid = ?1")?;
+            let mut lookup = tx.prepare("SELECT id FROM nodes WHERE uid = ?1")?;
             let mut insert_edge = tx.prepare(
                 "INSERT INTO edges(src, dst, kind, status, confidence)
                  VALUES (?1, ?2, ?3, ?4, ?5)
@@ -645,13 +642,13 @@ impl Store {
             // Resolving through a local cache avoids one query per endpoint on repos
             // where a handful of symbols are referenced tens of thousands of times.
             let mut cache: HashMap<String, Option<i64>> = HashMap::new();
-            let mut resolve = |uid: &str, cache: &mut HashMap<String, Option<i64>>| -> Result<Option<i64>> {
+            let mut resolve = |uid: &str,
+                               cache: &mut HashMap<String, Option<i64>>|
+             -> Result<Option<i64>> {
                 if let Some(hit) = cache.get(uid) {
                     return Ok(*hit);
                 }
-                let id: Option<i64> = lookup
-                    .query_row(params![uid], |r| r.get(0))
-                    .optional()?;
+                let id: Option<i64> = lookup.query_row(params![uid], |r| r.get(0)).optional()?;
                 cache.insert(uid.to_string(), id);
                 Ok(id)
             };
@@ -696,14 +693,22 @@ impl Store {
     pub fn node_by_uid(&self, uid: &str) -> Result<Option<Node>> {
         Ok(self
             .conn
-            .query_row(&format!("{NODE_SELECT} WHERE uid = ?1"), params![uid], row_to_node)
+            .query_row(
+                &format!("{NODE_SELECT} WHERE uid = ?1"),
+                params![uid],
+                row_to_node,
+            )
             .optional()?)
     }
 
     pub fn node_by_id(&self, id: i64) -> Result<Option<Node>> {
         Ok(self
             .conn
-            .query_row(&format!("{NODE_SELECT} WHERE id = ?1"), params![id], row_to_node)
+            .query_row(
+                &format!("{NODE_SELECT} WHERE id = ?1"),
+                params![id],
+                row_to_node,
+            )
             .optional()?)
     }
 
@@ -726,8 +731,7 @@ impl Store {
     pub fn count_edges(&self) -> Result<u64> {
         Ok(self
             .conn
-            .query_row("SELECT COUNT(*) FROM edges", [], |r| r.get::<_, i64>(0))?
-            as u64)
+            .query_row("SELECT COUNT(*) FROM edges", [], |r| r.get::<_, i64>(0))? as u64)
     }
 
     pub fn count_edges_of_kind(&self, kind: EdgeKind) -> Result<u64> {
@@ -815,12 +819,11 @@ impl Store {
         let Some(expr) = fts_expression(query) else {
             return Ok(Vec::new());
         };
-        let sql = format!(
-            "SELECT n.id, n.uid, n.kind, n.name, n.path, n.line_start, n.line_end,
+        let sql = "SELECT n.id, n.uid, n.kind, n.name, n.path, n.line_start, n.line_end,
                     n.lang, n.status, n.confidence, n.tokens, n.data, bm25(search)
              FROM search JOIN nodes n ON n.uid = search.uid
              WHERE search MATCH ?1 ORDER BY bm25(search) LIMIT ?2"
-        );
+            .to_string();
         let mut stmt = self.conn.prepare(&sql)?;
         let rows = stmt.query_map(params![expr, limit as i64], |r| {
             let node = row_to_node(r)?;
@@ -833,9 +836,7 @@ impl Store {
         let mut stmt = self
             .conn
             .prepare("SELECT source, locator, kind FROM evidence WHERE node_id = ?1")?;
-        let rows = stmt.query_map(params![node_id], |r| {
-            Ok((r.get(0)?, r.get(1)?, r.get(2)?))
-        })?;
+        let rows = stmt.query_map(params![node_id], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?;
         rows.map(|r| r.map_err(Into::into)).collect()
     }
 
@@ -974,7 +975,10 @@ mod tests {
         let mut b = Batch::default();
         b.node(sym("a.py", "alpha").status(Status::Inferred, 0.3));
         s.commit(b).unwrap();
-        let n = s.node_by_uid(&uid::symbol("a.py", "alpha")).unwrap().unwrap();
+        let n = s
+            .node_by_uid(&uid::symbol("a.py", "alpha"))
+            .unwrap()
+            .unwrap();
         assert_eq!(n.status, Status::Observed);
         assert!((n.confidence - 0.6).abs() < 1e-6);
     }
@@ -986,7 +990,11 @@ mod tests {
         let mut s = Store::in_memory().unwrap();
         let mut b = Batch::default();
         b.node(NewNode::new(uid::file("a.py"), NodeKind::File, "a.py").at("a.py", 0, 0));
-        b.node(NewNode::new(uid::commit("abcdef123456"), NodeKind::Commit, "abcdef1"));
+        b.node(NewNode::new(
+            uid::commit("abcdef123456"),
+            NodeKind::Commit,
+            "abcdef1",
+        ));
         b.node(sym("a.py", "alpha"));
         s.commit(b).unwrap();
         let mut b = Batch::default();
@@ -1009,16 +1017,31 @@ mod tests {
 
         s.forget_file_content("a.py").unwrap();
 
-        assert_eq!(s.count_edges_of_kind(EdgeKind::ChangedBy).unwrap(), 1, "history survives");
-        assert_eq!(s.count_edges_of_kind(EdgeKind::Imports).unwrap(), 0, "content is purged");
-        assert!(s.node_by_uid(&uid::file("a.py")).unwrap().is_some(), "the file node survives");
-        assert!(s.node_by_uid(&uid::symbol("a.py", "alpha")).unwrap().is_none());
+        assert_eq!(
+            s.count_edges_of_kind(EdgeKind::ChangedBy).unwrap(),
+            1,
+            "history survives"
+        );
+        assert_eq!(
+            s.count_edges_of_kind(EdgeKind::Imports).unwrap(),
+            0,
+            "content is purged"
+        );
+        assert!(
+            s.node_by_uid(&uid::file("a.py")).unwrap().is_some(),
+            "the file node survives"
+        );
+        assert!(s
+            .node_by_uid(&uid::symbol("a.py", "alpha"))
+            .unwrap()
+            .is_none());
     }
 
     #[test]
     fn facts_are_scoped_by_kind_and_invalidated_with_their_file() {
         let mut s = Store::in_memory().unwrap();
-        s.put_facts("rule", "a.py", &["r1".into(), "r2".into()]).unwrap();
+        s.put_facts("rule", "a.py", &["r1".into(), "r2".into()])
+            .unwrap();
         s.put_facts("concept", "a.py", &["c1".into()]).unwrap();
         s.put_facts("rule", "b.py", &["r3".into()]).unwrap();
         assert_eq!(s.all_facts("rule").unwrap(), vec!["r1", "r2", "r3"]);
@@ -1083,12 +1106,18 @@ mod tests {
 
         s.forget_file("a.py").unwrap();
 
-        assert!(s.node_by_uid(&uid::symbol("a.py", "alpha")).unwrap().is_none());
+        assert!(s
+            .node_by_uid(&uid::symbol("a.py", "alpha"))
+            .unwrap()
+            .is_none());
         assert_eq!(s.count_edges().unwrap(), 0);
         assert!(s.search("alpha", 10).unwrap().is_empty());
         assert!(s.file_hashes().unwrap().is_empty());
         // The untouched file must survive.
-        assert!(s.node_by_uid(&uid::symbol("b.py", "beta")).unwrap().is_some());
+        assert!(s
+            .node_by_uid(&uid::symbol("b.py", "beta"))
+            .unwrap()
+            .is_some());
     }
 
     #[test]
@@ -1105,8 +1134,14 @@ mod tests {
             0.9,
         ));
         s.commit(b).unwrap();
-        let alpha = s.node_by_uid(&uid::symbol("a.py", "alpha")).unwrap().unwrap();
-        let beta = s.node_by_uid(&uid::symbol("b.py", "beta")).unwrap().unwrap();
+        let alpha = s
+            .node_by_uid(&uid::symbol("a.py", "alpha"))
+            .unwrap()
+            .unwrap();
+        let beta = s
+            .node_by_uid(&uid::symbol("b.py", "beta"))
+            .unwrap()
+            .unwrap();
 
         let out = s.neighbors(alpha.id, Direction::Out, &[]).unwrap();
         assert_eq!(out.len(), 1);
@@ -1127,11 +1162,16 @@ mod tests {
         let mut s = Store::in_memory().unwrap();
         let mut b = Batch::default();
         b.node(
-            NewNode::new(uid::symbol("a.py", "Outer"), NodeKind::Symbol, "Outer").at("a.py", 1, 100),
+            NewNode::new(uid::symbol("a.py", "Outer"), NodeKind::Symbol, "Outer")
+                .at("a.py", 1, 100),
         );
         b.node(
-            NewNode::new(uid::symbol("a.py", "Outer.inner"), NodeKind::Symbol, "inner")
-                .at("a.py", 10, 20),
+            NewNode::new(
+                uid::symbol("a.py", "Outer.inner"),
+                NodeKind::Symbol,
+                "inner",
+            )
+            .at("a.py", 10, 20),
         );
         s.commit(b).unwrap();
         let hit = s.symbol_at("a.py", 15).unwrap().unwrap();
@@ -1149,7 +1189,10 @@ mod tests {
         s.commit(b).unwrap();
         // A raw query like this is an FTS5 syntax error if passed through unescaped.
         let hits = s.search("\"approval\" - corporate (orders)", 10).unwrap();
-        assert!(!hits.is_empty(), "punctuation must not break lexical search");
+        assert!(
+            !hits.is_empty(),
+            "punctuation must not break lexical search"
+        );
     }
 
     #[test]

@@ -90,8 +90,16 @@ pub fn extract(path: &str, text: &str, lang: Lang) -> Result<FileExtract> {
 pub fn is_specification(path: &str) -> bool {
     let lowered = path.to_ascii_lowercase();
     const HISTORICAL: &[&str] = &[
-        "change_log", "changelog", "changes", "release_note", "release-note",
-        "releasenotes", "/news", "history.md", "whatsnew", "migration",
+        "change_log",
+        "changelog",
+        "changes",
+        "release_note",
+        "release-note",
+        "releasenotes",
+        "/news",
+        "history.md",
+        "whatsnew",
+        "migration",
     ];
     !HISTORICAL.iter().any(|marker| lowered.contains(marker))
 }
@@ -142,14 +150,20 @@ pub fn split_markdown(text: &str) -> Vec<Section> {
             }
             Event::End(TagEnd::Heading(_)) => {
                 let level = in_heading.take().unwrap_or(1);
-                finish(&mut sections, std::mem::replace(&mut current, Section {
-                    slug: String::new(),
-                    title: heading_text.trim().to_string(),
-                    level,
-                    line: line_of(text, range.start),
-                    body: String::new(),
-                    lang: None,
-                }));
+                finish(
+                    &mut sections,
+                    std::mem::replace(
+                        &mut current,
+                        Section {
+                            slug: String::new(),
+                            title: heading_text.trim().to_string(),
+                            level,
+                            line: line_of(text, range.start),
+                            body: String::new(),
+                            lang: None,
+                        },
+                    ),
+                );
                 stack.truncate(level.saturating_sub(1) as usize);
                 stack.push(slugify(&heading_text));
                 current.slug = stack.join(".");
@@ -187,7 +201,11 @@ fn split_plain(text: &str) -> Vec<Section> {
 }
 
 fn finish(sections: &mut Vec<Section>, mut section: Section) {
-    section.body = section.body.split_whitespace().collect::<Vec<_>>().join(" ");
+    section.body = section
+        .body
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ");
     if section.body.is_empty() && section.title.is_empty() {
         return;
     }
@@ -290,7 +308,10 @@ Discounts stack additively.
     fn nested_headings_produce_a_dotted_citable_path() {
         let sections = split_markdown(MD);
         let exceptions = sections.iter().find(|s| s.title == "Exceptions").unwrap();
-        assert_eq!(exceptions.slug, "order-approval-brd.approval-thresholds.exceptions");
+        assert_eq!(
+            exceptions.slug,
+            "order-approval-brd.approval-thresholds.exceptions"
+        );
         assert_eq!(exceptions.level, 3);
     }
 
@@ -309,7 +330,10 @@ Discounts stack additively.
             .find(|s| s.title == "Approval thresholds")
             .unwrap();
         assert!(thresholds.body.contains("50M VND"));
-        assert!(!thresholds.body.contains("Strategic accounts"), "must not swallow the child section");
+        assert!(
+            !thresholds.body.contains("Strategic accounts"),
+            "must not swallow the child section"
+        );
     }
 
     #[test]
@@ -319,7 +343,11 @@ Discounts stack additively.
             .iter()
             .find(|s| s.title == "Approval thresholds")
             .unwrap();
-        assert!(thresholds.line >= 4 && thresholds.line <= 6, "got {}", thresholds.line);
+        assert!(
+            thresholds.line >= 4 && thresholds.line <= 6,
+            "got {}",
+            thresholds.line
+        );
     }
 
     #[test]
@@ -356,7 +384,10 @@ Discounts stack additively.
             .iter()
             .find(|n| n.name == "Exceptions")
             .unwrap();
-        assert_eq!(node.uid, "doc:docs/BRD-42.md#order-approval-brd.approval-thresholds.exceptions");
+        assert_eq!(
+            node.uid,
+            "doc:docs/BRD-42.md#order-approval-brd.approval-thresholds.exceptions"
+        );
         assert_eq!(node.data["document"], "Order Approval BRD");
         assert!(node.data["excerpt"].as_str().unwrap().contains("Strategic"));
     }
@@ -382,7 +413,12 @@ Discounts stack additively.
 
     #[test]
     fn plain_text_becomes_a_single_document_section() {
-        let fx = extract("notes.txt", "Corporate orders need approval above the limit.", Lang::Text).unwrap();
+        let fx = extract(
+            "notes.txt",
+            "Corporate orders need approval above the limit.",
+            Lang::Text,
+        )
+        .unwrap();
         assert_eq!(fx.batch.nodes.len(), 1);
         assert_eq!(fx.batch.nodes[0].data["slug"], "_document");
     }

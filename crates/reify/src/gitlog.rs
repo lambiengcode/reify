@@ -219,7 +219,10 @@ fn parse_log(text: &str) -> History {
             continue;
         }
 
-        let header_at = fields.len().checked_sub(4).filter(|&i| is_header(&fields[i..]));
+        let header_at = fields
+            .len()
+            .checked_sub(4)
+            .filter(|&i| is_header(&fields[i..]));
         let (paths, header) = match header_at {
             Some(i) => (&fields[..i], Some(&fields[i..])),
             None => (&fields[..], None),
@@ -350,7 +353,7 @@ pub fn classify(subject: &str) -> ChangeClass {
         return ChangeClass::Revert;
     }
     // Conventional-commit prefix, with or without a scope.
-    let prefix = s.split(|c| c == ':' || c == '(').next().unwrap_or("").trim();
+    let prefix = s.split([':', '(']).next().unwrap_or("").trim();
     match prefix {
         "fix" | "bugfix" | "hotfix" | "patch" => return ChangeClass::Fix,
         "feat" | "feature" => return ChangeClass::Feature,
@@ -410,7 +413,10 @@ mod tests {
     fn conventional_prefixes_classify_exactly() {
         assert_eq!(classify("fix: approval bypass"), ChangeClass::Fix);
         assert_eq!(classify("fix(order): approval bypass"), ChangeClass::Fix);
-        assert_eq!(classify("feat(selling): add discount tier"), ChangeClass::Feature);
+        assert_eq!(
+            classify("feat(selling): add discount tier"),
+            ChangeClass::Feature
+        );
         assert_eq!(classify("refactor: extract policy"), ChangeClass::Refactor);
         assert_eq!(classify("docs: update BRD"), ChangeClass::Docs);
         assert_eq!(classify("chore(deps): bump"), ChangeClass::Chore);
@@ -428,7 +434,10 @@ mod tests {
     #[test]
     fn repositories_without_the_convention_fall_back_to_keywords() {
         assert_eq!(classify("Fix enterprise approval flow"), ChangeClass::Fix);
-        assert_eq!(classify("Add strategic account handling"), ChangeClass::Feature);
+        assert_eq!(
+            classify("Add strategic account handling"),
+            ChangeClass::Feature
+        );
         assert_eq!(classify("Clean up dead code"), ChangeClass::Refactor);
         assert_eq!(classify("Merge branch main"), ChangeClass::Other);
     }
@@ -471,7 +480,13 @@ mod tests {
         let sha2 = "b".repeat(40);
         let sha3 = "c".repeat(40);
         let text = wire(&[
-            (&sha1, 1_555_459_200, "Kai", "fix: approval flow", &["a.py", "b.py"]),
+            (
+                &sha1,
+                1_555_459_200,
+                "Kai",
+                "fix: approval flow",
+                &["a.py", "b.py"],
+            ),
             (&sha2, 1_555_372_800, "Lan", "feat: add tier", &["c.ts"]),
             (&sha3, 1_555_286_400, "Minh", "chore: bump", &["d.md"]),
         ]);
@@ -487,7 +502,13 @@ mod tests {
     #[test]
     fn a_subject_containing_a_nul_lookalike_does_not_split_a_record() {
         let sha = "e".repeat(40);
-        let text = wire(&[(&sha, 1_555_459_200, "Kai", "fix: handle a:b:c ids", &["x.py"])]);
+        let text = wire(&[(
+            &sha,
+            1_555_459_200,
+            "Kai",
+            "fix: handle a:b:c ids",
+            &["x.py"],
+        )]);
         let hist = parse_log(&text);
         assert_eq!(hist.commits.len(), 1);
         assert_eq!(hist.commits[0].subject, "fix: handle a:b:c ids");
@@ -504,8 +525,10 @@ mod tests {
 
     #[test]
     fn by_file_indexes_commits_newest_first() {
-        let mut hist = History::default();
-        hist.commits = vec![commit("aa", &["a.py"]), commit("bb", &["a.py", "b.py"])];
+        let hist = History {
+            commits: vec![commit("aa", &["a.py"]), commit("bb", &["a.py", "b.py"])],
+            ..Default::default()
+        };
         let map = hist.by_file();
         assert_eq!(map["a.py"], vec![0, 1]);
         assert_eq!(map["b.py"], vec![1]);
@@ -513,12 +536,14 @@ mod tests {
 
     #[test]
     fn co_change_requires_repeated_support() {
-        let mut hist = History::default();
-        hist.commits = vec![
-            commit("1", &["a.py", "b.py"]),
-            commit("2", &["a.py", "b.py"]),
-            commit("3", &["a.py", "c.py"]),
-        ];
+        let hist = History {
+            commits: vec![
+                commit("1", &["a.py", "b.py"]),
+                commit("2", &["a.py", "b.py"]),
+                commit("3", &["a.py", "c.py"]),
+            ],
+            ..Default::default()
+        };
         let pairs = hist.co_changes(2, 10);
         assert_eq!(pairs.len(), 1);
         assert_eq!(pairs[0], ("a.py".into(), "b.py".into(), 2));
@@ -528,25 +553,29 @@ mod tests {
     fn sweeping_commits_are_excluded_from_co_change() {
         // A 500-file reformat would otherwise couple the entire repository.
         let wide: Vec<String> = (0..40).map(|i| format!("f{i}.py")).collect();
-        let mut hist = History::default();
-        hist.commits = vec![Commit {
-            sha: "x".into(),
-            timestamp: 0,
-            author: "a".into(),
-            subject: "s".into(),
-            class: ChangeClass::Other,
-            files: wide,
-        }];
+        let hist = History {
+            commits: vec![Commit {
+                sha: "x".into(),
+                timestamp: 0,
+                author: "a".into(),
+                subject: "s".into(),
+                class: ChangeClass::Other,
+                files: wide,
+            }],
+            ..Default::default()
+        };
         assert!(hist.co_changes(1, 100).is_empty());
     }
 
     #[test]
     fn co_change_truncation_is_deterministic() {
-        let mut hist = History::default();
-        hist.commits = vec![
-            commit("1", &["a.py", "b.py"]),
-            commit("2", &["c.py", "d.py"]),
-        ];
+        let hist = History {
+            commits: vec![
+                commit("1", &["a.py", "b.py"]),
+                commit("2", &["c.py", "d.py"]),
+            ],
+            ..Default::default()
+        };
         let first = hist.co_changes(1, 1);
         let second = hist.co_changes(1, 1);
         assert_eq!(first, second);
@@ -587,7 +616,10 @@ mod tests {
         let started = Instant::now();
         let result = run_bounded(sleeper, Duration::from_millis(120)).unwrap();
         assert!(result.is_none());
-        assert!(started.elapsed() < Duration::from_secs(5), "the child was not killed");
+        assert!(
+            started.elapsed() < Duration::from_secs(5),
+            "the child was not killed"
+        );
     }
 
     #[test]

@@ -567,6 +567,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
+ "rayon",
  "regex",
  "reify",
  "serde",

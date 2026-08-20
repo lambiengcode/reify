@@ -59,13 +59,12 @@ fn write_re() -> &'static Regex {
 /// such as "select a plan from the list" reaches this point and must produce nothing.
 const NOT_A_TABLE: &[&str] = &[
     // SQL
-    "select", "where", "dual", "lateral", "unnest", "values", "set", "table", "only",
-    "distinct", "all", "as", "on", "using", "inner", "outer", "left", "right", "full",
-    "cross", "natural",
+    "select", "where", "dual", "lateral", "unnest", "values", "set", "table", "only", "distinct",
+    "all", "as", "on", "using", "inner", "outer", "left", "right", "full", "cross", "natural",
     // English determiners and common prose nouns
-    "the", "a", "an", "this", "that", "these", "those", "it", "its", "my", "our",
-    "your", "their", "his", "her", "list", "each", "any", "some", "which", "what",
-    "here", "there", "them", "us", "me", "you", "we", "they", "he", "she",
+    "the", "a", "an", "this", "that", "these", "those", "it", "its", "my", "our", "your", "their",
+    "his", "her", "list", "each", "any", "some", "which", "what", "here", "there", "them", "us",
+    "me", "you", "we", "they", "he", "she",
 ];
 
 /// Find every table reference in a block of SQL text.
@@ -81,7 +80,9 @@ pub fn table_refs(sql: &str) -> Vec<TableRef> {
     }
     for caps in read_re().captures_iter(sql) {
         if let Some(name) = normalize(&caps[1]) {
-            let already_written = found.iter().any(|r| r.table == name && r.access == Access::Write);
+            let already_written = found
+                .iter()
+                .any(|r| r.table == name && r.access == Access::Write);
             if !already_written {
                 found.insert(TableRef {
                     table: name,
@@ -313,7 +314,7 @@ mod tests {
     #[test]
     fn embedded_sql_is_attributed_to_the_enclosing_symbol() {
         let src = "def load():\n    q = \"SELECT id FROM sales_order\"\n    return q\n";
-        let owner = |line: u32| (line >= 1 && line <= 3).then(|| "sym:a.py#load".to_string());
+        let owner = |line: u32| (1..=3).contains(&line).then(|| "sym:a.py#load".to_string());
         let fx = extract_embedded(src, &owner);
         assert_eq!(fx.batch.edges.len(), 1);
         assert_eq!(fx.batch.edges[0].src, "sym:a.py#load");

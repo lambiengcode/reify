@@ -104,8 +104,9 @@ impl<'a> Ctx<'a> {
     /// Recognise a declaration node and return its kind label and name.
     fn declaration(&self, node: TsNode<'_>) -> Option<(&'static str, String)> {
         let kind = match node.kind() {
-            "function_definition" | "function_declaration"
-            | "generator_function_declaration" => "function",
+            "function_definition" | "function_declaration" | "generator_function_declaration" => {
+                "function"
+            }
             "class_definition" | "class_declaration" | "abstract_class_declaration" => "class",
             "method_definition" => "method",
             "interface_declaration" => "interface",
@@ -127,7 +128,10 @@ impl<'a> Ctx<'a> {
         // definitions, overloads). Uids must stay unique or edges collapse onto one.
         let mut suffix = 2;
         while !self.used_names.insert(qualified.clone()) {
-            qualified = format!("{}~{suffix}", qualified.trim_end_matches(|c: char| c.is_ascii_digit() || c == '~'));
+            qualified = format!(
+                "{}~{suffix}",
+                qualified.trim_end_matches(|c: char| c.is_ascii_digit() || c == '~')
+            );
             suffix += 1;
         }
 
@@ -311,7 +315,8 @@ impl<'a> Ctx<'a> {
         };
         let name = match func.kind() {
             "identifier" => self.slice(func).to_string(),
-            "attribute" | "member_expression" => match self.named_child_text(func, "property")
+            "attribute" | "member_expression" => match self
+                .named_child_text(func, "property")
                 .or_else(|| self.named_child_text(func, "attribute"))
             {
                 Some(p) => p.to_string(),
@@ -351,7 +356,7 @@ fn parse_import_modules(text: &str) -> Vec<String> {
         }
     } else if let Some(rest) = text.strip_prefix("import ") {
         for part in rest.split(',') {
-            let name = part.trim().split_whitespace().next().unwrap_or("");
+            let name = part.split_whitespace().next().unwrap_or("");
             if !name.is_empty() && name != "{" {
                 out.push(name.trim_matches(|c| c == '"' || c == '\'').to_string());
             }
@@ -373,7 +378,7 @@ fn parse_import_modules(text: &str) -> Vec<String> {
 
 fn clean_docstring(raw: &str) -> String {
     let trimmed = raw
-        .trim_start_matches(|c| c == 'r' || c == 'b' || c == 'f' || c == 'u')
+        .trim_start_matches(['r', 'b', 'f', 'u'])
         .trim_matches('"')
         .trim_matches('\'');
     normalize_ws(trimmed).chars().take(400).collect()
@@ -411,7 +416,8 @@ pub fn split_identifier(name: &str) -> Vec<String> {
         let prev = if i > 0 { chars[i - 1] } else { '\0' };
         let next = chars.get(i + 1).copied().unwrap_or('\0');
         let starts_word = ch.is_uppercase()
-            && (prev.is_lowercase() || prev.is_ascii_digit()
+            && (prev.is_lowercase()
+                || prev.is_ascii_digit()
                 || (prev.is_uppercase() && next.is_lowercase()));
         let digit_boundary = ch.is_ascii_digit() != prev.is_ascii_digit() && prev != '\0';
         if (starts_word || digit_boundary) && !current.is_empty() {
@@ -582,14 +588,24 @@ export function helper(a: number) { return a; }
     #[test]
     fn python_docstrings_are_captured_as_symbol_documentation() {
         let fx = extract("order.py", PY, Lang::Python).unwrap();
-        let class = fx.batch.nodes.iter().find(|n| n.name == "OrderService").unwrap();
+        let class = fx
+            .batch
+            .nodes
+            .iter()
+            .find(|n| n.name == "OrderService")
+            .unwrap();
         assert_eq!(class.data["doc"], "Handles order approval.");
     }
 
     #[test]
     fn typescript_leading_comments_become_documentation() {
         let fx = extract("policy.ts", TS, Lang::TypeScript).unwrap();
-        let class = fx.batch.nodes.iter().find(|n| n.name == "DiscountPolicy").unwrap();
+        let class = fx
+            .batch
+            .nodes
+            .iter()
+            .find(|n| n.name == "DiscountPolicy")
+            .unwrap();
         assert_eq!(class.data["doc"], "Applies the discount policy.");
     }
 
@@ -736,7 +752,10 @@ export function helper(a: number) { return a; }
             split_identifier("CUSTOMER_GROUP_ID"),
             vec!["customer", "group", "id"]
         );
-        assert_eq!(split_identifier("HTTPServerError"), vec!["http", "server", "error"]);
+        assert_eq!(
+            split_identifier("HTTPServerError"),
+            vec!["http", "server", "error"]
+        );
         assert_eq!(split_identifier("order2Invoice"), vec!["order", "invoice"]);
     }
 
@@ -759,7 +778,11 @@ export function helper(a: number) { return a; }
         let src = "def f():\n    pass\ndef f():\n    pass\n";
         let fx = extract("d.py", src, Lang::Python).unwrap();
         let uids: HashSet<&str> = fx.batch.nodes.iter().map(|n| n.uid.as_str()).collect();
-        assert_eq!(uids.len(), 2, "redefinitions must not collapse onto one uid");
+        assert_eq!(
+            uids.len(),
+            2,
+            "redefinitions must not collapse onto one uid"
+        );
     }
 
     #[test]

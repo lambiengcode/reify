@@ -16,15 +16,38 @@ pub const MAX_FILE_BYTES: u64 = 2 * 1024 * 1024;
 
 /// Directory names never worth indexing, regardless of ignore files.
 const EXCLUDED_DIRS: &[&str] = &[
-    ".git", ".reify", "node_modules", "target", "dist", "build", "vendor", "__pycache__",
-    ".venv", "venv", ".tox", ".mypy_cache", ".pytest_cache", "site-packages", ".next",
-    "coverage", ".idea", ".vscode",
+    ".git",
+    ".reify",
+    "node_modules",
+    "target",
+    "dist",
+    "build",
+    "vendor",
+    "__pycache__",
+    ".venv",
+    "venv",
+    ".tox",
+    ".mypy_cache",
+    ".pytest_cache",
+    "site-packages",
+    ".next",
+    "coverage",
+    ".idea",
+    ".vscode",
 ];
 
 /// Name suffixes that mark generated or minified output.
 const EXCLUDED_SUFFIXES: &[&str] = &[
-    ".min.js", ".min.css", ".map", ".lock", ".bundle.js", "-lock.json", ".pb.go",
-    "_pb2.py", ".g.dart", ".generated.ts",
+    ".min.js",
+    ".min.css",
+    ".map",
+    ".lock",
+    ".bundle.js",
+    "-lock.json",
+    ".pb.go",
+    "_pb2.py",
+    ".g.dart",
+    ".generated.ts",
 ];
 
 /// One file that will be indexed.
@@ -89,7 +112,7 @@ impl Discovery {
                 None => counts.push((key, 1)),
             }
         }
-        counts.sort_by(|a, b| b.1.cmp(&a.1));
+        counts.sort_by_key(|(_, n)| std::cmp::Reverse(*n));
         counts
     }
 }
@@ -188,8 +211,8 @@ pub fn read_one(root: &Path, rel: &str) -> Result<Option<Discovered>> {
     if meta.len() > MAX_FILE_BYTES {
         return Ok(None);
     }
-    let text = std::fs::read_to_string(&abs)
-        .with_context(|| format!("reading {}", abs.display()))?;
+    let text =
+        std::fs::read_to_string(&abs).with_context(|| format!("reading {}", abs.display()))?;
     let hash = blake3::hash(text.as_bytes()).to_hex().to_string();
     let lines = text.lines().count() as u32;
     Ok(Some(Discovered {
@@ -254,7 +277,11 @@ mod tests {
 
         let found = discover(&d).unwrap();
         let paths: Vec<&str> = found.files.iter().map(|f| f.path.as_str()).collect();
-        assert_eq!(paths, vec!["a.py"], "only the real source file is indexable");
+        assert_eq!(
+            paths,
+            vec!["a.py"],
+            "only the real source file is indexable"
+        );
 
         let reasons: Vec<&str> = found.skipped.iter().map(|(_, r)| r.as_str()).collect();
         assert!(reasons.contains(&"generated or minified"));

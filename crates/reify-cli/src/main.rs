@@ -203,8 +203,7 @@ fn open_existing(root: &Path) -> Result<Store> {
 /// ignores half a repository is worse than one that indexes nothing.
 fn init(root: &Path, json: bool) -> Result<()> {
     let dir = root.join(index::REIFY_DIR);
-    std::fs::create_dir_all(&dir)
-        .with_context(|| format!("creating {}", dir.display()))?;
+    std::fs::create_dir_all(&dir).with_context(|| format!("creating {}", dir.display()))?;
 
     let glossary = dir.join(index::GLOSSARY_FILE);
     let created_glossary = !glossary.exists();
@@ -216,7 +215,10 @@ fn init(root: &Path, json: bool) -> Result<()> {
     // into a shared repository.
     let ignore = dir.join(".gitignore");
     if !ignore.exists() {
-        std::fs::write(&ignore, "# The compiled store is local to this machine.\n*\n")?;
+        std::fs::write(
+            &ignore,
+            "# The compiled store is local to this machine.\n*\n",
+        )?;
     }
 
     let found = reify::discover::discover(root)?;

@@ -29,7 +29,13 @@ const LABEL_KEYS: &[&str] = &["label", "title", "display_name", "caption"];
 
 /// Field types that are layout, not data. They carry no domain vocabulary.
 const LAYOUT_TYPES: &[&str] = &[
-    "Section Break", "Column Break", "Tab Break", "HTML", "Heading", "Button", "Fold",
+    "Section Break",
+    "Column Break",
+    "Tab Break",
+    "HTML",
+    "Heading",
+    "Button",
+    "Fold",
 ];
 
 /// A recognised entity definition.
@@ -75,7 +81,10 @@ pub fn parse(text: &str) -> Option<ModelDefinition> {
         let Some(field) = entry.as_object() else {
             continue;
         };
-        let field_type = field.get("fieldtype").and_then(|v| v.as_str()).unwrap_or("");
+        let field_type = field
+            .get("fieldtype")
+            .and_then(|v| v.as_str())
+            .unwrap_or("");
         if LAYOUT_TYPES.contains(&field_type) {
             continue;
         }
@@ -114,7 +123,9 @@ pub fn extract(path: &str, text: &str) -> FileExtract {
         return out;
     };
 
-    let table = model.table_name().unwrap_or_else(|| model.name.to_ascii_lowercase());
+    let table = model
+        .table_name()
+        .unwrap_or_else(|| model.name.to_ascii_lowercase());
     let table_uid = uid::db_object(&table);
     let field_names: Vec<&str> = model.fields.iter().map(|(m, _)| m.as_str()).collect();
 
@@ -211,11 +222,7 @@ mod tests {
         let model = parse(DOCTYPE).unwrap();
         assert_eq!(model.table_name().as_deref(), Some("tabsales order"));
         let fx = extract("selling/doctype/sales_order/sales_order.json", DOCTYPE);
-        assert!(fx
-            .batch
-            .nodes
-            .iter()
-            .any(|n| n.uid == "db:tabsales order"));
+        assert!(fx.batch.nodes.iter().any(|n| n.uid == "db:tabsales order"));
     }
 
     #[test]

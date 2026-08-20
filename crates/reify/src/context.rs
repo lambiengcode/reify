@@ -19,9 +19,19 @@ use crate::model::{EdgeKind, Node, NodeKind, Status};
 use crate::store::{Direction, Store};
 use crate::tokens;
 
-/// Default budget. Chosen to sit far below what an agent would spend exploring, while
-/// leaving room for the reads the answer recommends.
+/// Default budget. Chosen to sit far below what an agent would spend exploring.
+///
+/// The budget governs the **whole** cost of following the answer: the context output
+/// plus every span it recommends reading. Budgeting only the output would be a lie by
+/// omission — an answer costing 1,400 tokens that tells the agent to read 20,000 more
+/// has not reduced anything.
 pub const DEFAULT_BUDGET: u32 = 4_000;
+
+/// Share of the total budget the compiled context itself may use.
+///
+/// The remainder funds the reading plan. Weighted toward the reads because the answer
+/// is a map, not the territory: its job is to buy precise reads, not to replace them.
+const CONTEXT_SHARE: f32 = 0.4;
 
 /// How far relevance spreads from a seed. Beyond two hops nearly everything in a
 /// mature repository is reachable, so distance stops discriminating.
@@ -36,6 +46,9 @@ const LEXICAL_SEEDS: usize = 60;
 const MAX_NEXT_READS: usize = 6;
 /// Rough tokens per line of source, for estimating the cost of a recommended read.
 const TOKENS_PER_LINE: u32 = 10;
+
+/// How much a directory path agreeing with the task lifts everything inside it.
+const PATH_AFFINITY_WEIGHT: f32 = 1.0;
 
 /// How many items of each kind a compiled context may contain.
 ///
@@ -88,7 +101,14 @@ impl Default for ContextOptions {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct BudgetInfo {
+    /// The total an agent may spend following this answer.
     pub requested: u32,
+    /// Tokens the context output itself costs.
+    pub context: u32,
+    /// Tokens the recommended reads will cost.
+    pub reads: u32,
+    /// `context + reads`. Never exceeds `requested` except for conflicts, which are
+    /// admitted regardless because a known contradiction must never be dropped.
     pub used: u32,
     pub unit: &'static str,
     /// Named so a reported number can be traced to how it was counted.
@@ -203,14 +223,18 @@ struct Scored {
 /// Compile the minimum useful context for `task`.
 pub fn compile(store: &Store, task: &str, opts: &ContextOptions) -> Result<Context> {
     let scored = rank(store, task)?;
-    let selected = select(&scored, opts.budget);
+    let context_budget = (opts.budget as f32 * CONTEXT_SHARE) as u32;
+    let selected = select(&scored, context_budget);
+    let context_cost: u32 = selected.iter().map(|s| s.node.tokens).sum();
 
     let mut context = Context {
         schema: "reify.context/1",
         task: task.to_string(),
         budget: BudgetInfo {
             requested: opts.budget,
-            used: selected.iter().map(|s| s.node.tokens).sum(),
+            context: context_cost,
+            reads: 0,
+            used: context_cost,
             unit: "tokens",
             estimator: tokens::ESTIMATOR,
         },
@@ -244,7 +268,11 @@ pub fn compile(store: &Store, task: &str, opts: &ContextOptions) -> Result<Conte
         }
     }
 
-    context.next_reads = reading_plan(&selected, opts.max_next_reads);
+    // Whatever the context did not spend funds the reading plan.
+    let read_budget = opts.budget.saturating_sub(context_cost);
+    context.next_reads = reading_plan(&selected, opts.max_next_reads, read_budget);
+    context.budget.reads = context.next_reads.iter().map(|r| r.est_tokens).sum();
+    context.budget.used = context.budget.context + context.budget.reads;
 
     if context.concepts.is_empty() {
         context
@@ -285,9 +313,23 @@ fn rank(store: &Store, task: &str) -> Result<Vec<Scored>> {
         // repeating one term; a task names several things and the candidate that
         // mentions more of them is the better answer, so coverage is scored directly.
         let coverage = term_coverage(&node, &asked);
-        let score =
-            relevance * seed_weight(node.kind) * node.confidence * (0.35 + 0.65 * coverage);
-        bump(&mut scores, &mut nodes, node, score, "matches the task text");
+        // In a repository organised by domain — and mature business systems almost
+        // always are — the path is itself evidence. A symbol living under
+        // `.../timesheet_billing_summary/` is about timesheet billing summaries no
+        // matter what the symbol is called, so path agreement lifts everything in it.
+        let affinity = path_affinity(&node, &asked);
+        let score = relevance
+            * seed_weight(node.kind)
+            * node.confidence
+            * (0.35 + 0.65 * coverage)
+            * (1.0 + PATH_AFFINITY_WEIGHT * affinity);
+        bump(
+            &mut scores,
+            &mut nodes,
+            node,
+            score,
+            "matches the task text",
+        );
     }
 
     // Exact identifier hits beat anything lexical scoring can express: naming a symbol
@@ -309,13 +351,9 @@ fn rank(store: &Store, task: &str) -> Result<Vec<Scored>> {
             };
             let parent_name = nodes.get(&id).map(|n| n.name.clone()).unwrap_or_default();
             for direction in [Direction::Out, Direction::In] {
-                for (neighbour, kind, confidence) in
-                    store.neighbors(id, direction, SPREAD_EDGES)?
-                {
-                    let score = parent_score
-                        * kind.weight()
-                        * confidence
-                        * HOP_DECAY.powi(hop as i32 - 1);
+                for (neighbour, kind, confidence) in store.neighbors(id, direction, SPREAD_EDGES)? {
+                    let score =
+                        parent_score * kind.weight() * confidence * HOP_DECAY.powi(hop as i32 - 1);
                     if score < MIN_SCORE {
                         continue;
                     }
@@ -335,7 +373,11 @@ fn rank(store: &Store, task: &str) -> Result<Vec<Scored>> {
     let mut out: Vec<Scored> = scores
         .into_iter()
         .filter_map(|(id, (score, reason))| {
-            nodes.remove(&id).map(|node| Scored { node, score, reason })
+            nodes.remove(&id).map(|node| Scored {
+                node,
+                score,
+                reason,
+            })
         })
         .filter(|s| s.score >= MIN_SCORE)
         .collect();
@@ -371,6 +413,26 @@ fn term_coverage(node: &Node, asked: &BTreeSet<String>) -> f32 {
         }
     }
     let words = meaningful_words(&identity);
+    let matched = asked
+        .iter()
+        .filter(|w| words.contains(*w) || words.iter().any(|c| stem_match(c, w)))
+        .count();
+    matched as f32 / asked.len() as f32
+}
+
+/// The share of the task's words the node's *directory path* mentions.
+///
+/// Computed on the path alone, and on directories rather than the file stem, because
+/// the question it answers is "is this the right area of the system", not "is this the
+/// right function".
+fn path_affinity(node: &Node, asked: &BTreeSet<String>) -> f32 {
+    if asked.is_empty() {
+        return 0.0;
+    }
+    let Some(path) = &node.path else {
+        return 0.0;
+    };
+    let words = meaningful_words(path);
     let matched = asked
         .iter()
         .filter(|w| words.contains(*w) || words.iter().any(|c| stem_match(c, w)))
@@ -479,7 +541,10 @@ fn select(scored: &[Scored], budget: u32) -> Vec<Scored> {
         chosen.push(item.clone());
     };
 
-    for item in scored.iter().filter(|s| s.node.status == Status::Conflicted) {
+    for item in scored
+        .iter()
+        .filter(|s| s.node.status == Status::Conflicted)
+    {
         admit(item, &mut chosen, &mut spent, &mut taken);
     }
     for kind in [NodeKind::Concept, NodeKind::DocSection] {
@@ -523,14 +588,18 @@ fn select(scored: &[Scored], budget: u32) -> Vec<Scored> {
         *tokens_by_kind.entry(kind).or_insert(0) += item.node.tokens;
         admit(item, &mut chosen, &mut spent, &mut taken);
     }
-    // Spend budget the caps left unused on more code, which is what a change needs.
+    // Spend budget the shares left unused on more code, which is what a change needs
+    // — but never past the count cap, or the answer becomes a directory listing.
     for item in &remaining {
+        let kind = item.node.kind;
         if taken.contains(&item.node.id)
-            || item.node.kind != NodeKind::Symbol
+            || kind != NodeKind::Symbol
+            || *count_by_kind.get(&kind).unwrap_or(&0) >= max_items(kind)
             || spent + item.node.tokens > budget
         {
             continue;
         }
+        *count_by_kind.entry(kind).or_insert(0) += 1;
         admit(item, &mut chosen, &mut spent, &mut taken);
     }
 
@@ -542,23 +611,35 @@ fn select(scored: &[Scored], budget: u32) -> Vec<Scored> {
     chosen
 }
 
-/// The spans an agent should open next, highest relevance first.
-fn reading_plan(selected: &[Scored], limit: usize) -> Vec<NextRead> {
+/// The spans an agent should open next, highest relevance first, within budget.
+///
+/// A span that does not fit is skipped rather than truncated, and a cheaper span
+/// further down the list may still be taken — a 400-line class must not block six
+/// precise 20-line methods.
+fn reading_plan(selected: &[Scored], limit: usize, budget: u32) -> Vec<NextRead> {
     let mut plan: Vec<NextRead> = Vec::new();
+    let mut spent = 0u32;
     for item in selected {
-        if item.node.kind != NodeKind::Symbol || item.node.line_start == 0 {
-            continue;
-        }
-        let Some(path) = &item.node.path else { continue };
-        let span = item.node.line_end.saturating_sub(item.node.line_start) + 1;
-        plan.push(NextRead {
-            path: path.clone(),
-            lines: format!("{}-{}", item.node.line_start, item.node.line_end),
-            est_tokens: span * TOKENS_PER_LINE,
-        });
         if plan.len() >= limit {
             break;
         }
+        if item.node.kind != NodeKind::Symbol || item.node.line_start == 0 {
+            continue;
+        }
+        let Some(path) = &item.node.path else {
+            continue;
+        };
+        let span = item.node.line_end.saturating_sub(item.node.line_start) + 1;
+        let cost = span * TOKENS_PER_LINE;
+        if spent + cost > budget {
+            continue;
+        }
+        spent += cost;
+        plan.push(NextRead {
+            path: path.clone(),
+            lines: format!("{}-{}", item.node.line_start, item.node.line_end),
+            est_tokens: cost,
+        });
     }
     plan
 }
@@ -621,7 +702,12 @@ fn conflict_out(node: &Node) -> Option<ConflictOut> {
 }
 
 fn concept_out(node: &Node) -> ConceptOut {
-    let get = |key: &str| node.data.get(key).cloned().unwrap_or(serde_json::Value::Null);
+    let get = |key: &str| {
+        node.data
+            .get(key)
+            .cloned()
+            .unwrap_or(serde_json::Value::Null)
+    };
     ConceptOut {
         id: node
             .data
@@ -790,7 +876,12 @@ class DiscountPolicy:
     #[test]
     fn context_prefers_relevant_code_over_unrelated_code() {
         let (store, root) = indexed();
-        let ctx = compile(&store, "strategic account discount", &ContextOptions::default()).unwrap();
+        let ctx = compile(
+            &store,
+            "strategic account discount",
+            &ContextOptions::default(),
+        )
+        .unwrap();
         let positions: Vec<usize> = ctx
             .code
             .iter()
@@ -811,9 +902,16 @@ class DiscountPolicy:
     #[test]
     fn context_surfaces_the_document_that_states_the_rule() {
         let (store, root) = indexed();
-        let ctx = compile(&store, "strategic account discount", &ContextOptions::default()).unwrap();
+        let ctx = compile(
+            &store,
+            "strategic account discount",
+            &ContextOptions::default(),
+        )
+        .unwrap();
         assert!(
-            ctx.documents.iter().any(|d| d.excerpt.contains("15 percent")),
+            ctx.documents
+                .iter()
+                .any(|d| d.excerpt.contains("15 percent")),
             "documents: {:?}",
             ctx.documents
         );
@@ -856,6 +954,7 @@ class DiscountPolicy:
                 "used {} exceeded budget {budget}",
                 ctx.budget.used
             );
+            assert_eq!(ctx.budget.used, ctx.budget.context + ctx.budget.reads);
         }
         let _ = fs::remove_dir_all(&root);
     }
@@ -872,7 +971,10 @@ class DiscountPolicy:
             &ContextOptions::default(),
         )
         .unwrap();
-        assert!(!ctx.code.is_empty(), "an answer with no code is not an answer");
+        assert!(
+            !ctx.code.is_empty(),
+            "an answer with no code is not an answer"
+        );
         let _ = fs::remove_dir_all(&root);
     }
 
@@ -900,6 +1002,33 @@ class DiscountPolicy:
         let vague = term_coverage(&node("get_orders", "a/report.py"), &asked);
         assert!(focused > vague, "{focused} should exceed {vague}");
         assert!((focused - 1.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn a_symbol_in_a_matching_directory_outranks_one_elsewhere() {
+        let asked: BTreeSet<String> = ["timesheet", "billing", "summary"]
+            .iter()
+            .map(|s| s.to_string())
+            .collect();
+        let node = |path: &str| crate::model::Node {
+            id: 1,
+            uid: path.into(),
+            kind: NodeKind::Symbol,
+            name: "execute".into(),
+            path: Some(path.into()),
+            line_start: 1,
+            line_end: 2,
+            lang: None,
+            status: Status::Confirmed,
+            confidence: 1.0,
+            tokens: 10,
+            data: serde_json::Value::Null,
+        };
+        let inside = path_affinity(&node("report/timesheet_billing_summary/x.py"), &asked);
+        let elsewhere = path_affinity(&node("stock/doctype/bin/bin.py"), &asked);
+        assert!(inside > elsewhere);
+        assert!((inside - 1.0).abs() < 1e-6);
+        assert_eq!(elsewhere, 0.0);
     }
 
     #[test]
@@ -964,12 +1093,49 @@ class DiscountPolicy:
     }
 
     #[test]
+    fn the_reading_plan_is_inside_the_budget_not_beside_it() {
+        // An answer costing 1,400 tokens that tells the agent to read 20,000 more has
+        // reduced nothing. The budget must govern the whole cost of following it.
+        let (store, root) = indexed();
+        for budget in [400u32, 1_000, 4_000] {
+            let ctx = compile(
+                &store,
+                "strategic account discount policy",
+                &ContextOptions {
+                    budget,
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+            let plan: u32 = ctx.next_reads.iter().map(|r| r.est_tokens).sum();
+            assert_eq!(plan, ctx.budget.reads);
+            assert!(
+                ctx.budget.context + plan <= budget,
+                "context {} + reads {plan} exceeded {budget}",
+                ctx.budget.context
+            );
+        }
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
     fn the_answer_is_a_reading_plan_not_a_file_dump() {
         let (store, root) = indexed();
-        let ctx = compile(&store, "strategic account discount", &ContextOptions::default()).unwrap();
-        assert!(!ctx.next_reads.is_empty(), "an agent needs somewhere to go next");
+        let ctx = compile(
+            &store,
+            "strategic account discount",
+            &ContextOptions::default(),
+        )
+        .unwrap();
+        assert!(
+            !ctx.next_reads.is_empty(),
+            "an agent needs somewhere to go next"
+        );
         for read in &ctx.next_reads {
-            assert!(read.lines.contains('-'), "reads must be spans, not whole files");
+            assert!(
+                read.lines.contains('-'),
+                "reads must be spans, not whole files"
+            );
             assert!(read.est_tokens > 0);
         }
         let _ = fs::remove_dir_all(&root);
@@ -979,11 +1145,21 @@ class DiscountPolicy:
     fn compilation_is_deterministic() {
         let (store, root) = indexed();
         let once = serde_json::to_string(
-            &compile(&store, "strategic account discount", &ContextOptions::default()).unwrap(),
+            &compile(
+                &store,
+                "strategic account discount",
+                &ContextOptions::default(),
+            )
+            .unwrap(),
         )
         .unwrap();
         let twice = serde_json::to_string(
-            &compile(&store, "strategic account discount", &ContextOptions::default()).unwrap(),
+            &compile(
+                &store,
+                "strategic account discount",
+                &ContextOptions::default(),
+            )
+            .unwrap(),
         )
         .unwrap();
         assert_eq!(once, twice);
@@ -995,7 +1171,12 @@ class DiscountPolicy:
         // The safety property: an agent must always be able to tell a parsed fact from
         // a guess, on every item in every section.
         let (store, root) = indexed();
-        let ctx = compile(&store, "strategic account discount", &ContextOptions::default()).unwrap();
+        let ctx = compile(
+            &store,
+            "strategic account discount",
+            &ContextOptions::default(),
+        )
+        .unwrap();
         let json = serde_json::to_value(&ctx).unwrap();
         for section in ["concepts", "rules", "code", "documents", "data"] {
             for item in json[section].as_array().unwrap() {

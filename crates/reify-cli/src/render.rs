@@ -101,7 +101,7 @@ pub fn init(
             None => by_lang.push((key, 1)),
         }
     }
-    by_lang.sort_by(|a, b| b.1.cmp(&a.1));
+    by_lang.sort_by_key(|(_, n)| std::cmp::Reverse(*n));
     for (lang, count) in by_lang {
         println!("  {count:>6}  {lang}");
     }
@@ -120,7 +120,10 @@ pub fn index_report(report: &IndexReport, json: bool) -> Result<()> {
         return emit_json(report);
     }
     if report.was_noop() {
-        println!("Nothing changed. {} files already indexed.", report.files_unchanged);
+        println!(
+            "Nothing changed. {} files already indexed.",
+            report.files_unchanged
+        );
         return Ok(());
     }
     println!(
@@ -151,7 +154,10 @@ pub fn index_report(report: &IndexReport, json: bool) -> Result<()> {
         println!("  history walk hit its commit limit; older commits were not read");
     }
     if !report.parse_errors.is_empty() {
-        println!("  {} file(s) could not be parsed:", report.parse_errors.len());
+        println!(
+            "  {} file(s) could not be parsed:",
+            report.parse_errors.len()
+        );
         for error in report.parse_errors.iter().take(5) {
             println!("    {error}");
         }
@@ -189,7 +195,11 @@ pub fn status(store: &Store, root: &std::path::Path, json: bool) -> Result<()> {
     println!("files   {}", out.files);
     match (&out.indexed_head, &out.current_head) {
         (Some(indexed), Some(current)) if indexed != current => {
-            println!("head    {} (working tree is at {}) — run `reify index`", &indexed[..7.min(indexed.len())], &current[..7.min(current.len())]);
+            println!(
+                "head    {} (working tree is at {}) — run `reify index`",
+                &indexed[..7.min(indexed.len())],
+                &current[..7.min(current.len())]
+            );
         }
         (Some(indexed), _) => println!("head    {}", &indexed[..7.min(indexed.len())]),
         _ => println!("head    not a git repository"),
@@ -203,16 +213,26 @@ pub fn context(compiled: &Context, json: bool) -> Result<()> {
     }
     println!("TASK  {}", compiled.task);
     println!(
-        "      {} of {} tokens ({} estimate)",
-        compiled.budget.used, compiled.budget.requested, compiled.budget.estimator
+        "      {} of {} tokens = {} context + {} to read ({} estimate)",
+        compiled.budget.used,
+        compiled.budget.requested,
+        compiled.budget.context,
+        compiled.budget.reads,
+        compiled.budget.estimator
     );
 
     if !compiled.conflicts.is_empty() {
         heading("Conflicts");
         for conflict in &compiled.conflicts {
             println!("  {} {}", tag(conflict.status), conflict.subject);
-            println!("      documented: {} ({})", conflict.documented, conflict.documented_at);
-            println!("      observed:   {} ({})", conflict.observed, conflict.observed_at);
+            println!(
+                "      documented: {} ({})",
+                conflict.documented, conflict.documented_at
+            );
+            println!(
+                "      observed:   {} ({})",
+                conflict.observed, conflict.observed_at
+            );
         }
     }
     if !compiled.concepts.is_empty() {
@@ -265,7 +285,12 @@ pub fn context(compiled: &Context, json: bool) -> Result<()> {
         heading("Documents");
         for doc in &compiled.documents {
             let lang = doc.lang.as_deref().unwrap_or("?");
-            println!("  {} {} [{lang}]  {}", tag(doc.status), doc.location, doc.document);
+            println!(
+                "  {} {} [{lang}]  {}",
+                tag(doc.status),
+                doc.location,
+                doc.document
+            );
             println!("      {}", doc.excerpt);
         }
     }
@@ -284,7 +309,10 @@ pub fn context(compiled: &Context, json: bool) -> Result<()> {
     if !compiled.next_reads.is_empty() {
         heading("Read next");
         for read in &compiled.next_reads {
-            println!("  {}:{}  (~{} tokens)", read.path, read.lines, read.est_tokens);
+            println!(
+                "  {}:{}  (~{} tokens)",
+                read.path, read.lines, read.est_tokens
+            );
         }
     }
     if !compiled.unknowns.is_empty() {
@@ -300,7 +328,11 @@ pub fn why(answer: &WhyAnswer, json: bool) -> Result<()> {
     if json {
         return emit_json(answer);
     }
-    println!("{}  {}", answer.location, answer.symbol.as_deref().unwrap_or(&answer.target));
+    println!(
+        "{}  {}",
+        answer.location,
+        answer.symbol.as_deref().unwrap_or(&answer.target)
+    );
     if let Some(signature) = &answer.signature {
         println!("  {signature}");
     }
@@ -351,7 +383,12 @@ pub fn impact(answer: &ImpactAnswer, json: bool) -> Result<()> {
     if !answer.origins.is_empty() {
         heading("Changing");
         for origin in &answer.origins {
-            println!("  {} {}  {}", tag(origin.status), origin.location, origin.what);
+            println!(
+                "  {} {}  {}",
+                tag(origin.status),
+                origin.location,
+                origin.what
+            );
         }
     }
     if !answer.affected.is_empty() {
@@ -399,7 +436,12 @@ pub fn conflicts(items: &[StoredConflict], json: bool) -> Result<()> {
         return Ok(());
     }
     for conflict in items {
-        println!("\n{} {}  ({:.2})", tag(Status::Conflicted), conflict.subject, conflict.confidence);
+        println!(
+            "\n{} {}  ({:.2})",
+            tag(Status::Conflicted),
+            conflict.subject,
+            conflict.confidence
+        );
         println!("  documented  {}", conflict.documented);
         println!("              {}", conflict.documented_at);
         println!("  observed    {}", conflict.observed);

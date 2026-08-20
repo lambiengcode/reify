@@ -149,11 +149,10 @@ impl RuleCandidate {
         let concepts = meaningful_words(&claim);
         // The id is content-derived so the same rule keeps its identity across
         // reindexing, and so two extractions of the same rule collapse into one.
-        let digest = blake3::hash(
-            format!("{subject}|{polarity:?}|{}", normalize(&claim)).as_bytes(),
-        )
-        .to_hex()
-        .to_string();
+        let digest =
+            blake3::hash(format!("{subject}|{polarity:?}|{}", normalize(&claim)).as_bytes())
+                .to_hex()
+                .to_string();
         RuleCandidate {
             id: uid::rule(&digest),
             path: location.split(':').next().unwrap_or(&location).to_string(),
@@ -187,7 +186,14 @@ struct Subject {
 const SUBJECTS: &[Subject] = &[
     Subject {
         name: "approval",
-        terms: &["approval", "approve", "approved", "phê duyệt", "duyệt", "承認"],
+        terms: &[
+            "approval",
+            "approve",
+            "approved",
+            "phê duyệt",
+            "duyệt",
+            "承認",
+        ],
         require: &["require", "requires", "required", "need", "needs", "must"],
         bypass: &["bypass", "skip", "exempt", "waive", "without"],
     },
@@ -200,7 +206,14 @@ const SUBJECTS: &[Subject] = &[
     Subject {
         name: "validation",
         terms: &["validation", "validate", "kiểm tra", "検証"],
-        require: &["validate", "validates", "reject", "rejects", "block", "blocks"],
+        require: &[
+            "validate",
+            "validates",
+            "reject",
+            "rejects",
+            "block",
+            "blocks",
+        ],
         bypass: &["allow", "allows", "permit", "permits", "ignore"],
     },
     Subject {
@@ -258,7 +271,15 @@ pub fn from_symbol(
     if test_name_re().is_match(name) {
         let phrase = humanise(name);
         if let Some((subject, polarity)) = classify_phrase(&phrase) {
-            push(&mut out, phrase, subject, polarity, RuleSource::Test, location, anchor);
+            push(
+                &mut out,
+                phrase,
+                subject,
+                polarity,
+                RuleSource::Test,
+                location,
+                anchor,
+            );
         }
     }
 
@@ -270,7 +291,9 @@ pub fn from_symbol(
     let lines: Vec<&str> = body.lines().collect();
     for (i, line) in lines.iter().enumerate() {
         let trimmed = line.trim();
-        if !(trimmed.starts_with("if ") || trimmed.starts_with("if(") || trimmed.starts_with("elif "))
+        if !(trimmed.starts_with("if ")
+            || trimmed.starts_with("if(")
+            || trimmed.starts_with("elif "))
         {
             continue;
         }
@@ -361,8 +384,7 @@ fn push(
 /// Is this short enough that a human could verify it against the cited evidence?
 fn is_checkable_claim(claim: &str) -> bool {
     let words = claim.split_whitespace().count();
-    claim.chars().count() <= MAX_CLAIM_CHARS
-        && (MIN_CLAIM_WORDS..=MAX_CLAIM_WORDS).contains(&words)
+    claim.chars().count() <= MAX_CLAIM_CHARS && (MIN_CLAIM_WORDS..=MAX_CLAIM_WORDS).contains(&words)
 }
 
 /// Raise confidence when independent source kinds agree about the same rule.
@@ -549,7 +571,10 @@ fn classify_phrase(phrase: &str) -> Option<(String, Polarity)> {
             continue;
         }
         let signals = |words: &[&str], shared: &[&str]| {
-            words.iter().chain(shared.iter()).any(|w| contains_word(&lowered, w))
+            words
+                .iter()
+                .chain(shared.iter())
+                .any(|w| contains_word(&lowered, w))
         };
         // Bypass wins ties: "requires approval unless exempt" is an exemption rule,
         // and treating it as a plain requirement is the more damaging misreading.
@@ -588,7 +613,9 @@ fn humanise(text: &str) -> String {
             if w.chars().any(|c| c.is_uppercase()) && w.chars().any(|c| c.is_lowercase()) {
                 crate::extract::code::split_identifier(w)
             } else {
-                vec![w.trim_matches(|c: char| c == ':' || c == '(' || c == ')').to_string()]
+                vec![w
+                    .trim_matches(|c: char| c == ':' || c == '(' || c == ')')
+                    .to_string()]
             }
         })
         .filter(|w| !w.is_empty())
@@ -715,7 +742,8 @@ mod tests {
 
     #[test]
     fn a_guard_clause_becomes_a_rule_candidate() {
-        let body = "def check(self):\n    if self.is_strategic:\n        return self.bypass_approval()\n";
+        let body =
+            "def check(self):\n    if self.is_strategic:\n        return self.bypass_approval()\n";
         let rules = from_symbol(
             "check",
             "Order.check",
@@ -754,7 +782,10 @@ mod tests {
     fn ordinary_control_flow_does_not_become_a_business_rule() {
         let body = "def go(self):\n    if x is None:\n        return 0\n    if len(rows) > 10:\n        return rows[:10]\n";
         let rules = from_symbol("go", "A.go", None, body, "a.py:1", "sym:a.py#A.go");
-        assert!(rules.is_empty(), "false positives are the expensive failure: {rules:?}");
+        assert!(
+            rules.is_empty(),
+            "false positives are the expensive failure: {rules:?}"
+        );
     }
 
     #[test]
@@ -790,7 +821,8 @@ mod tests {
 
     #[test]
     fn claims_are_split_on_semicolons_and_bullets() {
-        let text = "Corporate orders must require approval; strategic accounts are exempt from approval";
+        let text =
+            "Corporate orders must require approval; strategic accounts are exempt from approval";
         let rules = from_document(text, "docs/BRD.md#1", "doc:docs/BRD.md#1");
         assert_eq!(rules.len(), 2, "got {rules:#?}");
     }
@@ -916,7 +948,10 @@ mod tests {
         ];
         let before = rules[0].confidence;
         corroborate(&mut rules);
-        assert_eq!(rules[0].confidence, before, "one fact duplicated is not corroboration");
+        assert_eq!(
+            rules[0].confidence, before,
+            "one fact duplicated is not corroboration"
+        );
         assert_eq!(rules[0].status, Status::Inferred);
     }
 
@@ -990,6 +1025,10 @@ mod tests {
         assert_eq!(batch.nodes.len(), 1);
         assert_eq!(batch.edges.len(), 1);
         assert_eq!(batch.edges[0].kind, EdgeKind::ImplementsRule);
-        assert_eq!(batch.evidence.len(), 1, "an inferred rule without evidence is not allowed");
+        assert_eq!(
+            batch.evidence.len(),
+            1,
+            "an inferred rule without evidence is not allowed"
+        );
     }
 }

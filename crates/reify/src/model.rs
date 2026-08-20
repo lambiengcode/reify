@@ -485,7 +485,10 @@ mod tests {
     fn uids_never_embed_line_numbers() {
         // Line numbers in a uid would break incremental caching on every edit above
         // the symbol, so this is a load-bearing property rather than a style rule.
-        assert_eq!(uid::symbol("a/b.py", "Order.total"), "sym:a/b.py#Order.total");
+        assert_eq!(
+            uid::symbol("a/b.py", "Order.total"),
+            "sym:a/b.py#Order.total"
+        );
         assert_eq!(uid::commit("8a31c2fdeadbeef"), "commit:8a31c2fdeadb");
     }
 

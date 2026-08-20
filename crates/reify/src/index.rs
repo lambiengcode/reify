@@ -34,6 +34,9 @@ pub const GLOSSARY_FILE: &str = "glossary.toml";
 /// operation; the applied bound is reported rather than silently imposed.
 pub const DEFAULT_MAX_COMMITS: usize = 20_000;
 
+/// `(path, language, rows)` for one translation file.
+type TranslationFile = (String, String, Vec<(String, String)>);
+
 /// Fact kinds persisted per file so repository-wide stages can rebuild without
 /// re-parsing unchanged files. See [`crate::store::Store::put_facts`].
 const FACT_RULE: &str = "rule";
@@ -143,14 +146,11 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     // --- 3-6. parse changed files in parallel --------------------------------
     // Extraction is pure: text in, staged knowledge out. That is what makes it safe
     // to run across cores and what would make it cacheable by content hash later.
-    let outcomes: Vec<FileOutcome> = changed
-        .par_iter()
-        .map(|file| extract_file(file))
-        .collect();
+    let outcomes: Vec<FileOutcome> = changed.par_iter().map(|file| extract_file(file)).collect();
 
     let mut staged = Batch::default();
     let mut pending: Vec<(String, String, String, EdgeKind)> = Vec::new();
-    let mut translations: Vec<(String, String, Vec<(String, String)>)> = Vec::new();
+    let mut translations: Vec<TranslationFile> = Vec::new();
     let mut mined_rules: Vec<(String, Vec<String>)> = Vec::new();
     let mut declared_concepts: Vec<(String, Vec<String>)> = Vec::new();
 
@@ -158,15 +158,23 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
         match outcome {
             FileOutcome::Failed(message) => {
                 // One unparseable file must never fail a whole index; it is reported.
-                report.parse_errors.push(format!("{}: {message}", file.path));
+                report
+                    .parse_errors
+                    .push(format!("{}: {message}", file.path));
                 staged.node(file_node(file));
                 continue;
             }
-            FileOutcome::Parsed { extract, rows } => {
+            FileOutcome::Parsed(parsed) => {
+                let ParsedFile { extract, rows } = *parsed;
                 staged.node(file_node(file));
                 staged.absorb(extract.batch);
                 for reference in extract.pending {
-                    pending.push((reference.from, reference.name, reference.file, reference.kind));
+                    pending.push((
+                        reference.from,
+                        reference.name,
+                        reference.file,
+                        reference.kind,
+                    ));
                 }
                 for module in extract.imports {
                     if let Some(target) = resolve_module(&module, &file.path, &present) {
@@ -223,9 +231,7 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     for (path, lang, rows) in &translations {
         let payloads: Vec<String> = rows
             .iter()
-            .filter_map(|(source, target)| {
-                serde_json::to_string(&(lang, source, target)).ok()
-            })
+            .filter_map(|(source, target)| serde_json::to_string(&(lang, source, target)).ok())
             .collect();
         store.put_facts(FACT_TRANSLATION, path, &payloads)?;
     }
@@ -311,7 +317,8 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     // --- 10. history, rebuilt only when HEAD moves ---------------------------
     let head = gitlog::head_sha(&opts.root);
     let stored_head = store.meta("head_sha")?;
-    let history_stale = opts.force || head.is_none() != stored_head.is_none() || head != stored_head;
+    let history_stale =
+        opts.force || head.is_none() != stored_head.is_none() || head != stored_head;
     if gitlog::is_repository(&opts.root) && history_stale {
         report.history_rebuilt = true;
         store.forget_history()?;
@@ -341,12 +348,16 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
 }
 
 enum FileOutcome {
-    Parsed {
-        extract: FileExtract,
-        /// Translation rows, when the file is a localisation table.
-        rows: Option<(String, Vec<(String, String)>)>,
-    },
+    /// Boxed because a `FileExtract` is large and this enum is returned once per file
+    /// across the whole repository; the failure variant should not pay for its size.
+    Parsed(Box<ParsedFile>),
     Failed(String),
+}
+
+struct ParsedFile {
+    extract: FileExtract,
+    /// Translation rows, when the file is a localisation table.
+    rows: Option<(String, Vec<(String, String)>)>,
 }
 
 /// Extract one file. Pure: no store access, no shared mutable state.
@@ -364,41 +375,41 @@ fn extract_file(file: &Discovered) -> FileOutcome {
                     let spans = symbol_spans(&fx);
                     let owner_at = |line: u32| owner_for_line(&spans, line);
                     fx.absorb(extract::sqlish::extract_embedded(&text, &owner_at));
-                    FileOutcome::Parsed {
+                    FileOutcome::Parsed(Box::new(ParsedFile {
                         extract: fx,
                         rows: None,
-                    }
+                    }))
                 }
                 Err(e) => FileOutcome::Failed(e.to_string()),
             }
         }
-        Lang::Sql => FileOutcome::Parsed {
+        Lang::Sql => FileOutcome::Parsed(Box::new(ParsedFile {
             extract: extract::sqlish::extract_file(&file.path, &text),
             rows: None,
-        },
+        })),
         Lang::Markdown | Lang::Text => match extract::docs::extract(&file.path, &text, file.lang) {
-            Ok(fx) => FileOutcome::Parsed {
+            Ok(fx) => FileOutcome::Parsed(Box::new(ParsedFile {
                 extract: fx,
                 rows: None,
-            },
+            })),
             Err(e) => FileOutcome::Failed(e.to_string()),
         },
         Lang::Csv => {
             let rows = concepts::translation_language(&file.path)
                 .map(|lang| (lang, concepts::parse_translation_csv(&text)));
-            FileOutcome::Parsed {
+            FileOutcome::Parsed(Box::new(ParsedFile {
                 extract: FileExtract::default(),
                 rows,
-            }
+            }))
         }
-        Lang::Json => FileOutcome::Parsed {
+        Lang::Json => FileOutcome::Parsed(Box::new(ParsedFile {
             extract: extract::schema::extract(&file.path, &text),
             rows: None,
-        },
-        Lang::Yaml | Lang::Other => FileOutcome::Parsed {
+        })),
+        Lang::Yaml | Lang::Other => FileOutcome::Parsed(Box::new(ParsedFile {
             extract: FileExtract::default(),
             rows: None,
-        },
+        })),
     }
 }
 
@@ -419,8 +430,7 @@ fn symbol_spans(fx: &FileExtract) -> Vec<(u32, u32, String)> {
 fn owner_for_line(spans: &[(u32, u32, String)], line: u32) -> Option<String> {
     spans
         .iter()
-        .filter(|(start, end, _)| *start <= line && line <= *end)
-        .next_back()
+        .rfind(|(start, end, _)| *start <= line && line <= *end)
         .map(|(_, _, uid)| uid.clone())
 }
 
@@ -460,7 +470,9 @@ fn resolve_module(module: &str, from: &str, present: &HashSet<&str>) -> Option<S
     } else {
         expand_extensions(&module.replace('.', "/"))
     };
-    candidates.into_iter().find(|c| present.contains(c.as_str()))
+    candidates
+        .into_iter()
+        .find(|c| present.contains(c.as_str()))
 }
 
 fn expand_extensions(stem: &str) -> Vec<String> {
@@ -645,8 +657,14 @@ class SalesOrder:
 
         assert!(report.symbols >= 5, "symbols: {}", report.symbols);
         assert!(report.doc_sections >= 2);
-        assert!(report.database_objects >= 1, "the embedded SQL table must be found");
-        assert!(report.concepts >= 1, "the translation bridge must produce concepts");
+        assert!(
+            report.database_objects >= 1,
+            "the embedded SQL table must be found"
+        );
+        assert!(
+            report.concepts >= 1,
+            "the translation bridge must produce concepts"
+        );
         assert!(report.parse_errors.is_empty(), "{:?}", report.parse_errors);
 
         assert!(store
@@ -684,7 +702,11 @@ class SalesOrder:
         assert_eq!(concept.data["labels"]["vie"], "khách hàng chiến lược");
 
         let mapped = store
-            .neighbors(concept.id, crate::store::Direction::Out, &[EdgeKind::MapsTo])
+            .neighbors(
+                concept.id,
+                crate::store::Direction::Out,
+                &[EdgeKind::MapsTo],
+            )
             .unwrap();
         let targets: Vec<&str> = mapped.iter().map(|(n, _, _)| n.uid.as_str()).collect();
         assert!(
@@ -813,7 +835,10 @@ class SalesOrder:
         let root = conflict_fixture("detect");
         let (store, report) = index_fresh(&root);
         assert!(report.rules >= 2, "both sides must be mined: {report:?}");
-        assert_eq!(report.conflicts, 1, "the planted contradiction must be found");
+        assert_eq!(
+            report.conflicts, 1,
+            "the planted contradiction must be found"
+        );
 
         let conflict = store
             .nodes_of_kind(NodeKind::BusinessRule)
@@ -823,8 +848,14 @@ class SalesOrder:
             .expect("a conflict node must be staged");
         assert_eq!(conflict.status, Status::Conflicted);
         assert_eq!(conflict.data["resolution"], "UNRESOLVED");
-        assert!(conflict.data["documented"].as_str().unwrap().contains("require"));
-        assert!(conflict.data["observed"].as_str().unwrap().contains("bypass"));
+        assert!(conflict.data["documented"]
+            .as_str()
+            .unwrap()
+            .contains("require"));
+        assert!(conflict.data["observed"]
+            .as_str()
+            .unwrap()
+            .contains("bypass"));
         let _ = fs::remove_dir_all(&root);
     }
 
@@ -834,7 +865,10 @@ class SalesOrder:
         // matters most for the feature being trusted.
         let root = fixture("agrees");
         let (_, report) = index_fresh(&root);
-        assert_eq!(report.conflicts, 0, "a consistent repository must stay silent");
+        assert_eq!(
+            report.conflicts, 0,
+            "a consistent repository must stay silent"
+        );
         let _ = fs::remove_dir_all(&root);
     }
 
@@ -900,7 +934,10 @@ class SalesOrder:
             .node_by_uid("sym:app/strategic.py#StrategicAccount")
             .unwrap()
             .is_none());
-        assert!(store.node_by_uid("file:app/strategic.py").unwrap().is_none());
+        assert!(store
+            .node_by_uid("file:app/strategic.py")
+            .unwrap()
+            .is_none());
         let _ = fs::remove_dir_all(&root);
     }
 
@@ -908,7 +945,11 @@ class SalesOrder:
     fn a_file_that_fails_to_parse_is_reported_and_does_not_stop_the_index() {
         let root = fixture("badfile");
         // Valid UTF-8, but not valid Python in a way tree-sitter still recovers from.
-        fs::write(root.join("app/broken.py"), "def ok():\n    pass\n\nclass !!!:\n").unwrap();
+        fs::write(
+            root.join("app/broken.py"),
+            "def ok():\n    pass\n\nclass !!!:\n",
+        )
+        .unwrap();
         let (store, report) = index_fresh(&root);
         assert!(store.node_by_uid("sym:app/broken.py#ok").unwrap().is_some());
         assert!(report.symbols > 0);
@@ -917,7 +958,9 @@ class SalesOrder:
 
     #[test]
     fn relative_imports_resolve_to_files_in_the_repository() {
-        let present: HashSet<&str> = ["app/order.py", "app/util/helpers.py"].into_iter().collect();
+        let present: HashSet<&str> = ["app/order.py", "app/util/helpers.py"]
+            .into_iter()
+            .collect();
         assert_eq!(
             resolve_module(".order", "app/main.py", &present).as_deref(),
             Some("app/order.py")
@@ -935,8 +978,14 @@ class SalesOrder:
             (1, 100, "sym:a.py#Outer".to_string()),
             (10, 20, "sym:a.py#Outer.inner".to_string()),
         ];
-        assert_eq!(owner_for_line(&spans, 15).as_deref(), Some("sym:a.py#Outer.inner"));
-        assert_eq!(owner_for_line(&spans, 50).as_deref(), Some("sym:a.py#Outer"));
+        assert_eq!(
+            owner_for_line(&spans, 15).as_deref(),
+            Some("sym:a.py#Outer.inner")
+        );
+        assert_eq!(
+            owner_for_line(&spans, 50).as_deref(),
+            Some("sym:a.py#Outer")
+        );
         assert_eq!(owner_for_line(&spans, 500), None);
     }
 }

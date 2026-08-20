@@ -1,0 +1,385 @@
+{
+  "repository": "/Users/lambiengcode/Documents/reify/projects/reify/.bench/erpnext",
+  "head": "2328e6da94d3787180251a339384e4ecfebdbef5",
+  "generated_from_commits": 2995,
+  "tasks": [
+    {
+      "id": "t-2328e6da",
+      "prompt": "changing product bundle warehouse should change packed items war…",
+      "ground_truth": [
+        "erpnext/public/js/utils/sales_common.js",
+        "erpnext/stock/doctype/packed_item/packed_item.py"
+      ],
+      "commit": "2328e6da94d3787180251a339384e4ecfebdbef5",
+      "date": "2026-08-20"
+    },
+    {
+      "id": "t-941baffd",
+      "prompt": "correct to and from date filters in timesheet billing summary re…",
+      "ground_truth": [
+        "erpnext/projects/report/timesheet_billing_summary/timesheet_billing_summary.py"
+      ],
+      "commit": "941baffdda02fb993c9a7969866b6221823e7175",
+      "date": "2026-08-20"
+    },
+    {
+      "id": "t-7faadb82",
+      "prompt": "stop doubling totals in timesheet billing summary",
+      "ground_truth": [
+        "erpnext/projects/report/timesheet_billing_summary/timesheet_billing_summary.py"
+      ],
+      "commit": "7faadb8282fae64dac92fe8e5808ff634e651798",
+      "date": "2026-08-20"
+    },
+    {
+      "id": "t-8320c776",
+      "prompt": "scope secondary items to job card",
+      "ground_truth": [
+        "erpnext/stock/doctype/stock_entry/services/manufacturing.py"
+      ],
+      "commit": "8320c77694cbdd07cae373fd5ba968416ed63400",
+      "date": "2026-08-19"
+    },
+    {
+      "id": "t-696f0df8",
+      "prompt": "update pick list status for product bundles",
+      "ground_truth": [
+        "erpnext/stock/doctype/delivery_note/delivery_note.py",
+        "erpnext/stock/doctype/pick_list/mapper.py",
+        "erpnext/stock/doctype/pick_list/pick_list.py"
+      ],
+      "commit": "696f0df81167abad1f1d3c5a419e5e1f30ad922d",
+      "date": "2026-08-19"
+    },
+    {
+      "id": "t-478a2f4f",
+      "prompt": "ignore future stock during batch reservation",
+      "ground_truth": [
+        "erpnext/stock/doctype/stock_reservation_entry/stock_reservation_entry.py"
+      ],
+      "commit": "478a2f4f4b11b963d0740d35a7b0f494cd04cd00",
+      "date": "2026-08-19"
+    },
+    {
+      "id": "t-f4ef7fdb",
+      "prompt": "preserve zero return incoming rates",
+      "ground_truth": [
+        "erpnext/controllers/sales_and_purchase_return.py"
+      ],
+      "commit": "f4ef7fdbcc3438bf2271fe2bc3a80fa334660c25",
+      "date": "2026-08-19"
+    },
+    {
+      "id": "t-e5cd30c5",
+      "prompt": "handle Transaction Deletion Record CSV edge cases",
+      "ground_truth": [
+        "erpnext/setup/doctype/transaction_deletion_record/transaction_deletion_record.py"
+      ],
+      "commit": "e5cd30c5ab1d46479c0c152a6c048cb8a7f65427",
+      "date": "2026-08-19"
+    },
+    {
+      "id": "t-8eeb0196",
+      "prompt": "show backdated batches in stock entry",
+      "ground_truth": [
+        "erpnext/stock/doctype/stock_entry/stock_entry.js"
+      ],
+      "commit": "8eeb0196e46e02b416f630d39489b094b0680b9d",
+      "date": "2026-08-19"
+    },
+    {
+      "id": "t-2524af47",
+      "prompt": "new docs should refetch incoming rates",
+      "ground_truth": [
+        "erpnext/controllers/selling_controller.py"
+      ],
+      "commit": "2524af4758de4ad1730d4143e7f955772a98d2dd",
+      "date": "2026-08-19"
+    },
+    {
+      "id": "t-3a6e17a0",
+      "prompt": "fetch item stock UOM in stock reconciliation",
+      "ground_truth": [
+        "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation.py"
+      ],
+      "commit": "3a6e17a03dcdde388c18fdfa8fd7484e1b4921cf",
+      "date": "2026-08-19"
+    },
+    {
+      "id": "t-8d4c1087",
+      "prompt": "read project from url argument in project portal script",
+      "ground_truth": [
+        "erpnext/templates/pages/projects.js"
+      ],
+      "commit": "8d4c10871dda8cc67da48372a17380324bba9e28",
+      "date": "2026-08-18"
+    },
+    {
+      "id": "t-25dfcb17",
+      "prompt": "escape on status image for workstations in production status",
+      "ground_truth": [
+        "erpnext/manufacturing/doctype/workstation/workstation.py"
+      ],
+      "commit": "25dfcb17c8ef3a3e31fc8cb45c2d3f9713e39ed3",
+      "date": "2026-08-18"
+    },
+    {
+      "id": "t-a3032f2f",
+      "prompt": "serialize document values with tojson in rfq portal script",
+      "ground_truth": [
+        "erpnext/templates/includes/rfq.js"
+      ],
+      "commit": "a3032f2f6640ef80ec8b8ee32c984b231d7ac230",
+      "date": "2026-08-18"
+    },
+    {
+      "id": "t-5c4fb99f",
+      "prompt": "urlencode project name in project portal page and script",
+      "ground_truth": [
+        "erpnext/templates/pages/projects.js"
+      ],
+      "commit": "5c4fb99f6859e15ac3a6bb63af9eddd9d605e860",
+      "date": "2026-08-18"
+    },
+    {
+      "id": "t-d91fce90",
+      "prompt": "use user data fields hook",
+      "ground_truth": [
+        "erpnext/hooks.py"
+      ],
+      "commit": "d91fce90c7853b7dd46a04c18c766757d9ecd16b",
+      "date": "2026-08-18"
+    },
+    {
+      "id": "t-27b06fcb",
+      "prompt": "match returns to source invoice items",
+      "ground_truth": [
+        "erpnext/accounts/report/gross_profit/gross_profit.py"
+      ],
+      "commit": "27b06fcb61788269e3ebccf5c188e14e06aeffe4",
+      "date": "2026-08-18"
+    },
+    {
+      "id": "t-b68324ce",
+      "prompt": "work order finish dialog with process loss qty from job card",
+      "ground_truth": [
+        "erpnext/manufacturing/doctype/job_card/job_card.py",
+        "erpnext/manufacturing/doctype/work_order/work_order.js"
+      ],
+      "commit": "b68324ce784d8781cf3b1a4ac4de1065a2fe24b2",
+      "date": "2026-08-18"
+    },
+    {
+      "id": "t-1fa057b9",
+      "prompt": "skip covered rows when ordering from the mrp report",
+      "ground_truth": [
+        "erpnext/manufacturing/report/material_requirements_planning_report/material_requirements_planning_report.py"
+      ],
+      "commit": "1fa057b9432bb22a02d4f5d4bb1f73dfc09291dc",
+      "date": "2026-08-18"
+    },
+    {
+      "id": "t-1f839061",
+      "prompt": "don't set work order status to In Process only due to skip material transfer",
+      "ground_truth": [
+        "erpnext/manufacturing/doctype/work_order/services/status.py"
+      ],
+      "commit": "1f839061899c019b9a326b960fc5d10b4b34c761",
+      "date": "2026-08-17"
+    },
+    {
+      "id": "t-d40679cf",
+      "prompt": "allocate drop-ship cost by invoice quantity",
+      "ground_truth": [
+        "erpnext/accounts/report/gross_profit/gross_profit.py"
+      ],
+      "commit": "d40679cffe27b91e00cfeec592e59547270efe5b",
+      "date": "2026-08-17"
+    },
+    {
+      "id": "t-4dc0b2ea",
+      "prompt": "fall back to item group defaults for work order warehouses",
+      "ground_truth": [
+        "erpnext/manufacturing/doctype/work_order/services/required_items.py",
+        "erpnext/manufacturing/doctype/work_order/work_order.py"
+      ],
+      "commit": "4dc0b2ea52082847f23ae4965dc129588512a931",
+      "date": "2026-08-17"
+    },
+    {
+      "id": "t-2f82e0dd",
+      "prompt": "fix: add missing permission check on multiple whitelisted methods",
+      "ground_truth": [
+        "erpnext/accounts/doctype/bank_statement_import/bank_statement_import.py"
+      ],
+      "commit": "2f82e0dd36fe3b96c04e8c24999863dd32c6db99",
+      "date": "2026-08-16"
+    },
+    {
+      "id": "t-9a71ab4d",
+      "prompt": "fix: add missing permission check on `get_import_status`",
+      "ground_truth": [
+        "erpnext/accounts/doctype/bank_statement_import/bank_statement_import.py"
+      ],
+      "commit": "9a71ab4d793f410ed3ecc779e46a9007ee77182b",
+      "date": "2026-08-16"
+    },
+    {
+      "id": "t-5a69bb90",
+      "prompt": "fix!: remove unused `get_last_interaction` endpoint",
+      "ground_truth": [
+        "erpnext/crm/doctype/utils.py"
+      ],
+      "commit": "5a69bb900198e707aad7f66baf57b6f4b1a9c20b",
+      "date": "2026-08-16"
+    },
+    {
+      "id": "t-9ee41029",
+      "prompt": "drop removed Restaurant doctype from sales tax template dashboard",
+      "ground_truth": [
+        "erpnext/accounts/doctype/sales_taxes_and_charges_template/sales_taxes_and_charges_template_dashboard.py"
+      ],
+      "commit": "9ee41029c89bd74b666009c04ab0d6d704b19113",
+      "date": "2026-08-16"
+    },
+    {
+      "id": "t-4a5943e2",
+      "prompt": "correct Item Group doctype name in item tax template dashboard",
+      "ground_truth": [
+        "erpnext/accounts/doctype/item_tax_template/item_tax_template_dashboard.py"
+      ],
+      "commit": "4a5943e2fb28befaaf9dba0b25f1e45774915d15",
+      "date": "2026-08-16"
+    },
+    {
+      "id": "t-c6b17299",
+      "prompt": "added permission check for `get_msg_html`",
+      "ground_truth": [
+        "erpnext/setup/doctype/email_digest/email_digest.py"
+      ],
+      "commit": "c6b172999c074cf6353532b757963602b01da507",
+      "date": "2026-08-15"
+    },
+    {
+      "id": "t-7cc236d1",
+      "prompt": "add status filter to Supplier Quotation Comparison report",
+      "ground_truth": [
+        "erpnext/buying/report/supplier_quotation_comparison/supplier_quotation_comparison.js",
+        "erpnext/buying/report/supplier_quotation_comparison/supplier_quotation_comparison.py"
+      ],
+      "commit": "7cc236d1a8a5e6233e92ee4c9d460f29c91c55e9",
+      "date": "2026-08-15"
+    },
+    {
+      "id": "t-70a8a2d0",
+      "prompt": "validate purchase receipt exchange rate parity on purchase invoice",
+      "ground_truth": [
+        "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py"
+      ],
+      "commit": "70a8a2d0c521c4295348446567da631066a0c552",
+      "date": "2026-08-15"
+    },
+    {
+      "id": "t-ef249746",
+      "prompt": "restore subcontracting inward warehouse checks",
+      "ground_truth": [
+        "erpnext/stock/doctype/stock_entry/services/material_receipt_issue.py",
+        "erpnext/stock/doctype/stock_entry/stock_entry.js",
+        "erpnext/stock/doctype/stock_entry/stock_entry.py"
+      ],
+      "commit": "ef24974645cc0c1637a8cc3776720d51171708f8",
+      "date": "2026-08-14"
+    },
+    {
+      "id": "t-fb7c2caf",
+      "prompt": "honour pick serial / batch based on in the batch selector",
+      "ground_truth": [
+        "erpnext/public/js/utils/serial_no_batch_selector.js"
+      ],
+      "commit": "fb7c2caf29563d516a66fe6a6587263a10d508fd",
+      "date": "2026-08-14"
+    },
+    {
+      "id": "t-7c6da80f",
+      "prompt": "validation for task end date check",
+      "ground_truth": [
+        "erpnext/projects/doctype/task/task.py"
+      ],
+      "commit": "7c6da80f9883ee2f6291631c3e1ce8e4086df4d1",
+      "date": "2026-08-14"
+    },
+    {
+      "id": "t-e5c24fb3",
+      "prompt": "cross-plan load and overlap validation in production plan scheduling",
+      "ground_truth": [
+        "erpnext/manufacturing/doctype/production_plan_schedule/production_plan_schedule.py",
+        "erpnext/manufacturing/scheduling/loaders.py",
+        "erpnext/manufacturing/scheduling/plan_adapter.py"
+      ],
+      "commit": "e5c24fb39854ace109dd9eba3895aa2c16bfa29f",
+      "date": "2026-08-14"
+    },
+    {
+      "id": "t-10109674",
+      "prompt": "add shipping contact person to sales order, delivery note and sales invoice",
+      "ground_truth": [
+        "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+        "erpnext/accounts/party.py",
+        "erpnext/public/js/utils/sales_common.js",
+        "erpnext/selling/doctype/sales_order/sales_order.py",
+        "erpnext/stock/doctype/delivery_note/delivery_note.py"
+      ],
+      "commit": "10109674a4505cb5bfde2b71809339774e778b1f",
+      "date": "2026-08-14"
+    },
+    {
+      "id": "t-3558ce3b",
+      "prompt": "opt-in 'Consider Accounting Dimension' filter on General Ledger Report",
+      "ground_truth": [
+        "erpnext/accounts/doctype/accounts_settings/accounts_settings.py",
+        "erpnext/accounts/report/general_ledger/general_ledger.js",
+        "erpnext/startup/boot.py"
+      ],
+      "commit": "3558ce3b599934dc55c150ae0f3be8d42972773f",
+      "date": "2026-08-14"
+    },
+    {
+      "id": "t-9239d1c2",
+      "prompt": "ignore historical negative batch stock in outward validation",
+      "ground_truth": [
+        "erpnext/stock/doctype/serial_and_batch_bundle/serial_and_batch_bundle.py"
+      ],
+      "commit": "9239d1c2a3f4d922f44c624425746519bf44c956",
+      "date": "2026-08-14"
+    },
+    {
+      "id": "t-9613d72d",
+      "prompt": "patch to delete the `crm_deal` custom fields",
+      "ground_truth": [
+        "erpnext/patches/v16_0/remove_frappe_crm_custom_fields.py"
+      ],
+      "commit": "9613d72d8182305148cf0fb4915cb013ea37839d",
+      "date": "2026-08-13"
+    },
+    {
+      "id": "t-be2dea0b",
+      "prompt": "create custom fields for Frappe CRM on enabling synchronization",
+      "ground_truth": [
+        "erpnext/crm/doctype/crm_settings/crm_settings.py"
+      ],
+      "commit": "be2dea0ba2f108f388e39e316d95d4a83442a1a3",
+      "date": "2026-08-13"
+    },
+    {
+      "id": "t-fd728dac",
+      "prompt": "allow purchase returns against a closed purchase order",
+      "ground_truth": [
+        "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+        "erpnext/controllers/buying_controller.py",
+        "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py"
+      ],
+      "commit": "fd728daccaa2f563b1b2592fdedd2a5ff796fb1b",
+      "date": "2026-08-13"
+    }
+  ]
+}
