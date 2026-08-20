@@ -246,6 +246,11 @@ pub fn classify(path: &str) -> Lang {
         "txt" | "rst" | "adoc" => Lang::Text,
         "html" | "htm" | "xhtml" => Lang::Html,
         "docx" => Lang::Docx,
+        "doc" => Lang::Doc,
+        "odt" | "ott" => Lang::Odt,
+        "rtf" => Lang::Rtf,
+        "xlsx" | "xlsm" => Lang::Xlsx,
+        "pptx" => Lang::Pptx,
         "pdf" => Lang::Pdf,
         "csv" => Lang::Csv,
         "json" => Lang::Json,
@@ -285,6 +290,11 @@ mod tests {
         assert_eq!(classify("src/Order.kt"), Lang::Kotlin);
         assert_eq!(classify("db/schema.sql"), Lang::Sql);
         assert_eq!(classify("docs/BRD.docx"), Lang::Docx);
+        assert_eq!(classify("docs/BRD-2011.doc"), Lang::Doc);
+        assert_eq!(classify("docs/spec.odt"), Lang::Odt);
+        assert_eq!(classify("docs/notes.rtf"), Lang::Rtf);
+        assert_eq!(classify("docs/rules.xlsx"), Lang::Xlsx);
+        assert_eq!(classify("docs/kickoff.pptx"), Lang::Pptx);
         assert_eq!(classify("docs/spec.pdf"), Lang::Pdf);
         assert_eq!(classify("wiki/export.html"), Lang::Html);
         assert_eq!(classify("docs/BRD.md"), Lang::Markdown);

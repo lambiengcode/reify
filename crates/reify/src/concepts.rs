@@ -27,17 +27,198 @@ const MIN_GROUNDING: usize = 1;
 const MIN_LABEL_WORD_LEN: usize = 4;
 
 /// Cap on symbols linked to a single concept, so a generic term cannot dominate
-/// retrieval.
+/// retrieval. The strongest bridge may link the most.
 const MAX_LINKS_PER_CONCEPT: usize = 24;
+
+/// How many symbols a concept from each bridge may claim.
+///
+/// A concept a human declared, or that a framework declares in metadata, has earned
+/// the right to name a lot of code. One inferred from the fact that two words appear
+/// near each other has not: linking it as widely makes the graph denser without making
+/// it more informative, and thins the relevance spread for everything else.
+fn max_links(bridge: Bridge) -> usize {
+    match bridge {
+        Bridge::Declared => MAX_LINKS_PER_CONCEPT,
+        Bridge::Translation => 16,
+        Bridge::CoOccurrence => 12,
+        Bridge::CodeVocabulary => 8,
+    }
+}
 
 /// Words that carry no domain meaning in any of the supported languages.
 const STOPWORDS: &[&str] = &[
     // English
-    "the", "and", "for", "with", "from", "this", "that", "are", "was", "were", "has", "have", "not",
-    "all", "any", "can", "may", "must", "shall", "will", "should", "into", "out", "new", "get",
-    "set", "add", "list", "item", "data", "name", "type", "value", // Vietnamese
-    "của", "và", "các", "cho", "một", "này", "đó", "là", "có", "không", "được", "khi", "với",
-    "trong", "theo", "từ", "đến", "hoặc",
+    "the",
+    "and",
+    "for",
+    "with",
+    "from",
+    "this",
+    "that",
+    "are",
+    "was",
+    "were",
+    "has",
+    "have",
+    "not",
+    "all",
+    "any",
+    "can",
+    "may",
+    "must",
+    "shall",
+    "will",
+    "should",
+    "into",
+    "out",
+    "new",
+    "get",
+    "set",
+    "add",
+    "list",
+    "item",
+    "data",
+    "name",
+    "type",
+    "value",
+    // Vietnamese
+    "của",
+    "và",
+    "các",
+    "cho",
+    "một",
+    "này",
+    "đó",
+    "là",
+    "có",
+    "không",
+    "được",
+    "khi",
+    "với",
+    "trong",
+    "theo",
+    "từ",
+    "đến",
+    "hoặc",
+    "những",
+    "đã",
+    "sẽ",
+    "phải",
+    "cần",
+    // German
+    "der",
+    "die",
+    "das",
+    "und",
+    "oder",
+    "für",
+    "mit",
+    "von",
+    "den",
+    "dem",
+    "des",
+    "ein",
+    "eine",
+    "ist",
+    "sind",
+    "wird",
+    "werden",
+    "nicht",
+    "auch",
+    "auf",
+    "aus",
+    "bei",
+    // Thai
+    "และ",
+    "หรือ",
+    "ของ",
+    "ที่",
+    "ใน",
+    "จะ",
+    "ได้",
+    "เป็น",
+    "การ",
+    "ให้",
+    "กับ",
+    "ไม่",
+    // Korean
+    "그리고",
+    "또는",
+    "에서",
+    "으로",
+    "하는",
+    "합니다",
+    "있는",
+    "없는",
+    "이다",
+    "위한",
+    // Japanese
+    "および",
+    "または",
+    "する",
+    "した",
+    "こと",
+    "ため",
+    "これ",
+    "それ",
+    "です",
+    "ます",
+    // Chinese
+    "的",
+    "和",
+    "或",
+    "在",
+    "是",
+    "为",
+    "与",
+    "这",
+    "那",
+    "有",
+    "不",
+    // Spanish / Portuguese / French / Italian
+    "que",
+    "los",
+    "las",
+    "del",
+    "por",
+    "con",
+    "para",
+    "una",
+    "uno",
+    "como",
+    "más",
+    "dos",
+    "das",
+    "não",
+    "são",
+    "ser",
+    "est",
+    "sont",
+    "pour",
+    "dans",
+    "avec",
+    "sur",
+    "les",
+    "des",
+    "une",
+    "qui",
+    "sono",
+    "per",
+    "con",
+    "nel",
+    "della",
+    "delle",
+    // Indonesian / Malay
+    "yang",
+    "dan",
+    "atau",
+    "untuk",
+    "dari",
+    "pada",
+    "dengan",
+    "adalah",
+    "akan",
+    "tidak",
 ];
 
 /// One business concept and every surface form it appears under.
@@ -381,11 +562,25 @@ const MAX_VOCABULARY_CONCEPTS: usize = 400;
 /// one observation — a multi-word phrase that recurs across many identifiers *is* the
 /// domain vocabulary, because that is what naming a domain looks like.
 ///
+/// It is a *fallback*, not a competitor. `already_named` holds the uids some stronger
+/// bridge already reaches, and those are excluded: where a human, a framework or a
+/// translation file has spoken, guessing from identifiers adds nothing and only thins
+/// the relevance spread across a denser graph.
+///
 /// `symbols` is `(name, uid)` for every symbol and database object in the repository.
-pub fn from_code_vocabulary(symbols: &[(String, String)]) -> Vec<Concept> {
+pub fn from_code_vocabulary(
+    symbols: &[(String, String)],
+    already_named: &BTreeSet<String>,
+) -> Vec<Concept> {
+    let symbols: Vec<(String, String)> = symbols
+        .iter()
+        .filter(|(_, uid)| !already_named.contains(uid))
+        .cloned()
+        .collect();
     if symbols.len() < MIN_PHRASE_SYMBOLS {
         return Vec::new();
     }
+    let symbols = &symbols[..];
 
     // Which words are structural in *this* repository rather than domain vocabulary.
     let mut word_frequency: BTreeMap<String, usize> = BTreeMap::new();
@@ -531,7 +726,7 @@ pub fn stage(concepts: &[Concept], grounding: &TermIndex) -> Batch {
         }
         targets.sort();
         targets.dedup();
-        targets.truncate(MAX_LINKS_PER_CONCEPT);
+        targets.truncate(max_links(concept.bridge));
 
         for target in targets {
             // A declared link is as strong as the declaration; a mined one is weaker.
@@ -650,26 +845,76 @@ pub fn translation_language(path: &str) -> Option<String> {
 /// speaks one vocabulary.
 fn three_letter_code(code: &str) -> Option<String> {
     let three = match code {
+        // The languages business documentation actually arrives in. Kept as an
+        // explicit table rather than a crate: the mapping is small, stable, and the
+        // failure mode of a wrong guess is a concept grounded on the wrong language.
         "vi" => "vie",
         "en" => "eng",
-        "ja" => "jpn",
+        "th" => "tha",
         "ko" => "kor",
-        "zh" => "cmn",
-        "fr" => "fra",
+        "ja" => "jpn",
+        "zh" | "cmn" => "cmn",
         "de" => "deu",
+        "fr" => "fra",
         "es" => "spa",
         "pt" => "por",
-        "th" => "tha",
-        "id" => "ind",
         "it" => "ita",
         "nl" => "nld",
         "ru" => "rus",
         "pl" => "pol",
         "tr" => "tur",
         "sv" => "swe",
+        "da" => "dan",
+        "nb" | "no" => "nob",
+        "fi" => "fin",
+        "cs" => "ces",
+        "sk" => "slk",
+        "hu" => "hun",
+        "ro" => "ron",
+        "bg" => "bul",
+        "uk" => "ukr",
         "el" => "ell",
-        "sw" => "swh",
+        "he" => "heb",
+        "ar" => "arb",
+        "fa" => "pes",
+        "hi" => "hin",
+        "bn" => "ben",
+        "ta" => "tam",
+        "te" => "tel",
+        "mr" => "mar",
+        "gu" => "guj",
+        "pa" => "pan",
+        "ur" => "urd",
+        "id" => "ind",
+        "ms" => "zsm",
+        "tl" => "tgl",
+        "km" => "khm",
+        "lo" => "lao",
+        "my" => "mya",
+        "ne" => "nep",
         "si" => "sin",
+        "sw" => "swh",
+        "af" => "afr",
+        "ca" => "cat",
+        "hr" => "hrv",
+        "sr" => "srp",
+        "sl" => "slv",
+        "lt" => "lit",
+        "lv" => "lav",
+        "et" => "est",
+        "az" => "aze",
+        "ka" => "kat",
+        "hy" => "hye",
+        "kk" => "kaz",
+        "uz" => "uzb",
+        "mn" => "mon",
+        "am" => "amh",
+        "yo" => "yor",
+        "zu" => "zul",
+        "eo" => "epo",
+        "jv" => "jav",
+        "mk" => "mkd",
+        "be" => "bel",
         _ => return None,
     };
     Some(three.to_string())
@@ -890,6 +1135,32 @@ mod tests {
         assert_eq!(ids, vec!["STRATEGIC_ACCOUNT_HANDLING"]);
     }
 
+    /// Nothing covered yet: the repository declares no vocabulary at all.
+    fn nothing_named() -> BTreeSet<String> {
+        BTreeSet::new()
+    }
+
+    #[test]
+    fn the_universal_bridge_skips_symbols_a_stronger_bridge_already_reaches() {
+        // It fills gaps. Where a glossary, framework or translation file has already
+        // named something, guessing from identifiers adds noise and no knowledge.
+        let symbols: Vec<(String, String)> = (0..6)
+            .map(|i| {
+                (
+                    format!("patient_encounter_{i}"),
+                    format!("sym:p{i}.java#p{i}"),
+                )
+            })
+            .collect();
+        assert_eq!(from_code_vocabulary(&symbols, &nothing_named()).len(), 1);
+
+        let covered: BTreeSet<String> = symbols.iter().map(|(_, uid)| uid.clone()).collect();
+        assert!(
+            from_code_vocabulary(&symbols, &covered).is_empty(),
+            "already-named symbols must not be mined again"
+        );
+    }
+
     #[test]
     fn vocabulary_concepts_are_mined_from_identifiers_alone() {
         // The universal case: no glossary, no translations, no metadata, no docs.
@@ -906,7 +1177,7 @@ mod tests {
         .map(|(a, b)| (a.to_string(), b.to_string()))
         .collect();
 
-        let concepts = from_code_vocabulary(&symbols);
+        let concepts = from_code_vocabulary(&symbols, &nothing_named());
         let ids: Vec<&str> = concepts.iter().map(|c| c.id.as_str()).collect();
         assert!(ids.contains(&"CUSTOMER_GROUP"), "got {ids:?}");
         let found = concepts.iter().find(|c| c.id == "CUSTOMER_GROUP").unwrap();
@@ -929,7 +1200,7 @@ mod tests {
         .iter()
         .map(|(a, b)| (a.to_string(), b.to_string()))
         .collect();
-        assert!(from_code_vocabulary(&symbols).is_empty());
+        assert!(from_code_vocabulary(&symbols, &nothing_named()).is_empty());
     }
 
     #[test]
@@ -949,7 +1220,7 @@ mod tests {
                 format!("sym:p{i}.java#p{i}"),
             ));
         }
-        let ids: Vec<String> = from_code_vocabulary(&symbols)
+        let ids: Vec<String> = from_code_vocabulary(&symbols, &nothing_named())
             .into_iter()
             .map(|c| c.id)
             .collect();
@@ -975,7 +1246,7 @@ mod tests {
                 )
             })
             .collect();
-        let ids: Vec<String> = from_code_vocabulary(&symbols)
+        let ids: Vec<String> = from_code_vocabulary(&symbols, &nothing_named())
             .into_iter()
             .map(|c| c.id)
             .collect();
@@ -992,8 +1263,8 @@ mod tests {
                 )
             })
             .collect();
-        let first = from_code_vocabulary(&symbols);
-        let second = from_code_vocabulary(&symbols);
+        let first = from_code_vocabulary(&symbols, &nothing_named());
+        let second = from_code_vocabulary(&symbols, &nothing_named());
         assert_eq!(
             first.iter().map(|c| &c.id).collect::<Vec<_>>(),
             second.iter().map(|c| &c.id).collect::<Vec<_>>()
@@ -1112,6 +1383,34 @@ db = ["CUSTOMER_GROUP=7"]
         }];
         let batch = stage(&concepts, &grounding());
         assert_eq!(batch.edges.len(), 1);
+    }
+
+    #[test]
+    fn a_weaker_bridge_links_less_widely() {
+        let mut idx = TermIndex::default();
+        for i in 0..30 {
+            idx.add(
+                &format!("strategic_account_{i}"),
+                &format!("sym:f{i}.py#strategic_account_{i}"),
+            );
+        }
+        let concept_for = |bridge: Bridge| Concept {
+            id: "STRATEGIC_ACCOUNT".into(),
+            labels: BTreeMap::from([("eng".into(), "strategic account".into())]),
+            status: Status::Observed,
+            confidence: 0.8,
+            bridge,
+            ..Concept::default()
+        };
+        let links = |bridge| stage(&[concept_for(bridge)], &idx).edges.len();
+        assert!(
+            links(Bridge::Declared) > links(Bridge::CodeVocabulary),
+            "evidence strength must bound how much code a concept claims"
+        );
+        assert_eq!(
+            links(Bridge::CodeVocabulary),
+            max_links(Bridge::CodeVocabulary)
+        );
     }
 
     #[test]

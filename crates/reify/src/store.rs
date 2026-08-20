@@ -15,7 +15,7 @@ use crate::tokens;
 
 /// Bumped whenever the schema changes shape. A store whose version differs from the
 /// binary's is rebuilt rather than migrated in place; rebuilds are cheap by design.
-pub const SCHEMA_VERSION: i64 = 2;
+pub const SCHEMA_VERSION: i64 = 5;
 
 /// Edge kinds derived from a single file's content, invalidated when its hash changes.
 pub const CONTENT_EDGE_KINDS: &[EdgeKind] = &[
@@ -108,6 +108,23 @@ CREATE TABLE IF NOT EXISTS refs (
 CREATE INDEX IF NOT EXISTS idx_refs_path ON refs(path_id);
 CREATE INDEX IF NOT EXISTS idx_refs_name ON refs(name);
 
+-- A substring index, for scripts that are written without word spacing.
+--
+-- Thai, Lao, Khmer, Japanese and Chinese put no spaces between words, so `unicode61`
+-- emits one enormous token per run of text and a query for a word *inside* that run
+-- matches nothing. Trigrams match substrings in any script at the cost of a larger
+-- index, so they are consulted only when the word index found nothing — Latin queries
+-- never pay for it, and unspaced ones stop failing silently.
+--
+-- Only bodies containing non-ASCII text are indexed here. An ASCII body is fully
+-- served by the word index, and trigramming every identifier in a codebase would
+-- multiply the store to buy nothing.
+CREATE VIRTUAL TABLE IF NOT EXISTS search_ngram USING fts5(
+    uid UNINDEXED,
+    body,
+    tokenize = "trigram"
+);
+
 CREATE TABLE IF NOT EXISTS facts (
     id      INTEGER PRIMARY KEY,
     kind    TEXT NOT NULL,
@@ -117,33 +134,42 @@ CREATE TABLE IF NOT EXISTS facts (
 CREATE INDEX IF NOT EXISTS idx_facts_path ON facts(path);
 CREATE INDEX IF NOT EXISTS idx_facts_kind ON facts(kind, path);
 
+-- The full-text index. Its `rowid` is deliberately the node's `id`.
+--
+-- `uid` is UNINDEXED, so `DELETE FROM search WHERE uid = ?` has no index to use and
+-- scans the whole table. Doing that once per node turns any rebuild into O(n^2) — it
+-- was four seconds to restage 900 concepts on a mid-sized repository. Deleting by
+-- rowid is O(1), and tying the rowid to the node id is what makes that possible.
 CREATE VIRTUAL TABLE IF NOT EXISTS search USING fts5(
     uid UNINDEXED,
     body,
-    tokenize = "unicode61 remove_diacritics 2",
-    -- `detail=none` drops per-token position data, which roughly halves the index.
-    -- Positions are only needed for phrase and NEAR queries, and Reify issues neither:
-    -- every query is rewritten into single quoted terms joined by OR (see
-    -- `fts_expression`), because user text is full of punctuation FTS5 reads as
-    -- operators. bm25 ranking is unaffected.
-    detail = none
+    tokenize = "unicode61 remove_diacritics 2"
+    -- `detail=full`, deliberately, despite `detail=none` being about half the size.
+    --
+    -- Without positions, FTS5 rejects any query term that tokenises to more than one
+    -- token — and in Thai, Khmer, Lao and Japanese a single written word routinely
+    -- does, because the tokenizer splits on combining marks and script boundaries that
+    -- carry no space. A Thai query then fails outright rather than returning results.
+    -- Correctness across the scripts business documentation is written in is worth
+    -- more than the megabytes.
 );
 "#;
 
 /// A piece of evidence supporting a node, staged for insertion.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NewEvidence {
     pub node_uid: String,
     pub source: String,
     pub locator: String,
-    pub kind: &'static str,
+    /// Owned rather than borrowed so a staged batch can be cached and replayed.
+    pub kind: String,
 }
 
 /// Nodes, edges and evidence accumulated by extractors before a single transaction.
 ///
 /// Edges address nodes by uid so an extractor can emit a call to a symbol that has not
 /// been parsed yet, which is the normal case for cross-file references.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct Batch {
     pub nodes: Vec<NewNode>,
     pub edges: Vec<NewEdge>,
@@ -355,8 +381,13 @@ impl Store {
             params![path],
         )?;
         self.conn.execute(
-            "DELETE FROM search WHERE uid IN
-                (SELECT uid FROM nodes WHERE path = ?1 AND kind <> 'File')",
+            "DELETE FROM search WHERE rowid IN
+                (SELECT id FROM nodes WHERE path = ?1 AND kind <> 'File')",
+            params![path],
+        )?;
+        self.conn.execute(
+            "DELETE FROM search_ngram WHERE rowid IN
+                (SELECT id FROM nodes WHERE path = ?1 AND kind <> 'File')",
             params![path],
         )?;
         self.conn.execute(
@@ -382,7 +413,11 @@ impl Store {
             params![path],
         )?;
         self.conn.execute(
-            "DELETE FROM search WHERE uid IN (SELECT uid FROM nodes WHERE path = ?1)",
+            "DELETE FROM search WHERE rowid IN (SELECT id FROM nodes WHERE path = ?1)",
+            params![path],
+        )?;
+        self.conn.execute(
+            "DELETE FROM search_ngram WHERE rowid IN (SELECT id FROM nodes WHERE path = ?1)",
             params![path],
         )?;
         self.conn
@@ -399,7 +434,11 @@ impl Store {
             params![EdgeKind::MapsTo.as_str()],
         )?;
         self.conn.execute(
-            "DELETE FROM search WHERE uid IN (SELECT uid FROM nodes WHERE kind = 'Concept')",
+            "DELETE FROM search WHERE rowid IN (SELECT id FROM nodes WHERE kind = 'Concept')",
+            [],
+        )?;
+        self.conn.execute(
+            "DELETE FROM search_ngram WHERE rowid IN (SELECT id FROM nodes WHERE kind = 'Concept')",
             [],
         )?;
         self.conn
@@ -423,8 +462,13 @@ impl Store {
             [],
         )?;
         self.conn.execute(
-            "DELETE FROM search WHERE uid IN
-                (SELECT uid FROM nodes WHERE kind = 'BusinessRule')",
+            "DELETE FROM search WHERE rowid IN
+                (SELECT id FROM nodes WHERE kind = 'BusinessRule')",
+            [],
+        )?;
+        self.conn.execute(
+            "DELETE FROM search_ngram WHERE rowid IN
+                (SELECT id FROM nodes WHERE kind = 'BusinessRule')",
             [],
         )?;
         self.conn
@@ -476,7 +520,11 @@ impl Store {
             [],
         )?;
         self.conn.execute(
-            "DELETE FROM search WHERE uid IN (SELECT uid FROM nodes WHERE kind = 'Commit')",
+            "DELETE FROM search WHERE rowid IN (SELECT id FROM nodes WHERE kind = 'Commit')",
+            [],
+        )?;
+        self.conn.execute(
+            "DELETE FROM search_ngram WHERE rowid IN (SELECT id FROM nodes WHERE kind = 'Commit')",
             [],
         )?;
         self.conn
@@ -578,7 +626,14 @@ impl Store {
     pub fn groundable_names(&self) -> Result<Vec<(String, String)>> {
         let mut stmt = self
             .conn
-            .prepare("SELECT name, uid FROM nodes WHERE kind IN ('Symbol', 'DatabaseObject')")?;
+            // Ordered by uid, not left to the scan: rewriting one file reassigns
+            // rowids, so an unordered scan returns the same set in a different order.
+            // Anything fingerprinting this list would then see a change that did not
+            // happen, and every stage cache keyed on it would miss forever.
+            .prepare(
+                "SELECT name, uid FROM nodes
+                 WHERE kind IN ('Symbol', 'DatabaseObject') ORDER BY uid",
+            )?;
         let rows = stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?;
         rows.map(|r| r.map_err(Into::into)).collect()
     }
@@ -658,8 +713,13 @@ impl Store {
                                   THEN excluded.status ELSE nodes.status END,
                     confidence = MAX(excluded.confidence, nodes.confidence)",
             )?;
-            let mut insert_search = tx.prepare("INSERT INTO search(uid, body) VALUES (?1, ?2)")?;
-            let mut clear_search = tx.prepare("DELETE FROM search WHERE uid = ?1")?;
+            let mut insert_search =
+                tx.prepare("INSERT INTO search(rowid, uid, body) VALUES (?1, ?2, ?3)")?;
+            let mut clear_search = tx.prepare("DELETE FROM search WHERE rowid = ?1")?;
+            let mut insert_ngram =
+                tx.prepare("INSERT INTO search_ngram(rowid, uid, body) VALUES (?1, ?2, ?3)")?;
+            let mut clear_ngram = tx.prepare("DELETE FROM search_ngram WHERE rowid = ?1")?;
+            let mut node_rowid = tx.prepare("SELECT id FROM nodes WHERE uid = ?1")?;
 
             for n in &batch.nodes {
                 let rendered = render_cost_preview(n);
@@ -677,8 +737,17 @@ impl Store {
                     serde_json::to_string(&n.data)?,
                 ])?;
                 if !n.search_text.is_empty() {
-                    clear_search.execute(params![n.uid])?;
-                    insert_search.execute(params![n.uid, n.search_text])?;
+                    // One indexed lookup, to trade an O(n) scan for an O(1) delete.
+                    let id: i64 = node_rowid.query_row(params![n.uid], |r| r.get(0))?;
+                    clear_search.execute(params![id])?;
+                    insert_search.execute(params![id, n.uid, n.search_text])?;
+                    // Only non-ASCII bodies need substring search. An ASCII body is
+                    // fully served by the word index, and indexing every identifier in
+                    // a codebase as trigrams would multiply the store for nothing.
+                    clear_ngram.execute(params![id])?;
+                    if !n.search_text.is_ascii() {
+                        insert_ngram.execute(params![id, n.uid, n.search_text])?;
+                    }
                 }
                 stats.nodes += 1;
             }
@@ -768,7 +837,8 @@ impl Store {
     pub fn nodes_of_kind(&self, kind: NodeKind) -> Result<Vec<Node>> {
         let mut stmt = self
             .conn
-            .prepare(&format!("{NODE_SELECT} WHERE kind = ?1 ORDER BY name"))?;
+            // `uid` breaks ties so the order is total, for the same reason as above.
+            .prepare(&format!("{NODE_SELECT} WHERE kind = ?1 ORDER BY name, uid"))?;
         let rows = stmt.query_map(params![kind.as_str()], row_to_node)?;
         rows.map(|r| r.map_err(Into::into)).collect()
     }
@@ -872,17 +942,38 @@ impl Store {
         let Some(expr) = fts_expression(query) else {
             return Ok(Vec::new());
         };
-        let sql = "SELECT n.id, n.uid, n.kind, n.name, n.path, n.line_start, n.line_end,
-                    n.lang, n.status, n.confidence, n.tokens, n.data, bm25(search)
-             FROM search JOIN nodes n ON n.uid = search.uid
-             WHERE search MATCH ?1 ORDER BY bm25(search) LIMIT ?2"
-            .to_string();
+        let hits = self.search_table("search", &expr, limit)?;
+        if !hits.is_empty() {
+            return Ok(hits);
+        }
+        // Nothing matched by word. In a script written without spaces the indexed text
+        // is one long token and the query is a substring of it, so fall back to the
+        // trigram index. Latin queries reach this only when they genuinely miss, so
+        // they pay nothing for it.
+        let Some(substring) = trigram_expression(query) else {
+            return Ok(Vec::new());
+        };
+        self.search_table("search_ngram", &substring, limit)
+    }
+
+    fn search_table(&self, table: &str, expr: &str, limit: usize) -> Result<Vec<(Node, f32)>> {
+        let sql = format!(
+            "SELECT n.id, n.uid, n.kind, n.name, n.path, n.line_start, n.line_end,
+                    n.lang, n.status, n.confidence, n.tokens, n.data, bm25({table})
+             FROM {table} JOIN nodes n ON n.uid = {table}.uid
+             WHERE {table} MATCH ?1 ORDER BY bm25({table}) LIMIT ?2"
+        );
         let mut stmt = self.conn.prepare(&sql)?;
         let rows = stmt.query_map(params![expr, limit as i64], |r| {
             let node = row_to_node(r)?;
             Ok((node, -(r.get::<_, f64>(12)? as f32)))
         })?;
-        rows.map(|r| r.map_err(Into::into)).collect()
+        // A malformed expression is "no lexical hits", never an error the caller has
+        // to handle: search is one input to ranking, not the answer.
+        match rows.collect::<rusqlite::Result<Vec<_>>>() {
+            Ok(hits) => Ok(hits),
+            Err(_) => Ok(Vec::new()),
+        }
     }
 
     pub fn evidence_for(&self, node_id: i64) -> Result<Vec<(String, String, String)>> {
@@ -936,18 +1027,19 @@ fn row_to_node(r: &rusqlite::Row<'_>) -> rusqlite::Result<Node> {
 /// when nothing usable is left, which the caller treats as "no lexical hits" rather
 /// than as an error.
 ///
-/// Terms are emitted **unquoted and lowercased**, which matters for two reasons that
-/// pull in the same direction. A quoted term is a phrase, and the index is built with
-/// `detail=none` — half the size, no phrase support. And FTS5's operators are
-/// recognised only in upper case, so a lowercased term can never be mistaken for one:
-/// a query containing the word "or" searches for "or".
+/// Terms are emitted **unquoted and lowercased**: FTS5's operators are recognised only
+/// in upper case, so a lowercased term can never be mistaken for one — a query
+/// containing the word "or" searches for "or".
 fn fts_expression(query: &str) -> Option<String> {
-    // Split exactly where the `unicode61` tokenizer splits, underscores included. A
-    // term the tokenizer would break into several tokens is a *phrase*, which a
-    // `detail=none` index cannot answer — so `customer_group` must arrive as two
-    // terms, which is also how it was indexed.
+    // Only ASCII punctuation is removed, and everything else is left for FTS5 to
+    // tokenise exactly as it tokenised the indexed text.
+    //
+    // Splitting on every non-alphanumeric character looks equivalent and is not: Thai
+    // vowel signs and tone marks are combining marks rather than letters, so that rule
+    // slices a Thai word into fragments that were never indexed as such, and the query
+    // matches nothing. The tokenizer already knows where the boundaries are.
     let terms: Vec<String> = query
-        .split(|c: char| !c.is_alphanumeric())
+        .split(|c: char| c.is_whitespace() || (c.is_ascii() && !c.is_ascii_alphanumeric()))
         .filter(|t| !t.is_empty())
         .map(str::to_lowercase)
         .collect();
@@ -956,6 +1048,20 @@ fn fts_expression(query: &str) -> Option<String> {
     } else {
         Some(terms.join(" OR "))
     }
+}
+
+/// Turn a query into a trigram substring expression.
+///
+/// The trigram tokenizer needs at least three characters, and quoting is required
+/// because a substring may contain anything. Terms are joined with OR so a partial
+/// match still ranks.
+fn trigram_expression(query: &str) -> Option<String> {
+    let terms: Vec<String> = query
+        .split(|c: char| c.is_whitespace() || (c.is_ascii() && !c.is_ascii_alphanumeric()))
+        .filter(|t| t.chars().count() >= 3)
+        .map(|t| format!("\"{}\"", t.to_lowercase().replace('"', "")))
+        .collect();
+    (!terms.is_empty()).then(|| terms.join(" OR "))
 }
 
 /// Approximate what a node costs when rendered into agent-facing context.
@@ -1154,6 +1260,28 @@ mod tests {
     }
 
     #[test]
+    fn groundable_names_come_back_in_a_total_order() {
+        // Load-bearing for the stage caches: rewriting a file changes rowids, and an
+        // unordered scan would make every fingerprint look different.
+        let mut s = Store::in_memory().unwrap();
+        let mut b = Batch::default();
+        for name in ["gamma", "alpha", "beta"] {
+            b.node(sym("a.py", name));
+        }
+        s.commit(b).unwrap();
+        let first = s.groundable_names().unwrap();
+
+        // Rewrite the file, which reassigns every rowid.
+        s.forget_file_content("a.py").unwrap();
+        let mut b = Batch::default();
+        for name in ["beta", "gamma", "alpha"] {
+            b.node(sym("a.py", name));
+        }
+        s.commit(b).unwrap();
+        assert_eq!(first, s.groundable_names().unwrap());
+    }
+
+    #[test]
     fn canonical_dump_is_stable_and_order_independent() {
         let build = |order: [&str; 2]| {
             let mut s = Store::in_memory().unwrap();
@@ -1282,6 +1410,31 @@ mod tests {
     }
 
     #[test]
+    fn restaging_a_node_replaces_its_search_entry_rather_than_duplicating_it() {
+        // The FTS rowid is the node id precisely so this delete is O(1); the entry
+        // must still be replaced exactly once.
+        let mut s = Store::in_memory().unwrap();
+        for body in [
+            "approval for corporate orders",
+            "approval for retail orders",
+        ] {
+            let mut b = Batch::default();
+            b.node(sym("a.py", "alpha").search(body.to_string()));
+            s.commit(b).unwrap();
+        }
+        let hits = s.search("approval", 10).unwrap();
+        assert_eq!(hits.len(), 1, "one node must have one search entry");
+        assert!(
+            s.search("retail", 10).unwrap().len() == 1,
+            "the newest body wins"
+        );
+        assert!(
+            s.search("corporate", 10).unwrap().is_empty(),
+            "the old body is gone"
+        );
+    }
+
+    #[test]
     fn search_ignores_diacritics_so_vietnamese_matches_either_way() {
         let mut s = Store::in_memory().unwrap();
         let mut b = Batch::default();
@@ -1289,6 +1442,42 @@ mod tests {
         s.commit(b).unwrap();
         assert!(!s.search("khach hang", 10).unwrap().is_empty());
         assert!(!s.search("khách hàng", 10).unwrap().is_empty());
+    }
+
+    #[test]
+    fn ascii_bodies_are_kept_out_of_the_substring_index() {
+        // Otherwise the trigram index costs more than the rest of the store combined
+        // on a repository that contains no non-Latin text at all.
+        let mut s = Store::in_memory().unwrap();
+        let mut b = Batch::default();
+        b.node(sym("a.py", "alpha").search("plain ascii identifiers and prose"));
+        s.commit(b).unwrap();
+        let indexed: i64 = s
+            .conn
+            .query_row("SELECT COUNT(*) FROM search_ngram", [], |r| r.get(0))
+            .unwrap();
+        assert_eq!(indexed, 0, "ascii text needs no substring index");
+    }
+
+    #[test]
+    fn scripts_without_word_spacing_are_searchable() {
+        // Thai and Khmer write without spaces, and their combining marks make a single
+        // written word tokenise into several. With a positionless index that is a
+        // phrase query and fails outright.
+        let mut s = Store::in_memory().unwrap();
+        let mut b = Batch::default();
+        b.node(sym("a.py", "approve").search("ลูกค้าเชิงกลยุทธ์ได้รับการยกเว้นการอนุมัติ"));
+        b.node(sym("b.py", "korean").search("전략 고객은 2단계 승인이 면제됩니다"));
+        s.commit(b).unwrap();
+        assert!(s.search("การอนุมัติ", 10).is_ok(), "thai query must not error");
+        assert!(
+            !s.search("การอนุมัติ", 10).unwrap().is_empty(),
+            "and must match"
+        );
+        assert!(
+            !s.search("승인이", 10).unwrap().is_empty(),
+            "korean must match"
+        );
     }
 
     #[test]

@@ -107,7 +107,8 @@ fn the_only_subprocess_reify_runs_is_git() {
     // a small set of system tools, each named here so adding another is a deliberate,
     // reviewed act rather than a silent one:
     //   git        — history, the only thing that can produce it
-    //   pdftotext  — PDF text extraction, absent any usable pure-Rust option
+    //   converters — document text extraction for formats with no usable pure-Rust
+    //                reader; the exact list is asserted separately below
     //   program    — the model provider the *user* configured, which is the whole
     //                point of the design: Reify opens no socket, and the one command
     //                that can reach a network is named by the user, logged on every
@@ -126,16 +127,51 @@ fn the_only_subprocess_reify_runs_is_git() {
             }
         }
     });
-    let allowed: BTreeSet<String> = ["\"git\"", "\"pdftotext\"", "\"sleep\"", "program"]
-        .iter()
-        .map(|s| s.to_string())
-        .collect();
+    let allowed: BTreeSet<String> = [
+        "\"git\"",
+        "\"sleep\"",
+        // Spawned from a reviewed table, asserted by the next test.
+        "c.program",
+        "converter.program",
+        "program",
+    ]
+    .iter()
+    .map(|s| s.to_string())
+    .collect();
     let unexpected: Vec<&String> = commands.difference(&allowed).collect();
     assert!(
         unexpected.is_empty(),
         "unexpected subprocesses: {unexpected:?}\n\
-         Only git and pdftotext are allowed, and adding one means updating this test \
-         and the privacy section of the README. (`sleep` is a timeout test.)"
+         Adding one means updating this test and the privacy section of the README. \
+         (`sleep` is a timeout test.)"
+    );
+}
+
+/// Every document converter Reify can spawn must be a known text extractor.
+///
+/// Asserted against the real table rather than a source grep, so adding a converter
+/// fails this test until the new program has been looked at. None of these can open a
+/// network connection on Reify's behalf, and each is handed a repository file as
+/// *input* rather than being loaded from the repository.
+#[test]
+fn every_document_converter_is_a_reviewed_text_extractor() {
+    let allowed: BTreeSet<&str> = [
+        "pdftotext", // poppler
+        "mutool",    // mupdf
+        "antiword",  // legacy .doc
+        "textutil",  // macOS, built in
+        "soffice",   // LibreOffice
+    ]
+    .into_iter()
+    .collect();
+
+    let declared: BTreeSet<&str> = reify::extract::richdoc::external_tools()
+        .into_iter()
+        .collect();
+    let unexpected: Vec<&&str> = declared.difference(&allowed).collect();
+    assert!(
+        unexpected.is_empty(),
+        "unreviewed document converters: {unexpected:?}"
     );
 }
 

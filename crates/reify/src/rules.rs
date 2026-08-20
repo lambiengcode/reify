@@ -190,22 +190,59 @@ const SUBJECTS: &[Subject] = &[
             "approval",
             "approve",
             "approved",
+            "authorisation",
+            "authorization",
             "phê duyệt",
             "duyệt",
             "承認",
+            "승인",
+            "การอนุมัติ",
+            "อนุมัติ",
+            "genehmigung",
+            "freigabe",
+            "aprobación",
+            "approbation",
+            "aprovação",
+            "persetujuan",
         ],
-        require: &["require", "requires", "required", "need", "needs", "must"],
+        require: &["require", "requires", "required", "need", "needs"],
         bypass: &["bypass", "skip", "exempt", "waive", "without"],
     },
     Subject {
         name: "discount",
-        terms: &["discount", "chiết khấu", "giảm giá", "割引"],
+        terms: &[
+            "discount",
+            "rebate",
+            "chiết khấu",
+            "giảm giá",
+            "割引",
+            "할인",
+            "ส่วนลด",
+            "rabatt",
+            "descuento",
+            "remise",
+            "desconto",
+            "diskon",
+        ],
         require: &["apply", "applies", "grant", "grants", "receive", "receives"],
         bypass: &["deny", "denies", "exclude", "excludes", "no"],
     },
     Subject {
         name: "validation",
-        terms: &["validation", "validate", "kiểm tra", "検証"],
+        terms: &[
+            "validation",
+            "validate",
+            "kiểm tra",
+            "検証",
+            "검증",
+            "การตรวจสอบ",
+            "validierung",
+            "prüfung",
+            "validación",
+            "validation",
+            "validação",
+            "validasi",
+        ],
         require: &[
             "validate",
             "validates",
@@ -218,7 +255,18 @@ const SUBJECTS: &[Subject] = &[
     },
     Subject {
         name: "credit limit",
-        terms: &["credit limit", "hạn mức", "与信限度"],
+        terms: &[
+            "credit limit",
+            "hạn mức",
+            "与信限度",
+            "여신 한도",
+            "วงเงิน",
+            "kreditlimit",
+            "límite de crédito",
+            "limite de crédit",
+            "limite de crédito",
+            "batas kredit",
+        ],
         require: &["enforce", "enforces", "check", "checks", "block", "blocks"],
         bypass: &["override", "overrides", "ignore", "ignores"],
     },
@@ -228,8 +276,53 @@ const SUBJECTS: &[Subject] = &[
 ///
 /// Business documents in the target repositories are frequently not in English, and a
 /// rule miner that only understands English modals silently mines nothing from them.
-const REQUIRE_WORDS: &[&str] = &["must", "shall", "mandatory", "phải", "cần", "bắt buộc"];
-const BYPASS_WORDS: &[&str] = &["exempt", "exempted", "miễn", "bỏ", "qua", "免除"];
+const REQUIRE_WORDS: &[&str] = &[
+    "must",
+    "shall",
+    "mandatory",
+    "required",
+    "phải",
+    "cần",
+    "bắt buộc",
+    "muss",
+    "müssen",
+    "soll",
+    "erforderlich",
+    "debe",
+    "deben",
+    "obligatorio",
+    "doit",
+    "doivent",
+    "obligatoire",
+    "deve",
+    "devem",
+    "obrigatório",
+    "harus",
+    "wajib",
+    "ต้อง",
+    "จะต้อง",
+    "해야",
+    "필수",
+    "必须",
+    "必要",
+];
+const BYPASS_WORDS: &[&str] = &[
+    "exempt",
+    "exempted",
+    "waived",
+    "miễn",
+    "bỏ",
+    "qua",
+    "ausgenommen",
+    "befreit",
+    "exento",
+    "exempté",
+    "isento",
+    "dikecualikan",
+    "免除",
+    "면제",
+    "ยกเว้น",
+];
 
 fn modal_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
@@ -242,7 +335,7 @@ fn modal_re() -> &'static Regex {
         // clauses that contradict the general rule, so a modal-only gate is blind to
         // the most valuable half of the corpus.
         Regex::new(
-            r"(?i)\b(must|shall|should|required to|may not|cannot|is required|are required|exempt|exempted|not required|no longer required|phải|không được|bắt buộc|được miễn|miễn)\b",
+            r"(?i)(\b(must|shall|should|required to|may not|cannot|is required|are required|exempt|exempted|not required|no longer required)\b|\b(phải|không được|bắt buộc|được miễn|miễn|cần phải)\b|\b(muss|müssen|soll|sollen|darf nicht|erforderlich|verpflichtet|ausgenommen|befreit)\b|\b(debe|deben|deberá|obligatorio|exento|no puede)\b|\b(doit|doivent|obligatoire|exempté|ne peut pas)\b|\b(deve|devem|obrigatório|isento)\b|(ต้อง|จะต้อง|ห้าม|ได้รับการยกเว้น)|(해야|하여야|필수|금지|면제)|(しなければならない|する必要|禁止|免除|必須)|(必须|必須|应当|應當|禁止|免除|需要)|\b(harus|wajib|dikecualikan|tidak boleh)\b)",
         )
         .expect("modal regex is a compile-time constant")
     })
@@ -383,9 +476,27 @@ fn push(
 
 /// Is this short enough that a human could verify it against the cited evidence?
 fn is_checkable_claim(claim: &str) -> bool {
-    let words = claim.split_whitespace().count();
-    claim.chars().count() <= MAX_CLAIM_CHARS && (MIN_CLAIM_WORDS..=MAX_CLAIM_WORDS).contains(&words)
+    claim.chars().count() <= MAX_CLAIM_CHARS
+        && (MIN_CLAIM_WORDS..=MAX_CLAIM_WORDS).contains(&claim_length(claim))
 }
+
+/// How long a claim is, in a unit that means the same thing in every script.
+///
+/// Thai, Khmer, Lao, Japanese and Chinese write without spaces, so counting
+/// whitespace-separated words scores an entire sentence as one — and every claim in
+/// those languages is then rejected as too short to be a rule. Where there is no
+/// spacing to count, characters stand in for it.
+fn claim_length(text: &str) -> usize {
+    let words = text.split_whitespace().count();
+    if words > 1 {
+        words
+    } else {
+        text.chars().count() / CHARS_PER_WORD_UNSPACED
+    }
+}
+
+/// Roughly how many characters a word occupies in a script written without spaces.
+const CHARS_PER_WORD_UNSPACED: usize = 6;
 
 /// Raise confidence when independent source kinds agree about the same rule.
 ///
@@ -421,7 +532,7 @@ pub fn corroborate(candidates: &mut [RuleCandidate]) {
 }
 
 /// A documented claim and an implemented claim that disagree.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Conflict {
     pub id: String,
     pub subject: String,
@@ -431,7 +542,10 @@ pub struct Conflict {
     pub observed_at: String,
     pub status: Status,
     pub confidence: f32,
-    pub resolution: &'static str,
+    /// Currently always `UNRESOLVED`. A `String` rather than a constant because a
+    /// resolution a human has recorded is the obvious next state, and because a
+    /// borrowed literal cannot round-trip through the cache.
+    pub resolution: String,
 }
 
 /// Detect conflicts, conservatively.
@@ -493,7 +607,7 @@ pub fn detect_conflicts(candidates: &[RuleCandidate]) -> Vec<Conflict> {
                 observed_at: observed.location.clone(),
                 status: Status::Conflicted,
                 confidence: documented.confidence.min(observed.confidence),
-                resolution: "UNRESOLVED",
+                resolution: "UNRESOLVED".to_string(),
             });
         }
     }
@@ -536,7 +650,7 @@ pub fn stage(candidates: &[RuleCandidate], conflicts: &[Conflict]) -> Batch {
             node_uid: rule.id.clone(),
             source: rule.location.clone(),
             locator: rule.location.clone(),
-            kind: rule.source.as_str(),
+            kind: rule.source.as_str().to_string(),
         });
     }
     for conflict in conflicts {
@@ -600,7 +714,11 @@ fn classify_phrase(phrase: &str) -> Option<(String, Polarity)> {
 /// Multi-word needles ("không được") fall back to substring containment, since word
 /// splitting cannot express them.
 fn contains_word(haystack: &str, needle: &str) -> bool {
-    if needle.contains(' ') {
+    // Whole-word matching is a Latin-script assumption. Korean attaches particles
+    // directly to the stem — `승인` becomes `승인을` — and Thai has no word boundaries
+    // at all, so an exact token comparison finds nothing. Multi-word needles cannot be
+    // expressed by word splitting either.
+    if needle.contains(' ') || !needle.is_ascii() {
         return haystack.contains(needle);
     }
     haystack
@@ -725,6 +843,23 @@ mod tests {
     }
 
     #[test]
+    fn agglutinative_and_unspaced_scripts_still_match() {
+        // Korean attaches particles to the stem and Thai has no word boundaries, so
+        // exact token comparison finds neither.
+        assert!(contains_word("전략 고객은 승인이 면제됩니다", "승인"));
+        assert!(contains_word("ลูกค้าเชิงกลยุทธ์ได้รับการยกเว้น", "ยกเว้น"));
+        // ASCII needles keep whole-word semantics.
+        assert!(!contains_word("send a discount notification", "no"));
+    }
+
+    #[test]
+    fn a_claim_in_an_unspaced_script_is_measured_in_characters() {
+        assert!(claim_length("one two three four") == 4);
+        assert!(claim_length("ลูกค้าองค์กรต้องได้รับการอนุมัติก่อนยืนยันคำสั่งซื้อ") >= MIN_CLAIM_WORDS);
+        assert_eq!(claim_length("short"), 0, "one short token is not a claim");
+    }
+
+    #[test]
     fn substring_matches_do_not_trigger_a_polarity() {
         // "no" inside "notification" must not make this a bypass rule.
         assert!(!contains_word("send a discount notification", "no"));
@@ -805,6 +940,62 @@ mod tests {
         assert_eq!(rules.len(), 1);
         assert_eq!(rules[0].source, RuleSource::Document);
         assert_eq!(rules[0].polarity, Polarity::Require);
+    }
+
+    #[test]
+    fn obligation_sentences_are_recognised_across_languages() {
+        // Business documentation arrives in whatever language the analyst writes in;
+        // a miner that only reads English silently mines nothing from half of them.
+        let cases = [
+            (
+                "Corporate orders must require approval before confirmation",
+                "en",
+            ),
+            (
+                "Đơn hàng doanh nghiệp phải phê duyệt trước khi xử lý đơn",
+                "vi",
+            ),
+            (
+                "Firmenkunden müssen eine Genehmigung erhalten bevor bestellt wird",
+                "de",
+            ),
+            (
+                "Los pedidos corporativos deben tener aprobación antes de confirmar",
+                "es",
+            ),
+            (
+                "Les commandes doivent obtenir une approbation avant confirmation",
+                "fr",
+            ),
+            (
+                "Pesanan korporat harus mendapat persetujuan sebelum dikonfirmasi",
+                "id",
+            ),
+        ];
+        for (text, tag) in cases {
+            let rules = from_document(text, "docs/BRD.md#1", "doc:docs/BRD.md#1");
+            assert_eq!(rules.len(), 1, "{tag}: {text} -> {rules:#?}");
+            assert_eq!(rules[0].subject, "approval", "{tag}");
+        }
+    }
+
+    #[test]
+    fn exemption_clauses_are_recognised_across_languages() {
+        for (text, tag) in [
+            (
+                "Strategic accounts are exempt from level two approval",
+                "en",
+            ),
+            ("Khách hàng chiến lược được miễn phê duyệt cấp hai", "vi"),
+            (
+                "Strategische Kunden sind von der Genehmigung ausgenommen worden",
+                "de",
+            ),
+        ] {
+            let rules = from_document(text, "docs/BRD.md#1", "doc:docs/BRD.md#1");
+            assert_eq!(rules.len(), 1, "{tag}: {rules:#?}");
+            assert_eq!(rules[0].polarity, Polarity::Bypass, "{tag}");
+        }
     }
 
     #[test]

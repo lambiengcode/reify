@@ -229,6 +229,11 @@ pub fn index_report(report: &IndexReport, json: bool) -> Result<()> {
             report.conflicts
         );
     }
+    if std::env::var_os("REIFY_TIMING").is_some() {
+        for (stage, ms) in &report.stage_ms {
+            println!("  {:>7}ms  {stage}", ms);
+        }
+    }
     if report.history_truncated {
         println!("  history walk hit its commit limit; older commits were not read");
     }

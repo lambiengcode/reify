@@ -31,8 +31,11 @@ pub fn extract(path: &str, text: &str, lang: Lang) -> Result<FileExtract> {
     // HTML, DOCX and PDF arrive already converted to the Markdown-shaped
     // intermediate, so one splitter serves every document format and a Confluence
     // export cites exactly like a `.md` file.
+    // Every format that carries headings has already been converted to the
+    // Markdown-shaped intermediate, so one splitter serves them all and a Confluence
+    // export, a Word file and an OpenDocument cite identically.
     let sections = match lang {
-        Lang::Markdown | Lang::Html | Lang::Docx => split_markdown(text),
+        Lang::Markdown | Lang::Html | Lang::Docx | Lang::Odt | Lang::Pptx => split_markdown(text),
         _ => split_plain(text),
     };
 

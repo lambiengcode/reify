@@ -36,8 +36,25 @@ pub const GLOSSARY_FILE: &str = "glossary.toml";
 /// operation; the applied bound is reported rather than silently imposed.
 pub const DEFAULT_MAX_COMMITS: usize = 20_000;
 
+/// Converts a zip-based document's bytes into the Markdown-shaped intermediate.
+type ZipDocReader = fn(&[u8]) -> anyhow::Result<String>;
+/// Converts a document on disk into text via an external program.
+type DelegatedReader = fn(&std::path::Path) -> anyhow::Result<String>;
+
 /// `(path, language, rows)` for one translation file.
 type TranslationFile = (String, String, Vec<(String, String)>);
+
+/// Meta keys holding the fingerprint of each global stage's inputs, and the cached
+/// result computed from them.
+///
+/// A repository-wide stage cannot be made incremental without breaking the guarantee
+/// that an incremental index equals a full one. It can, however, be *skipped* when its
+/// inputs are provably identical — same inputs, same output — which turns the common
+/// case of editing a function body into no work at all.
+const META_CONCEPT_INPUT: &str = "concept_input";
+const META_CONCEPT_CACHE: &str = "concept_cache";
+const META_RULE_INPUT: &str = "rule_input";
+const META_RULE_CACHE: &str = "rule_cache";
 
 /// Fact kinds persisted per file so repository-wide stages can rebuild without
 /// re-parsing unchanged files. See [`crate::store::Store::put_facts`].
@@ -94,6 +111,45 @@ impl IndexOptions {
     }
 }
 
+/// Times each stage and reports its start, so progress and measurement stay in step.
+struct Stages<'a> {
+    opts: &'a IndexOptions,
+    started: Instant,
+    current: Option<String>,
+    timings: Vec<(String, u128)>,
+}
+
+impl<'a> Stages<'a> {
+    fn new(opts: &'a IndexOptions) -> Self {
+        Stages {
+            opts,
+            started: Instant::now(),
+            current: None,
+            timings: Vec::new(),
+        }
+    }
+
+    /// Close the previous stage and open a new one.
+    fn begin(&mut self, name: &str) {
+        self.close();
+        self.opts.report(name, 0, 0);
+        self.current = Some(name.to_string());
+        self.started = Instant::now();
+    }
+
+    fn close(&mut self) {
+        if let Some(name) = self.current.take() {
+            self.timings
+                .push((name, self.started.elapsed().as_millis()));
+        }
+    }
+
+    fn finish(mut self) -> Vec<(String, u128)> {
+        self.close();
+        self.timings
+    }
+}
+
 impl IndexOptions {
     pub fn new(root: impl Into<PathBuf>) -> Self {
         IndexOptions {
@@ -134,6 +190,11 @@ pub struct IndexReport {
     pub history_rebuilt: bool,
     pub history_truncated: bool,
     pub parse_errors: Vec<String>,
+    /// Wall-clock milliseconds per stage, in the order they ran.
+    ///
+    /// Reported rather than logged because the interesting question about indexing is
+    /// never "how long did it take" but "which stage took it".
+    pub stage_ms: Vec<(String, u128)>,
     pub elapsed_ms: u128,
 }
 
@@ -148,9 +209,10 @@ impl IndexReport {
 pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     let started = Instant::now();
     let mut report = IndexReport::default();
+    let mut stages = Stages::new(opts);
 
     // --- 1-2. discover and classify ------------------------------------------
-    opts.report("discovering files", 0, 0);
+    stages.begin("discovering files");
     let found: Discovery = discover::discover(&opts.root)
         .with_context(|| format!("walking {}", opts.root.display()))?;
     report.files_total = found.files.len();
@@ -206,6 +268,7 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     // --- 3-6. parse changed files in parallel --------------------------------
     // Extraction is pure: text in, staged knowledge out. That is what makes it safe
     // to run across cores and what would make it cacheable by content hash later.
+    stages.begin("parsing");
     opts.report("parsing", 0, changed.len());
     let parsed = AtomicUsize::new(0);
     let outcomes: Vec<FileOutcome> = changed
@@ -328,7 +391,7 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     // Repository-wide rather than incremental on purpose: editing one file changes
     // which symbols other files' references resolve to, and re-resolving is a hash
     // lookup per reference.
-    opts.report("resolving references", 0, 0);
+    stages.begin("resolving references");
     let mut symbols = SymbolIndex::default();
     for (name, node_uid, path, lang) in store.symbol_triples()? {
         symbols.add(&name, &node_uid, &path, lang);
@@ -348,80 +411,148 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     report.unresolved_refs += stats.unresolved_edges;
 
     // --- 8. concepts, rebuilt globally every run -----------------------------
-    opts.report("linking concepts", 0, 0);
+    stages.begin("clearing old concepts");
     store.forget_concepts()?;
+    stages.begin("indexing vocabulary");
+    let groundable = store.groundable_names()?;
     let mut grounding = TermIndex::default();
-    for (name, node_uid) in store.groundable_names()? {
-        grounding.add(&name, &node_uid);
-    }
-    let glossary = Glossary::load(&opts.glossary_path())?;
-    let mut sources = vec![glossary.concepts];
-
-    // Concepts declared by structured model metadata, from every file — including
-    // files this run did not parse, which is exactly what the fact store is for.
-    sources.push(
-        store
-            .all_facts(FACT_CONCEPT)?
-            .iter()
-            .filter_map(|payload| serde_json::from_str::<Concept>(payload).ok())
-            .collect(),
-    );
-
-    // Translation rows, grouped by target language.
-    let mut by_language: std::collections::BTreeMap<String, Vec<(String, String)>> =
-        std::collections::BTreeMap::new();
-    for payload in store.all_facts(FACT_TRANSLATION)? {
-        if let Ok((lang, source, target)) =
-            serde_json::from_str::<(String, String, String)>(&payload)
-        {
-            by_language.entry(lang).or_default().push((source, target));
-        }
-    }
-    // Message bundles are joined across locales here, once every one has been read:
-    // the source string lives in the base bundle and the translation in another file.
-    let bundles: Vec<(Option<String>, String, String)> = store
-        .all_facts(FACT_MESSAGE)?
-        .iter()
-        .filter_map(|payload| serde_json::from_str(payload).ok())
-        .collect();
-    for (lang, rows) in concepts::join_message_bundles(&bundles) {
-        by_language.entry(lang).or_default().extend(rows);
+    for (name, node_uid) in &groundable {
+        grounding.add(name, node_uid);
     }
 
-    for (lang, rows) in &by_language {
-        sources.push(concepts::from_translations(lang, rows, &grounding));
-    }
+    // Mining is the expensive half and depends only on repository-wide inputs, so it
+    // is skipped when those are unchanged. Staging always runs: a changed file's nodes
+    // were deleted, taking their concept links with them.
+    stages.begin("checking concept cache");
+    let glossary_text = std::fs::read_to_string(opts.glossary_path()).unwrap_or_default();
+    let concept_facts = store.all_facts(FACT_CONCEPT)?;
+    let translation_facts = store.all_facts(FACT_TRANSLATION)?;
+    let message_facts = store.all_facts(FACT_MESSAGE)?;
     let headings: Vec<String> = store
         .nodes_of_kind(NodeKind::DocSection)?
         .into_iter()
         .map(|n| n.name)
         .collect();
-    sources.push(concepts::from_headings(&headings, &grounding));
+    let concept_input = fingerprint(&[
+        &groundable
+            .iter()
+            .map(|(n, u)| format!("{n}\u{1}{u}"))
+            .collect::<Vec<_>>(),
+        &concept_facts,
+        &translation_facts,
+        &message_facts,
+        &headings,
+        &vec![glossary_text],
+    ]);
 
-    // The universal bridge, last because it is the weakest and first because it is the
-    // only one that is always available: a repository that declares nothing — no
-    // glossary, no translations, no entity metadata, no documentation — still has
-    // identifiers, and a phrase its identifiers keep repeating is its vocabulary.
-    let groundable = store.groundable_names()?;
-    sources.push(concepts::from_code_vocabulary(&groundable));
-    let merged = concepts::merge(sources);
-    store.commit(concepts::stage(&merged, &grounding))?;
+    // The cache holds the *staged batch*, not the mined concept list. Mining is the
+    // cheaper half; resolving every concept's label words against the grounding index
+    // is what costs, and its result is a pure function of the same inputs.
+    stages.begin("mining concepts");
+    let cached = (!opts.force && store.meta(META_CONCEPT_INPUT)? == Some(concept_input.clone()))
+        .then(|| store.meta(META_CONCEPT_CACHE))
+        .transpose()?
+        .flatten()
+        .and_then(|json| serde_json::from_str::<Batch>(json.as_str()).ok());
+
+    let staged = match cached {
+        Some(batch) => batch,
+        None => {
+            let glossary = Glossary::load(&opts.glossary_path())?;
+            let mut sources = vec![glossary.concepts];
+            sources.push(
+                concept_facts
+                    .iter()
+                    .filter_map(|payload| serde_json::from_str::<Concept>(payload).ok())
+                    .collect(),
+            );
+
+            let mut by_language: std::collections::BTreeMap<String, Vec<(String, String)>> =
+                std::collections::BTreeMap::new();
+            for payload in &translation_facts {
+                if let Ok((lang, source, target)) =
+                    serde_json::from_str::<(String, String, String)>(payload)
+                {
+                    by_language.entry(lang).or_default().push((source, target));
+                }
+            }
+            // Message bundles are joined across locales here, once every one has been
+            // read: the source string lives in the base bundle, the translation in
+            // another file.
+            let bundles: Vec<(Option<String>, String, String)> = message_facts
+                .iter()
+                .filter_map(|payload| serde_json::from_str(payload).ok())
+                .collect();
+            for (lang, rows) in concepts::join_message_bundles(&bundles) {
+                by_language.entry(lang).or_default().extend(rows);
+            }
+            for (lang, rows) in &by_language {
+                sources.push(concepts::from_translations(lang, rows, &grounding));
+            }
+            sources.push(concepts::from_headings(&headings, &grounding));
+
+            // The universal bridge, weakest and always available: a repository that
+            // declares nothing still has identifiers, and a phrase its identifiers keep
+            // repeating is its vocabulary. It runs last and only on what the stronger
+            // bridges left uncovered, so it fills gaps instead of competing.
+            let declared = concepts::merge(sources.clone());
+            let already_named: BTreeSet<String> = concepts::stage(&declared, &grounding)
+                .edges
+                .iter()
+                .map(|e| e.dst.clone())
+                .collect();
+            sources.push(concepts::from_code_vocabulary(&groundable, &already_named));
+
+            let merged = concepts::merge(sources);
+            let batch = concepts::stage(&merged, &grounding);
+            store.set_meta(META_CONCEPT_INPUT, &concept_input)?;
+            store.set_meta(META_CONCEPT_CACHE, &serde_json::to_string(&batch)?)?;
+            batch
+        }
+    };
+    stages.begin("linking concepts");
+    store.commit(staged)?;
 
     // --- 9. rules and conflicts, rebuilt globally every run ------------------
     // Corroboration and conflict detection are repository-wide: a rule's confidence
     // depends on what other files say, so the layer is rebuilt whole rather than
     // patched. The candidates themselves are per-file and were invalidated above.
-    opts.report("mining rules", 0, 0);
+    stages.begin("clearing old rules");
+    // Corroboration and conflict detection are repository-wide: a rule's confidence
+    // depends on what other files say, so the layer is rebuilt whole rather than
+    // patched. The candidates themselves are per-file and were invalidated above.
     store.forget_rules()?;
-    let mut candidates: Vec<RuleCandidate> = store
-        .all_facts(FACT_RULE)?
-        .iter()
-        .filter_map(|payload| serde_json::from_str(payload).ok())
-        .collect();
-    rules::corroborate(&mut candidates);
-    let conflicts = rules::detect_conflicts(&candidates);
-    report.conflicts = conflicts.len();
-    store.commit(rules::stage(&candidates, &conflicts))?;
+    stages.begin("mining rules");
+    let rule_facts = store.all_facts(FACT_RULE)?;
+    let rule_input = fingerprint(&[&rule_facts]);
+
+    let cached_rules = (!opts.force && store.meta(META_RULE_INPUT)? == Some(rule_input.clone()))
+        .then(|| store.meta(META_RULE_CACHE))
+        .transpose()?
+        .flatten()
+        .and_then(|json| serde_json::from_str::<(Batch, usize)>(json.as_str()).ok());
+
+    let (rule_batch, conflict_count) = match cached_rules {
+        Some(pair) => pair,
+        None => {
+            let mut candidates: Vec<RuleCandidate> = rule_facts
+                .iter()
+                .filter_map(|payload| serde_json::from_str(payload).ok())
+                .collect();
+            rules::corroborate(&mut candidates);
+            let conflicts = rules::detect_conflicts(&candidates);
+            let batch = rules::stage(&candidates, &conflicts);
+            store.set_meta(META_RULE_INPUT, &rule_input)?;
+            store.set_meta(
+                META_RULE_CACHE,
+                &serde_json::to_string(&(&batch, conflicts.len()))?,
+            )?;
+            (batch, conflicts.len())
+        }
+    };
+    report.conflicts = conflict_count;
+    stages.begin("linking rules");
+    store.commit(rule_batch)?;
 
     // --- 10. history, rebuilt only when HEAD moves ---------------------------
     let head = gitlog::head_sha(&opts.root);
@@ -429,7 +560,7 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     let history_stale =
         opts.force || head.is_none() != stored_head.is_none() || head != stored_head;
     if gitlog::is_repository(&opts.root) && history_stale {
-        opts.report("reading history", 0, 0);
+        stages.begin("reading history");
         report.history_rebuilt = true;
         store.forget_history()?;
         let history = gitlog::history(&opts.root, opts.max_commits)?;
@@ -441,7 +572,7 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     }
 
     // --- 11. finish ----------------------------------------------------------
-    opts.report("finishing", 0, 0);
+    stages.begin("finishing");
     store.set_meta("indexed_at", &format!("{}", now_unix()))?;
     store.set_meta("root", &opts.root.to_string_lossy())?;
     store.optimize()?;
@@ -454,6 +585,7 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     report.commits = store.count_of_kind(NodeKind::Commit)?;
     report.rules = store.count_of_kind(NodeKind::BusinessRule)? - report.conflicts as u64;
     report.edges = store.count_edges()?;
+    report.stage_ms = stages.finish();
     report.elapsed_ms = started.elapsed().as_millis();
     Ok(report)
 }
@@ -474,18 +606,32 @@ struct ParsedFile {
 /// Extract one file. Pure with respect to Reify's own state: no store access and no
 /// shared mutable state. Rich document formats may invoke an external text extractor.
 fn extract_file(file: &Discovered) -> FileOutcome {
-    // Binary document formats are read as bytes, never as UTF-8 text.
-    if file.lang == Lang::Docx {
+    // Zip-based document formats are read as bytes, never as UTF-8 text.
+    let zipped: Option<ZipDocReader> = match file.lang {
+        Lang::Docx => Some(extract::richdoc::docx_to_markdown),
+        Lang::Odt => Some(extract::richdoc::odt_to_markdown),
+        Lang::Xlsx => Some(extract::richdoc::xlsx_to_markdown),
+        Lang::Pptx => Some(extract::richdoc::pptx_to_markdown),
+        _ => None,
+    };
+    if let Some(convert) = zipped {
         return match std::fs::read(&file.abs)
             .map_err(|e| anyhow::anyhow!("{e}"))
-            .and_then(|bytes| extract::richdoc::docx_to_markdown(&bytes))
+            .and_then(|bytes| convert(&bytes))
         {
             Ok(markdown) => document_outcome(file, &markdown),
             Err(e) => FileOutcome::Failed(e.to_string()),
         };
     }
-    if file.lang == Lang::Pdf {
-        return match extract::richdoc::pdf_to_text(&file.abs) {
+    // Formats with no usable pure-Rust reader are delegated to an external converter,
+    // which reports precisely what is missing rather than indexing nothing quietly.
+    let delegated: Option<DelegatedReader> = match file.lang {
+        Lang::Pdf => Some(extract::richdoc::pdf_to_text),
+        Lang::Doc => Some(extract::richdoc::doc_to_text),
+        _ => None,
+    };
+    if let Some(convert) = delegated {
+        return match convert(&file.abs) {
             Ok(text) => document_outcome(file, &text),
             Err(e) => FileOutcome::Failed(e.to_string()),
         };
@@ -495,10 +641,11 @@ fn extract_file(file: &Discovered) -> FileOutcome {
         Ok(t) => t,
         Err(e) => return FileOutcome::Failed(e.to_string()),
     };
-    let text = if file.lang == Lang::Html {
-        extract::richdoc::html_to_markdown(&text)
-    } else {
-        text
+    let text = match file.lang {
+        Lang::Html => extract::richdoc::html_to_markdown(&text),
+        Lang::Rtf => extract::richdoc::rtf_to_markdown(&file.abs, &text)
+            .unwrap_or_else(|_| extract::richdoc::rtf_to_text(&text)),
+        _ => text,
     };
     match file.lang {
         // Every language with a grammar takes the same path: parse, then attribute any
@@ -523,9 +670,7 @@ fn extract_file(file: &Discovered) -> FileOutcome {
             extract: extract::sqlish::extract_file(&file.path, &text),
             rows: None,
         })),
-        Lang::Markdown | Lang::Text | Lang::Html | Lang::Docx | Lang::Pdf => {
-            document_outcome(file, &text)
-        }
+        lang if lang.is_doc() => document_outcome(file, &text),
         Lang::Csv => {
             let rows = concepts::translation_language(&file.path)
                 .map(|lang| (lang, concepts::parse_translation_csv(&text)));
@@ -733,6 +878,25 @@ fn stage_history(history: &gitlog::History, present: &HashSet<&str>) -> Batch {
         ));
     }
     batch
+}
+
+/// A stable fingerprint of a stage's inputs.
+///
+/// Order-sensitive, which places a real obligation on the caller: every list fed in
+/// must come back in a *total* order. SQLite returns rows in scan order unless told
+/// otherwise, and rewriting one file reassigns rowids — so an unordered query makes
+/// this fingerprint differ on every run and the cache never hits. The queries feeding
+/// it order explicitly, and `groundable_names_come_back_in_a_total_order` pins that.
+fn fingerprint(groups: &[&Vec<String>]) -> String {
+    let mut hasher = blake3::Hasher::new();
+    for group in groups {
+        hasher.update(&(group.len() as u64).to_le_bytes());
+        for item in *group {
+            hasher.update(item.as_bytes());
+            hasher.update(&[0]);
+        }
+    }
+    hasher.finalize().to_hex().to_string()
 }
 
 fn now_unix() -> u64 {
@@ -1147,6 +1311,72 @@ class SalesOrder:
         assert_eq!(
             incremental.canonical_dump().unwrap(),
             full.canonical_dump().unwrap()
+        );
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn editing_a_body_reuses_the_global_stage_caches() {
+        // Editing inside a function changes no symbol name, no fact and no heading, so
+        // the concept and rule layers are provably identical and must not be rebuilt.
+        let root = fixture("cache-hit");
+        let mut store = Store::in_memory().unwrap();
+        let opts = IndexOptions::new(&root);
+        index(&mut store, &opts).unwrap();
+        let concept_key = store.meta(META_CONCEPT_INPUT).unwrap();
+        let rule_key = store.meta(META_RULE_INPUT).unwrap();
+        assert!(concept_key.is_some() && rule_key.is_some());
+
+        fs::write(
+            root.join("app/strategic.py"),
+            "class StrategicAccount:\n    \"\"\"An enterprise customer on the strategic tier.\"\"\"\n    def rate(self):\n        return 0.25\n",
+        )
+        .unwrap();
+        let report = index(&mut store, &opts).unwrap();
+        assert_eq!(report.files_parsed, 1);
+        assert_eq!(store.meta(META_CONCEPT_INPUT).unwrap(), concept_key);
+        assert_eq!(store.meta(META_RULE_INPUT).unwrap(), rule_key);
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn adding_a_symbol_invalidates_the_concept_cache() {
+        // A new symbol changes the grounding index, so the concept layer must be
+        // rebuilt rather than reused — otherwise the new symbol is unreachable.
+        let root = fixture("cache-miss");
+        let mut store = Store::in_memory().unwrap();
+        let opts = IndexOptions::new(&root);
+        index(&mut store, &opts).unwrap();
+        let before = store.meta(META_CONCEPT_INPUT).unwrap();
+
+        fs::write(
+            root.join("app/invoice.py"),
+            "class StrategicInvoice:\n    def settle(self):\n        return 1\n",
+        )
+        .unwrap();
+        index(&mut store, &opts).unwrap();
+        assert_ne!(store.meta(META_CONCEPT_INPUT).unwrap(), before);
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn a_forced_rebuild_ignores_the_caches() {
+        let root = fixture("cache-force");
+        let mut store = Store::in_memory().unwrap();
+        index(&mut store, &IndexOptions::new(&root)).unwrap();
+        let dump = store.canonical_dump().unwrap();
+        index(
+            &mut store,
+            &IndexOptions {
+                force: true,
+                ..IndexOptions::new(&root)
+            },
+        )
+        .unwrap();
+        assert_eq!(
+            dump,
+            store.canonical_dump().unwrap(),
+            "force must not change the result"
         );
         let _ = fs::remove_dir_all(&root);
     }

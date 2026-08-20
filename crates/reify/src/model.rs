@@ -204,6 +204,12 @@ pub enum Lang {
     Text,
     Html,
     Docx,
+    /// Legacy binary Word. Business requirements written years ago are still `.doc`.
+    Doc,
+    Odt,
+    Rtf,
+    Xlsx,
+    Pptx,
     Pdf,
     Csv,
     Json,
@@ -233,6 +239,11 @@ impl Lang {
             Lang::Text => "text",
             Lang::Html => "html",
             Lang::Docx => "docx",
+            Lang::Doc => "doc",
+            Lang::Odt => "odt",
+            Lang::Rtf => "rtf",
+            Lang::Xlsx => "xlsx",
+            Lang::Pptx => "pptx",
             Lang::Pdf => "pdf",
             Lang::Csv => "csv",
             Lang::Json => "json",
@@ -261,6 +272,11 @@ impl Lang {
             "text" => Lang::Text,
             "html" => Lang::Html,
             "docx" => Lang::Docx,
+            "doc" => Lang::Doc,
+            "odt" => Lang::Odt,
+            "rtf" => Lang::Rtf,
+            "xlsx" => Lang::Xlsx,
+            "pptx" => Lang::Pptx,
             "pdf" => Lang::Pdf,
             "csv" => Lang::Csv,
             "json" => Lang::Json,
@@ -313,13 +329,22 @@ impl Lang {
     pub fn is_doc(self) -> bool {
         matches!(
             self,
-            Lang::Markdown | Lang::Text | Lang::Html | Lang::Docx | Lang::Pdf
+            Lang::Markdown
+                | Lang::Text
+                | Lang::Html
+                | Lang::Docx
+                | Lang::Doc
+                | Lang::Odt
+                | Lang::Rtf
+                | Lang::Xlsx
+                | Lang::Pptx
+                | Lang::Pdf
         )
     }
 }
 
 /// A node staged for insertion. Ids are assigned by the store.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NewNode {
     pub uid: String,
     pub kind: NodeKind,
@@ -386,7 +411,7 @@ impl NewNode {
 ///
 /// Resolving uids late lets extractors emit edges to symbols they have not seen yet,
 /// which is the normal case for calls across files.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NewEdge {
     pub src: String,
     pub dst: String,
@@ -498,6 +523,11 @@ mod tests {
             Lang::Text,
             Lang::Html,
             Lang::Docx,
+            Lang::Doc,
+            Lang::Odt,
+            Lang::Rtf,
+            Lang::Xlsx,
+            Lang::Pptx,
             Lang::Pdf,
             Lang::Csv,
             Lang::Json,

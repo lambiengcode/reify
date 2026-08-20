@@ -9,7 +9,7 @@
     "tokens_total": 3998,
     "files_inspected": 2,
     "wrong_files": 1,
-    "elapsed_ms": 58
+    "elapsed_ms": 57
   },
   {
     "task": "t-feaeac50",
@@ -30,10 +30,10 @@
     "precision": 0.0,
     "first_hit_rank": null,
     "tokens_to_first_hit": null,
-    "tokens_total": 3467,
+    "tokens_total": 3388,
     "files_inspected": 11,
     "wrong_files": 11,
-    "elapsed_ms": 78
+    "elapsed_ms": 161
   },
   {
     "task": "t-eb0a1006",
@@ -66,10 +66,10 @@
     "precision": 0.0,
     "first_hit_rank": null,
     "tokens_to_first_hit": null,
-    "tokens_total": 1536,
+    "tokens_total": 1532,
     "files_inspected": 18,
     "wrong_files": 18,
-    "elapsed_ms": 57
+    "elapsed_ms": 55
   },
   {
     "task": "t-c6fcdc5b",
@@ -81,7 +81,7 @@
     "tokens_total": 3917,
     "files_inspected": 1,
     "wrong_files": 1,
-    "elapsed_ms": 34
+    "elapsed_ms": 33
   },
   {
     "task": "t-c6fcdc5b",
@@ -102,10 +102,10 @@
     "precision": 0.0,
     "first_hit_rank": null,
     "tokens_to_first_hit": null,
-    "tokens_total": 1372,
-    "files_inspected": 9,
-    "wrong_files": 9,
-    "elapsed_ms": 27
+    "tokens_total": 3661,
+    "files_inspected": 3,
+    "wrong_files": 3,
+    "elapsed_ms": 14
   },
   {
     "task": "t-6783feb1",
@@ -117,7 +117,7 @@
     "tokens_total": 3910,
     "files_inspected": 2,
     "wrong_files": 2,
-    "elapsed_ms": 40
+    "elapsed_ms": 39
   },
   {
     "task": "t-6783feb1",
@@ -134,14 +134,14 @@
   {
     "task": "t-6783feb1",
     "condition": "R-reify",
-    "recall": 1.0,
-    "precision": 0.14285715,
-    "first_hit_rank": 5,
-    "tokens_to_first_hit": 1394,
-    "tokens_total": 1424,
+    "recall": 0.0,
+    "precision": 0.0,
+    "first_hit_rank": null,
+    "tokens_to_first_hit": null,
+    "tokens_total": 1453,
     "files_inspected": 7,
-    "wrong_files": 6,
-    "elapsed_ms": 153
+    "wrong_files": 7,
+    "elapsed_ms": 148
   },
   {
     "task": "t-589cfcaf",
@@ -153,7 +153,7 @@
     "tokens_total": 3988,
     "files_inspected": 4,
     "wrong_files": 3,
-    "elapsed_ms": 57
+    "elapsed_ms": 58
   },
   {
     "task": "t-589cfcaf",
@@ -173,11 +173,11 @@
     "recall": 1.0,
     "precision": 0.1,
     "first_hit_rank": 1,
-    "tokens_to_first_hit": 3844,
-    "tokens_total": 3994,
+    "tokens_to_first_hit": 3832,
+    "tokens_total": 3982,
     "files_inspected": 10,
     "wrong_files": 9,
-    "elapsed_ms": 30
+    "elapsed_ms": 28
   },
   {
     "task": "t-708c62c6",
@@ -189,7 +189,7 @@
     "tokens_total": 3989,
     "files_inspected": 5,
     "wrong_files": 5,
-    "elapsed_ms": 40
+    "elapsed_ms": 42
   },
   {
     "task": "t-708c62c6",
@@ -210,10 +210,10 @@
     "precision": 0.0,
     "first_hit_rank": null,
     "tokens_to_first_hit": null,
-    "tokens_total": 2025,
+    "tokens_total": 2029,
     "files_inspected": 10,
     "wrong_files": 10,
-    "elapsed_ms": 54
+    "elapsed_ms": 69
   },
   {
     "task": "t-d0308f34",
@@ -225,7 +225,7 @@
     "tokens_total": 3947,
     "files_inspected": 2,
     "wrong_files": 2,
-    "elapsed_ms": 45
+    "elapsed_ms": 46
   },
   {
     "task": "t-d0308f34",
@@ -243,13 +243,13 @@
     "task": "t-d0308f34",
     "condition": "R-reify",
     "recall": 1.0,
-    "precision": 0.083333336,
+    "precision": 0.09090909,
     "first_hit_rank": 8,
-    "tokens_to_first_hit": 3314,
-    "tokens_total": 3374,
-    "files_inspected": 12,
-    "wrong_files": 11,
-    "elapsed_ms": 62
+    "tokens_to_first_hit": 3315,
+    "tokens_total": 3375,
+    "files_inspected": 11,
+    "wrong_files": 10,
+    "elapsed_ms": 42
   },
   {
     "task": "t-ebdfb1b7",
@@ -282,10 +282,10 @@
     "precision": 0.0,
     "first_hit_rank": null,
     "tokens_to_first_hit": null,
-    "tokens_total": 2564,
+    "tokens_total": 2563,
     "files_inspected": 9,
     "wrong_files": 9,
-    "elapsed_ms": 124
+    "elapsed_ms": 104
   },
   {
     "task": "t-52fd8bbb",
@@ -297,7 +297,7 @@
     "tokens_total": 3945,
     "files_inspected": 4,
     "wrong_files": 4,
-    "elapsed_ms": 24
+    "elapsed_ms": 25
   },
   {
     "task": "t-52fd8bbb",
@@ -318,10 +318,10 @@
     "precision": 0.0,
     "first_hit_rank": null,
     "tokens_to_first_hit": null,
-    "tokens_total": 1871,
+    "tokens_total": 1873,
     "files_inspected": 13,
     "wrong_files": 13,
-    "elapsed_ms": 80
+    "elapsed_ms": 69
   },
   {
     "task": "t-1a5a9613",
@@ -333,7 +333,7 @@
     "tokens_total": 3893,
     "files_inspected": 2,
     "wrong_files": 2,
-    "elapsed_ms": 66
+    "elapsed_ms": 67
   },
   {
     "task": "t-1a5a9613",
@@ -352,12 +352,12 @@
     "condition": "R-reify",
     "recall": 1.0,
     "precision": 0.14285715,
-    "first_hit_rank": 3,
-    "tokens_to_first_hit": 1537,
-    "tokens_total": 2227,
+    "first_hit_rank": 5,
+    "tokens_to_first_hit": 1581,
+    "tokens_total": 2211,
     "files_inspected": 7,
     "wrong_files": 6,
-    "elapsed_ms": 35
+    "elapsed_ms": 24
   },
   {
     "task": "t-95503da5",
@@ -369,7 +369,7 @@
     "tokens_total": 3871,
     "files_inspected": 4,
     "wrong_files": 3,
-    "elapsed_ms": 41
+    "elapsed_ms": 42
   },
   {
     "task": "t-95503da5",
@@ -386,14 +386,14 @@
   {
     "task": "t-95503da5",
     "condition": "R-reify",
-    "recall": 0.0,
-    "precision": 0.0,
-    "first_hit_rank": null,
-    "tokens_to_first_hit": null,
-    "tokens_total": 3688,
-    "files_inspected": 11,
-    "wrong_files": 11,
-    "elapsed_ms": 125
+    "recall": 0.5,
+    "precision": 0.071428575,
+    "first_hit_rank": 4,
+    "tokens_to_first_hit": 1473,
+    "tokens_total": 3873,
+    "files_inspected": 14,
+    "wrong_files": 13,
+    "elapsed_ms": 100
   },
   {
     "task": "t-d9f68276",
@@ -426,10 +426,10 @@
     "precision": 0.0,
     "first_hit_rank": null,
     "tokens_to_first_hit": null,
-    "tokens_total": 3555,
+    "tokens_total": 3535,
     "files_inspected": 13,
     "wrong_files": 13,
-    "elapsed_ms": 119
+    "elapsed_ms": 111
   },
   {
     "task": "t-b7da8139",
@@ -465,7 +465,7 @@
     "tokens_total": 1228,
     "files_inspected": 12,
     "wrong_files": 12,
-    "elapsed_ms": 15
+    "elapsed_ms": 14
   },
   {
     "task": "t-b384d8ad",
@@ -477,7 +477,7 @@
     "tokens_total": 3865,
     "files_inspected": 2,
     "wrong_files": 2,
-    "elapsed_ms": 42
+    "elapsed_ms": 43
   },
   {
     "task": "t-b384d8ad",
@@ -498,10 +498,10 @@
     "precision": 0.0,
     "first_hit_rank": null,
     "tokens_to_first_hit": null,
-    "tokens_total": 3964,
-    "files_inspected": 12,
-    "wrong_files": 12,
-    "elapsed_ms": 68
+    "tokens_total": 3917,
+    "files_inspected": 11,
+    "wrong_files": 11,
+    "elapsed_ms": 45
   },
   {
     "task": "t-b276e078",
@@ -513,7 +513,7 @@
     "tokens_total": 3919,
     "files_inspected": 2,
     "wrong_files": 2,
-    "elapsed_ms": 35
+    "elapsed_ms": 36
   },
   {
     "task": "t-b276e078",
@@ -531,13 +531,13 @@
     "task": "t-b276e078",
     "condition": "R-reify",
     "recall": 0.5,
-    "precision": 0.07692308,
-    "first_hit_rank": 13,
-    "tokens_to_first_hit": 3774,
-    "tokens_total": 3774,
-    "files_inspected": 13,
-    "wrong_files": 12,
-    "elapsed_ms": 35
+    "precision": 0.071428575,
+    "first_hit_rank": 11,
+    "tokens_to_first_hit": 2370,
+    "tokens_total": 2370,
+    "files_inspected": 14,
+    "wrong_files": 13,
+    "elapsed_ms": 26
   },
   {
     "task": "t-73886ee0",
@@ -573,7 +573,7 @@
     "tokens_total": 57,
     "files_inspected": 0,
     "wrong_files": 0,
-    "elapsed_ms": 14
+    "elapsed_ms": 10
   },
   {
     "task": "t-93c63591",
@@ -603,13 +603,13 @@
     "task": "t-93c63591",
     "condition": "R-reify",
     "recall": 1.0,
-    "precision": 0.2,
+    "precision": 0.14285715,
     "first_hit_rank": 1,
-    "tokens_to_first_hit": 3523,
-    "tokens_total": 3993,
-    "files_inspected": 5,
-    "wrong_files": 4,
-    "elapsed_ms": 37
+    "tokens_to_first_hit": 3602,
+    "tokens_total": 3992,
+    "files_inspected": 7,
+    "wrong_files": 6,
+    "elapsed_ms": 34
   },
   {
     "task": "t-429f1311",
@@ -621,7 +621,7 @@
     "tokens_total": 3917,
     "files_inspected": 1,
     "wrong_files": 1,
-    "elapsed_ms": 31
+    "elapsed_ms": 32
   },
   {
     "task": "t-429f1311",
@@ -642,10 +642,10 @@
     "precision": 0.0,
     "first_hit_rank": null,
     "tokens_to_first_hit": null,
-    "tokens_total": 2143,
-    "files_inspected": 6,
-    "wrong_files": 6,
-    "elapsed_ms": 24
+    "tokens_total": 2327,
+    "files_inspected": 7,
+    "wrong_files": 7,
+    "elapsed_ms": 17
   },
   {
     "task": "t-96dae963",
@@ -678,10 +678,10 @@
     "precision": 0.0,
     "first_hit_rank": null,
     "tokens_to_first_hit": null,
-    "tokens_total": 3999,
-    "files_inspected": 16,
-    "wrong_files": 16,
-    "elapsed_ms": 68
+    "tokens_total": 3969,
+    "files_inspected": 17,
+    "wrong_files": 17,
+    "elapsed_ms": 58
   },
   {
     "task": "t-e07341b3",
@@ -711,13 +711,13 @@
     "task": "t-e07341b3",
     "condition": "R-reify",
     "recall": 0.6666667,
-    "precision": 0.5,
+    "precision": 0.16666667,
     "first_hit_rank": 1,
-    "tokens_to_first_hit": 3949,
-    "tokens_total": 3949,
-    "files_inspected": 4,
-    "wrong_files": 2,
-    "elapsed_ms": 70
+    "tokens_to_first_hit": 1429,
+    "tokens_total": 3849,
+    "files_inspected": 12,
+    "wrong_files": 10,
+    "elapsed_ms": 60
   },
   {
     "task": "t-e174da06",
@@ -729,7 +729,7 @@
     "tokens_total": 3949,
     "files_inspected": 3,
     "wrong_files": 3,
-    "elapsed_ms": 32
+    "elapsed_ms": 34
   },
   {
     "task": "t-e174da06",
@@ -746,13 +746,13 @@
   {
     "task": "t-e174da06",
     "condition": "R-reify",
-    "recall": 0.5,
-    "precision": 0.07692308,
-    "first_hit_rank": 1,
-    "tokens_to_first_hit": 1674,
-    "tokens_total": 2434,
-    "files_inspected": 13,
-    "wrong_files": 12,
+    "recall": 1.0,
+    "precision": 0.13333334,
+    "first_hit_rank": 3,
+    "tokens_to_first_hit": 1788,
+    "tokens_total": 2358,
+    "files_inspected": 15,
+    "wrong_files": 13,
     "elapsed_ms": 30
   },
   {
@@ -783,12 +783,12 @@
     "task": "t-b6d9b960",
     "condition": "R-reify",
     "recall": 1.0,
-    "precision": 0.11111111,
+    "precision": 0.09090909,
     "first_hit_rank": 5,
-    "tokens_to_first_hit": 2409,
-    "tokens_total": 2409,
-    "files_inspected": 9,
-    "wrong_files": 8,
-    "elapsed_ms": 46
+    "tokens_to_first_hit": 2297,
+    "tokens_total": 2487,
+    "files_inspected": 11,
+    "wrong_files": 10,
+    "elapsed_ms": 34
   }
 ]

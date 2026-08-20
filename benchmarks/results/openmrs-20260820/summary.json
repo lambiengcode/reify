@@ -10,7 +10,7 @@
     "median_tokens_to_first_hit": 2323,
     "median_tokens_total": 3917,
     "median_files_inspected": 3,
-    "median_elapsed_ms": 40
+    "median_elapsed_ms": 39
   },
   {
     "condition": "C-path-grep",
@@ -31,11 +31,11 @@
     "tasks_with_a_hit": 9,
     "hit_rate": 0.4090909,
     "mean_recall": 0.34848484,
-    "mean_precision": 0.065182045,
-    "mrr": 0.22432984,
-    "median_tokens_to_first_hit": 3314,
-    "median_tokens_total": 2564,
+    "mean_precision": 0.045926798,
+    "mrr": 0.19087467,
+    "median_tokens_to_first_hit": 2297,
+    "median_tokens_total": 2563,
     "median_files_inspected": 11,
-    "median_elapsed_ms": 57
+    "median_elapsed_ms": 45
   }
 ]

@@ -228,6 +228,66 @@ fn the_matched_language_pair_resolves_to_the_same_answer() {
 }
 
 #[test]
+fn a_requirement_is_retrievable_in_every_language_it_was_written_in() {
+    // Business documentation arrives in whatever language the analyst writes in, and
+    // `minierp-vi` holds the same requirement in five. Each must reach the code, and
+    // none of them is privileged — English included.
+    let store = indexed("minierp-vi");
+    let queries = [
+        ("exempt from approval", "eng"),
+        ("miễn phê duyệt", "vie"),
+        ("ได้รับการยกเว้นการอนุมัติ", "tha"),
+        ("승인이 면제", "kor"),
+        ("von der Genehmigung ausgenommen", "deu"),
+    ];
+    for (query, tag) in queries {
+        let compiled = compile(&store, query, &ContextOptions::default())
+            .unwrap_or_else(|e| panic!("{tag}: {e}"));
+        assert!(
+            !compiled.documents.is_empty() || !compiled.code.is_empty(),
+            "{tag}: `{query}` retrieved nothing"
+        );
+    }
+}
+
+#[test]
+fn every_language_the_fixture_uses_is_detected_as_itself() {
+    // Detection drives per-section language tagging, which is how a multilingual
+    // corpus stays navigable. A misdetected section is silently mislabelled.
+    let store = indexed("minierp-vi");
+    let detected: std::collections::BTreeSet<String> = store
+        .nodes_of_kind(NodeKind::DocSection)
+        .expect("sections")
+        .into_iter()
+        .filter_map(|n| {
+            n.data
+                .get("lang")
+                .and_then(|v| v.as_str())
+                .map(str::to_string)
+        })
+        .collect();
+    for expected in ["vie", "tha", "kor", "deu"] {
+        assert!(
+            detected.contains(expected),
+            "{expected} was not detected; got {detected:?}"
+        );
+    }
+}
+
+#[test]
+fn a_multilingual_obligation_is_mined_as_a_rule_whatever_the_language() {
+    let store = indexed("minierp-vi");
+    let rules = query::rules(&store, 0.0).expect("rules");
+    let locations: Vec<String> = rules.iter().map(|r| r.location()).collect();
+    for language_file in ["BRD-42-vi", "BRD-42-th", "BRD-42-ko", "BRD-42-de"] {
+        assert!(
+            locations.iter().any(|l| l.contains(language_file)),
+            "no rule mined from {language_file}: {locations:?}"
+        );
+    }
+}
+
+#[test]
 fn indexing_a_fixture_twice_changes_nothing() {
     let root = fixture("minierp");
     let mut store = Store::in_memory().expect("store");
