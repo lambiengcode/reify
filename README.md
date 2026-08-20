@@ -96,20 +96,32 @@ Does the tool put the right file in front of the agent at all?
 | Median files put in front of the agent | 3 | 88 | 13 |
 | Median latency | 43 ms | 0 ms | 57 ms |
 
-The report names all four tasks where the baseline still beat Reify, and lists five
-limitations that bound what these numbers mean — the largest being that this is
-single-shot file identification, not an agent completing a task.
+### Does it generalise? A second repository, in a typed language
 
-Everything is reproducible, and the raw per-task outcomes are committed:
+**OpenMRS** — Java, 1,325 files, 13,182 commits, 22 tasks, same leakage-free method.
 
-```bash
-reify-bench tasks  --repo <repo> --after <base-sha> --out benchmarks/tasks/erpnext.json
-reify-bench run    --repo <repo> --tasks ... --out results/     # retrieval
-reify-bench agent  --repo <repo> --tasks ... --out results/     # with a model
-reify-bench report --in results/ --out benchmarks/REPORT.md
-```
+| Condition | Hit rate |
+|---|---:|
+| No context at all | **0%** |
+| Content grep, budget-matched | 41% |
+| **Reify** | **50%** |
+| Decoy context | 5% |
+| Perfect context | 100% |
 
-Full report: [`benchmarks/REPORT.md`](benchmarks/REPORT.md).
+The direction holds and the controls are cleaner than ERPNext's — zero memorisation, and
+a decoy scores 5% against Reify's 50%. **But the margin is far smaller: 9 points over
+grep, against 40 points on ERPNext.**
+
+The cause is measurable rather than mysterious. Reify builds **579 concepts** on ERPNext
+and **10** on OpenMRS, because ERPNext declares its domain vocabulary in structured
+entity metadata and OpenMRS does not — in the form Reify currently reads. OpenMRS *does*
+ship 20 Hibernate mappings and 27 message bundles, which are the same shape and are not
+yet ingested.
+
+So the honest summary is: **Reify's advantage scales with how much declared vocabulary a
+repository hands it.** On a repository that declares a lot, it is transformative. On one
+that declares little, it is a modest improvement over grep. Closing that gap is the
+clearest item on the roadmap.
 
 ### Measured performance
 
@@ -136,12 +148,17 @@ guarantee is the next performance task, not a tuning knob.
 ## Install and use
 
 ```bash
+# From a release build (recommended once tagged):
+#   curl -sSL https://github.com/lambiengcode/reify/releases/latest/download/... | tar xz
 cargo install --path crates/reify-cli
 
 cd your-repo
 reify init      # reports what it will and will not index, and why
-reify index     # ~80s for a 5,000-file repository; incremental afterwards
+reify index     # ~80s for a 5,000-file repository; 0.6s when nothing changed
 ```
+
+`reify init --write-agent-instructions` appends Reify's usage block to your `AGENTS.md`
+or `CLAUDE.md`. `reify completions <shell>` prints a completion script.
 
 Then tell your agent, in `AGENTS.md` or `CLAUDE.md`:
 

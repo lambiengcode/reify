@@ -626,9 +626,13 @@ fn agent_section(input: &Path) -> String {
              figures above rather than ignored.\n\n",
             floor.hit_rate * 100.0,
             if floor.hit_rate > 0.4 {
-                "**That is high enough that contamination is a serious concern.**"
+                "**That is high enough that contamination is a serious concern and the \
+                 other numbers should be read sceptically.**"
+            } else if floor.hit_rate > 0.05 {
+                "Some contamination, as expected for a well-known public repository."
             } else {
-                "Some contamination, as expected for a public repository."
+                "Effectively none: the model cannot answer these from memory, so the \
+                 remaining conditions measure retrieval rather than recall."
             }
         ));
     }

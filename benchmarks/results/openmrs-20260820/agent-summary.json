@@ -1,0 +1,72 @@
+[
+  {
+    "condition": "N-no-context",
+    "tasks": 22,
+    "errors": 0,
+    "hits": 0,
+    "hit_rate": 0.0,
+    "hit_rate_ci": [
+      0.0,
+      0.14865953
+    ],
+    "mean_recall": 0.0,
+    "median_prompt_tokens": 89,
+    "median_elapsed_ms": 1261
+  },
+  {
+    "condition": "B-content-grep",
+    "tasks": 22,
+    "errors": 0,
+    "hits": 9,
+    "hit_rate": 0.4090909,
+    "hit_rate_ci": [
+      0.2325556,
+      0.61265516
+    ],
+    "mean_recall": 0.28939396,
+    "median_prompt_tokens": 140,
+    "median_elapsed_ms": 985
+  },
+  {
+    "condition": "R-reify",
+    "tasks": 22,
+    "errors": 0,
+    "hits": 11,
+    "hit_rate": 0.5,
+    "hit_rate_ci": [
+      0.30721804,
+      0.6927819
+    ],
+    "mean_recall": 0.3651515,
+    "median_prompt_tokens": 258,
+    "median_elapsed_ms": 1078
+  },
+  {
+    "condition": "R-shuffled",
+    "tasks": 22,
+    "errors": 0,
+    "hits": 1,
+    "hit_rate": 0.045454547,
+    "hit_rate_ci": [
+      0.008069217,
+      0.21798488
+    ],
+    "mean_recall": 0.045454547,
+    "median_prompt_tokens": 253,
+    "median_elapsed_ms": 1073
+  },
+  {
+    "condition": "O-oracle",
+    "tasks": 22,
+    "errors": 0,
+    "hits": 22,
+    "hit_rate": 1.0,
+    "hit_rate_ci": [
+      0.8513404,
+      1.0
+    ],
+    "mean_recall": 0.98484844,
+    "median_prompt_tokens": 123,
+    "median_elapsed_ms": 965
+  }
+]

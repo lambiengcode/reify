@@ -95,7 +95,7 @@ Single-shot file identification: the model is given the task and one context blo
 
 **E3 — is the model reading the context, or just its framing?** Context compiled for a *different* task scores 30%, against 65% for the real context and 22% for no context at all. Real context clearly outperforms decoy context of identical shape and size, so the gain comes from what the context says rather than from being handed a list of files.
 
-**E6 — are these tasks memorised?** With no repository access at all the model still scores 22%. Some contamination, as expected for a public repository. That floor is subtracted in the headroom figures above rather than ignored.
+**E6 — are these tasks memorised?** With no repository access at all the model still scores 22%. Some contamination, as expected for a well-known public repository. That floor is subtracted in the headroom figures above rather than ignored.
 
 ### Reading these numbers honestly
 
