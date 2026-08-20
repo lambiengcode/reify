@@ -1,0 +1,23 @@
+[package]
+name = "reify"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow = "1.0.104"
+blake3 = "1.8.6"
+csv = "1.4.0"
+ignore = "0.4.33"
+pulldown-cmark = "0.13.4"
+rayon = "1.12.0"
+regex = "1.13.1"
+rusqlite = { version = "0.40.2", features = ["bundled"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+thiserror = "2.0.20"
+toml = "1.1.4"
+tree-sitter = "0.26.12"
+tree-sitter-python = "0.25.0"
+tree-sitter-typescript = "0.23.2"
+whatlang = "0.18.0"

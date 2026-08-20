@@ -1,0 +1,784 @@
+//! The indexing pipeline.
+//!
+//! Ten stages, of which the first seven are deterministic and always run. Nothing here
+//! touches the network. See `docs/PLAN.md` §H.
+//!
+//! The load-bearing property is that an incremental run produces the same store as a
+//! full rebuild. That is achieved by giving every stage a disjoint set of edge kinds
+//! and its own invalidation trigger (see [`crate::store::CONTENT_EDGE_KINDS`]), and by
+//! persisting unresolved references so a changed file can be re-resolved against the
+//! whole repository rather than only against itself.
+
+use anyhow::{Context, Result};
+use rayon::prelude::*;
+use std::collections::{BTreeSet, HashMap, HashSet};
+use std::path::{Path, PathBuf};
+use std::time::Instant;
+
+use crate::concepts::{self, Bridge, Glossary, TermIndex};
+use crate::discover::{self, Discovered, Discovery};
+use crate::extract::{self, code::SymbolIndex, FileExtract};
+use crate::gitlog;
+use crate::model::{uid, EdgeKind, Lang, NewEdge, NewNode, NodeKind, Status};
+use crate::store::{Batch, FileRecord, Store};
+
+/// Where Reify keeps its store and configuration, relative to the repository root.
+pub const REIFY_DIR: &str = ".reify";
+pub const STORE_FILE: &str = "store.db";
+pub const GLOSSARY_FILE: &str = "glossary.toml";
+
+/// Default bound on how far back history is walked.
+///
+/// A fifteen-year monorepo must not make the first `reify index` a forty-minute
+/// operation; the applied bound is reported rather than silently imposed.
+pub const DEFAULT_MAX_COMMITS: usize = 20_000;
+
+/// Minimum number of shared commits before two files are called co-changing.
+const CO_CHANGE_MIN_SUPPORT: u32 = 3;
+const CO_CHANGE_MAX_PAIRS: usize = 20_000;
+
+/// Most recent commits linked per file. Older history stays reachable through
+/// `reify why`, which queries git directly for a precise line range.
+const COMMITS_PER_FILE: usize = 8;
+
+#[derive(Debug, Clone)]
+pub struct IndexOptions {
+    pub root: PathBuf,
+    /// Rebuild from scratch, ignoring cached per-file results.
+    pub force: bool,
+    pub max_commits: usize,
+}
+
+impl IndexOptions {
+    pub fn new(root: impl Into<PathBuf>) -> Self {
+        IndexOptions {
+            root: root.into(),
+            force: false,
+            max_commits: DEFAULT_MAX_COMMITS,
+        }
+    }
+
+    pub fn store_path(&self) -> PathBuf {
+        self.root.join(REIFY_DIR).join(STORE_FILE)
+    }
+
+    pub fn glossary_path(&self) -> PathBuf {
+        self.root.join(REIFY_DIR).join(GLOSSARY_FILE)
+    }
+}
+
+#[derive(Debug, Default, Clone, serde::Serialize)]
+pub struct IndexReport {
+    pub files_total: usize,
+    pub files_parsed: usize,
+    pub files_unchanged: usize,
+    pub files_removed: usize,
+    pub files_skipped: usize,
+    pub skip_reasons: Vec<(String, usize)>,
+    pub symbols: u64,
+    pub doc_sections: u64,
+    pub database_objects: u64,
+    pub concepts: u64,
+    pub commits: u64,
+    pub edges: u64,
+    pub unresolved_refs: usize,
+    pub history_rebuilt: bool,
+    pub history_truncated: bool,
+    pub parse_errors: Vec<String>,
+    pub elapsed_ms: u128,
+}
+
+impl IndexReport {
+    /// Whether this run did the cheap thing: nothing changed.
+    pub fn was_noop(&self) -> bool {
+        self.files_parsed == 0 && self.files_removed == 0 && !self.history_rebuilt
+    }
+}
+
+/// Run the pipeline against `store`.
+pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
+    let started = Instant::now();
+    let mut report = IndexReport::default();
+
+    // --- 1-2. discover and classify ------------------------------------------
+    let found: Discovery = discover::discover(&opts.root)
+        .with_context(|| format!("walking {}", opts.root.display()))?;
+    report.files_total = found.files.len();
+    report.files_skipped = found.skipped.len();
+    report.skip_reasons = found
+        .skip_summary()
+        .into_iter()
+        .map(|(reason, n)| (reason.to_string(), n))
+        .collect();
+
+    // --- decide what actually needs work -------------------------------------
+    let previous = store.file_hashes()?;
+    let present: HashSet<&str> = found.files.iter().map(|f| f.path.as_str()).collect();
+    for gone in previous.keys().filter(|p| !present.contains(p.as_str())) {
+        store.forget_file(gone)?;
+        report.files_removed += 1;
+    }
+    let changed: Vec<&Discovered> = found
+        .files
+        .iter()
+        .filter(|f| opts.force || previous.get(&f.path) != Some(&f.hash))
+        .collect();
+    report.files_parsed = changed.len();
+    report.files_unchanged = found.files.len() - changed.len();
+
+    for file in &changed {
+        store.forget_file_content(&file.path)?;
+    }
+
+    // --- 3-6. parse changed files in parallel --------------------------------
+    // Extraction is pure: text in, staged knowledge out. That is what makes it safe
+    // to run across cores and what would make it cacheable by content hash later.
+    let outcomes: Vec<FileOutcome> = changed
+        .par_iter()
+        .map(|file| extract_file(file))
+        .collect();
+
+    let mut staged = Batch::default();
+    let mut pending: Vec<(String, String, String, EdgeKind)> = Vec::new();
+    let mut translations: Vec<(String, Vec<(String, String)>)> = Vec::new();
+
+    for (file, outcome) in changed.iter().zip(outcomes) {
+        match outcome {
+            FileOutcome::Failed(message) => {
+                // One unparseable file must never fail a whole index; it is reported.
+                report.parse_errors.push(format!("{}: {message}", file.path));
+                staged.node(file_node(file));
+                continue;
+            }
+            FileOutcome::Parsed { extract, rows } => {
+                staged.node(file_node(file));
+                staged.absorb(extract.batch);
+                for reference in extract.pending {
+                    pending.push((reference.from, reference.name, reference.file, reference.kind));
+                }
+                for module in extract.imports {
+                    if let Some(target) = resolve_module(&module, &file.path, &present) {
+                        staged.edge(NewEdge::new(
+                            uid::file(&file.path),
+                            uid::file(&target),
+                            EdgeKind::Imports,
+                            Status::Observed,
+                            0.9,
+                        ));
+                    }
+                }
+                if let Some((lang, rows)) = rows {
+                    translations.push((lang, rows));
+                }
+            }
+        }
+        store.upsert_file(&FileRecord {
+            path: file.path.clone(),
+            lang: file.lang,
+            hash: file.hash.clone(),
+            bytes: file.bytes,
+            lines: file.lines,
+        })?;
+    }
+
+    let stats = store.commit(staged)?;
+    report.unresolved_refs = stats.unresolved_edges;
+    store.put_refs(&pending)?;
+
+    // --- 7. resolve every reference in the repository ------------------------
+    // Repository-wide rather than incremental on purpose: editing one file changes
+    // which symbols other files' references resolve to, and re-resolving is a hash
+    // lookup per reference.
+    let mut symbols = SymbolIndex::default();
+    for (name, node_uid, path) in store.symbol_triples()? {
+        symbols.add(&name, &node_uid, &path);
+    }
+    let all_refs = store.all_refs()?;
+    let pending_refs: Vec<extract::PendingRef> = all_refs
+        .into_iter()
+        .map(|(from, name, file, kind)| extract::PendingRef {
+            from,
+            name,
+            file,
+            kind,
+        })
+        .collect();
+    let resolved = extract::code::resolve(&pending_refs, &symbols);
+    let stats = store.commit(resolved)?;
+    report.unresolved_refs += stats.unresolved_edges;
+
+    // --- 8. concepts, rebuilt globally every run -----------------------------
+    store.forget_concepts()?;
+    let mut grounding = TermIndex::default();
+    for (name, node_uid) in store.groundable_names()? {
+        grounding.add(&name, &node_uid);
+    }
+    let glossary = Glossary::load(&opts.glossary_path())?;
+    let mut sources = vec![glossary.concepts];
+    // Translation files may live in files this run did not touch, so they are read
+    // fresh; there are few of them and they are small.
+    let translation_rows = if translations.is_empty() {
+        read_translation_files(&opts.root, &found)?
+    } else {
+        translations
+    };
+    for (lang, rows) in &translation_rows {
+        sources.push(concepts::from_translations(lang, rows, &grounding));
+    }
+    let headings: Vec<String> = store
+        .nodes_of_kind(NodeKind::DocSection)?
+        .into_iter()
+        .map(|n| n.name)
+        .collect();
+    sources.push(concepts::from_headings(&headings, &grounding));
+    let merged = concepts::merge(sources);
+    store.commit(concepts::stage(&merged, &grounding))?;
+
+    // --- 9. history, rebuilt only when HEAD moves ----------------------------
+    let head = gitlog::head_sha(&opts.root);
+    let stored_head = store.meta("head_sha")?;
+    let history_stale = opts.force || head.is_none() != stored_head.is_none() || head != stored_head;
+    if gitlog::is_repository(&opts.root) && history_stale {
+        report.history_rebuilt = true;
+        store.forget_history()?;
+        let history = gitlog::history(&opts.root, opts.max_commits)?;
+        report.history_truncated = history.truncated;
+        store.commit(stage_history(&history, &present))?;
+        if let Some(sha) = &head {
+            store.set_meta("head_sha", sha)?;
+        }
+    }
+
+    // --- 10. finish ----------------------------------------------------------
+    store.set_meta("indexed_at", &format!("{}", now_unix()))?;
+    store.set_meta("root", &opts.root.to_string_lossy())?;
+    store.optimize()?;
+
+    report.symbols = store.count_of_kind(NodeKind::Symbol)?;
+    report.doc_sections = store.count_of_kind(NodeKind::DocSection)?;
+    report.database_objects = store.count_of_kind(NodeKind::DatabaseObject)?;
+    report.concepts = store.count_of_kind(NodeKind::Concept)?;
+    report.commits = store.count_of_kind(NodeKind::Commit)?;
+    report.edges = store.count_edges()?;
+    report.elapsed_ms = started.elapsed().as_millis();
+    Ok(report)
+}
+
+enum FileOutcome {
+    Parsed {
+        extract: FileExtract,
+        /// Translation rows, when the file is a localisation table.
+        rows: Option<(String, Vec<(String, String)>)>,
+    },
+    Failed(String),
+}
+
+/// Extract one file. Pure: no store access, no shared mutable state.
+fn extract_file(file: &Discovered) -> FileOutcome {
+    let text = match file.read() {
+        Ok(t) => t,
+        Err(e) => return FileOutcome::Failed(e.to_string()),
+    };
+    match file.lang {
+        Lang::Python | Lang::TypeScript | Lang::JavaScript => {
+            match extract::code::extract(&file.path, &text, file.lang) {
+                Ok(mut fx) => {
+                    // SQL embedded in source is attributed to the enclosing symbol, so
+                    // the access edge points at the function performing the query.
+                    let spans = symbol_spans(&fx);
+                    let owner_at = |line: u32| owner_for_line(&spans, line);
+                    fx.absorb(extract::sqlish::extract_embedded(&text, &owner_at));
+                    FileOutcome::Parsed {
+                        extract: fx,
+                        rows: None,
+                    }
+                }
+                Err(e) => FileOutcome::Failed(e.to_string()),
+            }
+        }
+        Lang::Sql => FileOutcome::Parsed {
+            extract: extract::sqlish::extract_file(&file.path, &text),
+            rows: None,
+        },
+        Lang::Markdown | Lang::Text => match extract::docs::extract(&file.path, &text, file.lang) {
+            Ok(fx) => FileOutcome::Parsed {
+                extract: fx,
+                rows: None,
+            },
+            Err(e) => FileOutcome::Failed(e.to_string()),
+        },
+        Lang::Csv => {
+            let rows = concepts::translation_language(&file.path)
+                .map(|lang| (lang, concepts::parse_translation_csv(&text)));
+            FileOutcome::Parsed {
+                extract: FileExtract::default(),
+                rows,
+            }
+        }
+        Lang::Json | Lang::Yaml | Lang::Other => FileOutcome::Parsed {
+            extract: FileExtract::default(),
+            rows: None,
+        },
+    }
+}
+
+/// `(start, end, uid)` for every symbol staged by an extraction, innermost last.
+fn symbol_spans(fx: &FileExtract) -> Vec<(u32, u32, String)> {
+    let mut spans: Vec<(u32, u32, String)> = fx
+        .batch
+        .nodes
+        .iter()
+        .filter(|n| n.kind == NodeKind::Symbol)
+        .map(|n| (n.line_start, n.line_end, n.uid.clone()))
+        .collect();
+    // Narrowest last, so a linear scan finds the innermost owner.
+    spans.sort_by_key(|(start, end, _)| std::cmp::Reverse(end.saturating_sub(*start)));
+    spans
+}
+
+fn owner_for_line(spans: &[(u32, u32, String)], line: u32) -> Option<String> {
+    spans
+        .iter()
+        .filter(|(start, end, _)| *start <= line && line <= *end)
+        .next_back()
+        .map(|(_, _, uid)| uid.clone())
+}
+
+fn file_node(file: &Discovered) -> NewNode {
+    NewNode::new(uid::file(&file.path), NodeKind::File, &file.path)
+        .at(&file.path, 0, file.lines)
+        .lang(file.lang)
+        .status(Status::Confirmed, 1.0)
+        .search(file.path.replace(['/', '_', '-', '.'], " "))
+        .data(serde_json::json!({
+            "lines": file.lines,
+            "bytes": file.bytes,
+            "summary": format!("file {}", file.path),
+        }))
+}
+
+/// Map an import specifier onto a file in this repository, if it names one.
+///
+/// Deliberately conservative: a specifier that does not land on a known path produces
+/// no edge rather than a guess. Third-party imports are supposed to miss.
+fn resolve_module(module: &str, from: &str, present: &HashSet<&str>) -> Option<String> {
+    let candidates: Vec<String> = if module.starts_with('.') {
+        let base = from.rsplit_once('/').map(|(dir, _)| dir).unwrap_or("");
+        let mut relative = module.trim_start_matches('.').replace('.', "/");
+        let up = module.len() - module.trim_start_matches('.').len();
+        let mut dir: Vec<&str> = base.split('/').filter(|s| !s.is_empty()).collect();
+        for _ in 1..up {
+            dir.pop();
+        }
+        relative = relative.trim_start_matches('/').to_string();
+        let joined = if dir.is_empty() {
+            relative
+        } else {
+            format!("{}/{}", dir.join("/"), relative)
+        };
+        expand_extensions(&joined)
+    } else {
+        expand_extensions(&module.replace('.', "/"))
+    };
+    candidates.into_iter().find(|c| present.contains(c.as_str()))
+}
+
+fn expand_extensions(stem: &str) -> Vec<String> {
+    let stem = stem.trim_end_matches('/');
+    [
+        format!("{stem}.py"),
+        format!("{stem}/__init__.py"),
+        format!("{stem}.ts"),
+        format!("{stem}.tsx"),
+        format!("{stem}/index.ts"),
+        format!("{stem}.js"),
+    ]
+    .into_iter()
+    .collect()
+}
+
+/// Stage commit nodes and the history edges that point at indexed files.
+fn stage_history(history: &gitlog::History, present: &HashSet<&str>) -> Batch {
+    let mut batch = Batch::default();
+    let by_file = history.by_file();
+    let mut linked: BTreeSet<usize> = BTreeSet::new();
+
+    for (path, positions) in by_file {
+        if !present.contains(path) {
+            continue;
+        }
+        let file_uid = uid::file(path);
+        // Newest first, so the last entry is the introducing commit within the walked
+        // window. When the walk was truncated this is the oldest commit we can see,
+        // not necessarily the true first — reported via `history_truncated`.
+        if let Some(&oldest) = positions.last() {
+            linked.insert(oldest);
+            batch.edge(NewEdge::new(
+                file_uid.clone(),
+                uid::commit(&history.commits[oldest].sha),
+                EdgeKind::IntroducedBy,
+                Status::Confirmed,
+                1.0,
+            ));
+        }
+        for &position in positions.iter().take(COMMITS_PER_FILE) {
+            let commit = &history.commits[position];
+            // Chores and formatting explain nothing about why code looks as it does.
+            if !commit.class.is_explanatory() {
+                continue;
+            }
+            linked.insert(position);
+            batch.edge(NewEdge::new(
+                file_uid.clone(),
+                uid::commit(&commit.sha),
+                EdgeKind::ChangedBy,
+                Status::Confirmed,
+                1.0,
+            ));
+        }
+    }
+
+    for position in linked {
+        let commit = &history.commits[position];
+        batch.node(
+            NewNode::new(
+                uid::commit(&commit.sha),
+                NodeKind::Commit,
+                &commit.sha[..7.min(commit.sha.len())],
+            )
+            .status(Status::Confirmed, 1.0)
+            .search(commit.subject.clone())
+            .data(serde_json::json!({
+                "sha": commit.sha,
+                "date": commit.date(),
+                "author": commit.author,
+                "subject": commit.subject,
+                "class": commit.class.as_str(),
+                "summary": format!("{} {}", commit.date(), commit.subject),
+            })),
+        );
+    }
+
+    for (a, b, support) in history.co_changes(CO_CHANGE_MIN_SUPPORT, CO_CHANGE_MAX_PAIRS) {
+        if !present.contains(a.as_str()) || !present.contains(b.as_str()) {
+            continue;
+        }
+        // Confidence rises with support but never reaches certainty: co-change is
+        // evidence of coupling, not proof of it.
+        let confidence = (0.4 + 0.05 * support as f32).min(0.85);
+        batch.edge(NewEdge::new(
+            uid::file(&a),
+            uid::file(&b),
+            EdgeKind::CoChangesWith,
+            Status::Observed,
+            confidence,
+        ));
+    }
+    batch
+}
+
+/// Read every translation file in the repository.
+fn read_translation_files(
+    root: &Path,
+    found: &Discovery,
+) -> Result<Vec<(String, Vec<(String, String)>)>> {
+    let mut out = Vec::new();
+    for file in &found.files {
+        if file.lang != Lang::Csv {
+            continue;
+        }
+        let Some(lang) = concepts::translation_language(&file.path) else {
+            continue;
+        };
+        let Ok(text) = std::fs::read_to_string(root.join(&file.path)) else {
+            continue;
+        };
+        out.push((lang, concepts::parse_translation_csv(&text)));
+    }
+    Ok(out)
+}
+
+fn now_unix() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0)
+}
+
+/// Concept counts by bridge, for `reify report`.
+pub fn concept_bridges(store: &Store) -> Result<HashMap<String, u64>> {
+    let mut counts: HashMap<String, u64> = HashMap::new();
+    for node in store.nodes_of_kind(NodeKind::Concept)? {
+        let bridge = node
+            .data
+            .get("bridge")
+            .and_then(|v| v.as_str())
+            .unwrap_or(Bridge::CoOccurrence.as_str())
+            .to_string();
+        *counts.entry(bridge).or_default() += 1;
+    }
+    Ok(counts)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+
+    fn fixture(name: &str) -> PathBuf {
+        let dir = std::env::temp_dir().join(format!(
+            "reify-index-{}-{name}-{}",
+            std::process::id(),
+            now_unix()
+        ));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(dir.join("app")).unwrap();
+        fs::create_dir_all(dir.join("docs")).unwrap();
+        fs::create_dir_all(dir.join("translations")).unwrap();
+
+        fs::write(
+            dir.join("app/order.py"),
+            r#"
+class SalesOrder:
+    """A customer order."""
+
+    def requires_approval(self):
+        if self.customer_group == 7:
+            return self.bypass_level_two()
+        return True
+
+    def bypass_level_two(self):
+        rows = self.db.sql("SELECT name FROM `tabSales Order` WHERE docstatus = 1")
+        return rows
+"#,
+        )
+        .unwrap();
+        fs::write(
+            dir.join("app/strategic.py"),
+            "class StrategicAccount:\n    def rate(self):\n        return 0.15\n",
+        )
+        .unwrap();
+        fs::write(
+            dir.join("docs/BRD-42.md"),
+            "# Approval BRD\n\n## Sales Order approval\n\nOrders above 50M require L2 approval.\n",
+        )
+        .unwrap();
+        fs::write(
+            dir.join("translations/vi.csv"),
+            "Strategic Account,khách hàng chiến lược\nSales Order,đơn bán hàng\nPlease wait,Vui lòng đợi\n",
+        )
+        .unwrap();
+        dir
+    }
+
+    fn index_fresh(root: &Path) -> (Store, IndexReport) {
+        let mut store = Store::in_memory().unwrap();
+        let opts = IndexOptions::new(root);
+        let report = index(&mut store, &opts).unwrap();
+        (store, report)
+    }
+
+    #[test]
+    fn a_full_index_finds_symbols_docs_tables_and_concepts() {
+        let root = fixture("full");
+        let (store, report) = index_fresh(&root);
+
+        assert!(report.symbols >= 5, "symbols: {}", report.symbols);
+        assert!(report.doc_sections >= 2);
+        assert!(report.database_objects >= 1, "the embedded SQL table must be found");
+        assert!(report.concepts >= 1, "the translation bridge must produce concepts");
+        assert!(report.parse_errors.is_empty(), "{:?}", report.parse_errors);
+
+        assert!(store
+            .node_by_uid("sym:app/order.py#SalesOrder.requires_approval")
+            .unwrap()
+            .is_some());
+        assert!(store.node_by_uid("db:tabsales order").unwrap().is_some());
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn embedded_sql_is_attributed_to_the_method_that_runs_it() {
+        let root = fixture("sql");
+        let (store, _) = index_fresh(&root);
+        let method = store
+            .node_by_uid("sym:app/order.py#SalesOrder.bypass_level_two")
+            .unwrap()
+            .unwrap();
+        let out = store
+            .neighbors(method.id, crate::store::Direction::Out, &[EdgeKind::Reads])
+            .unwrap();
+        assert_eq!(out.len(), 1, "expected one table read");
+        assert_eq!(out[0].0.uid, "db:tabsales order");
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn a_vietnamese_term_reaches_english_code_through_a_concept() {
+        let root = fixture("vi");
+        let (store, _) = index_fresh(&root);
+        let concept = store
+            .node_by_uid("concept:STRATEGIC_ACCOUNT")
+            .unwrap()
+            .expect("the grounded translation row must become a concept");
+        assert_eq!(concept.data["labels"]["vie"], "khách hàng chiến lược");
+
+        let mapped = store
+            .neighbors(concept.id, crate::store::Direction::Out, &[EdgeKind::MapsTo])
+            .unwrap();
+        let targets: Vec<&str> = mapped.iter().map(|(n, _, _)| n.uid.as_str()).collect();
+        assert!(
+            targets.contains(&"sym:app/strategic.py#StrategicAccount"),
+            "got {targets:?}"
+        );
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn ungrounded_translation_rows_do_not_become_concepts() {
+        let root = fixture("ungrounded");
+        let (store, _) = index_fresh(&root);
+        assert!(
+            store.node_by_uid("concept:PLEASE_WAIT").unwrap().is_none(),
+            "a UI string must not become a business concept"
+        );
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn calls_resolve_across_the_repository() {
+        let root = fixture("calls");
+        let (store, _) = index_fresh(&root);
+        let caller = store
+            .node_by_uid("sym:app/order.py#SalesOrder.requires_approval")
+            .unwrap()
+            .unwrap();
+        let out = store
+            .neighbors(caller.id, crate::store::Direction::Out, &[EdgeKind::Calls])
+            .unwrap();
+        let names: Vec<&str> = out.iter().map(|(n, _, _)| n.name.as_str()).collect();
+        assert!(names.contains(&"bypass_level_two"), "got {names:?}");
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn reindexing_an_unchanged_tree_parses_nothing() {
+        let root = fixture("noop");
+        let mut store = Store::in_memory().unwrap();
+        let opts = IndexOptions::new(&root);
+        index(&mut store, &opts).unwrap();
+        let second = index(&mut store, &opts).unwrap();
+        assert_eq!(second.files_parsed, 0);
+        assert!(second.files_unchanged > 0);
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    /// The property the whole incremental design exists to preserve.
+    #[test]
+    fn incremental_indexing_equals_a_full_rebuild() {
+        let root = fixture("equiv");
+        let opts = IndexOptions::new(&root);
+
+        // Build incrementally through a sequence of realistic edits.
+        let mut incremental = Store::in_memory().unwrap();
+        index(&mut incremental, &opts).unwrap();
+
+        fs::write(
+            root.join("app/strategic.py"),
+            "class StrategicAccount:\n    def rate(self):\n        return 0.20\n\n    def tier(self):\n        return 'S'\n",
+        )
+        .unwrap();
+        index(&mut incremental, &opts).unwrap();
+
+        fs::write(
+            root.join("app/invoice.py"),
+            "class Invoice:\n    def total(self):\n        return 0\n",
+        )
+        .unwrap();
+        index(&mut incremental, &opts).unwrap();
+
+        fs::remove_file(root.join("docs/BRD-42.md")).unwrap();
+        index(&mut incremental, &opts).unwrap();
+
+        fs::write(
+            root.join("docs/BRD-43.md"),
+            "# Pricing\n\n## Strategic Account discounts\n\nStrategic accounts get 15%.\n",
+        )
+        .unwrap();
+        index(&mut incremental, &opts).unwrap();
+
+        // Build the same final state from scratch.
+        let mut full = Store::in_memory().unwrap();
+        index(&mut full, &opts).unwrap();
+
+        let a = incremental.canonical_dump().unwrap();
+        let b = full.canonical_dump().unwrap();
+        if a != b {
+            let only_incremental: Vec<&str> =
+                a.lines().filter(|l| !b.contains(*l)).take(8).collect();
+            let only_full: Vec<&str> = b.lines().filter(|l| !a.contains(*l)).take(8).collect();
+            panic!(
+                "incremental diverged from full\n  only incremental: {only_incremental:#?}\n  only full: {only_full:#?}"
+            );
+        }
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn deleting_a_file_removes_everything_it_contributed() {
+        let root = fixture("delete");
+        let mut store = Store::in_memory().unwrap();
+        let opts = IndexOptions::new(&root);
+        index(&mut store, &opts).unwrap();
+        assert!(store
+            .node_by_uid("sym:app/strategic.py#StrategicAccount")
+            .unwrap()
+            .is_some());
+
+        fs::remove_file(root.join("app/strategic.py")).unwrap();
+        let report = index(&mut store, &opts).unwrap();
+        assert_eq!(report.files_removed, 1);
+        assert!(store
+            .node_by_uid("sym:app/strategic.py#StrategicAccount")
+            .unwrap()
+            .is_none());
+        assert!(store.node_by_uid("file:app/strategic.py").unwrap().is_none());
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn a_file_that_fails_to_parse_is_reported_and_does_not_stop_the_index() {
+        let root = fixture("badfile");
+        // Valid UTF-8, but not valid Python in a way tree-sitter still recovers from.
+        fs::write(root.join("app/broken.py"), "def ok():\n    pass\n\nclass !!!:\n").unwrap();
+        let (store, report) = index_fresh(&root);
+        assert!(store.node_by_uid("sym:app/broken.py#ok").unwrap().is_some());
+        assert!(report.symbols > 0);
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn relative_imports_resolve_to_files_in_the_repository() {
+        let present: HashSet<&str> = ["app/order.py", "app/util/helpers.py"].into_iter().collect();
+        assert_eq!(
+            resolve_module(".order", "app/main.py", &present).as_deref(),
+            Some("app/order.py")
+        );
+        assert_eq!(
+            resolve_module("app.util.helpers", "app/main.py", &present).as_deref(),
+            Some("app/util/helpers.py")
+        );
+        assert_eq!(resolve_module("os", "app/main.py", &present), None);
+    }
+
+    #[test]
+    fn the_innermost_symbol_owns_an_embedded_query() {
+        let spans = vec![
+            (1, 100, "sym:a.py#Outer".to_string()),
+            (10, 20, "sym:a.py#Outer.inner".to_string()),
+        ];
+        assert_eq!(owner_for_line(&spans, 15).as_deref(), Some("sym:a.py#Outer.inner"));
+        assert_eq!(owner_for_line(&spans, 50).as_deref(), Some("sym:a.py#Outer"));
+        assert_eq!(owner_for_line(&spans, 500), None);
+    }
+}
