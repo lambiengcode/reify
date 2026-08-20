@@ -35,6 +35,13 @@ pub fn extract(path: &str, text: &str, lang: Lang) -> Result<FileExtract> {
         Lang::TypeScript => tree_sitter_typescript::LANGUAGE_TYPESCRIPT.into(),
         Lang::JavaScript => tree_sitter_typescript::LANGUAGE_TSX.into(),
         Lang::Java => tree_sitter_java::LANGUAGE.into(),
+        Lang::Go => tree_sitter_go::LANGUAGE.into(),
+        Lang::CSharp => tree_sitter_c_sharp::LANGUAGE.into(),
+        Lang::Rust => tree_sitter_rust::LANGUAGE.into(),
+        Lang::Ruby => tree_sitter_ruby::LANGUAGE.into(),
+        Lang::Php => tree_sitter_php::LANGUAGE_PHP.into(),
+        Lang::Cpp => tree_sitter_cpp::LANGUAGE.into(),
+        Lang::Kotlin => tree_sitter_kotlin_ng::LANGUAGE.into(),
         other => return Err(anyhow!("no code grammar for {}", other.as_str())),
     };
     parser
@@ -92,10 +99,20 @@ impl<'a> Ctx<'a> {
             return;
         }
         match node.kind() {
-            "call" | "call_expression" | "method_invocation" => self.record_call(node),
-            "import_statement" | "import_from_statement" | "import_declaration" => {
-                self.record_import(node)
-            }
+            "call"
+            | "call_expression"
+            | "method_invocation"
+            | "invocation_expression"
+            | "function_call_expression"
+            | "member_call_expression"
+            | "scoped_call_expression" => self.record_call(node),
+            "import_statement"
+            | "import_from_statement"
+            | "import_declaration"
+            | "import_spec"
+            | "using_directive"
+            | "use_declaration"
+            | "namespace_use_declaration" => self.record_import(node),
             _ => {}
         }
         let mut cursor = node.walk();
@@ -107,24 +124,70 @@ impl<'a> Ctx<'a> {
     /// Recognise a declaration node and return its kind label and name.
     fn declaration(&self, node: TsNode<'_>) -> Option<(&'static str, String)> {
         let kind = match node.kind() {
-            "function_definition" | "function_declaration" | "generator_function_declaration" => {
-                "function"
-            }
+            // One label per concept across every grammar. The grammars disagree about
+            // names for the same idea — Go's `function_declaration` is Rust's
+            // `function_item` is Ruby's `method` — so the mapping is explicit rather
+            // than pattern-matched, and adding a language is adding rows here.
+            "function_definition"
+            | "function_declaration"
+            | "generator_function_declaration"
+            | "function_item"
+            | "local_function_statement"
+            | "function_definition_statement" => "function",
             "class_definition"
             | "class_declaration"
             | "abstract_class_declaration"
-            | "record_declaration" => "class",
+            | "record_declaration"
+            | "struct_item"
+            | "struct_specifier"
+            | "class_specifier"
+            | "type_spec"
+            | "object_declaration"
+            // Ruby names these nodes with the bare keyword. That is safe to match on
+            // even where another grammar uses the same word as a keyword *token*,
+            // because a token has no `name` field and is rejected below.
+            | "class"
+            | "module" => "class",
             // `method_declaration` and `constructor_declaration` are Java. Omitting
             // them silently reduces a Java repository to one symbol per file — the
             // class — which looks like a working index and is not one.
-            "method_definition" | "method_declaration" | "constructor_declaration" => "method",
-            "interface_declaration" | "annotation_type_declaration" => "interface",
-            "type_alias_declaration" => "type",
+            "method_definition"
+            | "method_declaration"
+            | "constructor_declaration"
+            | "method_spec"
+            | "method"
+            | "singleton_method"
+            | "function_declarator" => "method",
+            "interface_declaration" | "annotation_type_declaration" | "trait_item" => "interface",
+            "type_alias_declaration" | "type_item" | "impl_item" => "type",
             "enum_declaration" => "enum",
             _ => return None,
         };
-        let name = self.named_child_text(node, "name")?.to_string();
+        let name = self.declaration_name(node)?;
         Some((kind, name))
+    }
+
+    /// The declared name, however this grammar nests it.
+    ///
+    /// Most grammars expose a `name` field. C and C++ instead wrap the name in a
+    /// declarator chain — `function_definition` → `function_declarator` → `identifier`
+    /// — so a `name`-only lookup finds nothing and silently skips every function in a
+    /// C++ repository.
+    fn declaration_name(&self, node: TsNode<'_>) -> Option<String> {
+        if let Some(name) = self.named_child_text(node, "name") {
+            return Some(name.to_string());
+        }
+        let mut current = node.child_by_field_name("declarator")?;
+        // Bounded: a declarator chain is a handful of levels, and a cycle would hang.
+        for _ in 0..8 {
+            match current.kind() {
+                "identifier" | "field_identifier" | "type_identifier" | "qualified_identifier" => {
+                    return Some(self.slice(current).to_string());
+                }
+                _ => current = current.child_by_field_name("declarator")?,
+            }
+        }
+        None
     }
 
     fn enter_declaration(&mut self, node: TsNode<'_>, (kind, name): (&'static str, String)) {
@@ -333,15 +396,39 @@ impl<'a> Ctx<'a> {
             return; // a call at module level belongs to no symbol
         };
         // Java names the callee in `name`; the JS and Python grammars use `function`.
+        // The grammars disagree about which field holds the callee: `function` in
+        // Python and JavaScript, `name` in Java, `method` in Ruby.
         let Some(func) = node
             .child_by_field_name("function")
             .or_else(|| node.child_by_field_name("name"))
+            .or_else(|| node.child_by_field_name("method"))
+            // Kotlin and some others name no field at all; the callee is simply the
+            // first child of the call expression.
+            .or_else(|| node.named_child(0))
         else {
             return;
         };
         let name = match func.kind() {
-            "identifier" if node.kind() == "method_invocation" => self.slice(func).to_string(),
-            "identifier" => self.slice(func).to_string(),
+            // Java's `method_invocation`, Go's selector, Ruby's bare identifier: the
+            // callee is the identifier itself rather than a nested expression.
+            "identifier" | "field_identifier" | "type_identifier"
+                if node.kind() != "call_expression" =>
+            {
+                self.slice(func).to_string()
+            }
+            // PHP calls its identifier node `name`; Kotlin uses `simple_identifier`.
+            "identifier" | "field_identifier" | "name" | "simple_identifier" => {
+                self.slice(func).to_string()
+            }
+            "selector_expression" | "scoped_identifier" | "field_expression" => {
+                match self
+                    .named_child_text(func, "field")
+                    .or_else(|| self.named_child_text(func, "name"))
+                {
+                    Some(p) => p.to_string(),
+                    None => return,
+                }
+            }
             "attribute" | "member_expression" => match self
                 .named_child_text(func, "property")
                 .or_else(|| self.named_child_text(func, "attribute"))
@@ -851,6 +938,173 @@ export function helper(a: number) { return a; }
             "rules: {:#?}",
             fx.rules
         );
+    }
+
+    /// One real snippet per grammar, asserting the same three things: the container is
+    /// found, the callable inside it is found, and the call between them is recorded.
+    ///
+    /// Grammars name the same idea differently, and a missing node kind produces an
+    /// index that looks healthy while containing one symbol per file — the exact
+    /// failure that went unnoticed in Java until a second repository exposed it.
+    #[test]
+    fn every_supported_language_yields_containers_callables_and_calls() {
+        struct Case {
+            lang: Lang,
+            file: &'static str,
+            source: &'static str,
+            container: &'static str,
+            callable: &'static str,
+            callee: &'static str,
+        }
+
+        let cases = [
+            Case {
+                lang: Lang::Go,
+                file: "order.go",
+                source: "package main\n\ntype OrderService struct{ total int }\n\n\
+                         func (s *OrderService) RequiresApproval() bool {\n\
+                         \treturn s.bypassApproval()\n}\n\n\
+                         func (s *OrderService) bypassApproval() bool { return false }\n",
+                container: "OrderService",
+                callable: "RequiresApproval",
+                callee: "bypassApproval",
+            },
+            Case {
+                lang: Lang::CSharp,
+                file: "OrderService.cs",
+                source: "namespace App {\n public class OrderService {\n\
+                           public bool RequiresApproval() { return BypassApproval(); }\n\
+                           private bool BypassApproval() { return false; }\n }\n}\n",
+                container: "OrderService",
+                callable: "RequiresApproval",
+                callee: "BypassApproval",
+            },
+            Case {
+                lang: Lang::Rust,
+                file: "order.rs",
+                source: "pub struct OrderService;\n\nimpl OrderService {\n\
+                         pub fn requires_approval(&self) -> bool { self.bypass_approval() }\n\
+                         fn bypass_approval(&self) -> bool { false }\n}\n",
+                container: "OrderService",
+                callable: "requires_approval",
+                callee: "bypass_approval",
+            },
+            Case {
+                lang: Lang::Ruby,
+                file: "order.rb",
+                source:
+                    "class OrderService\n  def requires_approval\n    self.bypass_approval\n  end\n\
+                         \n  def bypass_approval\n    false\n  end\nend\n",
+                container: "OrderService",
+                callable: "requires_approval",
+                callee: "bypass_approval",
+            },
+            Case {
+                lang: Lang::Php,
+                file: "Order.php",
+                source: "<?php\nclass OrderService {\n\
+                         public function requiresApproval() { return $this->bypassApproval(); }\n\
+                         private function bypassApproval() { return false; }\n}\n",
+                container: "OrderService",
+                callable: "requiresApproval",
+                callee: "bypassApproval",
+            },
+            Case {
+                lang: Lang::Cpp,
+                file: "order.cpp",
+                source: "class OrderService {\npublic:\n\
+                         bool requiresApproval() { return bypassApproval(); }\n\
+                         bool bypassApproval() { return false; }\n};\n",
+                container: "OrderService",
+                callable: "requiresApproval",
+                callee: "bypassApproval",
+            },
+            Case {
+                lang: Lang::Kotlin,
+                file: "Order.kt",
+                source: "class OrderService {\n\
+                         fun requiresApproval(): Boolean = bypassApproval()\n\
+                         fun bypassApproval(): Boolean = false\n}\n",
+                container: "OrderService",
+                callable: "requiresApproval",
+                callee: "bypassApproval",
+            },
+        ];
+
+        for case in cases {
+            let fx = extract(case.file, case.source, case.lang)
+                .unwrap_or_else(|e| panic!("{:?}: {e}", case.lang));
+            let names: Vec<&str> = fx.batch.nodes.iter().map(|n| n.name.as_str()).collect();
+            assert!(
+                names.contains(&case.container),
+                "{:?}: no container {} in {names:?}",
+                case.lang,
+                case.container
+            );
+            assert!(
+                names.contains(&case.callable),
+                "{:?}: no callable {} in {names:?} — a grammar node kind is unmapped",
+                case.lang,
+                case.callable
+            );
+            let called: Vec<&str> = fx
+                .pending
+                .iter()
+                .filter(|p| p.kind == EdgeKind::Calls)
+                .map(|p| p.name.as_str())
+                .collect();
+            assert!(
+                called.contains(&case.callee),
+                "{:?}: no call to {} in {called:?}",
+                case.lang,
+                case.callee
+            );
+        }
+    }
+
+    #[test]
+    fn a_bare_ruby_method_call_is_a_known_recall_gap() {
+        // Ruby cannot distinguish `foo` the local variable from `foo` the method call
+        // without resolving scope. Recording every identifier as a call would flood the
+        // graph, so the receiver-less form is missed. Pinned as a test so the
+        // limitation is visible rather than folklore.
+        let src = "class A\n  def a\n    b\n  end\n  def b\n    1\n  end\nend\n";
+        let fx = extract("a.rb", src, Lang::Ruby).unwrap();
+        let calls: Vec<&str> = fx
+            .pending
+            .iter()
+            .filter(|p| p.kind == EdgeKind::Calls)
+            .map(|p| p.name.as_str())
+            .collect();
+        assert!(
+            calls.is_empty(),
+            "if this now finds `b`, delete this test: {calls:?}"
+        );
+    }
+
+    #[test]
+    fn every_language_claiming_a_grammar_can_load_it() {
+        // `has_grammar` routes files to the parser, so a language that claims one and
+        // cannot load it fails every file in a repository at run time.
+        for lang in [
+            Lang::Python,
+            Lang::TypeScript,
+            Lang::JavaScript,
+            Lang::Java,
+            Lang::Go,
+            Lang::CSharp,
+            Lang::Rust,
+            Lang::Ruby,
+            Lang::Php,
+            Lang::Cpp,
+            Lang::Kotlin,
+        ] {
+            assert!(lang.has_grammar(), "{lang:?}");
+            assert!(
+                extract("probe", "", lang).is_ok(),
+                "{lang:?} claims a grammar it cannot load"
+            );
+        }
     }
 
     #[test]

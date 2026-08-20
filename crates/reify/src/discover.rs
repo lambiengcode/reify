@@ -234,6 +234,13 @@ pub fn classify(path: &str) -> Lang {
         "ts" | "tsx" => Lang::TypeScript,
         "js" | "jsx" | "mjs" | "cjs" => Lang::JavaScript,
         "java" => Lang::Java,
+        "go" => Lang::Go,
+        "cs" => Lang::CSharp,
+        "rs" => Lang::Rust,
+        "rb" | "rake" => Lang::Ruby,
+        "php" => Lang::Php,
+        "cpp" | "cc" | "cxx" | "hpp" | "hh" | "c" | "h" => Lang::Cpp,
+        "kt" | "kts" => Lang::Kotlin,
         "sql" => Lang::Sql,
         "md" | "markdown" | "mdx" => Lang::Markdown,
         "txt" | "rst" | "adoc" => Lang::Text,
@@ -243,6 +250,10 @@ pub fn classify(path: &str) -> Lang {
         "csv" => Lang::Csv,
         "json" => Lang::Json,
         "yaml" | "yml" => Lang::Yaml,
+        // Both are structured model metadata in Java stacks: Hibernate mappings
+        // declare entity-to-table shape, message bundles declare vocabulary.
+        "xml" => Lang::Xml,
+        "properties" => Lang::Properties,
         _ => Lang::Other,
     }
 }
@@ -265,12 +276,24 @@ mod tests {
         assert_eq!(classify("app/x.tsx"), Lang::TypeScript);
         assert_eq!(classify("app/x.mjs"), Lang::JavaScript);
         assert_eq!(classify("src/main/java/Order.java"), Lang::Java);
+        assert_eq!(classify("internal/order/service.go"), Lang::Go);
+        assert_eq!(classify("Services/OrderService.cs"), Lang::CSharp);
+        assert_eq!(classify("src/order.rs"), Lang::Rust);
+        assert_eq!(classify("app/models/order.rb"), Lang::Ruby);
+        assert_eq!(classify("src/Order.php"), Lang::Php);
+        assert_eq!(classify("src/order.cpp"), Lang::Cpp);
+        assert_eq!(classify("src/Order.kt"), Lang::Kotlin);
         assert_eq!(classify("db/schema.sql"), Lang::Sql);
         assert_eq!(classify("docs/BRD.docx"), Lang::Docx);
         assert_eq!(classify("docs/spec.pdf"), Lang::Pdf);
         assert_eq!(classify("wiki/export.html"), Lang::Html);
         assert_eq!(classify("docs/BRD.md"), Lang::Markdown);
         assert_eq!(classify("i18n/vi.csv"), Lang::Csv);
+        assert_eq!(classify("db/hibernate/Alert.hbm.xml"), Lang::Xml);
+        assert_eq!(
+            classify("resources/messages_fr.properties"),
+            Lang::Properties
+        );
         assert_eq!(classify("bin/tool"), Lang::Other);
     }
 

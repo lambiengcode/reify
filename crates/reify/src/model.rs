@@ -192,6 +192,13 @@ pub enum Lang {
     TypeScript,
     JavaScript,
     Java,
+    Go,
+    CSharp,
+    Rust,
+    Ruby,
+    Php,
+    Cpp,
+    Kotlin,
     Sql,
     Markdown,
     Text,
@@ -201,6 +208,9 @@ pub enum Lang {
     Csv,
     Json,
     Yaml,
+    Xml,
+    /// A Java/Spring `.properties` message bundle.
+    Properties,
     Other,
 }
 
@@ -211,6 +221,13 @@ impl Lang {
             Lang::TypeScript => "typescript",
             Lang::JavaScript => "javascript",
             Lang::Java => "java",
+            Lang::Go => "go",
+            Lang::CSharp => "csharp",
+            Lang::Rust => "rust",
+            Lang::Ruby => "ruby",
+            Lang::Php => "php",
+            Lang::Cpp => "cpp",
+            Lang::Kotlin => "kotlin",
             Lang::Sql => "sql",
             Lang::Markdown => "markdown",
             Lang::Text => "text",
@@ -220,6 +237,8 @@ impl Lang {
             Lang::Csv => "csv",
             Lang::Json => "json",
             Lang::Yaml => "yaml",
+            Lang::Xml => "xml",
+            Lang::Properties => "properties",
             Lang::Other => "other",
         }
     }
@@ -230,6 +249,13 @@ impl Lang {
             "typescript" => Lang::TypeScript,
             "javascript" => Lang::JavaScript,
             "java" => Lang::Java,
+            "go" => Lang::Go,
+            "csharp" => Lang::CSharp,
+            "rust" => Lang::Rust,
+            "ruby" => Lang::Ruby,
+            "php" => Lang::Php,
+            "cpp" => Lang::Cpp,
+            "kotlin" => Lang::Kotlin,
             "sql" => Lang::Sql,
             "markdown" => Lang::Markdown,
             "text" => Lang::Text,
@@ -239,6 +265,8 @@ impl Lang {
             "csv" => Lang::Csv,
             "json" => Lang::Json,
             "yaml" => Lang::Yaml,
+            "xml" => Lang::Xml,
+            "properties" => Lang::Properties,
             _ => Lang::Other,
         }
     }
@@ -246,7 +274,18 @@ impl Lang {
     pub fn is_code(self) -> bool {
         matches!(
             self,
-            Lang::Python | Lang::TypeScript | Lang::JavaScript | Lang::Java | Lang::Sql
+            Lang::Python
+                | Lang::TypeScript
+                | Lang::JavaScript
+                | Lang::Java
+                | Lang::Go
+                | Lang::CSharp
+                | Lang::Rust
+                | Lang::Ruby
+                | Lang::Php
+                | Lang::Cpp
+                | Lang::Kotlin
+                | Lang::Sql
         )
     }
 
@@ -257,7 +296,17 @@ impl Lang {
     pub fn has_grammar(self) -> bool {
         matches!(
             self,
-            Lang::Python | Lang::TypeScript | Lang::JavaScript | Lang::Java
+            Lang::Python
+                | Lang::TypeScript
+                | Lang::JavaScript
+                | Lang::Java
+                | Lang::Go
+                | Lang::CSharp
+                | Lang::Rust
+                | Lang::Ruby
+                | Lang::Php
+                | Lang::Cpp
+                | Lang::Kotlin
         )
     }
 
@@ -437,6 +486,13 @@ mod tests {
             Lang::TypeScript,
             Lang::JavaScript,
             Lang::Java,
+            Lang::Go,
+            Lang::CSharp,
+            Lang::Rust,
+            Lang::Ruby,
+            Lang::Php,
+            Lang::Cpp,
+            Lang::Kotlin,
             Lang::Sql,
             Lang::Markdown,
             Lang::Text,
@@ -446,6 +502,8 @@ mod tests {
             Lang::Csv,
             Lang::Json,
             Lang::Yaml,
+            Lang::Xml,
+            Lang::Properties,
         ] {
             assert_eq!(Lang::parse(lang.as_str()), lang);
             assert!(

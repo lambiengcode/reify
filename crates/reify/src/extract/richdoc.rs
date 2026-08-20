@@ -164,7 +164,11 @@ fn heading_from_style(style: &str) -> Option<usize> {
     digits.parse().ok().or(Some(1))
 }
 
-fn local_name(raw: &[u8]) -> String {
+/// The tag or attribute name with any namespace prefix removed.
+///
+/// Shared with the schema extractor: `w:t` and `hbm:class` are both namespaced, and
+/// neither parser cares which namespace an element came from.
+pub(crate) fn local_name(raw: &[u8]) -> String {
     let text = String::from_utf8_lossy(raw);
     text.rsplit(':').next().unwrap_or(&text).to_string()
 }

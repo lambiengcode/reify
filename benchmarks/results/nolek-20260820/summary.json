@@ -30,12 +30,12 @@
     "tasks": 40,
     "tasks_with_a_hit": 24,
     "hit_rate": 0.6,
-    "mean_recall": 0.52666664,
-    "mean_precision": 0.05900832,
-    "mrr": 0.20072421,
-    "median_tokens_to_first_hit": 2914,
-    "median_tokens_total": 3717,
+    "mean_recall": 0.5258333,
+    "mean_precision": 0.057041537,
+    "mrr": 0.24541518,
+    "median_tokens_to_first_hit": 2886,
+    "median_tokens_total": 3907,
     "median_files_inspected": 13,
-    "median_elapsed_ms": 57
+    "median_elapsed_ms": 64
   }
 ]

@@ -67,6 +67,12 @@ pub enum Bridge {
     /// Mined from document headings that co-occur with code identifiers.
     #[default]
     CoOccurrence,
+    /// Mined from the code's own identifiers, with nothing declared anywhere.
+    ///
+    /// The universal bridge: every repository has identifiers, so this one works
+    /// regardless of framework, language or documentation. It is the weakest of the
+    /// four and the only one that is always available.
+    CodeVocabulary,
 }
 
 impl Bridge {
@@ -75,6 +81,7 @@ impl Bridge {
             Bridge::Declared => "declared",
             Bridge::Translation => "translation",
             Bridge::CoOccurrence => "co-occurrence",
+            Bridge::CodeVocabulary => "code-vocabulary",
         }
     }
 }
@@ -342,6 +349,112 @@ pub fn from_headings(headings: &[String], grounding: &TermIndex) -> Vec<Concept>
     by_id.into_values().collect()
 }
 
+/// A phrase must name this many distinct symbols before it counts as vocabulary.
+///
+/// One symbol called `customer_group` is a name. Six symbols across four files sharing
+/// the phrase is a concept the codebase keeps returning to.
+const MIN_PHRASE_SYMBOLS: usize = 3;
+
+/// A word appearing in more than this share of all symbols is structural, not domain.
+///
+/// `get`, `set`, `handle`, `manager`, `service`, `util` — every codebase has its own,
+/// and hard-coding a list would be wrong for the next one. Measuring which words are
+/// ubiquitous *in this repository* finds them without guessing.
+const UBIQUITOUS_WORD_SHARE: f32 = 0.02;
+
+/// Ubiquity cannot be established below this many occurrences, whatever the share.
+///
+/// Two percent of a small repository is a handful of symbols, and a genuine domain
+/// term easily appears that often — so without a floor the filter deletes exactly the
+/// vocabulary it exists to find. The share only starts to bind on repositories large
+/// enough for it to mean something.
+const UBIQUITOUS_FLOOR: usize = 25;
+
+/// The most vocabulary concepts to mine. Enough to cover a domain, few enough that the
+/// concept layer stays a vocabulary rather than a second symbol table.
+const MAX_VOCABULARY_CONCEPTS: usize = 400;
+
+/// Mine concepts from the code's own identifiers.
+///
+/// This is the bridge that makes Reify work on a repository that declares nothing: no
+/// glossary, no translation files, no entity metadata, no documentation. It rests on
+/// one observation — a multi-word phrase that recurs across many identifiers *is* the
+/// domain vocabulary, because that is what naming a domain looks like.
+///
+/// `symbols` is `(name, uid)` for every symbol and database object in the repository.
+pub fn from_code_vocabulary(symbols: &[(String, String)]) -> Vec<Concept> {
+    if symbols.len() < MIN_PHRASE_SYMBOLS {
+        return Vec::new();
+    }
+
+    // Which words are structural in *this* repository rather than domain vocabulary.
+    let mut word_frequency: BTreeMap<String, usize> = BTreeMap::new();
+    let split: Vec<(Vec<String>, &String)> = symbols
+        .iter()
+        .map(|(name, uid)| (split_identifier(name), uid))
+        .collect();
+    for (words, _) in &split {
+        for word in words.iter().collect::<BTreeSet<_>>() {
+            *word_frequency.entry(word.clone()).or_default() += 1;
+        }
+    }
+    let ubiquitous_at =
+        (((symbols.len() as f32) * UBIQUITOUS_WORD_SHARE) as usize).max(UBIQUITOUS_FLOOR);
+
+    // Adjacent word pairs are the unit: `customer_group`, `approval_policy`. Longer
+    // phrases fragment, and single words are rarely a concept on their own.
+    let mut phrases: BTreeMap<(String, String), BTreeSet<String>> = BTreeMap::new();
+    for (words, uid) in &split {
+        let meaningful: Vec<&String> = words
+            .iter()
+            .filter(|w| w.len() >= 3 && !STOPWORDS.contains(&w.as_str()))
+            .collect();
+        for pair in meaningful.windows(2) {
+            let (a, b) = (pair[0], pair[1]);
+            // A pair of two ubiquitous words is boilerplate; one is acceptable, since
+            // `service` in `approval_service` still points at the domain.
+            let generic = |w: &String| word_frequency.get(w).copied().unwrap_or(0) > ubiquitous_at;
+            if generic(a) && generic(b) {
+                continue;
+            }
+            phrases
+                .entry((a.clone(), b.clone()))
+                .or_default()
+                .insert((*uid).clone());
+        }
+    }
+
+    let mut ranked: Vec<((String, String), BTreeSet<String>)> = phrases
+        .into_iter()
+        .filter(|(_, uids)| uids.len() >= MIN_PHRASE_SYMBOLS)
+        .collect();
+    // Most-used first, then alphabetically so truncation is deterministic.
+    ranked.sort_by(|a, b| b.1.len().cmp(&a.1.len()).then(a.0.cmp(&b.0)));
+    ranked.truncate(MAX_VOCABULARY_CONCEPTS);
+
+    ranked
+        .into_iter()
+        .map(|((a, b), uids)| {
+            let label = format!("{a} {b}");
+            Concept {
+                id: normalize_id(&label),
+                labels: BTreeMap::from([("eng".to_string(), label)]),
+                code: uids
+                    .iter()
+                    .filter_map(|u| u.rsplit(['#', ':']).next().map(str::to_string))
+                    .take(6)
+                    .collect(),
+                db: BTreeSet::new(),
+                // Read off the code and nothing else: real, but weaker evidence than a
+                // human or a framework declaring the same thing.
+                status: Status::Observed,
+                confidence: 0.55,
+                bridge: Bridge::CodeVocabulary,
+            }
+        })
+        .collect()
+}
+
 /// Merge concepts from several bridges, strongest bridge winning on conflict.
 ///
 /// A declared concept always absorbs a mined one with the same id rather than being
@@ -426,6 +539,7 @@ pub fn stage(concepts: &[Concept], grounding: &TermIndex) -> Batch {
                 Bridge::Declared => 0.95,
                 Bridge::Translation => 0.8,
                 Bridge::CoOccurrence => 0.6,
+                Bridge::CodeVocabulary => 0.5,
             };
             batch.edge(NewEdge::new(
                 concept_uid.clone(),
@@ -464,6 +578,63 @@ pub fn parse_translation_csv(text: &str) -> Vec<(String, String)> {
     rows
 }
 
+/// Parse a Java/Spring `.properties` message bundle into `(key, value)` pairs.
+///
+/// These are the translation bridge for JVM stacks, and they differ from a CSV in one
+/// important way: the source and the translation live in *different files*, joined by
+/// key. So this returns keys, and the join happens once every bundle has been read.
+pub fn parse_properties(text: &str) -> Vec<(String, String)> {
+    let mut out = Vec::new();
+    let mut pending = String::new();
+    for raw in text.lines() {
+        let line = if pending.is_empty() {
+            raw.trim_start()
+        } else {
+            raw.trim()
+        };
+        if pending.is_empty() && (line.starts_with('#') || line.starts_with('!') || line.is_empty())
+        {
+            continue;
+        }
+        // A trailing backslash continues the value onto the next line.
+        if let Some(head) = line.strip_suffix('\\') {
+            pending.push_str(head);
+            continue;
+        }
+        let full = if pending.is_empty() {
+            line.to_string()
+        } else {
+            std::mem::take(&mut pending) + line
+        };
+        let Some((key, value)) = full.split_once(['=', ':']) else {
+            continue;
+        };
+        let (key, value) = (key.trim(), value.trim());
+        if key.is_empty() || value.is_empty() {
+            continue;
+        }
+        out.push((key.to_string(), value.to_string()));
+    }
+    out
+}
+
+/// The locale a message bundle is written in, or `None` when it is the base bundle.
+///
+/// `messages.properties` is the base — conventionally English — and
+/// `messages_fr.properties` is its French translation. The locale is the *last*
+/// underscore-separated segment, which is the opposite of the CSV convention where the
+/// whole stem is the language.
+pub fn bundle_locale(path: &str) -> Option<String> {
+    let stem = path.rsplit('/').next()?.strip_suffix(".properties")?;
+    // `messages_fr` and `messages_pt_BR`: drop the bundle's base name, and the first
+    // segment that remains is the language. Taking the *last* segment instead reads
+    // `pt_BR` as the region and finds no language at all.
+    let mut segments = stem.split('_');
+    let _base = segments.next()?;
+    let code = segments.next()?.split('-').next()?.to_ascii_lowercase();
+    three_letter_code(&code)
+}
+
 /// Infer the target language of a translation file from its path.
 pub fn translation_language(path: &str) -> Option<String> {
     let stem = path
@@ -472,9 +643,13 @@ pub fn translation_language(path: &str) -> Option<String> {
         .rsplit_once('.')
         .map(|(stem, _)| stem)?;
     let code = stem.split(['-', '_']).next()?.to_ascii_lowercase();
-    // ISO-639-1 codes seen on translation files, mapped to the 3-letter form used by
-    // the language detector so both bridges speak one vocabulary.
-    let three = match code.as_str() {
+    three_letter_code(&code)
+}
+
+/// ISO-639-1 to the three-letter form the language detector uses, so every bridge
+/// speaks one vocabulary.
+fn three_letter_code(code: &str) -> Option<String> {
+    let three = match code {
         "vi" => "vie",
         "en" => "eng",
         "ja" => "jpn",
@@ -486,9 +661,50 @@ pub fn translation_language(path: &str) -> Option<String> {
         "pt" => "por",
         "th" => "tha",
         "id" => "ind",
+        "it" => "ita",
+        "nl" => "nld",
+        "ru" => "rus",
+        "pl" => "pol",
+        "tr" => "tur",
+        "sv" => "swe",
+        "el" => "ell",
+        "sw" => "swh",
+        "si" => "sin",
         _ => return None,
     };
     Some(three.to_string())
+}
+
+/// Join base-locale and translated message bundles into `(source, translation)` rows.
+///
+/// `bundles` is `(locale, key, value)`, where `locale` is `None` for the base bundle.
+/// A key present in a translation but absent from the base yields nothing: without the
+/// source string there is no pair, and inventing one would ground a concept on a term
+/// the codebase never uses.
+pub fn join_message_bundles(
+    bundles: &[(Option<String>, String, String)],
+) -> BTreeMap<String, Vec<(String, String)>> {
+    let base: BTreeMap<&str, &str> = bundles
+        .iter()
+        .filter(|(locale, _, _)| locale.is_none())
+        .map(|(_, key, value)| (key.as_str(), value.as_str()))
+        .collect();
+
+    let mut by_language: BTreeMap<String, Vec<(String, String)>> = BTreeMap::new();
+    for (locale, key, value) in bundles {
+        let Some(locale) = locale else { continue };
+        let Some(source) = base.get(key.as_str()) else {
+            continue;
+        };
+        if *source == value {
+            continue; // untranslated
+        }
+        by_language
+            .entry(locale.clone())
+            .or_default()
+            .push((source.to_string(), value.clone()));
+    }
+    by_language
 }
 
 /// Lowercase, de-stopworded, de-punctuated words of a label or identifier.
@@ -675,6 +891,117 @@ mod tests {
     }
 
     #[test]
+    fn vocabulary_concepts_are_mined_from_identifiers_alone() {
+        // The universal case: no glossary, no translations, no metadata, no docs.
+        let symbols: Vec<(String, String)> = [
+            (
+                "customer_group_for_order",
+                "sym:a.py#customer_group_for_order",
+            ),
+            ("CustomerGroupPolicy", "sym:b.py#CustomerGroupPolicy"),
+            ("resolveCustomerGroup", "sym:c.ts#resolveCustomerGroup"),
+            ("unrelated_helper", "sym:d.py#unrelated_helper"),
+        ]
+        .iter()
+        .map(|(a, b)| (a.to_string(), b.to_string()))
+        .collect();
+
+        let concepts = from_code_vocabulary(&symbols);
+        let ids: Vec<&str> = concepts.iter().map(|c| c.id.as_str()).collect();
+        assert!(ids.contains(&"CUSTOMER_GROUP"), "got {ids:?}");
+        let found = concepts.iter().find(|c| c.id == "CUSTOMER_GROUP").unwrap();
+        assert_eq!(found.bridge, Bridge::CodeVocabulary);
+        assert_eq!(found.status, Status::Observed);
+        assert!(found.confidence < 0.8, "weaker than anything declared");
+    }
+
+    #[test]
+    fn a_phrase_used_once_is_a_name_not_a_concept() {
+        let symbols: Vec<(String, String)> = [
+            ("customer_group", "sym:a.py#customer_group"),
+            ("wildly_different_thing", "sym:b.py#wildly_different_thing"),
+            ("another_unique_name", "sym:c.py#another_unique_name"),
+            (
+                "yet_more_distinct_words",
+                "sym:d.py#yet_more_distinct_words",
+            ),
+        ]
+        .iter()
+        .map(|(a, b)| (a.to_string(), b.to_string()))
+        .collect();
+        assert!(from_code_vocabulary(&symbols).is_empty());
+    }
+
+    #[test]
+    fn structural_boilerplate_is_measured_out_rather_than_hard_coded() {
+        // Every codebase has its own boilerplate vocabulary. Ubiquity within *this*
+        // repository identifies it without a curated list that fits only one stack.
+        let mut symbols: Vec<(String, String)> = Vec::new();
+        for i in 0..200 {
+            symbols.push((
+                format!("abstract_factory_{i}"),
+                format!("sym:f{i}.java#a{i}"),
+            ));
+        }
+        for i in 0..5 {
+            symbols.push((
+                format!("patient_encounter_{i}"),
+                format!("sym:p{i}.java#p{i}"),
+            ));
+        }
+        let ids: Vec<String> = from_code_vocabulary(&symbols)
+            .into_iter()
+            .map(|c| c.id)
+            .collect();
+        assert!(
+            ids.contains(&"PATIENT_ENCOUNTER".to_string()),
+            "got {ids:?}"
+        );
+        assert!(
+            !ids.contains(&"ABSTRACT_FACTORY".to_string()),
+            "a phrase in 200 of 205 symbols is boilerplate: {ids:?}"
+        );
+    }
+
+    #[test]
+    fn a_domain_term_survives_the_boilerplate_filter_on_a_small_repository() {
+        // Two percent of a small repository is a handful of symbols. Without a floor,
+        // the ubiquity filter deletes the very vocabulary it exists to find.
+        let symbols: Vec<(String, String)> = (0..6)
+            .map(|i| {
+                (
+                    format!("patient_encounter_{i}"),
+                    format!("sym:p{i}.java#p{i}"),
+                )
+            })
+            .collect();
+        let ids: Vec<String> = from_code_vocabulary(&symbols)
+            .into_iter()
+            .map(|c| c.id)
+            .collect();
+        assert_eq!(ids, vec!["PATIENT_ENCOUNTER"], "got {ids:?}");
+    }
+
+    #[test]
+    fn vocabulary_mining_is_deterministic_and_bounded() {
+        let symbols: Vec<(String, String)> = (0..2000)
+            .map(|i| {
+                (
+                    format!("domain_term_{}", i % 300),
+                    format!("sym:f{i}.py#s{i}"),
+                )
+            })
+            .collect();
+        let first = from_code_vocabulary(&symbols);
+        let second = from_code_vocabulary(&symbols);
+        assert_eq!(
+            first.iter().map(|c| &c.id).collect::<Vec<_>>(),
+            second.iter().map(|c| &c.id).collect::<Vec<_>>()
+        );
+        assert!(first.len() <= MAX_VOCABULARY_CONCEPTS);
+    }
+
+    #[test]
     fn a_declared_concept_absorbs_a_mined_one_rather_than_being_overwritten() {
         let declared = vec![Concept {
             id: "STRATEGIC_ACCOUNT".into(),
@@ -824,6 +1151,68 @@ db = ["CUSTOMER_GROUP=7"]
     fn untranslated_rows_are_dropped() {
         let rows = parse_translation_csv("Order,Order\n,\nSubmit,Gửi\n");
         assert_eq!(rows, vec![("Submit".into(), "Gửi".into())]);
+    }
+
+    #[test]
+    fn properties_bundles_parse_including_continuations_and_comments() {
+        let text = "# a comment\n!another\n\nlogin.title=OpenMRS - Login\n\
+                    long.key=first part \\\n  second part\nempty.key=\n";
+        let rows = parse_properties(text);
+        assert_eq!(rows[0], ("login.title".into(), "OpenMRS - Login".into()));
+        assert_eq!(
+            rows[1],
+            ("long.key".into(), "first part second part".into())
+        );
+        assert_eq!(rows.len(), 2, "empty values are not vocabulary: {rows:?}");
+    }
+
+    #[test]
+    fn a_bundle_locale_is_the_suffix_not_the_stem() {
+        // The opposite of the CSV convention, where the whole stem is the language.
+        assert_eq!(
+            bundle_locale("resources/messages_fr.properties").as_deref(),
+            Some("fra")
+        );
+        assert_eq!(
+            bundle_locale("resources/messages_pt_BR.properties").as_deref(),
+            Some("por")
+        );
+        assert_eq!(
+            bundle_locale("resources/messages.properties"),
+            None,
+            "the base bundle"
+        );
+        assert_eq!(bundle_locale("config/application.properties"), None);
+    }
+
+    #[test]
+    fn message_bundles_join_across_locales_by_key() {
+        let bundles = vec![
+            (None, "alert.text".to_string(), "Alert text".to_string()),
+            (None, "alert.read".to_string(), "Alert read".to_string()),
+            (
+                Some("fra".to_string()),
+                "alert.text".to_string(),
+                "Texte alerte".to_string(),
+            ),
+            // No base entry, so no pair can be made.
+            (
+                Some("fra".to_string()),
+                "orphan".to_string(),
+                "Orphelin".to_string(),
+            ),
+            // Identical to the base: not actually translated.
+            (
+                Some("fra".to_string()),
+                "alert.read".to_string(),
+                "Alert read".to_string(),
+            ),
+        ];
+        let joined = join_message_bundles(&bundles);
+        assert_eq!(
+            joined["fra"],
+            vec![("Alert text".to_string(), "Texte alerte".to_string())]
+        );
     }
 
     #[test]

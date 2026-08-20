@@ -44,6 +44,9 @@ type TranslationFile = (String, String, Vec<(String, String)>);
 const FACT_RULE: &str = "rule";
 const FACT_CONCEPT: &str = "concept";
 const FACT_TRANSLATION: &str = "translation";
+/// One `(locale, key, value)` row of a message bundle. Locale is absent for the base
+/// bundle; the source-to-translation join happens once every bundle has been read.
+const FACT_MESSAGE: &str = "message";
 
 /// Minimum number of shared commits before two files are called co-changing.
 const CO_CHANGE_MIN_SUPPORT: u32 = 3;
@@ -224,6 +227,7 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     let mut translations: Vec<TranslationFile> = Vec::new();
     let mut mined_rules: Vec<(String, Vec<String>)> = Vec::new();
     let mut declared_concepts: Vec<(String, Vec<String>)> = Vec::new();
+    let mut message_bundles: Vec<(String, Vec<String>)> = Vec::new();
 
     for (file, outcome) in changed.iter().zip(outcomes) {
         match outcome {
@@ -281,6 +285,16 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
                 }
             }
         }
+        if file.lang == Lang::Properties {
+            if let Ok(text) = file.read() {
+                let locale = concepts::bundle_locale(&file.path);
+                let payloads: Vec<String> = concepts::parse_properties(&text)
+                    .into_iter()
+                    .filter_map(|(key, value)| serde_json::to_string(&(&locale, key, value)).ok())
+                    .collect();
+                message_bundles.push((file.path.clone(), payloads));
+            }
+        }
         store.upsert_file(&FileRecord {
             path: file.path.clone(),
             lang: file.lang,
@@ -298,6 +312,9 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     }
     for (path, payloads) in &declared_concepts {
         store.put_facts(FACT_CONCEPT, path, payloads)?;
+    }
+    for (path, payloads) in &message_bundles {
+        store.put_facts(FACT_MESSAGE, path, payloads)?;
     }
     for (path, lang, rows) in &translations {
         let payloads: Vec<String> = rows
@@ -360,6 +377,17 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
             by_language.entry(lang).or_default().push((source, target));
         }
     }
+    // Message bundles are joined across locales here, once every one has been read:
+    // the source string lives in the base bundle and the translation in another file.
+    let bundles: Vec<(Option<String>, String, String)> = store
+        .all_facts(FACT_MESSAGE)?
+        .iter()
+        .filter_map(|payload| serde_json::from_str(payload).ok())
+        .collect();
+    for (lang, rows) in concepts::join_message_bundles(&bundles) {
+        by_language.entry(lang).or_default().extend(rows);
+    }
+
     for (lang, rows) in &by_language {
         sources.push(concepts::from_translations(lang, rows, &grounding));
     }
@@ -369,6 +397,13 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
         .map(|n| n.name)
         .collect();
     sources.push(concepts::from_headings(&headings, &grounding));
+
+    // The universal bridge, last because it is the weakest and first because it is the
+    // only one that is always available: a repository that declares nothing — no
+    // glossary, no translations, no entity metadata, no documentation — still has
+    // identifiers, and a phrase its identifiers keep repeating is its vocabulary.
+    let groundable = store.groundable_names()?;
+    sources.push(concepts::from_code_vocabulary(&groundable));
     let merged = concepts::merge(sources);
     store.commit(concepts::stage(&merged, &grounding))?;
 
@@ -466,7 +501,9 @@ fn extract_file(file: &Discovered) -> FileOutcome {
         text
     };
     match file.lang {
-        Lang::Python | Lang::TypeScript | Lang::JavaScript | Lang::Java => {
+        // Every language with a grammar takes the same path: parse, then attribute any
+        // embedded SQL to the enclosing symbol.
+        lang if lang.has_grammar() => {
             match extract::code::extract(&file.path, &text, file.lang) {
                 Ok(mut fx) => {
                     // SQL embedded in source is attributed to the enclosing symbol, so
@@ -501,7 +538,30 @@ fn extract_file(file: &Discovered) -> FileOutcome {
             extract: extract::schema::extract(&file.path, &text),
             rows: None,
         })),
-        Lang::Yaml | Lang::Other => FileOutcome::Parsed(Box::new(ParsedFile {
+        // Most XML in a repository is build configuration; the parser recognises an
+        // ORM mapping and returns nothing for everything else.
+        Lang::Xml => FileOutcome::Parsed(Box::new(ParsedFile {
+            extract: extract::schema::extract_hibernate(&file.path, &text),
+            rows: None,
+        })),
+        Lang::Properties => {
+            let mut fx = FileExtract::default();
+            // Vocabulary from the base bundle grounds concepts even where no
+            // translation exists.
+            for (key, value) in concepts::parse_properties(&text) {
+                fx.vocabulary
+                    .extend(crate::extract::code::split_identifier(&key));
+                fx.vocabulary
+                    .extend(crate::concepts::meaningful_words(&value));
+            }
+            FileOutcome::Parsed(Box::new(ParsedFile {
+                extract: fx,
+                rows: None,
+            }))
+        }
+        // A guard arm cannot prove exhaustiveness, so everything not handled above —
+        // YAML, and anything classified but not yet extracted — lands here.
+        _ => FileOutcome::Parsed(Box::new(ParsedFile {
             extract: FileExtract::default(),
             rows: None,
         })),
