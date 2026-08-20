@@ -1,8 +1,11 @@
 pub mod concepts;
+pub mod context;
 pub mod discover;
 pub mod extract;
 pub mod gitlog;
 pub mod index;
 pub mod model;
+pub mod query;
+pub mod rules;
 pub mod store;
 pub mod tokens;

@@ -42,7 +42,7 @@ const STOPWORDS: &[&str] = &[
 ];
 
 /// One business concept and every surface form it appears under.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct Concept {
     /// Opaque stable id, e.g. `STRATEGIC_ACCOUNT`.
     pub id: String,
@@ -58,7 +58,8 @@ pub struct Concept {
     pub bridge: Bridge,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum Bridge {
     /// Declared by a human in `.reify/glossary.toml`.
     Declared,
@@ -492,17 +493,16 @@ pub fn translation_language(path: &str) -> Option<String> {
     Some(three.to_string())
 }
 
-/// Lowercase, de-stopworded, de-punctuated words of a label.
+/// Lowercase, de-stopworded, de-punctuated words of a label or identifier.
+///
+/// Every token goes through [`split_identifier`], so `customer_group`,
+/// `customerGroup` and `Customer Group` all reduce to the same two words. Treating
+/// snake_case as a single opaque token — which is what a naive split does, since `_`
+/// is a word character — quietly stops business vocabulary from ever matching code.
 pub fn meaningful_words(text: &str) -> BTreeSet<String> {
-    text.split(|c: char| !c.is_alphanumeric() && c != '_')
+    text.split(|c: char| !c.is_alphanumeric() && c != '_' && c != '-')
         .filter(|w| !w.is_empty())
-        .flat_map(|w| {
-            if w.chars().any(|c| c.is_uppercase()) && w.chars().any(|c| c.is_lowercase()) {
-                split_identifier(w)
-            } else {
-                vec![w.to_lowercase()]
-            }
-        })
+        .flat_map(split_identifier)
         .filter(|w| w.chars().count() >= 3 && !STOPWORDS.contains(&w.as_str()))
         .collect()
 }
@@ -796,6 +796,23 @@ db = ["CUSTOMER_GROUP=7"]
         assert!(!words.contains("the"));
         assert!(!words.contains("all"));
         assert!(!words.contains("list"));
+    }
+
+    #[test]
+    fn snake_case_and_camel_case_reduce_to_the_same_words() {
+        let expected: BTreeSet<String> =
+            ["customer", "group"].iter().map(|s| s.to_string()).collect();
+        assert_eq!(meaningful_words("customer_group"), expected);
+        assert_eq!(meaningful_words("customerGroup"), expected);
+        assert_eq!(meaningful_words("Customer Group"), expected);
+        assert_eq!(meaningful_words("CUSTOMER_GROUP"), expected);
+    }
+
+    #[test]
+    fn vietnamese_words_survive_identifier_splitting() {
+        let words = meaningful_words("khách hàng chiến lược");
+        assert!(words.contains("khách"));
+        assert!(words.contains("chiến"));
     }
 
     #[test]

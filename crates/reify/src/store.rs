@@ -99,6 +99,15 @@ CREATE TABLE IF NOT EXISTS refs (
 CREATE INDEX IF NOT EXISTS idx_refs_path ON refs(path);
 CREATE INDEX IF NOT EXISTS idx_refs_name ON refs(name);
 
+CREATE TABLE IF NOT EXISTS facts (
+    id      INTEGER PRIMARY KEY,
+    kind    TEXT NOT NULL,
+    path    TEXT NOT NULL,
+    payload TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_facts_path ON facts(path);
+CREATE INDEX IF NOT EXISTS idx_facts_kind ON facts(kind, path);
+
 CREATE VIRTUAL TABLE IF NOT EXISTS search USING fts5(
     uid UNINDEXED,
     body,
@@ -341,6 +350,8 @@ impl Store {
         )?;
         self.conn
             .execute("DELETE FROM refs WHERE path = ?1", params![path])?;
+        self.conn
+            .execute("DELETE FROM facts WHERE path = ?1", params![path])?;
         Ok(())
     }
 
@@ -377,6 +388,62 @@ impl Store {
         self.conn
             .execute("DELETE FROM nodes WHERE kind = 'Concept'", [])?;
         Ok(())
+    }
+
+    /// Drop everything the rule stage owns, before it rebuilds globally.
+    ///
+    /// Rules are rebuilt whole on every run rather than patched, because corroboration
+    /// and conflict detection are repository-wide: deleting a file must be able to
+    /// *lower* a surviving rule's confidence, which an incremental upsert cannot do.
+    pub fn forget_rules(&self) -> Result<()> {
+        self.conn.execute(
+            "DELETE FROM edges WHERE kind = ?1",
+            params![EdgeKind::ImplementsRule.as_str()],
+        )?;
+        self.conn.execute(
+            "DELETE FROM evidence WHERE node_id IN
+                (SELECT id FROM nodes WHERE kind = 'BusinessRule')",
+            [],
+        )?;
+        self.conn.execute(
+            "DELETE FROM search WHERE uid IN
+                (SELECT uid FROM nodes WHERE kind = 'BusinessRule')",
+            [],
+        )?;
+        self.conn
+            .execute("DELETE FROM nodes WHERE kind = 'BusinessRule'", [])?;
+        Ok(())
+    }
+
+    /// Persist per-file facts of one kind, so a repository-wide stage can rebuild
+    /// from them without re-reading or re-parsing unchanged files.
+    ///
+    /// This is what lets stages whose output depends on the *whole* repository —
+    /// rule corroboration, concept merging, conflict detection — be rebuilt from
+    /// scratch on every run while still only parsing what changed.
+    pub fn put_facts(&mut self, kind: &str, path: &str, payloads: &[String]) -> Result<()> {
+        if payloads.is_empty() {
+            return Ok(());
+        }
+        let tx = self.conn.transaction()?;
+        {
+            let mut stmt =
+                tx.prepare("INSERT INTO facts(kind, path, payload) VALUES (?1, ?2, ?3)")?;
+            for payload in payloads {
+                stmt.execute(params![kind, path, payload])?;
+            }
+        }
+        tx.commit()?;
+        Ok(())
+    }
+
+    /// Every stored fact of one kind, in a stable order.
+    pub fn all_facts(&self, kind: &str) -> Result<Vec<String>> {
+        let mut stmt = self
+            .conn
+            .prepare("SELECT payload FROM facts WHERE kind = ?1 ORDER BY path, payload")?;
+        let rows = stmt.query_map(params![kind], |r| r.get::<_, String>(0))?;
+        rows.map(|r| r.map_err(Into::into)).collect()
     }
 
     /// Drop everything the history stage owns, before it rebuilds from a new `HEAD`.
@@ -437,12 +504,20 @@ impl Store {
         rows.map(|r| r.map_err(Into::into)).collect()
     }
 
-    /// `(name, uid, path)` for every symbol, to rebuild the resolver index.
-    pub fn symbol_triples(&self) -> Result<Vec<(String, String, String)>> {
+    /// `(name, uid, path, lang)` for every symbol, to rebuild the resolver index.
+    pub fn symbol_triples(&self) -> Result<Vec<(String, String, String, Lang)>> {
         let mut stmt = self.conn.prepare(
-            "SELECT name, uid, COALESCE(path, '') FROM nodes WHERE kind = 'Symbol'",
+            "SELECT name, uid, COALESCE(path, ''), COALESCE(lang, 'other')
+             FROM nodes WHERE kind = 'Symbol'",
         )?;
-        let rows = stmt.query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?;
+        let rows = stmt.query_map([], |r| {
+            Ok((
+                r.get(0)?,
+                r.get(1)?,
+                r.get(2)?,
+                Lang::parse(&r.get::<_, String>(3)?),
+            ))
+        })?;
         rows.map(|r| r.map_err(Into::into)).collect()
     }
 
@@ -938,6 +1013,20 @@ mod tests {
         assert_eq!(s.count_edges_of_kind(EdgeKind::Imports).unwrap(), 0, "content is purged");
         assert!(s.node_by_uid(&uid::file("a.py")).unwrap().is_some(), "the file node survives");
         assert!(s.node_by_uid(&uid::symbol("a.py", "alpha")).unwrap().is_none());
+    }
+
+    #[test]
+    fn facts_are_scoped_by_kind_and_invalidated_with_their_file() {
+        let mut s = Store::in_memory().unwrap();
+        s.put_facts("rule", "a.py", &["r1".into(), "r2".into()]).unwrap();
+        s.put_facts("concept", "a.py", &["c1".into()]).unwrap();
+        s.put_facts("rule", "b.py", &["r3".into()]).unwrap();
+        assert_eq!(s.all_facts("rule").unwrap(), vec!["r1", "r2", "r3"]);
+        assert_eq!(s.all_facts("concept").unwrap(), vec!["c1"]);
+
+        s.forget_file_content("a.py").unwrap();
+        assert_eq!(s.all_facts("rule").unwrap(), vec!["r3"]);
+        assert!(s.all_facts("concept").unwrap().is_empty());
     }
 
     #[test]

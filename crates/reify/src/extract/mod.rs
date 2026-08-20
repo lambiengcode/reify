@@ -6,9 +6,12 @@
 
 pub mod code;
 pub mod docs;
+pub mod schema;
 pub mod sqlish;
 
+use crate::concepts::Concept;
 use crate::model::EdgeKind;
+use crate::rules::RuleCandidate;
 use crate::store::Batch;
 
 /// A reference whose target cannot be known until every file has been parsed.
@@ -32,6 +35,10 @@ pub struct FileExtract {
     pub imports: Vec<String>,
     /// Identifier words seen in this file, feeding the concept miner.
     pub vocabulary: Vec<String>,
+    /// Business-rule candidates mined from this file.
+    pub rules: Vec<RuleCandidate>,
+    /// Concepts declared by this file's structured metadata.
+    pub concepts: Vec<Concept>,
 }
 
 impl FileExtract {
@@ -40,5 +47,7 @@ impl FileExtract {
         self.pending.extend(other.pending);
         self.imports.extend(other.imports);
         self.vocabulary.extend(other.vocabulary);
+        self.rules.extend(other.rules);
+        self.concepts.extend(other.concepts);
     }
 }

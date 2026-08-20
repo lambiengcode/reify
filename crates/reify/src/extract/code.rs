@@ -21,6 +21,12 @@ use crate::store::Batch;
 /// costs the context compiler far more than the edges are worth.
 const MAX_CALL_CANDIDATES: usize = 5;
 
+/// Names shorter than this only resolve inside their own file.
+///
+/// `_` is the translation helper in most codebases and appears in every file of every
+/// language; resolving it globally invents thousands of edges that mean nothing.
+const MIN_CROSS_FILE_NAME_LEN: usize = 3;
+
 /// Extract symbols, calls, imports and inheritance from one source file.
 pub fn extract(path: &str, text: &str, lang: Lang) -> Result<FileExtract> {
     let mut parser = Parser::new();
@@ -45,6 +51,7 @@ pub fn extract(path: &str, text: &str, lang: Lang) -> Result<FileExtract> {
         scope: Vec::new(),
         enclosing: Vec::new(),
         used_names: HashSet::new(),
+        consumed: Vec::new(),
     };
     ctx.walk(tree.root_node());
     Ok(ctx.out)
@@ -61,6 +68,12 @@ struct Ctx<'a> {
     enclosing: Vec<String>,
     /// Qualified names already emitted in this file, so redefinitions stay addressable.
     used_names: HashSet<String>,
+    /// Line spans already claimed by a nested declaration.
+    ///
+    /// A guard belongs to the innermost declaration containing it. Without this, a
+    /// class and each of its methods would all mine the same `if` and the repository
+    /// would appear to state one rule several times.
+    consumed: Vec<(u32, u32)>,
 }
 
 impl<'a> Ctx<'a> {
@@ -162,14 +175,51 @@ impl<'a> Ctx<'a> {
 
         self.record_inheritance(node, &symbol_uid);
 
-        self.scope.push(name);
-        self.enclosing.push(symbol_uid);
+        // Descend first, so nested declarations can claim their own line spans.
+        let mark = self.consumed.len();
+        self.scope.push(name.clone());
+        self.enclosing.push(symbol_uid.clone());
         let mut cursor = node.walk();
         for child in node.children(&mut cursor) {
             self.walk(child);
         }
         self.enclosing.pop();
         self.scope.pop();
+
+        // Mine rule candidates from what is left: the declaration's own name (a test
+        // name is an executable rule), its documentation, and the guards in its body
+        // that no nested declaration already claimed.
+        let nested: Vec<(u32, u32)> = self.consumed[mark..].to_vec();
+        let body = self.body_without_nested(node, start, &nested);
+        self.out.rules.extend(crate::rules::from_symbol(
+            &name,
+            &qualified,
+            doc.as_deref(),
+            &body,
+            &format!("{}:{start}", self.path),
+            &symbol_uid,
+        ));
+        self.consumed.push((start, end));
+    }
+
+    /// The declaration's text with every nested declaration's lines blanked out.
+    fn body_without_nested(&self, node: TsNode<'_>, start: u32, nested: &[(u32, u32)]) -> String {
+        if nested.is_empty() {
+            return self.slice(node).to_string();
+        }
+        self.slice(node)
+            .lines()
+            .enumerate()
+            .map(|(offset, line)| {
+                let absolute = start + offset as u32;
+                if nested.iter().any(|(s, e)| *s <= absolute && absolute <= *e) {
+                    ""
+                } else {
+                    line
+                }
+            })
+            .collect::<Vec<_>>()
+            .join("\n")
     }
 
     /// The declaration's first line, trimmed — enough for an agent to judge relevance
@@ -383,19 +433,34 @@ pub fn split_identifier(name: &str) -> Vec<String> {
 pub fn resolve(pending: &[PendingRef], symbols: &SymbolIndex) -> Batch {
     let mut batch = Batch::default();
     for r in pending {
-        let Some(candidates) = symbols.by_name.get(&r.name) else {
+        let Some(all) = symbols.by_name.get(&r.name) else {
             continue;
         };
+        let source_lang = symbols.lang_of(&r.from);
+        let candidates: Vec<&String> = all
+            .iter()
+            .filter(|uid| match (source_lang, symbols.lang_of(uid)) {
+                (Some(a), Some(b)) => SymbolIndex::callable_across(a, b),
+                _ => true,
+            })
+            .collect();
+        if candidates.is_empty() {
+            continue;
+        }
         let local: Vec<&String> = candidates
             .iter()
+            .copied()
             .filter(|uid| symbols.file_of(uid) == Some(r.file.as_str()))
             .collect();
         let (chosen, confidence): (Vec<&String>, f32) = if local.len() == 1 {
             (local, 0.95)
+        } else if r.name.chars().count() < MIN_CROSS_FILE_NAME_LEN {
+            continue; // too generic to resolve outside its own file
         } else if candidates.len() == 1 {
-            (candidates.iter().collect(), 0.9)
+            (candidates, 0.9)
         } else if candidates.len() <= MAX_CALL_CANDIDATES {
-            (candidates.iter().collect(), 1.0 / candidates.len() as f32)
+            let n = candidates.len() as f32;
+            (candidates, 1.0 / n)
         } else {
             continue; // too ambiguous to be worth an edge
         };
@@ -419,28 +484,47 @@ pub fn resolve(pending: &[PendingRef], symbols: &SymbolIndex) -> Batch {
 #[derive(Debug, Default)]
 pub struct SymbolIndex {
     pub by_name: HashMap<String, Vec<String>>,
-    file_by_uid: HashMap<String, String>,
+    /// `uid -> (path, language)`. Language is kept because a call never crosses a
+    /// language boundary, and matching on name alone happily claims that a Python
+    /// function calls a TypeScript one.
+    location_by_uid: HashMap<String, (String, Lang)>,
 }
 
 impl SymbolIndex {
-    pub fn add(&mut self, name: &str, uid: &str, path: &str) {
+    pub fn add(&mut self, name: &str, uid: &str, path: &str, lang: Lang) {
         self.by_name
             .entry(name.to_string())
             .or_default()
             .push(uid.to_string());
-        self.file_by_uid.insert(uid.to_string(), path.to_string());
+        self.location_by_uid
+            .insert(uid.to_string(), (path.to_string(), lang));
     }
 
     fn file_of(&self, uid: &str) -> Option<&str> {
-        self.file_by_uid.get(uid).map(|s| s.as_str())
+        self.location_by_uid.get(uid).map(|(path, _)| path.as_str())
+    }
+
+    fn lang_of(&self, uid: &str) -> Option<Lang> {
+        self.location_by_uid.get(uid).map(|(_, lang)| *lang)
+    }
+
+    /// Do these two languages share a call graph?
+    ///
+    /// TypeScript and JavaScript do. Nothing else in the supported set does.
+    fn callable_across(a: Lang, b: Lang) -> bool {
+        a == b
+            || matches!(
+                (a, b),
+                (Lang::TypeScript, Lang::JavaScript) | (Lang::JavaScript, Lang::TypeScript)
+            )
     }
 
     pub fn len(&self) -> usize {
-        self.file_by_uid.len()
+        self.location_by_uid.len()
     }
 
     pub fn is_empty(&self) -> bool {
-        self.file_by_uid.is_empty()
+        self.location_by_uid.is_empty()
     }
 }
 
@@ -536,8 +620,8 @@ export function helper(a: number) { return a; }
     #[test]
     fn resolution_prefers_a_local_definition_over_a_remote_one() {
         let mut idx = SymbolIndex::default();
-        idx.add("apply", "sym:a.ts#A.apply", "a.ts");
-        idx.add("apply", "sym:b.ts#B.apply", "b.ts");
+        idx.add("apply", "sym:a.ts#A.apply", "a.ts", Lang::TypeScript);
+        idx.add("apply", "sym:b.ts#B.apply", "b.ts", Lang::TypeScript);
         let pending = vec![PendingRef {
             from: "sym:a.ts#A.run".into(),
             name: "apply".into(),
@@ -554,7 +638,12 @@ export function helper(a: number) { return a; }
     fn ambiguous_names_produce_low_confidence_edges_not_a_guess() {
         let mut idx = SymbolIndex::default();
         for i in 0..3 {
-            idx.add("save", &format!("sym:f{i}.py#save"), &format!("f{i}.py"));
+            idx.add(
+                "save",
+                &format!("sym:f{i}.py#save"),
+                &format!("f{i}.py"),
+                Lang::Python,
+            );
         }
         let pending = vec![PendingRef {
             from: "sym:x.py#run".into(),
@@ -571,10 +660,62 @@ export function helper(a: number) { return a; }
     }
 
     #[test]
+    fn a_call_never_crosses_a_language_boundary() {
+        // `_` is the translation helper in Python, JavaScript and TypeScript alike.
+        // Matching on name alone claims that Python calls TypeScript.
+        let mut idx = SymbolIndex::default();
+        idx.add("helper", "sym:a.py#helper", "a.py", Lang::Python);
+        idx.add("helper", "sym:b.ts#helper", "b.ts", Lang::TypeScript);
+        let pending = vec![PendingRef {
+            from: "sym:c.py#caller".into(),
+            name: "helper".into(),
+            file: "c.py".into(),
+            kind: EdgeKind::Calls,
+        }];
+        idx.add("caller", "sym:c.py#caller", "c.py", Lang::Python);
+        let batch = resolve(&pending, &idx);
+        assert_eq!(batch.edges.len(), 1);
+        assert_eq!(batch.edges[0].dst, "sym:a.py#helper");
+    }
+
+    #[test]
+    fn typescript_and_javascript_still_share_a_call_graph() {
+        let mut idx = SymbolIndex::default();
+        idx.add("caller", "sym:a.js#caller", "a.js", Lang::JavaScript);
+        idx.add("helper", "sym:b.ts#helper", "b.ts", Lang::TypeScript);
+        let pending = vec![PendingRef {
+            from: "sym:a.js#caller".into(),
+            name: "helper".into(),
+            file: "a.js".into(),
+            kind: EdgeKind::Calls,
+        }];
+        assert_eq!(resolve(&pending, &idx).edges.len(), 1);
+    }
+
+    #[test]
+    fn a_one_character_name_does_not_resolve_across_files() {
+        let mut idx = SymbolIndex::default();
+        idx.add("caller", "sym:a.py#caller", "a.py", Lang::Python);
+        idx.add("_", "sym:translate.py#_", "translate.py", Lang::Python);
+        let pending = vec![PendingRef {
+            from: "sym:a.py#caller".into(),
+            name: "_".into(),
+            file: "a.py".into(),
+            kind: EdgeKind::Calls,
+        }];
+        assert!(resolve(&pending, &idx).edges.is_empty());
+    }
+
+    #[test]
     fn hopelessly_ambiguous_names_are_dropped_rather_than_polluting_the_graph() {
         let mut idx = SymbolIndex::default();
         for i in 0..20 {
-            idx.add("get", &format!("sym:f{i}.py#get"), &format!("f{i}.py"));
+            idx.add(
+                "get",
+                &format!("sym:f{i}.py#get"),
+                &format!("f{i}.py"),
+                Lang::Python,
+            );
         }
         let pending = vec![PendingRef {
             from: "sym:x.py#run".into(),
@@ -597,6 +738,20 @@ export function helper(a: number) { return a; }
         );
         assert_eq!(split_identifier("HTTPServerError"), vec!["http", "server", "error"]);
         assert_eq!(split_identifier("order2Invoice"), vec!["order", "invoice"]);
+    }
+
+    #[test]
+    fn a_guard_is_mined_once_by_the_innermost_declaration() {
+        // A class and its method both contain the same `if`; only the method owns it.
+        let src = "class Order:\n    def check(self):\n        if self.corporate:\n            return self.bypass_approval()\n";
+        let fx = extract("order.py", src, Lang::Python).unwrap();
+        let guards: Vec<&crate::rules::RuleCandidate> = fx
+            .rules
+            .iter()
+            .filter(|r| r.source == crate::rules::RuleSource::CodeGuard)
+            .collect();
+        assert_eq!(guards.len(), 1, "got {guards:#?}");
+        assert!(guards[0].anchor.ends_with("Order.check"));
     }
 
     #[test]

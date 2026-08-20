@@ -12,14 +12,15 @@
 use anyhow::{Context, Result};
 use rayon::prelude::*;
 use std::collections::{BTreeSet, HashMap, HashSet};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::time::Instant;
 
-use crate::concepts::{self, Bridge, Glossary, TermIndex};
+use crate::concepts::{self, Bridge, Concept, Glossary, TermIndex};
 use crate::discover::{self, Discovered, Discovery};
 use crate::extract::{self, code::SymbolIndex, FileExtract};
 use crate::gitlog;
 use crate::model::{uid, EdgeKind, Lang, NewEdge, NewNode, NodeKind, Status};
+use crate::rules::{self, RuleCandidate};
 use crate::store::{Batch, FileRecord, Store};
 
 /// Where Reify keeps its store and configuration, relative to the repository root.
@@ -32,6 +33,12 @@ pub const GLOSSARY_FILE: &str = "glossary.toml";
 /// A fifteen-year monorepo must not make the first `reify index` a forty-minute
 /// operation; the applied bound is reported rather than silently imposed.
 pub const DEFAULT_MAX_COMMITS: usize = 20_000;
+
+/// Fact kinds persisted per file so repository-wide stages can rebuild without
+/// re-parsing unchanged files. See [`crate::store::Store::put_facts`].
+const FACT_RULE: &str = "rule";
+const FACT_CONCEPT: &str = "concept";
+const FACT_TRANSLATION: &str = "translation";
 
 /// Minimum number of shared commits before two files are called co-changing.
 const CO_CHANGE_MIN_SUPPORT: u32 = 3;
@@ -79,7 +86,10 @@ pub struct IndexReport {
     pub doc_sections: u64,
     pub database_objects: u64,
     pub concepts: u64,
+    pub entities: u64,
     pub commits: u64,
+    pub rules: u64,
+    pub conflicts: usize,
     pub edges: u64,
     pub unresolved_refs: usize,
     pub history_rebuilt: bool,
@@ -140,7 +150,9 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
 
     let mut staged = Batch::default();
     let mut pending: Vec<(String, String, String, EdgeKind)> = Vec::new();
-    let mut translations: Vec<(String, Vec<(String, String)>)> = Vec::new();
+    let mut translations: Vec<(String, String, Vec<(String, String)>)> = Vec::new();
+    let mut mined_rules: Vec<(String, Vec<String>)> = Vec::new();
+    let mut declared_concepts: Vec<(String, Vec<String>)> = Vec::new();
 
     for (file, outcome) in changed.iter().zip(outcomes) {
         match outcome {
@@ -168,7 +180,25 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
                     }
                 }
                 if let Some((lang, rows)) = rows {
-                    translations.push((lang, rows));
+                    translations.push((file.path.clone(), lang, rows));
+                }
+                if !extract.concepts.is_empty() {
+                    declared_concepts.push((
+                        file.path.clone(),
+                        extract
+                            .concepts
+                            .iter()
+                            .filter_map(|c| serde_json::to_string(c).ok())
+                            .collect(),
+                    ));
+                }
+                if !extract.rules.is_empty() {
+                    let payloads: Vec<String> = extract
+                        .rules
+                        .iter()
+                        .filter_map(|r| serde_json::to_string(r).ok())
+                        .collect();
+                    mined_rules.push((file.path.clone(), payloads));
                 }
             }
         }
@@ -184,14 +214,29 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     let stats = store.commit(staged)?;
     report.unresolved_refs = stats.unresolved_edges;
     store.put_refs(&pending)?;
+    for (path, payloads) in &mined_rules {
+        store.put_facts(FACT_RULE, path, payloads)?;
+    }
+    for (path, payloads) in &declared_concepts {
+        store.put_facts(FACT_CONCEPT, path, payloads)?;
+    }
+    for (path, lang, rows) in &translations {
+        let payloads: Vec<String> = rows
+            .iter()
+            .filter_map(|(source, target)| {
+                serde_json::to_string(&(lang, source, target)).ok()
+            })
+            .collect();
+        store.put_facts(FACT_TRANSLATION, path, &payloads)?;
+    }
 
     // --- 7. resolve every reference in the repository ------------------------
     // Repository-wide rather than incremental on purpose: editing one file changes
     // which symbols other files' references resolve to, and re-resolving is a hash
     // lookup per reference.
     let mut symbols = SymbolIndex::default();
-    for (name, node_uid, path) in store.symbol_triples()? {
-        symbols.add(&name, &node_uid, &path);
+    for (name, node_uid, path, lang) in store.symbol_triples()? {
+        symbols.add(&name, &node_uid, &path, lang);
     }
     let all_refs = store.all_refs()?;
     let pending_refs: Vec<extract::PendingRef> = all_refs
@@ -215,14 +260,28 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     }
     let glossary = Glossary::load(&opts.glossary_path())?;
     let mut sources = vec![glossary.concepts];
-    // Translation files may live in files this run did not touch, so they are read
-    // fresh; there are few of them and they are small.
-    let translation_rows = if translations.is_empty() {
-        read_translation_files(&opts.root, &found)?
-    } else {
-        translations
-    };
-    for (lang, rows) in &translation_rows {
+
+    // Concepts declared by structured model metadata, from every file — including
+    // files this run did not parse, which is exactly what the fact store is for.
+    sources.push(
+        store
+            .all_facts(FACT_CONCEPT)?
+            .iter()
+            .filter_map(|payload| serde_json::from_str::<Concept>(payload).ok())
+            .collect(),
+    );
+
+    // Translation rows, grouped by target language.
+    let mut by_language: std::collections::BTreeMap<String, Vec<(String, String)>> =
+        std::collections::BTreeMap::new();
+    for payload in store.all_facts(FACT_TRANSLATION)? {
+        if let Ok((lang, source, target)) =
+            serde_json::from_str::<(String, String, String)>(&payload)
+        {
+            by_language.entry(lang).or_default().push((source, target));
+        }
+    }
+    for (lang, rows) in &by_language {
         sources.push(concepts::from_translations(lang, rows, &grounding));
     }
     let headings: Vec<String> = store
@@ -234,7 +293,22 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     let merged = concepts::merge(sources);
     store.commit(concepts::stage(&merged, &grounding))?;
 
-    // --- 9. history, rebuilt only when HEAD moves ----------------------------
+    // --- 9. rules and conflicts, rebuilt globally every run ------------------
+    // Corroboration and conflict detection are repository-wide: a rule's confidence
+    // depends on what other files say, so the layer is rebuilt whole rather than
+    // patched. The candidates themselves are per-file and were invalidated above.
+    store.forget_rules()?;
+    let mut candidates: Vec<RuleCandidate> = store
+        .all_facts(FACT_RULE)?
+        .iter()
+        .filter_map(|payload| serde_json::from_str(payload).ok())
+        .collect();
+    rules::corroborate(&mut candidates);
+    let conflicts = rules::detect_conflicts(&candidates);
+    report.conflicts = conflicts.len();
+    store.commit(rules::stage(&candidates, &conflicts))?;
+
+    // --- 10. history, rebuilt only when HEAD moves ---------------------------
     let head = gitlog::head_sha(&opts.root);
     let stored_head = store.meta("head_sha")?;
     let history_stale = opts.force || head.is_none() != stored_head.is_none() || head != stored_head;
@@ -249,7 +323,7 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
         }
     }
 
-    // --- 10. finish ----------------------------------------------------------
+    // --- 11. finish ----------------------------------------------------------
     store.set_meta("indexed_at", &format!("{}", now_unix()))?;
     store.set_meta("root", &opts.root.to_string_lossy())?;
     store.optimize()?;
@@ -258,7 +332,9 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     report.doc_sections = store.count_of_kind(NodeKind::DocSection)?;
     report.database_objects = store.count_of_kind(NodeKind::DatabaseObject)?;
     report.concepts = store.count_of_kind(NodeKind::Concept)?;
+    report.entities = store.count_of_kind(NodeKind::DatabaseObject)?;
     report.commits = store.count_of_kind(NodeKind::Commit)?;
+    report.rules = store.count_of_kind(NodeKind::BusinessRule)? - report.conflicts as u64;
     report.edges = store.count_edges()?;
     report.elapsed_ms = started.elapsed().as_millis();
     Ok(report)
@@ -315,7 +391,11 @@ fn extract_file(file: &Discovered) -> FileOutcome {
                 rows,
             }
         }
-        Lang::Json | Lang::Yaml | Lang::Other => FileOutcome::Parsed {
+        Lang::Json => FileOutcome::Parsed {
+            extract: extract::schema::extract(&file.path, &text),
+            rows: None,
+        },
+        Lang::Yaml | Lang::Other => FileOutcome::Parsed {
             extract: FileExtract::default(),
             rows: None,
         },
@@ -477,27 +557,6 @@ fn stage_history(history: &gitlog::History, present: &HashSet<&str>) -> Batch {
     batch
 }
 
-/// Read every translation file in the repository.
-fn read_translation_files(
-    root: &Path,
-    found: &Discovery,
-) -> Result<Vec<(String, Vec<(String, String)>)>> {
-    let mut out = Vec::new();
-    for file in &found.files {
-        if file.lang != Lang::Csv {
-            continue;
-        }
-        let Some(lang) = concepts::translation_language(&file.path) else {
-            continue;
-        };
-        let Ok(text) = std::fs::read_to_string(root.join(&file.path)) else {
-            continue;
-        };
-        out.push((lang, concepts::parse_translation_csv(&text)));
-    }
-    Ok(out)
-}
-
 fn now_unix() -> u64 {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
@@ -524,6 +583,7 @@ pub fn concept_bridges(store: &Store) -> Result<HashMap<String, u64>> {
 mod tests {
     use super::*;
     use std::fs;
+    use std::path::Path;
 
     fn fixture(name: &str) -> PathBuf {
         let dir = std::env::temp_dir().join(format!(
@@ -721,6 +781,104 @@ class SalesOrder:
                 "incremental diverged from full\n  only incremental: {only_incremental:#?}\n  only full: {only_full:#?}"
             );
         }
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    /// A fixture with a deliberately planted disagreement between a document and the
+    /// code that implements it.
+    fn conflict_fixture(name: &str) -> PathBuf {
+        let dir = std::env::temp_dir().join(format!(
+            "reify-conflict-{}-{name}-{}",
+            std::process::id(),
+            now_unix()
+        ));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(dir.join("app")).unwrap();
+        fs::create_dir_all(dir.join("docs")).unwrap();
+        fs::write(
+            dir.join("docs/BRD-42.md"),
+            "# Approval\n\n## Corporate approval\n\nCorporate customers must require approval before an order is confirmed.\n",
+        )
+        .unwrap();
+        fs::write(
+            dir.join("app/order.py"),
+            "class Order:\n    def check(self):\n        if self.corporate_customers:\n            return self.bypass_approval()\n        return True\n",
+        )
+        .unwrap();
+        dir
+    }
+
+    #[test]
+    fn a_documented_rule_contradicting_the_code_is_detected_end_to_end() {
+        let root = conflict_fixture("detect");
+        let (store, report) = index_fresh(&root);
+        assert!(report.rules >= 2, "both sides must be mined: {report:?}");
+        assert_eq!(report.conflicts, 1, "the planted contradiction must be found");
+
+        let conflict = store
+            .nodes_of_kind(NodeKind::BusinessRule)
+            .unwrap()
+            .into_iter()
+            .find(|n| n.uid.starts_with("conflict:"))
+            .expect("a conflict node must be staged");
+        assert_eq!(conflict.status, Status::Conflicted);
+        assert_eq!(conflict.data["resolution"], "UNRESOLVED");
+        assert!(conflict.data["documented"].as_str().unwrap().contains("require"));
+        assert!(conflict.data["observed"].as_str().unwrap().contains("bypass"));
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn a_repository_that_agrees_with_itself_reports_no_conflicts() {
+        // The expensive failure mode is a false positive, so this is the test that
+        // matters most for the feature being trusted.
+        let root = fixture("agrees");
+        let (_, report) = index_fresh(&root);
+        assert_eq!(report.conflicts, 0, "a consistent repository must stay silent");
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn removing_the_contradicting_document_clears_the_conflict() {
+        // Exercises the global rebuild: a per-file upsert could never lower a rule's
+        // confidence or retract a conflict.
+        let root = conflict_fixture("clears");
+        let mut store = Store::in_memory().unwrap();
+        let opts = IndexOptions::new(&root);
+        assert_eq!(index(&mut store, &opts).unwrap().conflicts, 1);
+
+        fs::remove_file(root.join("docs/BRD-42.md")).unwrap();
+        assert_eq!(index(&mut store, &opts).unwrap().conflicts, 0);
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn incremental_indexing_equals_a_full_rebuild_with_rules_in_play() {
+        let root = conflict_fixture("equiv");
+        let opts = IndexOptions::new(&root);
+
+        let mut incremental = Store::in_memory().unwrap();
+        index(&mut incremental, &opts).unwrap();
+        fs::write(
+            root.join("app/order.py"),
+            "class Order:\n    def check(self):\n        if self.corporate_customers:\n            return self.bypass_approval()\n        return False\n",
+        )
+        .unwrap();
+        index(&mut incremental, &opts).unwrap();
+        fs::write(
+            root.join("docs/BRD-43.md"),
+            "# Discounts\n\n## Strategic discount\n\nStrategic accounts must receive a discount on every order.\n",
+        )
+        .unwrap();
+        index(&mut incremental, &opts).unwrap();
+
+        let mut full = Store::in_memory().unwrap();
+        index(&mut full, &opts).unwrap();
+
+        assert_eq!(
+            incremental.canonical_dump().unwrap(),
+            full.canonical_dump().unwrap()
+        );
         let _ = fs::remove_dir_all(&root);
     }
 

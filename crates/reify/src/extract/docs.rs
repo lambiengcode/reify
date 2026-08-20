@@ -53,6 +53,13 @@ pub fn extract(path: &str, text: &str, lang: Lang) -> Result<FileExtract> {
 
         out.vocabulary
             .extend(words(&section.title).into_iter().filter(|w| w.len() > 2));
+        if is_specification(path) {
+            out.rules.extend(crate::rules::from_document(
+                &format!("{}. {}", section.title, section.body),
+                &format!("{path}:{}", section.line),
+                &section_uid,
+            ));
+        }
 
         out.batch.node(
             NewNode::new(&section_uid, NodeKind::DocSection, display)
@@ -71,6 +78,22 @@ pub fn extract(path: &str, text: &str, lang: Lang) -> Result<FileExtract> {
         );
     }
     Ok(out)
+}
+
+/// Is this document a specification rather than a historical record?
+///
+/// Release notes, changelogs and news files are lists of things that happened. They
+/// state no requirements, but they mention every domain term in the product, so mining
+/// rules from them produces claims that appear to contradict half the codebase.
+/// Excluding them by path is crude but exactly right: they are categorically not
+/// requirement documents.
+pub fn is_specification(path: &str) -> bool {
+    let lowered = path.to_ascii_lowercase();
+    const HISTORICAL: &[&str] = &[
+        "change_log", "changelog", "changes", "release_note", "release-note",
+        "releasenotes", "/news", "history.md", "whatsnew", "migration",
+    ];
+    !HISTORICAL.iter().any(|marker| lowered.contains(marker))
 }
 
 /// A readable document title: the first level-1 heading, else the file stem.
@@ -336,6 +359,25 @@ Discounts stack additively.
         assert_eq!(node.uid, "doc:docs/BRD-42.md#order-approval-brd.approval-thresholds.exceptions");
         assert_eq!(node.data["document"], "Order Approval BRD");
         assert!(node.data["excerpt"].as_str().unwrap().contains("Strategic"));
+    }
+
+    #[test]
+    fn release_notes_are_not_treated_as_specifications() {
+        assert!(!is_specification("erpnext/change_log/v13/v13_0_0.md"));
+        assert!(!is_specification("CHANGELOG.md"));
+        assert!(!is_specification("docs/release-notes/2024.md"));
+        assert!(is_specification("docs/BRD-42.md"));
+        assert!(is_specification("erpnext/selling/README.md"));
+    }
+
+    #[test]
+    fn a_changelog_contributes_sections_but_no_rules() {
+        let text = "# v13\n\n## Fixes\n\nOrders must require approval was changed and discount handling updated.\n";
+        let spec = extract("docs/BRD.md", text, Lang::Markdown).unwrap();
+        let notes = extract("change_log/v13.md", text, Lang::Markdown).unwrap();
+        assert!(!spec.rules.is_empty(), "a specification still yields rules");
+        assert!(notes.rules.is_empty(), "release notes must yield none");
+        assert!(!notes.batch.nodes.is_empty(), "but are still searchable");
     }
 
     #[test]
