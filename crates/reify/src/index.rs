@@ -13,6 +13,8 @@ use anyhow::{Context, Result};
 use rayon::prelude::*;
 use std::collections::{BTreeSet, HashMap, HashSet};
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Arc;
 use std::time::Instant;
 
 use crate::concepts::{self, Bridge, Concept, Glossary, TermIndex};
@@ -51,12 +53,42 @@ const CO_CHANGE_MAX_PAIRS: usize = 20_000;
 /// `reify why`, which queries git directly for a precise line range.
 const COMMITS_PER_FILE: usize = 8;
 
-#[derive(Debug, Clone)]
+/// Called as indexing advances. `(stage, done, total)`, where `total` is zero when a
+/// stage has no countable unit of work.
+///
+/// A callback rather than printing: a library that writes to stderr cannot be embedded,
+/// and indexing a large repository takes over a minute, which without any output is
+/// indistinguishable from a hang.
+pub type ProgressFn = Arc<dyn Fn(&str, usize, usize) + Send + Sync>;
+
+#[derive(Clone)]
 pub struct IndexOptions {
     pub root: PathBuf,
     /// Rebuild from scratch, ignoring cached per-file results.
     pub force: bool,
     pub max_commits: usize,
+    /// Optional progress reporting.
+    pub progress: Option<ProgressFn>,
+}
+
+impl std::fmt::Debug for IndexOptions {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("IndexOptions")
+            .field("root", &self.root)
+            .field("force", &self.force)
+            .field("max_commits", &self.max_commits)
+            .field("progress", &self.progress.is_some())
+            .finish()
+    }
+}
+
+impl IndexOptions {
+    /// Report progress, if a callback is installed.
+    fn report(&self, stage: &str, done: usize, total: usize) {
+        if let Some(progress) = &self.progress {
+            progress(stage, done, total);
+        }
+    }
 }
 
 impl IndexOptions {
@@ -65,6 +97,7 @@ impl IndexOptions {
             root: root.into(),
             force: false,
             max_commits: DEFAULT_MAX_COMMITS,
+            progress: None,
         }
     }
 
@@ -114,6 +147,7 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     let mut report = IndexReport::default();
 
     // --- 1-2. discover and classify ------------------------------------------
+    opts.report("discovering files", 0, 0);
     let found: Discovery = discover::discover(&opts.root)
         .with_context(|| format!("walking {}", opts.root.display()))?;
     report.files_total = found.files.len();
@@ -169,7 +203,21 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     // --- 3-6. parse changed files in parallel --------------------------------
     // Extraction is pure: text in, staged knowledge out. That is what makes it safe
     // to run across cores and what would make it cacheable by content hash later.
-    let outcomes: Vec<FileOutcome> = changed.par_iter().map(|file| extract_file(file)).collect();
+    opts.report("parsing", 0, changed.len());
+    let parsed = AtomicUsize::new(0);
+    let outcomes: Vec<FileOutcome> = changed
+        .par_iter()
+        .map(|file| {
+            let outcome = extract_file(file);
+            // Reported in batches rather than per file: a callback that writes to a
+            // terminal thousands of times measurably slows a parallel stage down.
+            let done = parsed.fetch_add(1, Ordering::Relaxed) + 1;
+            if done % 64 == 0 || done == changed.len() {
+                opts.report("parsing", done, changed.len());
+            }
+            outcome
+        })
+        .collect();
 
     let mut staged = Batch::default();
     let mut pending: Vec<(String, String, String, EdgeKind)> = Vec::new();
@@ -263,6 +311,7 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     // Repository-wide rather than incremental on purpose: editing one file changes
     // which symbols other files' references resolve to, and re-resolving is a hash
     // lookup per reference.
+    opts.report("resolving references", 0, 0);
     let mut symbols = SymbolIndex::default();
     for (name, node_uid, path, lang) in store.symbol_triples()? {
         symbols.add(&name, &node_uid, &path, lang);
@@ -282,6 +331,7 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     report.unresolved_refs += stats.unresolved_edges;
 
     // --- 8. concepts, rebuilt globally every run -----------------------------
+    opts.report("linking concepts", 0, 0);
     store.forget_concepts()?;
     let mut grounding = TermIndex::default();
     for (name, node_uid) in store.groundable_names()? {
@@ -326,6 +376,7 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     // Corroboration and conflict detection are repository-wide: a rule's confidence
     // depends on what other files say, so the layer is rebuilt whole rather than
     // patched. The candidates themselves are per-file and were invalidated above.
+    opts.report("mining rules", 0, 0);
     store.forget_rules()?;
     let mut candidates: Vec<RuleCandidate> = store
         .all_facts(FACT_RULE)?
@@ -343,6 +394,7 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     let history_stale =
         opts.force || head.is_none() != stored_head.is_none() || head != stored_head;
     if gitlog::is_repository(&opts.root) && history_stale {
+        opts.report("reading history", 0, 0);
         report.history_rebuilt = true;
         store.forget_history()?;
         let history = gitlog::history(&opts.root, opts.max_commits)?;
@@ -354,6 +406,7 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     }
 
     // --- 11. finish ----------------------------------------------------------
+    opts.report("finishing", 0, 0);
     store.set_meta("indexed_at", &format!("{}", now_unix()))?;
     store.set_meta("root", &opts.root.to_string_lossy())?;
     store.optimize()?;
@@ -701,6 +754,44 @@ class SalesOrder:
         let opts = IndexOptions::new(root);
         let report = index(&mut store, &opts).unwrap();
         (store, report)
+    }
+
+    #[test]
+    fn progress_is_reported_for_every_stage() {
+        use std::sync::Mutex;
+        let root = fixture("progress");
+        let seen: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
+        let recorder = seen.clone();
+        let opts = IndexOptions {
+            progress: Some(Arc::new(move |stage: &str, _, _| {
+                recorder.lock().expect("lock").push(stage.to_string());
+            })),
+            ..IndexOptions::new(&root)
+        };
+        let mut store = Store::in_memory().unwrap();
+        index(&mut store, &opts).unwrap();
+
+        let stages = seen.lock().unwrap().clone();
+        for expected in [
+            "discovering files",
+            "parsing",
+            "linking concepts",
+            "finishing",
+        ] {
+            assert!(
+                stages.iter().any(|s| s == expected),
+                "missing stage {expected}: {stages:?}"
+            );
+        }
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn indexing_works_with_no_progress_callback() {
+        let root = fixture("noprogress");
+        let (_, report) = index_fresh(&root);
+        assert!(report.symbols > 0);
+        let _ = fs::remove_dir_all(&root);
     }
 
     #[test]

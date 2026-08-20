@@ -5,7 +5,8 @@ used, and is what the benchmark measured.
 
 ## Level 0 — a shell command (recommended)
 
-`reify init` offers to append this to your `AGENTS.md` or `CLAUDE.md`:
+`reify init` finds your `AGENTS.md` or `CLAUDE.md` and tells you what to add.
+`reify init --write-agent-instructions` appends it for you:
 
 ```markdown
 ## Before changing code in this repo

@@ -1,0 +1,60 @@
+name: nightly
+
+on:
+  schedule: [{ cron: "0 3 * * *" }]
+  workflow_dispatch:
+
+jobs:
+  # Indexing a real repository catches what fixtures cannot: grammar edge cases, and
+  # silent extraction regressions that show up as a shifted symbol count rather than
+  # as a failing assertion.
+  real-repository:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release -p reify-cli
+
+      - name: Fetch ERPNext at a pinned commit
+        run: |
+          git clone --filter=blob:none https://github.com/frappe/erpnext.git /tmp/erpnext
+          git -C /tmp/erpnext checkout 2328e6da94d3787180251a339384e4ecfebdbef5
+
+      - name: Index and check the counts have not shifted
+        run: |
+          ./target/release/reify -C /tmp/erpnext init
+          ./target/release/reify -C /tmp/erpnext index
+          ./target/release/reify -C /tmp/erpnext --json report > report.json
+          python3 - <<'PY'
+          import json, sys
+          # Baselines measured on 2026-08-20 at the pinned commit. A drift beyond 10%
+          # means extraction changed, which is either a bug or a deliberate change that
+          # should update these numbers in the same pull request.
+          BASELINE = {"symbols": 18900, "doc_sections": 535, "database_objects": 731,
+                      "concepts": 579, "rules": 412}
+          got = json.load(open("report.json"))
+          bad = []
+          for key, expected in BASELINE.items():
+              actual = got[key]
+              if abs(actual - expected) > expected * 0.10:
+                  bad.append(f"{key}: {actual} vs baseline {expected}")
+          if bad:
+              sys.exit("extraction drifted:\n  " + "\n  ".join(bad))
+          print("counts within 10% of baseline")
+          PY
+
+      - name: Query latency must stay usable
+        run: |
+          time ./target/release/reify -C /tmp/erpnext --json context "credit limit on sales order" > /dev/null
+
+  benches:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo bench -p reify -- --output-format bencher | tee bench.txt
+      - uses: actions/upload-artifact@v4
+        with: { name: bench-results, path: bench.txt }

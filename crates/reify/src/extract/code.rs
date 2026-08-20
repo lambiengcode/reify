@@ -110,9 +110,15 @@ impl<'a> Ctx<'a> {
             "function_definition" | "function_declaration" | "generator_function_declaration" => {
                 "function"
             }
-            "class_definition" | "class_declaration" | "abstract_class_declaration" => "class",
-            "method_definition" => "method",
-            "interface_declaration" => "interface",
+            "class_definition"
+            | "class_declaration"
+            | "abstract_class_declaration"
+            | "record_declaration" => "class",
+            // `method_declaration` and `constructor_declaration` are Java. Omitting
+            // them silently reduces a Java repository to one symbol per file — the
+            // class — which looks like a working index and is not one.
+            "method_definition" | "method_declaration" | "constructor_declaration" => "method",
+            "interface_declaration" | "annotation_type_declaration" => "interface",
             "type_alias_declaration" => "type",
             "enum_declaration" => "enum",
             _ => return None,
@@ -576,6 +582,22 @@ def standalone(x):
     return x
 "#;
 
+    const JAVA: &str = r#"
+public class OrderService extends BaseService {
+    /** Decides whether an order needs approval. */
+    public boolean requiresApproval(Order order) {
+        if (order.getCustomerGroup() == 7) {
+            return bypassApproval(order);
+        }
+        return true;
+    }
+
+    private boolean bypassApproval(Order order) { return false; }
+
+    public OrderService() { }
+}
+"#;
+
     const TS: &str = r#"
 // Applies the discount policy.
 export class DiscountPolicy extends BasePolicy {
@@ -762,6 +784,73 @@ export function helper(a: number) { return a; }
             kind: EdgeKind::Calls,
         }];
         assert!(resolve(&pending, &idx).edges.is_empty());
+    }
+
+    #[test]
+    fn java_methods_and_constructors_are_extracted_not_just_the_class() {
+        // The regression that made a 1,350-file Java repository yield 1,521 symbols:
+        // the class was found and every method inside it was skipped.
+        let fx = extract("OrderService.java", JAVA, Lang::Java).unwrap();
+        let names: Vec<&str> = fx.batch.nodes.iter().map(|n| n.name.as_str()).collect();
+        assert!(names.contains(&"OrderService"), "got {names:?}");
+        assert!(names.contains(&"requiresApproval"), "got {names:?}");
+        assert!(names.contains(&"bypassApproval"), "got {names:?}");
+        assert!(
+            fx.batch.nodes.len() >= 4,
+            "a class with two methods and a constructor is four symbols: {names:?}"
+        );
+    }
+
+    #[test]
+    fn java_methods_carry_their_qualified_name_and_javadoc() {
+        let fx = extract("OrderService.java", JAVA, Lang::Java).unwrap();
+        let method = fx
+            .batch
+            .nodes
+            .iter()
+            .find(|n| n.name == "requiresApproval")
+            .expect("the method must be found");
+        assert_eq!(method.data["qualified"], "OrderService.requiresApproval");
+        assert_eq!(method.data["symbol_kind"], "method");
+        assert!(
+            method.data["doc"]
+                .as_str()
+                .is_some_and(|d| d.contains("approval")),
+            "javadoc: {:?}",
+            method.data["doc"]
+        );
+    }
+
+    #[test]
+    fn java_calls_and_inheritance_are_recorded() {
+        let fx = extract("OrderService.java", JAVA, Lang::Java).unwrap();
+        let called: Vec<&str> = fx
+            .pending
+            .iter()
+            .filter(|p| p.kind == EdgeKind::Calls)
+            .map(|p| p.name.as_str())
+            .collect();
+        assert!(called.contains(&"bypassApproval"), "calls: {called:?}");
+
+        let inherits: Vec<&str> = fx
+            .pending
+            .iter()
+            .filter(|p| p.kind == EdgeKind::Inherits)
+            .map(|p| p.name.as_str())
+            .collect();
+        assert_eq!(inherits, vec!["BaseService"], "inherits: {inherits:?}");
+    }
+
+    #[test]
+    fn a_java_guard_becomes_a_business_rule_candidate() {
+        let fx = extract("OrderService.java", JAVA, Lang::Java).unwrap();
+        assert!(
+            fx.rules
+                .iter()
+                .any(|r| r.source == crate::rules::RuleSource::CodeGuard),
+            "rules: {:#?}",
+            fx.rules
+        );
     }
 
     #[test]

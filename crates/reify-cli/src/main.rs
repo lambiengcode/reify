@@ -9,12 +9,13 @@ mod mcp;
 mod render;
 
 use anyhow::{bail, Context, Result};
-use clap::{Parser, Subcommand};
+use clap::{CommandFactory, Parser, Subcommand};
 use std::path::{Path, PathBuf};
 
 use reify::context::{self, ContextOptions};
 use reify::index::{self, IndexOptions};
 use reify::llm;
+use reify::lockfile::IndexLock;
 use reify::query;
 use reify::store::Store;
 
@@ -41,7 +42,13 @@ struct Cli {
 #[derive(Subcommand, Debug)]
 enum Command {
     /// Create `.reify/`, and report what will and will not be indexed.
-    Init,
+    Init {
+        /// Append Reify's usage instructions to this repository's agent instruction
+        /// file (`AGENTS.md` or `CLAUDE.md`). Without it, `init` only shows the block
+        /// and where it would go.
+        #[arg(long)]
+        write_agent_instructions: bool,
+    },
 
     /// Compile the system model. Incremental unless `--force`.
     Index {
@@ -124,6 +131,13 @@ enum Command {
         action: LlmAction,
     },
 
+    /// Print a shell completion script.
+    Completions {
+        /// The shell to generate for.
+        #[arg(value_enum)]
+        shell: clap_complete::Shell,
+    },
+
     /// Serve the Model Context Protocol on stdio.
     Serve {
         /// Speak MCP. Present so the flag is explicit rather than implied.
@@ -156,16 +170,32 @@ fn run() -> Result<()> {
     let root = resolve_root(cli.repo.as_deref())?;
 
     match &cli.command {
-        Command::Init => init(&root, cli.json),
+        Command::Init {
+            write_agent_instructions,
+        } => init(&root, *write_agent_instructions, cli.json),
         Command::Index { force, max_commits } => {
+            let reify_dir = root.join(index::REIFY_DIR);
+            std::fs::create_dir_all(&reify_dir)?;
+
+            // Held for the whole run and released on drop. Without it, two concurrent
+            // runs interleave and the only symptom a developer sees is a raw SQLite
+            // "database is locked" error.
+            let lock = IndexLock::acquire(&reify_dir)?;
+            if lock.reclaimed_stale() && !cli.json {
+                eprintln!(
+                    "A previous index did not finish; its lock was reclaimed.                      If results look wrong, run `reify index --force`."
+                );
+            }
+
             let opts = IndexOptions {
                 root: root.clone(),
                 force: *force,
                 max_commits: *max_commits,
+                progress: (!cli.json).then(render::progress_reporter),
             };
-            std::fs::create_dir_all(root.join(index::REIFY_DIR))?;
             let mut store = open_store_for_write(&opts)?;
             let report = index::index(&mut store, &opts)?;
+            render::clear_progress();
             render::index_report(&report, cli.json)
         }
         Command::Status => {
@@ -238,6 +268,12 @@ fn run() -> Result<()> {
                 render::llm_preview(&prompt, cli.json)
             }
         },
+        Command::Completions { shell } => {
+            let mut command = Cli::command();
+            let name = command.get_name().to_string();
+            clap_complete::generate(*shell, &mut command, name, &mut std::io::stdout());
+            Ok(())
+        }
         Command::Serve { mcp } => {
             anyhow::ensure!(*mcp, "only `--mcp` is supported; pass `reify serve --mcp`");
             mcp::serve(&root)
@@ -318,9 +354,9 @@ fn open_existing(root: &Path) -> Result<Store> {
 
 /// Create `.reify/`, scaffold a glossary, and report what indexing will cover.
 ///
-/// The skipped-file summary is printed here on purpose: a knowledge tool that silently
+/// The skipped-file summary is printed on purpose: a knowledge tool that silently
 /// ignores half a repository is worse than one that indexes nothing.
-fn init(root: &Path, json: bool) -> Result<()> {
+fn init(root: &Path, write_agent_instructions: bool, json: bool) -> Result<()> {
     let dir = root.join(index::REIFY_DIR);
     std::fs::create_dir_all(&dir).with_context(|| format!("creating {}", dir.display()))?;
 
@@ -341,8 +377,60 @@ fn init(root: &Path, json: bool) -> Result<()> {
     }
 
     let found = reify::discover::discover(root)?;
-    render::init(root, &found, created_glossary, json)
+    let agent_file = find_agent_instruction_file(root);
+    let mut wrote_instructions = false;
+    if write_agent_instructions {
+        let target = agent_file.clone().unwrap_or_else(|| root.join("AGENTS.md"));
+        let existing = std::fs::read_to_string(&target).unwrap_or_default();
+        if existing.contains("reify context") {
+            eprintln!(
+                "{} already mentions reify; nothing appended.",
+                target.display()
+            );
+        } else {
+            let mut updated = existing;
+            if !updated.is_empty() && !updated.ends_with('\n') {
+                updated.push('\n');
+            }
+            updated.push_str(AGENT_INSTRUCTIONS);
+            std::fs::write(&target, updated)
+                .with_context(|| format!("writing {}", target.display()))?;
+            eprintln!("Appended Reify instructions to {}", target.display());
+            wrote_instructions = true;
+        }
+    }
+
+    render::init(
+        root,
+        &found,
+        created_glossary,
+        agent_file.as_deref(),
+        wrote_instructions,
+        reify::gitlog::is_repository(root),
+        json,
+    )
 }
+
+/// The agent instruction file this repository already uses, if any.
+fn find_agent_instruction_file(root: &Path) -> Option<PathBuf> {
+    ["AGENTS.md", "CLAUDE.md", "CONVENTIONS.md", ".cursorrules"]
+        .iter()
+        .map(|name| root.join(name))
+        .find(|path| path.is_file())
+}
+
+/// What an agent needs to be told. Kept short on purpose: instructions an agent must
+/// re-read every session are themselves a context cost.
+pub const AGENT_INSTRUCTIONS: &str = r#"
+## Before changing code in this repository
+
+Run `reify context "<what you are about to do>"` and read its output first.
+Run `reify why <file>:<line>` before modifying unfamiliar logic.
+Run `reify impact "<symbol>"` before changing anything shared.
+
+Claims marked `INFERRED` are leads to verify against their citation, not facts.
+If `conflicts` is non-empty, resolve the disagreement before changing behaviour.
+"#;
 
 const GLOSSARY_TEMPLATE: &str = r#"# Reify glossary.
 #
@@ -370,6 +458,16 @@ mod tests {
     }
 
     #[test]
+    fn the_documented_agent_instructions_name_the_commands_they_describe() {
+        // These are what `docs/integration/` tells users to add, so the two must not
+        // drift apart.
+        for command in ["reify context", "reify why", "reify impact"] {
+            assert!(AGENT_INSTRUCTIONS.contains(command), "missing {command}");
+        }
+        assert!(AGENT_INSTRUCTIONS.contains("INFERRED"));
+    }
+
+    #[test]
     fn an_explicit_repo_flag_wins_over_discovery() {
         let dir = std::env::temp_dir();
         let resolved = resolve_root(Some(&dir)).unwrap();
@@ -392,6 +490,7 @@ mod tests {
             vec!["reify", "--json", "concepts"],
             vec!["reify", "--json", "preflight", "a.py"],
             vec!["reify", "--json", "llm", "status"],
+            vec!["reify", "--json", "init"],
         ] {
             let cli = Cli::try_parse_from(&args).expect("should parse");
             assert!(cli.json, "{args:?}");

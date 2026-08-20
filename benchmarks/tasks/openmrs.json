@@ -1,0 +1,220 @@
+{
+  "repository": "/Users/lambiengcode/Documents/reify/projects/reify/.bench/openmrs",
+  "head": "b5ec6fa66d017ac9df75d58ab20314eff84fbfc0",
+  "generated_from_commits": 400,
+  "base": "e9bb1b7a48f97d1ef009c5324ba13d10e439fe54",
+  "tasks": [
+    {
+      "id": "t-feaeac50",
+      "prompt": "TRUNK-6716: Fix log-level filter in StartupPerformanceIT.LogConsumer that suppresses all container logs",
+      "ground_truth": [
+        "test-suite/performance/src/test/java/org/openmrs/StartupPerformanceIT.java"
+      ],
+      "commit": "feaeac506698c3da27795cad8c85f043abce6fdf",
+      "date": "2026-07-29"
+    },
+    {
+      "id": "t-eb0a1006",
+      "prompt": "TRUNK-6688: Fix circular initialization error in logging setup",
+      "ground_truth": [
+        "api/src/main/java/org/openmrs/api/context/ServiceContext.java",
+        "api/src/main/java/org/openmrs/logging/OpenmrsConfigurationFactory.java",
+        "api/src/test/java/org/openmrs/api/context/ServiceContextTest.java"
+      ],
+      "commit": "eb0a1006c7e188d4408deb298685c98ea1fef321",
+      "date": "2026-07-17"
+    },
+    {
+      "id": "t-c6fcdc5b",
+      "prompt": "TRUNK-6689: Fix spelling mistakes in test comments",
+      "ground_truth": [
+        "api/src/test/java/org/openmrs/CohortTest.java",
+        "api/src/test/java/org/openmrs/api/OpenmrsServiceTest.java"
+      ],
+      "commit": "c6fcdc5be85ea0cb620b48e293e32cd61c9458e8",
+      "date": "2026-07-16"
+    },
+    {
+      "id": "t-6783feb1",
+      "prompt": "TRUNK-6647: Add @BatchSize annotation to ConceptReferenceTerm",
+      "ground_truth": [
+        "api/src/main/java/org/openmrs/ConceptReferenceTerm.java"
+      ],
+      "commit": "6783feb18c2d1ede60c28af5293340cf56e0b5e8",
+      "date": "2026-06-01"
+    },
+    {
+      "id": "t-589cfcaf",
+      "prompt": "Fix stray trailing quote in SchemaOnlyTunerTest XPath literals",
+      "ground_truth": [
+        "liquibase/src/test/java/org/openmrs/liquibase/SchemaOnlyTunerTest.java"
+      ],
+      "commit": "589cfcafaf2c20479a172e104cfa0e18a6d8d4fe",
+      "date": "2026-05-28"
+    },
+    {
+      "id": "t-708c62c6",
+      "prompt": "Fix 404 on /openmrs/ welcome page when no UI module is installed",
+      "ground_truth": [
+        "web/src/main/java/org/openmrs/web/WebConfig.java"
+      ],
+      "commit": "708c62c6a48d0e40bfce49289ae0de99f302a816",
+      "date": "2026-05-26"
+    },
+    {
+      "id": "t-d0308f34",
+      "prompt": "Fix ClassCastException for birthtime after Hibernate upgrade",
+      "ground_truth": [
+        "api/src/main/java/org/openmrs/Person.java"
+      ],
+      "commit": "d0308f34779dbb07533f98d9de90948de43998b4",
+      "date": "2026-04-12"
+    },
+    {
+      "id": "t-ebdfb1b7",
+      "prompt": "TRUNK-6596: Patient should be allowed to have duplicate identifier at a different location unless behavior \"UNIQUE\"",
+      "ground_truth": [
+        "api/src/main/java/org/openmrs/api/impl/PatientServiceImpl.java",
+        "api/src/main/java/org/openmrs/validator/PatientIdentifierValidator.java",
+        "api/src/test/java/org/openmrs/api/PatientServiceTest.java",
+        "api/src/test/java/org/openmrs/api/impl/PatientServiceImplTest.java",
+        "api/src/test/java/org/openmrs/validator/PatientIdentifierValidatorTest.java"
+      ],
+      "commit": "ebdfb1b7febc427f0fb87292562ca7ec38da2850",
+      "date": "2026-03-30"
+    },
+    {
+      "id": "t-52fd8bbb",
+      "prompt": "Fix an issue with the ModuleResourceServlet",
+      "ground_truth": [
+        "web/src/main/java/org/openmrs/module/web/ModuleResourcesServlet.java"
+      ],
+      "commit": "52fd8bbb98b1edd07765d52b526554236f7fa0ac",
+      "date": "2026-03-16"
+    },
+    {
+      "id": "t-1a5a9613",
+      "prompt": "TRUNK-6578: Fix thread-safety bug in HibernateContextDAO by using ThreadLocal for session participation flag",
+      "ground_truth": [
+        "api/src/main/java/org/openmrs/api/db/hibernate/HibernateContextDAO.java"
+      ],
+      "commit": "1a5a9613b65d3c75d28f5bb1cc088fb333ddf180",
+      "date": "2026-03-10"
+    },
+    {
+      "id": "t-95503da5",
+      "prompt": "TRUNK-6576 : Drug entry form should require the dose to be greater than 0",
+      "ground_truth": [
+        "api/src/main/java/org/openmrs/validator/DrugOrderValidator.java",
+        "api/src/test/java/org/openmrs/validator/DrugOrderValidatorTest.java"
+      ],
+      "commit": "95503da547a78a4b7d8156b78f10658c227e8d46",
+      "date": "2026-03-01"
+    },
+    {
+      "id": "t-d9f68276",
+      "prompt": "Fixes to make the legacyui module run on core 3.x",
+      "ground_truth": [
+        "web/src/main/java/org/openmrs/web/WebConfig.java"
+      ],
+      "commit": "d9f6827694f533e3a6bb88f338a227a862c53014",
+      "date": "2026-02-24"
+    },
+    {
+      "id": "t-b7da8139",
+      "prompt": "TRUNK-6571 - Fix Build Issues",
+      "ground_truth": [
+        "api/src/main/java/org/openmrs/util/DatabaseUtil.java",
+        "api/src/main/java/org/openmrs/validator/ObsValidator.java",
+        "api/src/test/java/org/openmrs/validator/ObsValidatorTest.java"
+      ],
+      "commit": "b7da8139edb2ec82676c85f0ab1e29e3929424bf",
+      "date": "2026-02-24"
+    },
+    {
+      "id": "t-b384d8ad",
+      "prompt": "TRUNK-6565 - Add at least one assertion to this test case.",
+      "ground_truth": [
+        "api/src/test/java/org/openmrs/CohortTest.java"
+      ],
+      "commit": "b384d8ad38b5c08b4547fe17446fcbb2e2cdd9b3",
+      "date": "2026-02-23"
+    },
+    {
+      "id": "t-b276e078",
+      "prompt": "TRUNK-6469: Add support for automatic initialization of Envers audit tables",
+      "ground_truth": [
+        "api/src/main/java/org/openmrs/api/db/hibernate/HibernateSessionFactoryBean.java",
+        "api/src/test/java/org/openmrs/util/DatabaseIT.java"
+      ],
+      "commit": "b276e078de004bb4eaa88d03875f8931548ae49a",
+      "date": "2026-02-21"
+    },
+    {
+      "id": "t-73886ee0",
+      "prompt": "TRUNK-6563: added @Transactional and fixed some minor mistakes",
+      "ground_truth": [
+        "api/src/main/java/org/openmrs/api/impl/OrderSetServiceImpl.java"
+      ],
+      "commit": "73886ee039857942a364440e1ce99983bc34e209",
+      "date": "2026-02-17"
+    },
+    {
+      "id": "t-93c63591",
+      "prompt": "Fix AuditableInterceptorTest polluting DB state via daemon task",
+      "ground_truth": [
+        "api/src/test/java/org/openmrs/api/db/hibernate/AuditableInterceptorTest.java"
+      ],
+      "commit": "93c635911f35b8a6cdca7ee1b7626a3b0c35d903",
+      "date": "2026-02-16"
+    },
+    {
+      "id": "t-429f1311",
+      "prompt": "TRUNK-6559 Fix the NotReadableProperty Invalid property 'groupMember'",
+      "ground_truth": [
+        "api/src/main/java/org/openmrs/validator/ObsValidator.java"
+      ],
+      "commit": "429f1311604c1d7650862d685a7cfe3e185c399c",
+      "date": "2026-02-16"
+    },
+    {
+      "id": "t-96dae963",
+      "prompt": "Fix test file isolation and dependency check resilience",
+      "ground_truth": [
+        "liquibase/src/test/java/org/openmrs/liquibase/AbstractSnapshotTunerTest.java"
+      ],
+      "commit": "96dae963efd61674110d6e50bf6b1f562d50239c",
+      "date": "2026-02-10"
+    },
+    {
+      "id": "t-e07341b3",
+      "prompt": "Fix some serious errors in the ThreadSafeCircularFifoQueue",
+      "ground_truth": [
+        "api/src/main/java/org/openmrs/util/ThreadSafeCircularFifoQueue.java",
+        "api/src/test/java/org/openmrs/OpenmrsTestsTest.java",
+        "api/src/test/java/org/openmrs/util/ThreadSafeCircularFifoQueueTest.java"
+      ],
+      "commit": "e07341b3365cc16e6e0fe1c15e4d75e03b0d30e3",
+      "date": "2026-02-05"
+    },
+    {
+      "id": "t-e174da06",
+      "prompt": "Fix a possible Zip-slip exploit in ModuleUtil",
+      "ground_truth": [
+        "api/src/main/java/org/openmrs/module/ModuleUtil.java",
+        "api/src/test/java/org/openmrs/module/ModuleUtilTest.java"
+      ],
+      "commit": "e174da06cb0d27bc90e60ec9f204008d7ad5c69a",
+      "date": "2026-02-05"
+    },
+    {
+      "id": "t-b6d9b960",
+      "prompt": "Fix double-check locking in Context#getMailSession",
+      "ground_truth": [
+        "api/src/main/java/org/openmrs/api/context/Context.java"
+      ],
+      "commit": "b6d9b960dea763b58c0187f2d638c7476b1057d9",
+      "date": "2026-02-05"
+    }
+  ]
+}

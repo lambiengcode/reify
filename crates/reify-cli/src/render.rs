@@ -66,10 +66,42 @@ fn heading(text: &str) {
     }
 }
 
+/// A progress line that overwrites itself, for a stage that runs for a minute.
+///
+/// Written to **stderr** so `reify index` stays pipeable, and suppressed entirely when
+/// stderr is not a terminal — progress in a CI log is noise, not information.
+pub fn progress_reporter() -> reify::index::ProgressFn {
+    std::sync::Arc::new(|stage: &str, done: usize, total: usize| {
+        if !std::io::IsTerminal::is_terminal(&std::io::stderr()) {
+            return;
+        }
+        let line = if total > 0 {
+            format!("  {stage} {done}/{total}")
+        } else {
+            format!("  {stage}")
+        };
+        // \r and a trailing clear, so the next stage overwrites this one cleanly.
+        eprint!("\r{line}\x1b[K");
+        let _ = std::io::Write::flush(&mut std::io::stderr());
+    })
+}
+
+/// Erase the progress line before printing the result.
+pub fn clear_progress() {
+    if std::io::IsTerminal::is_terminal(&std::io::stderr()) {
+        eprint!("\r\x1b[K");
+        let _ = std::io::Write::flush(&mut std::io::stderr());
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
 pub fn init(
     root: &std::path::Path,
     found: &Discovery,
     created_glossary: bool,
+    agent_file: Option<&std::path::Path>,
+    wrote_instructions: bool,
+    is_git_repository: bool,
     json: bool,
 ) -> Result<()> {
     #[derive(Serialize)]
@@ -79,6 +111,9 @@ pub fn init(
         skipped: usize,
         skip_reasons: Vec<(&'a str, usize)>,
         glossary_created: bool,
+        agent_instruction_file: Option<String>,
+        agent_instructions_written: bool,
+        git_repository: bool,
     }
     let skip_reasons = found.skip_summary();
     if json {
@@ -88,14 +123,39 @@ pub fn init(
             skipped: found.skipped.len(),
             skip_reasons: skip_reasons.clone(),
             glossary_created: created_glossary,
+            agent_instruction_file: agent_file.map(|p| p.display().to_string()),
+            agent_instructions_written: wrote_instructions,
+            git_repository: is_git_repository,
         });
     }
 
     println!("Initialised reify in {}", root.join(".reify").display());
+
+    // An empty or non-repository directory is almost always a mistake — the wrong
+    // path, or a directory that was never checked out. Saying nothing lets the user
+    // discover it a minute later, at the end of an index that found nothing.
+    if found.files.is_empty() {
+        println!("\nNothing here is indexable.");
+        println!("Check the path, or that this directory contains source you expect.");
+        if !skip_reasons.is_empty() {
+            println!("\nEverything present was skipped:");
+            for (reason, count) in &skip_reasons {
+                println!("  {count:>6}  {reason}");
+            }
+        }
+        return Ok(());
+    }
+    if !is_git_repository {
+        println!(
+            "\nThis is not a git repository, so history, blame and co-change will be \
+             empty.\nEverything else works."
+        );
+    }
     if created_glossary {
         println!("Wrote .reify/glossary.toml — declaring your domain terms there is the");
         println!("single highest-value thing you can do for retrieval quality.");
     }
+
     heading("Will index");
     let mut by_lang: Vec<(&str, usize)> = Vec::new();
     for file in &found.files {
@@ -115,6 +175,21 @@ pub fn init(
             println!("  {count:>6}  {reason}");
         }
     }
+
+    heading("Tell your agent about it");
+    match (agent_file, wrote_instructions) {
+        (Some(path), true) => println!("  Instructions appended to {}", path.display()),
+        (Some(path), false) => println!(
+            "  Add Reify to {} — run `reify init --write-agent-instructions`",
+            path.display()
+        ),
+        (None, _) => println!(
+            "  No AGENTS.md or CLAUDE.md found. Create one and run\n  \
+             `reify init --write-agent-instructions`, or add this yourself:\n\
+             \n      Run `reify context \"<task>\"` before changing code here."
+        ),
+    }
+
     println!("\nNext: reify index");
     Ok(())
 }

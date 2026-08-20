@@ -5,6 +5,7 @@ pub mod extract;
 pub mod gitlog;
 pub mod index;
 pub mod llm;
+pub mod lockfile;
 pub mod model;
 pub mod query;
 pub mod rules;

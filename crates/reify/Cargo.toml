@@ -3,6 +3,14 @@ name = "reify"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+description.workspace = true
+repository.workspace = true
+homepage.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+rust-version.workspace = true
+documentation.workspace = true
 
 [dependencies]
 anyhow = "1.0.104"

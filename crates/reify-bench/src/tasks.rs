@@ -173,7 +173,10 @@ fn candidate(root: &Path, commit: &gitlog::Commit) -> Option<Task> {
         if file.contains("/test_") || file.ends_with("_test.py") {
             continue;
         }
-        if file.ends_with(".py") || file.ends_with(".js") || file.ends_with(".ts") {
+        // Whatever the indexer treats as code counts as ground truth. Hard-coding a
+        // language list here silently produced zero tasks on a Java repository, which
+        // looks like "no suitable commits" rather than like a bug.
+        if reify::discover::classify(file).is_code() {
             truth.insert(file.clone());
         }
     }
@@ -263,6 +266,17 @@ mod tests {
         assert!(candidate(root, &commit("chore: bump version to 15.2")).is_none());
         assert!(candidate(root, &commit("fix: typo")).is_none());
         assert!(candidate(root, &commit("fix: update translation strings")).is_none());
+    }
+
+    #[test]
+    fn ground_truth_follows_the_indexer_rather_than_a_hard_coded_list() {
+        // A Java repository must produce tasks; anything the indexer parses qualifies.
+        for path in ["a/B.java", "a/b.py", "a/b.ts", "a/b.js", "db/x.sql"] {
+            assert!(reify::discover::classify(path).is_code(), "{path}");
+        }
+        for path in ["docs/x.md", "a/b.json", "a/b.yml"] {
+            assert!(!reify::discover::classify(path).is_code(), "{path}");
+        }
     }
 
     #[test]

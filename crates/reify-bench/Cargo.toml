@@ -3,6 +3,8 @@ name = "reify-bench"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+# Not published: this is the benchmark harness, useful only inside this repository.
+publish = false
 
 [dependencies]
 anyhow = "1.0.104"

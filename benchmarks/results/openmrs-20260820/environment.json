@@ -1,0 +1,12 @@
+{
+  "budget_tokens": 4000,
+  "code_files_in_corpus": 1277,
+  "conditions": [
+    "B-content-grep",
+    "C-path-grep",
+    "R-reify"
+  ],
+  "head": "b5ec6fa66d017ac9df75d58ab20314eff84fbfc0",
+  "reify_version": "0.1.0",
+  "repository": "/Users/lambiengcode/Documents/reify/projects/reify/.bench/openmrs"
+}

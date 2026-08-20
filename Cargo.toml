@@ -6,6 +6,14 @@ members = ["crates/reify", "crates/reify-cli", "crates/reify-bench"]
 version = "0.1.0"
 edition = "2021"
 license = "Apache-2.0"
+description = "A local knowledge engine that gives AI coding agents the smallest context they need to change mature business systems correctly."
+repository = "https://github.com/lambiengcode/reify"
+homepage = "https://github.com/lambiengcode/reify"
+documentation = "https://docs.rs/reify"
+readme = "README.md"
+keywords = ["ai", "agents", "code-search", "knowledge-graph", "codebase"]
+categories = ["development-tools", "command-line-utilities"]
+rust-version = "1.82"
 
 [profile.release]
 opt-level = 3
