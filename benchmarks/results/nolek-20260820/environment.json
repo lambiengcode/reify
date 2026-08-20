@@ -1,0 +1,12 @@
+{
+  "budget_tokens": 4000,
+  "code_files_in_corpus": 3565,
+  "conditions": [
+    "B-content-grep",
+    "C-path-grep",
+    "R-reify"
+  ],
+  "head": "2328e6da94d3787180251a339384e4ecfebdbef5",
+  "reify_version": "0.1.0",
+  "repository": "/Users/lambiengcode/Documents/reify/projects/reify/.bench/erpnext"
+}

@@ -440,13 +440,9 @@ fn path_affinity(node: &Node, asked: &BTreeSet<String>) -> f32 {
     matched as f32 / asked.len() as f32
 }
 
-/// Match singular against plural without pulling in a stemmer.
-///
-/// "orders" in a task must reach `sales_order`; anything more elaborate is not worth a
-/// dependency for the one inflection English uses in identifiers.
+/// Match singular against plural. One shared definition, in `concepts`.
 fn stem_match(candidate: &str, asked: &str) -> bool {
-    let strip = |w: &str| w.strip_suffix('s').unwrap_or(w).to_string();
-    strip(candidate) == strip(asked)
+    crate::concepts::same_word(candidate, asked)
 }
 
 /// Edge kinds relevance travels along. History edges are excluded from the general

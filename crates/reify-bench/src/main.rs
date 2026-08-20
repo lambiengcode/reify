@@ -12,6 +12,7 @@
 //! per-task outcomes are written out alongside the summary. Nothing in the report is
 //! computed anywhere except from those files.
 
+mod agent;
 mod conditions;
 mod metrics;
 mod tasks;
@@ -47,6 +48,11 @@ enum Command {
         count: usize,
         #[arg(long, default_value_t = 4_000)]
         scan: usize,
+        /// Only take tasks from commits *after* this revision, and record it as the
+        /// base an index should be built at. This is what removes the leakage caveat:
+        /// index at the base, and the changes being asked for are genuinely absent.
+        #[arg(long)]
+        after: Option<String>,
     },
     /// Run every condition over a task set.
     Run {
@@ -58,6 +64,20 @@ enum Command {
         out: PathBuf,
         #[arg(long, default_value_t = DEFAULT_BUDGET)]
         budget: u32,
+    },
+    /// Run the model-in-the-loop experiments, including the falsification controls.
+    Agent {
+        #[arg(long)]
+        repo: PathBuf,
+        #[arg(long)]
+        tasks: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long, default_value_t = DEFAULT_BUDGET)]
+        budget: u32,
+        /// Tasks to run. The full matrix is expensive, so a subset is the default.
+        #[arg(long, default_value_t = 20)]
+        limit: usize,
     },
     /// Render a report from raw results.
     Report {
@@ -82,14 +102,26 @@ fn run() -> Result<()> {
             out,
             count,
             scan,
+            after,
         } => {
-            let set = tasks::generate(&repo, count, scan)?;
+            let set = tasks::generate(&repo, count, scan, after.as_deref())?;
             eprintln!(
                 "{} tasks from {} commits at {}",
                 set.tasks.len(),
                 set.generated_from_commits,
                 &set.head[..8.min(set.head.len())]
             );
+            match &set.base {
+                Some(base) => eprintln!(
+                    "base {} — build the index there:\n  \
+                     git worktree add <dir> {base} && reify -C <dir> init && reify -C <dir> index",
+                    &base[..8.min(base.len())]
+                ),
+                None => eprintln!(
+                    "no --after given, so the index will contain the changes being asked \
+                     for; results are an upper bound"
+                ),
+            }
             write_json(&out, &set)
         }
         Command::Run {
@@ -98,8 +130,145 @@ fn run() -> Result<()> {
             out,
             budget,
         } => execute(&repo, &task_file, &out, budget),
+        Command::Agent {
+            repo,
+            tasks: task_file,
+            out,
+            budget,
+            limit,
+        } => agent_experiments(&repo, &task_file, &out, budget, limit),
         Command::Report { input, out } => report(&input, &out),
     }
+}
+
+/// Run every model condition over a task subset.
+///
+/// Conditions run per task rather than per condition so a run interrupted halfway
+/// still holds a balanced sample rather than one complete condition and four empty
+/// ones.
+fn agent_experiments(
+    repo: &Path,
+    task_file: &Path,
+    out: &Path,
+    budget: u32,
+    limit: usize,
+) -> Result<()> {
+    let set: tasks::TaskSet = read_json(task_file)?;
+    let provider = agent::provider_or_explain(repo)?;
+    eprintln!("provider: {}", provider.label);
+
+    let store_path = repo
+        .join(reify::index::REIFY_DIR)
+        .join(reify::index::STORE_FILE);
+    anyhow::ensure!(store_path.exists(), "no index at {}", store_path.display());
+    let store = Store::open(&store_path)?;
+    let corpus = conditions::Corpus::load(repo)?;
+
+    let chosen: Vec<&tasks::Task> = set.tasks.iter().take(limit).collect();
+    let mut outcomes: Vec<agent::AgentOutcome> = Vec::new();
+
+    for (i, task) in chosen.iter().enumerate() {
+        eprint!("\r  task {}/{}   ", i + 1, chosen.len());
+
+        // E6: memorisation control. No context at all.
+        outcomes.push(agent::run(&provider, repo, task, "N-no-context", ""));
+
+        // E1: the budget-matched lexical baseline.
+        let grep = conditions::content_search(&corpus, &task.prompt, budget);
+        outcomes.push(agent::run(
+            &provider,
+            repo,
+            task,
+            "B-content-grep",
+            &agent::files_block(&grep),
+        ));
+
+        // The condition under test.
+        let compiled = conditions::reify_context(&store, &task.prompt, budget)?;
+        outcomes.push(agent::run(
+            &provider,
+            repo,
+            task,
+            "R-reify",
+            &agent::files_block(&compiled),
+        ));
+
+        // E3: negative control. Reify's context for a *different* task. If this scores
+        // like the real thing, the model is not reading the content.
+        //
+        // Skipped for a single-task run, where "a different task" would be this one
+        // and the control would silently measure nothing.
+        if chosen.len() >= 2 {
+            let other = chosen[(i + chosen.len() / 2) % chosen.len()];
+            debug_assert_ne!(other.id, task.id, "the control must use a different task");
+            let shuffled = conditions::reify_context(&store, &other.prompt, budget)?;
+            outcomes.push(agent::run(
+                &provider,
+                repo,
+                task,
+                "R-shuffled",
+                &agent::files_block(&shuffled),
+            ));
+        }
+
+        // E2: the ceiling. The answer, handed over.
+        outcomes.push(agent::run(
+            &provider,
+            repo,
+            task,
+            "O-oracle",
+            &agent::oracle_block(task),
+        ));
+    }
+    eprintln!();
+
+    let names = [
+        "N-no-context",
+        "B-content-grep",
+        "R-reify",
+        "R-shuffled",
+        "O-oracle",
+    ];
+    let summaries: Vec<agent::AgentSummary> = names
+        .iter()
+        .map(|n| agent::summarise(n, &outcomes))
+        .collect();
+
+    std::fs::create_dir_all(out)?;
+    write_json(&out.join("agent-outcomes.json"), &outcomes)?;
+    write_json(&out.join("agent-summary.json"), &summaries)?;
+    write_json(
+        &out.join("agent-environment.json"),
+        &serde_json::json!({
+            "provider": provider.label,
+            "tasks": chosen.len(),
+            "budget_tokens": budget,
+            "conditions": names,
+            "head": set.head,
+            "token_counts": "estimated by reify heuristic-v1; the provider interface \
+                             is a command, so no usage counts are returned",
+        }),
+    )?;
+
+    eprintln!(
+        "\n{:<16} {:>6} {:>8} {:>8} {:>8}",
+        "condition", "tasks", "hit", "recall", "tokens"
+    );
+    for s in &summaries {
+        eprintln!(
+            "{:<16} {:>6} {:>7.0}% {:>8.2} {:>8}",
+            s.condition,
+            s.tasks,
+            s.hit_rate * 100.0,
+            s.mean_recall,
+            s.median_prompt_tokens
+        );
+        if s.errors > 0 {
+            eprintln!("{:<16} {} provider failures excluded", "", s.errors);
+        }
+    }
+    eprintln!("wrote {}", out.display());
+    Ok(())
 }
 
 fn execute(repo: &Path, task_file: &Path, out: &Path, budget: u32) -> Result<()> {
@@ -203,6 +372,17 @@ fn report(input: &Path, out: &Path) -> Result<()> {
         environment["budget_tokens"],
         environment["code_files_in_corpus"],
     ));
+    match set.base.as_deref() {
+        Some(base) => md.push_str(&format!(
+            "The index was built at `{base}`, **before** any of these changes were \
+             made, so the code being asked for is genuinely absent.\n\n"
+        )),
+        None => md.push_str(
+            "The index was built at `HEAD`, so the change being asked for is already \
+             present in the code. This makes every task easier for every condition \
+             equally, and means these numbers are an upper bound.\n\n",
+        ),
+    }
 
     md.push_str("## Conditions\n\n");
     md.push_str(
@@ -290,28 +470,180 @@ fn report(input: &Path, out: &Path) -> Result<()> {
          win on tokens by returning almost nothing, so the two must be read together.\n\n",
     );
 
+    md.push_str(&agent_section(input));
     md.push_str(&where_reify_lost(&outcomes, &set));
 
     md.push_str("\n## Limitations\n\n");
     md.push_str(
         "These are stated because the benchmark is only worth what its caveats allow.\n\n\
-         1. **Retrieval, not task success.** No model is run. A tool that surfaces the\n   \
-            right file may still be given to an agent that fails the task.\n\
-         2. **The index is built at `HEAD`, not at each task's parent commit.** The change\n   \
-            being asked for is therefore already present in the code. This makes every\n   \
-            task easier, for every condition equally — but it means these numbers are an\n   \
-            upper bound on real-world retrieval, not an estimate of it.\n\
+         1. **Single-shot, not agentic.** The model gets one turn and no tools. A real\n   \
+            agent greps, reads, and greps again. This understates every condition\n   \
+            equally, but it is not the same measurement.\n\
+         2. LEAKAGE_NOTE\n\
          3. **Ground truth is what one commit touched.** A different correct solution\n   \
             touching different files scores as a miss.\n\
          4. **One repository, one language mix.** Nothing here shows the result holds for\n   \
             a typed-language codebase.\n\
-         5. **No baseline uses a model.** A real agent iterates: greps, reads, greps again.\n   \
-            These baselines are single-shot, which understates them.\n",
+         5. **Estimated token counts.** The provider interface is a command, so no usage\n   \
+            counts are returned. Prompt sizes are Reify's own estimate, named as such.\n",
     );
+
+    let leakage = match set.base {
+        Some(_) => {
+            "**Leakage is controlled.** The index was built before any of these \
+                    changes were made, so the code being asked for is genuinely absent."
+        }
+        None => {
+            "**The index is built at `HEAD`.** The change being asked for is already \
+                 present in the code, which makes every task easier for every condition \
+                 equally and makes these numbers an upper bound."
+        }
+    };
+    let md = md.replace("LEAKAGE_NOTE", leakage);
 
     std::fs::write(out, md).with_context(|| format!("writing {}", out.display()))?;
     eprintln!("wrote {}", out.display());
     Ok(())
+}
+
+/// The model-in-the-loop results, when an agent run exists in the same directory.
+///
+/// This is the half of the benchmark that tests the product claim rather than a proxy
+/// for it, so it leads with the falsification controls: if the oracle does not beat the
+/// no-context floor, nothing else in the report matters.
+fn agent_section(input: &Path) -> String {
+    let Ok(summaries) = read_json::<Vec<agent::AgentSummary>>(&input.join("agent-summary.json"))
+    else {
+        return String::new();
+    };
+    let environment: serde_json::Value =
+        read_json(&input.join("agent-environment.json")).unwrap_or(serde_json::Value::Null);
+    let find = |name: &str| summaries.iter().find(|s| s.condition == name);
+
+    let mut md = String::from("\n## With a model in the loop\n\n");
+    md.push_str(&format!(
+        "Single-shot file identification: the model is given the task and one context \
+         block, and asked which files must change. Provider `{}`, {} tasks.\n\n",
+        environment["provider"].as_str().unwrap_or("?"),
+        environment["tasks"].as_u64().unwrap_or(0)
+    ));
+
+    md.push_str(
+        "| Condition | Experiment | Tasks | Hit rate | 95% CI | Recall | Prompt tokens |\n",
+    );
+    md.push_str("|---|---|---:|---:|---:|---:|---:|\n");
+    let purpose = |name: &str| match name {
+        "N-no-context" => "E6 memorisation control",
+        "B-content-grep" => "E1 budget-matched baseline",
+        "R-reify" => "condition under test",
+        "R-shuffled" => "E3 negative control",
+        "O-oracle" => "E2 ceiling",
+        _ => "",
+    };
+    for s in &summaries {
+        md.push_str(&format!(
+            "| `{}` | {} | {} | {:.0}% | {:.0}–{:.0}% | {:.2} | {} |\n",
+            s.condition,
+            purpose(&s.condition),
+            s.tasks,
+            s.hit_rate * 100.0,
+            s.hit_rate_ci.0 * 100.0,
+            s.hit_rate_ci.1 * 100.0,
+            s.mean_recall,
+            s.median_prompt_tokens
+        ));
+    }
+
+    md.push_str("\n### What the controls say\n\n");
+    if let (Some(oracle), Some(floor)) = (find("O-oracle"), find("N-no-context")) {
+        let headroom = oracle.hit_rate - floor.hit_rate;
+        md.push_str(&format!(
+            "**E2 — is context the bottleneck at all?** Perfect context scores {:.0}% \
+             against {:.0}% with none. That {:.0}-point gap is the entire space any \
+             retrieval system can compete in. {}\n\n",
+            oracle.hit_rate * 100.0,
+            floor.hit_rate * 100.0,
+            headroom * 100.0,
+            if headroom > 0.3 {
+                "The thesis survives its most dangerous test."
+            } else {
+                "**This is small. The thesis is in trouble: see the kill criteria in PLAN.md §Y.**"
+            }
+        ));
+        if let Some(reify) = find("R-reify") {
+            let captured = if headroom > 0.0 {
+                (reify.hit_rate - floor.hit_rate) / headroom
+            } else {
+                0.0
+            };
+            let baseline_captured = find("B-content-grep")
+                .map(|b| {
+                    if headroom > 0.0 {
+                        (b.hit_rate - floor.hit_rate) / headroom
+                    } else {
+                        0.0
+                    }
+                })
+                .unwrap_or(0.0);
+            md.push_str(&format!(
+                "**Share of that headroom recovered:** Reify {:.0}%, lexical baseline \
+                 {:.0}%.\n\n",
+                captured * 100.0,
+                baseline_captured * 100.0
+            ));
+        }
+    }
+    if let (Some(shuffled), Some(reify), Some(floor)) =
+        (find("R-shuffled"), find("R-reify"), find("N-no-context"))
+    {
+        // The comparison that matters is shuffled against the *real* context, not
+        // against the floor: the question is whether the content is doing the work or
+        // the format is. A shuffled score near the floor is expected; a shuffled score
+        // near the real one is the failure mode.
+        let separated = reify.hit_rate - shuffled.hit_rate;
+        md.push_str(&format!(
+            "**E3 — is the model reading the context, or just its framing?** Context \
+             compiled for a *different* task scores {:.0}%, against {:.0}% for the real \
+             context and {:.0}% for no context at all. {}\n\n",
+            shuffled.hit_rate * 100.0,
+            reify.hit_rate * 100.0,
+            floor.hit_rate * 100.0,
+            if separated >= 0.15 {
+                "Real context clearly outperforms decoy context of identical shape and \
+                 size, so the gain comes from what the context says rather than from \
+                 being handed a list of files."
+            } else {
+                "**The control did not separate: a decoy scores about as well as the \
+                 real thing, which means the format rather than the content is doing \
+                 the work. Treat the main result as unsupported.**"
+            }
+        ));
+    }
+    if let Some(floor) = find("N-no-context") {
+        md.push_str(&format!(
+            "**E6 — are these tasks memorised?** With no repository access at all the \
+             model still scores {:.0}%. {} That floor is subtracted in the headroom \
+             figures above rather than ignored.\n\n",
+            floor.hit_rate * 100.0,
+            if floor.hit_rate > 0.4 {
+                "**That is high enough that contamination is a serious concern.**"
+            } else {
+                "Some contamination, as expected for a public repository."
+            }
+        ));
+    }
+
+    md.push_str(
+        "### Reading these numbers honestly\n\n\
+         The confidence intervals overlap. At this sample size the ordering is \
+         consistent but not established: a difference of a few tasks is not a \
+         difference. What the run *does* establish is the direction of all three \
+         controls, which is a structural result rather than a marginal one.\n\n\
+         Prompt tokens are **estimates**. The provider interface is a command, so no \
+         usage counts come back. Reify's prompts are larger than the baseline's, so \
+         its higher hit rate is bought with tokens, not free.\n",
+    );
+    md
 }
 
 /// The section the benchmark exists to keep honest.

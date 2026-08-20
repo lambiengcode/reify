@@ -14,7 +14,7 @@ use std::sync::OnceLock;
 
 use regex::Regex;
 
-use crate::concepts::meaningful_words;
+use crate::concepts::{meaningful_words, same_word};
 use crate::model::{uid, EdgeKind, NewEdge, NewNode, NodeKind, Status};
 use crate::store::{Batch, NewEvidence};
 
@@ -458,12 +458,19 @@ pub fn detect_conflicts(candidates: &[RuleCandidate]) -> Vec<Conflict> {
             // both name. Without this, "corporate customers require approval" and
             // "timesheet entries bypass approval" look like a contradiction purely
             // because both contain the word "approval".
+            // Compared with inflection folded away: a document writes "corporate
+            // customers require" where the code writes "customer", and treating those
+            // as different words silently makes the detector unable to see the most
+            // common shape of a real contradiction.
             let subject_words = subject_vocabulary(&a.subject);
             let shared = a
                 .concepts
-                .intersection(&b.concepts)
-                .filter(|w| !subject_words.contains(*w))
-                .count();
+                .iter()
+                .filter(|w| !subject_words.iter().any(|s| same_word(s, w)))
+                .filter(|w| b.concepts.iter().any(|o| same_word(o, w)))
+                .map(|w| crate::concepts::stem(w))
+                .collect::<BTreeSet<&str>>()
+                .len();
             if shared < MIN_SHARED_WORDS {
                 continue;
             }
@@ -855,6 +862,19 @@ mod tests {
         );
         let code = code_rule("corporate customers bypass approval");
         assert!(detect_conflicts(&[doc_comment, code]).is_empty());
+    }
+
+    #[test]
+    fn a_plural_in_the_document_still_matches_the_singular_in_the_code() {
+        let rules = vec![
+            doc_rule("corporate customers must require approval for every order"),
+            code_rule("corporate customer order bypass approval"),
+        ];
+        assert_eq!(
+            detect_conflicts(&rules).len(),
+            1,
+            "inflection must not hide a real contradiction"
+        );
     }
 
     #[test]

@@ -14,6 +14,7 @@ use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 use std::path::Path;
+use std::process::Command;
 
 use reify::gitlog::{self, ChangeClass};
 
@@ -36,6 +37,11 @@ pub struct TaskSet {
     pub repository: String,
     pub head: String,
     pub generated_from_commits: usize,
+    /// The commit an index should be built at, when the set was generated with
+    /// `--after`. Indexing here means the changes being asked for are **not** already
+    /// in the code, which removes the benchmark's largest caveat.
+    #[serde(default)]
+    pub base: Option<String>,
     pub tasks: Vec<Task>,
 }
 
@@ -71,18 +77,40 @@ const MECHANICAL: &[&str] = &[
 /// `wanted` tasks are selected from the newest `scan` commits, taking every commit
 /// that passes the filters in order. Selection is deterministic and happens before any
 /// condition is run, so there is no opportunity to choose tasks that flatter a result.
-pub fn generate(root: &Path, wanted: usize, scan: usize) -> Result<TaskSet> {
+pub fn generate(root: &Path, wanted: usize, scan: usize, after: Option<&str>) -> Result<TaskSet> {
     let head = gitlog::head_sha(root).context("reading HEAD")?;
     let history = gitlog::history(root, scan)?;
 
+    // When a base is given, the walk stops there: every task must describe a change
+    // made *after* the state the index will be built at.
+    let base = after.map(|rev| resolve(root, rev)).transpose()?;
+    let cutoff = base.as_ref().and_then(|sha| {
+        history
+            .commits
+            .iter()
+            .position(|c| c.sha.starts_with(sha) || sha.starts_with(&c.sha))
+    });
+
     let mut tasks = Vec::new();
-    for commit in &history.commits {
+    for (i, commit) in history.commits.iter().enumerate() {
         if tasks.len() >= wanted {
             break;
         }
-        let Some(task) = candidate(root, commit) else {
+        if cutoff.is_some_and(|stop| i >= stop) {
+            break;
+        }
+        let Some(mut task) = candidate(root, commit) else {
             continue;
         };
+        // A file created by the change cannot be retrieved from a base that predates
+        // it. Keeping it as ground truth would score every condition zero and measure
+        // nothing, so the task is narrowed to the files that already existed.
+        if let Some(base) = &base {
+            task.ground_truth.retain(|path| exists_at(root, base, path));
+            if task.ground_truth.is_empty() {
+                continue;
+            }
+        }
         tasks.push(task);
     }
 
@@ -90,8 +118,35 @@ pub fn generate(root: &Path, wanted: usize, scan: usize) -> Result<TaskSet> {
         repository: root.display().to_string(),
         head,
         generated_from_commits: history.commits.len(),
+        base,
         tasks,
     })
+}
+
+/// Resolve a revision to a full sha.
+fn resolve(root: &Path, rev: &str) -> Result<String> {
+    let output = Command::new("git")
+        .args(["rev-parse", rev])
+        .current_dir(root)
+        .output()
+        .context("running git rev-parse")?;
+    anyhow::ensure!(
+        output.status.success(),
+        "cannot resolve `{rev}` in {}",
+        root.display()
+    );
+    Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
+}
+
+/// Did `path` exist at `commit`?
+fn exists_at(root: &Path, commit: &str, path: &str) -> bool {
+    Command::new("git")
+        .args(["cat-file", "-e", &format!("{commit}:{path}")])
+        .current_dir(root)
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .status()
+        .is_ok_and(|s| s.success())
 }
 
 fn candidate(root: &Path, commit: &gitlog::Commit) -> Option<Task> {

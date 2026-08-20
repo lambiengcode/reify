@@ -1,0 +1,10 @@
+{
+  "doctype": "DocType",
+  "name": "Strategic Account",
+  "engine": "InnoDB",
+  "fields": [
+    {"fieldname": "section_break_1", "fieldtype": "Section Break"},
+    {"fieldname": "customer_group", "label": "Customer Group", "fieldtype": "Link"},
+    {"fieldname": "discount_rate", "label": "Discount Rate", "fieldtype": "Percent"}
+  ]
+}

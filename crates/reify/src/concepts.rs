@@ -505,6 +505,25 @@ pub fn meaningful_words(text: &str) -> BTreeSet<String> {
         .collect()
 }
 
+/// Reduce a word to a form that compares across simple English inflection.
+///
+/// Deliberately not a stemmer. It folds the one inflection that matters for matching
+/// business vocabulary against code — the plural `s` — and nothing else. Treating
+/// "customers" and "customer" as unrelated words is a bug; aggressively stemming
+/// "billing" to "bill" would be a different and worse one.
+pub fn stem(word: &str) -> &str {
+    if word.len() > 3 && word.ends_with('s') && !word.ends_with("ss") {
+        &word[..word.len() - 1]
+    } else {
+        word
+    }
+}
+
+/// Do two words match once simple inflection is folded away?
+pub fn same_word(a: &str, b: &str) -> bool {
+    a == b || stem(a) == stem(b)
+}
+
 /// Turn a label into a stable opaque concept id.
 pub fn normalize_id(label: &str) -> String {
     let mut out = String::new();
@@ -825,6 +844,18 @@ db = ["CUSTOMER_GROUP=7"]
         assert_eq!(normalize_id("Strategic Account"), "STRATEGIC_ACCOUNT");
         assert_eq!(normalize_id("  L2 approval! "), "L2_APPROVAL");
         assert_eq!(normalize_id("???"), "CONCEPT");
+    }
+
+    #[test]
+    fn inflection_folding_matches_plurals_without_over_stemming() {
+        assert!(same_word("customers", "customer"));
+        assert!(same_word("requires", "require"));
+        assert!(same_word("order", "orders"));
+        // Must not fold words that merely end in s, or collapse unrelated stems.
+        assert!(!same_word("class", "clas"));
+        assert!(!same_word("billing", "bill"));
+        assert!(!same_word("approval", "approve"));
+        assert_eq!(stem("is"), "is", "short words are left alone");
     }
 
     #[test]

@@ -24,3 +24,10 @@ tree-sitter-python = "0.25.0"
 tree-sitter-typescript = "0.23.2"
 whatlang = "0.18.0"
 zip = "8.6.0"
+
+[dev-dependencies]
+criterion = { version = "0.8.2", default-features = false, features = ["cargo_bench_support"] }
+
+[[bench]]
+name = "queries"
+harness = false

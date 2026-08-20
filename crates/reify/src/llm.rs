@@ -7,9 +7,10 @@
 //! that guarantee for every user, including the overwhelming majority who never enable
 //! a model.
 //!
-//! So the provider is **a command the user configures**. Reify writes a prompt to its
-//! stdin and reads a completion from its stdout. That buys four things an embedded
-//! client would not:
+//! So the provider is **a command the user configures**. Reify writes the prompt to its
+//! stdin — or substitutes it for a `{prompt}` placeholder in the arguments, since many
+//! model CLIs take the prompt as an argument — and reads the completion from stdout.
+//! That buys four things an embedded client would not:
 //!
 //! - the offline guarantee stays literally true, and testable;
 //! - a local model (`ollama run`, `llama-cli`) works with no extra code;
@@ -53,11 +54,35 @@ const DEFAULT_TIMEOUT: Duration = Duration::from_secs(60);
 /// A configured completion provider.
 #[derive(Debug, Clone)]
 pub struct Provider {
-    /// Argv. The first element is the program; the prompt goes to its stdin.
+    /// Argv. The first element is the program.
+    ///
+    /// If any argument contains `{prompt}`, the prompt is substituted there and stdin
+    /// is left closed. Otherwise the prompt is written to stdin. Both shapes are
+    /// common among model CLIs and neither should require a wrapper script.
     pub command: Vec<String>,
     /// Recorded in provenance so a cached artifact can be traced to what produced it.
     pub label: String,
     pub timeout: Duration,
+}
+
+/// Marker substituted with the prompt when a provider takes it as an argument.
+pub const PROMPT_PLACEHOLDER: &str = "{prompt}";
+
+impl Provider {
+    /// Does this provider take the prompt as an argument rather than on stdin?
+    pub fn uses_placeholder(&self) -> bool {
+        self.command
+            .iter()
+            .any(|arg| arg.contains(PROMPT_PLACEHOLDER))
+    }
+
+    /// The argv to execute for `prompt`.
+    pub fn argv(&self, prompt: &str) -> Vec<String> {
+        self.command
+            .iter()
+            .map(|arg| arg.replace(PROMPT_PLACEHOLDER, prompt))
+            .collect()
+    }
 }
 
 /// Why model assistance is unavailable, in words a user can act on.
@@ -203,24 +228,32 @@ pub fn complete(provider: &Provider, root: &Path, prompt: &str) -> Result<String
     let hash = input_hash(provider, prompt);
     let started = Instant::now();
 
-    let (program, args) = provider
-        .command
+    let argv = provider.argv(prompt);
+    let (program, args) = argv
         .split_first()
         .ok_or_else(|| anyhow!("the provider command is empty"))?;
+    let uses_placeholder = provider.uses_placeholder();
+
     let mut child = Command::new(program)
         .args(args)
-        .stdin(Stdio::piped())
+        .stdin(if uses_placeholder {
+            Stdio::null()
+        } else {
+            Stdio::piped()
+        })
         .stdout(Stdio::piped())
         .stderr(Stdio::null())
         .spawn()
         .with_context(|| format!("spawning the model provider `{program}`"))?;
 
-    child
-        .stdin
-        .take()
-        .ok_or_else(|| anyhow!("the provider closed its stdin"))?
-        .write_all(prompt.as_bytes())
-        .context("writing the prompt to the provider")?;
+    if !uses_placeholder {
+        child
+            .stdin
+            .take()
+            .ok_or_else(|| anyhow!("the provider closed its stdin"))?
+            .write_all(prompt.as_bytes())
+            .context("writing the prompt to the provider")?;
+    }
 
     loop {
         match child.try_wait()? {
@@ -429,6 +462,41 @@ mod tests {
     fn anything_a_model_produces_is_only_ever_inferred() {
         assert_eq!(DERIVED_STATUS, Status::Inferred);
         assert!(!DERIVED_STATUS.is_actionable());
+    }
+
+    #[test]
+    fn a_provider_taking_the_prompt_as_an_argument_is_supported() {
+        // Many model CLIs take the prompt as an argument; requiring a wrapper script
+        // would push users toward pasting credentials into one.
+        let p = Provider {
+            command: vec!["llm".into(), "ask".into(), PROMPT_PLACEHOLDER.into()],
+            label: "llm".into(),
+            timeout: DEFAULT_TIMEOUT,
+        };
+        assert!(p.uses_placeholder());
+        assert_eq!(p.argv("hello"), vec!["llm", "ask", "hello"]);
+
+        let stdin_provider = Provider {
+            command: vec!["cat".into()],
+            label: "cat".into(),
+            timeout: DEFAULT_TIMEOUT,
+        };
+        assert!(!stdin_provider.uses_placeholder());
+        assert_eq!(stdin_provider.argv("hello"), vec!["cat"]);
+    }
+
+    #[test]
+    fn an_argument_provider_completes_without_using_stdin() {
+        let dir = std::env::temp_dir().join(format!("reify-llm-arg-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(dir.join(crate::index::REIFY_DIR)).unwrap();
+        let p = Provider {
+            command: vec!["echo".into(), PROMPT_PLACEHOLDER.into()],
+            label: "echo".into(),
+            timeout: Duration::from_secs(5),
+        };
+        assert_eq!(complete(&p, &dir, "hello facts").unwrap(), "hello facts");
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]
