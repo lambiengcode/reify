@@ -33,14 +33,14 @@ The index was built at `f493417c3d81670bbc5827258f9670e2d59bd4a8`, **before** an
 
 | Metric | B content grep | C path grep | R reify |
 |---|---:|---:|---:|
-| Tasks with at least one correct file | 4/40 (10%) | 7/40 (18%) | 24/40 (60%) |
-| Mean recall of changed files | 0.08 | 0.16 | 0.53 |
+| Tasks with at least one correct file | 4/40 (10%) | 7/40 (18%) | 23/40 (58%) |
+| Mean recall of changed files | 0.08 | 0.16 | 0.50 |
 | Mean precision | 0.03 | 0.00 | 0.06 |
-| MRR of first correct file | 0.07 | 0.12 | 0.20 |
-| Median tokens to first correct file | 3522 | 1048 | 2914 |
-| Median tokens for the whole answer | 3993 | 3964 | 3717 |
+| MRR of first correct file | 0.07 | 0.12 | 0.23 |
+| Median tokens to first correct file | 3522 | 1048 | 2916 |
+| Median tokens for the whole answer | 3993 | 3964 | 3826 |
 | Median files put in front of the agent | 3 | 88 | 13 |
-| Median latency (ms) | 43 | 0 | 57 |
+| Median latency (ms) | 45 | 0 | 59 |
 
 ### Cost, corrected for difficulty
 
@@ -53,14 +53,14 @@ else. Two corrections follow.
 
 | B content grep | C path grep | R reify |
 |---:|---:|---:|
-| 3876 | 3451 | 3381 |
+| 3876 | 3451 | 3426 |
 
 **Head to head on the tasks both solved:**
 
 | | |
 |---|---:|
 | Tasks both solved | 3 |
-| Median tokens, Reify | 3683 |
+| Median tokens, Reify | 3681 |
 | Median tokens, content grep | 2126 |
 | Tasks Reify reached first for less | 0 |
 | Tasks content grep reached first for less | 3 |
@@ -81,19 +81,19 @@ Single-shot file identification: the model is given the task and one context blo
 
 | Condition | Experiment | Tasks | Hit rate | 95% CI | Recall | Prompt tokens |
 |---|---|---:|---:|---:|---:|---:|
-| `N-no-context` | E6 memorisation control | 40 | 22% | 12–38% | 0.15 | 88 |
-| `B-content-grep` | E1 budget-matched baseline | 40 | 25% | 14–40% | 0.20 | 142 |
-| `R-reify` | condition under test | 40 | 65% | 50–78% | 0.59 | 255 |
-| `R-shuffled` | E3 negative control | 40 | 30% | 18–45% | 0.21 | 254 |
+| `N-no-context` | E6 memorisation control | 40 | 22% | 12–38% | 0.16 | 88 |
+| `B-content-grep` | E1 budget-matched baseline | 40 | 32% | 20–48% | 0.27 | 142 |
+| `R-reify` | condition under test | 40 | 60% | 45–74% | 0.54 | 255 |
+| `R-shuffled` | E3 negative control | 40 | 25% | 14–40% | 0.17 | 254 |
 | `O-oracle` | E2 ceiling | 40 | 100% | 91–100% | 1.00 | 120 |
 
 ### What the controls say
 
 **E2 — is context the bottleneck at all?** Perfect context scores 100% against 22% with none. That 78-point gap is the entire space any retrieval system can compete in. The thesis survives its most dangerous test.
 
-**Share of that headroom recovered:** Reify 55%, lexical baseline 3%.
+**Share of that headroom recovered:** Reify 48%, lexical baseline 13%.
 
-**E3 — is the model reading the context, or just its framing?** Context compiled for a *different* task scores 30%, against 65% for the real context and 22% for no context at all. Real context clearly outperforms decoy context of identical shape and size, so the gain comes from what the context says rather than from being handed a list of files.
+**E3 — is the model reading the context, or just its framing?** Context compiled for a *different* task scores 25%, against 60% for the real context and 22% for no context at all. Real context clearly outperforms decoy context of identical shape and size, so the gain comes from what the context says rather than from being handed a list of files.
 
 **E6 — are these tasks memorised?** With no repository access at all the model still scores 22%. Some contamination, as expected for a well-known public repository. That floor is subtracted in the headroom figures above rather than ignored.
 
@@ -109,11 +109,11 @@ Prompt tokens are **estimates**. The provider interface is a command, so no usag
 
 - `t-9ee41029` — baseline found a changed file; Reify found none
   > drop removed Restaurant doctype from sales tax template dashboard
-- `t-7c6da80f` — reached the first changed file at 3683 tokens vs 3522 for the baseline
+- `t-7c6da80f` — reached the first changed file at 3681 tokens vs 3522 for the baseline
   > validation for task end date check
-- `t-3558ce3b` — reached the first changed file at 3902 tokens vs 1505 for the baseline
+- `t-3558ce3b` — reached the first changed file at 3979 tokens vs 1505 for the baseline
   > opt-in 'Consider Accounting Dimension' filter on General Ledger Report
-- `t-be2dea0b` — reached the first changed file at 2504 tokens vs 2126 for the baseline
+- `t-be2dea0b` — reached the first changed file at 2552 tokens vs 2126 for the baseline
   > create custom fields for Frappe CRM on enabling synchronization
 
 ## Limitations

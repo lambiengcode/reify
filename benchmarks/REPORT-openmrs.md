@@ -33,14 +33,14 @@ The index was built at `e9bb1b7a48f97d1ef009c5324ba13d10e439fe54`, **before** an
 
 | Metric | B content grep | C path grep | R reify |
 |---|---:|---:|---:|
-| Tasks with at least one correct file | 7/22 (32%) | 4/22 (18%) | 10/22 (45%) |
-| Mean recall of changed files | 0.20 | 0.15 | 0.36 |
-| Mean precision | 0.11 | 0.02 | 0.06 |
-| MRR of first correct file | 0.27 | 0.18 | 0.24 |
-| Median tokens to first correct file | 2323 | 1761 | 3264 |
-| Median tokens for the whole answer | 3917 | 3871 | 2498 |
+| Tasks with at least one correct file | 7/22 (32%) | 4/22 (18%) | 9/22 (41%) |
+| Mean recall of changed files | 0.20 | 0.15 | 0.35 |
+| Mean precision | 0.11 | 0.02 | 0.05 |
+| MRR of first correct file | 0.27 | 0.18 | 0.19 |
+| Median tokens to first correct file | 2323 | 1761 | 2297 |
+| Median tokens for the whole answer | 3917 | 3871 | 2563 |
 | Median files put in front of the agent | 3 | 12 | 11 |
-| Median latency (ms) | 39 | 0 | 58 |
+| Median latency (ms) | 39 | 0 | 45 |
 
 ### Cost, corrected for difficulty
 
@@ -53,14 +53,14 @@ else. Two corrections follow.
 
 | B content grep | C path grep | R reify |
 |---:|---:|---:|
-| 3516 | 3551 | 3381 |
+| 3516 | 3551 | 3349 |
 
 **Head to head on the tasks both solved:**
 
 | | |
 |---|---:|
 | Tasks both solved | 4 |
-| Median tokens, Reify | 3786 |
+| Median tokens, Reify | 3602 |
 | Median tokens, content grep | 2278 |
 | Tasks Reify reached first for less | 1 |
 | Tasks content grep reached first for less | 3 |
@@ -83,17 +83,17 @@ Single-shot file identification: the model is given the task and one context blo
 |---|---|---:|---:|---:|---:|---:|
 | `N-no-context` | E6 memorisation control | 22 | 0% | 0–15% | 0.00 | 89 |
 | `B-content-grep` | E1 budget-matched baseline | 22 | 41% | 23–61% | 0.29 | 140 |
-| `R-reify` | condition under test | 22 | 50% | 31–69% | 0.37 | 258 |
-| `R-shuffled` | E3 negative control | 22 | 5% | 1–22% | 0.05 | 253 |
+| `R-reify` | condition under test | 22 | 45% | 27–65% | 0.39 | 269 |
+| `R-shuffled` | E3 negative control | 22 | 14% | 5–33% | 0.11 | 269 |
 | `O-oracle` | E2 ceiling | 22 | 100% | 85–100% | 0.98 | 123 |
 
 ### What the controls say
 
 **E2 — is context the bottleneck at all?** Perfect context scores 100% against 0% with none. That 100-point gap is the entire space any retrieval system can compete in. The thesis survives its most dangerous test.
 
-**Share of that headroom recovered:** Reify 50%, lexical baseline 41%.
+**Share of that headroom recovered:** Reify 45%, lexical baseline 41%.
 
-**E3 — is the model reading the context, or just its framing?** Context compiled for a *different* task scores 5%, against 50% for the real context and 0% for no context at all. Real context clearly outperforms decoy context of identical shape and size, so the gain comes from what the context says rather than from being handed a list of files.
+**E3 — is the model reading the context, or just its framing?** Context compiled for a *different* task scores 14%, against 45% for the real context and 0% for no context at all. Real context clearly outperforms decoy context of identical shape and size, so the gain comes from what the context says rather than from being handed a list of files.
 
 **E6 — are these tasks memorised?** With no repository access at all the model still scores 0%. Effectively none: the model cannot answer these from memory, so the remaining conditions measure retrieval rather than recall. That floor is subtracted in the headroom figures above rather than ignored.
 
@@ -111,13 +111,13 @@ Prompt tokens are **estimates**. The provider interface is a command, so no usag
   > TRUNK-6716: Fix log-level filter in StartupPerformanceIT.LogConsumer that suppresses all container logs
 - `t-eb0a1006` — baseline found a changed file; Reify found none
   > TRUNK-6688: Fix circular initialization error in logging setup
-- `t-589cfcaf` — reached the first changed file at 3786 tokens vs 1761 for the baseline
+- `t-589cfcaf` — reached the first changed file at 3832 tokens vs 1761 for the baseline
   > Fix stray trailing quote in SchemaOnlyTunerTest XPath literals
 - `t-ebdfb1b7` — baseline found a changed file; Reify found none
   > TRUNK-6596: Patient should be allowed to have duplicate identifier at a different location unless behavior "UNIQUE"
-- `t-93c63591` — reached the first changed file at 3538 tokens vs 2323 for the baseline
+- `t-93c63591` — reached the first changed file at 3602 tokens vs 2323 for the baseline
   > Fix AuditableInterceptorTest polluting DB state via daemon task
-- `t-e07341b3` — reached the first changed file at 3936 tokens vs 1183 for the baseline
+- `t-e07341b3` — reached the first changed file at 1429 tokens vs 1183 for the baseline
   > Fix some serious errors in the ThreadSafeCircularFifoQueue
 
 ## Limitations

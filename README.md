@@ -61,27 +61,25 @@ budget.
 The model is given the task and one context block, and asked which files must change.
 Three of the five conditions exist to try to falsify the result rather than support it.
 
+**ERPNext** — Python/JS, 5,064 files, 40 tasks.
+
 | Condition | | Hit rate | 95% CI | Recall |
 |---|---|---:|---:|---:|
-| No context at all | *memorisation control* | 22% | 12–38% | 0.15 |
-| Content grep, budget-matched | *baseline* | 25% | 14–40% | 0.20 |
-| **Reify** | | **65%** | **50–78%** | **0.59** |
-| Reify, context from a *different* task | *negative control* | 30% | 18–45% | 0.21 |
+| No context at all | *memorisation control* | 22% | 12–38% | 0.16 |
+| Content grep, budget-matched | *baseline* | 32% | 20–48% | 0.27 |
+| **Reify** | | **60%** | **45–74%** | **0.54** |
+| Reify with another task's context | *negative control* | 25% | 14–40% | 0.17 |
 | Perfect context | *ceiling* | 100% | 91–100% | 1.00 |
 
 **What the controls establish:**
 
 - **Context is the bottleneck.** Perfect context scores 100% where none scores 22%.
-  That 78-point gap is the entire space any retrieval system can compete in — and it is
-  wide, which is the single most important thing this benchmark had to determine.
-- **Reify recovers 55% of that gap. Grep recovers 3%.**
-- **The content is doing the work, not the framing.** A decoy context of identical
-  shape and size scores 30% against Reify's 65%.
-- **Contamination is modest.** With no repository access the model still scores 22%,
-  and that floor is subtracted above rather than ignored.
-
-Reify's confidence interval does not overlap the baseline's. It costs about 1.8× the
-prompt tokens for about 2.6× the hit rate — the gain is bought with tokens, not free.
+  That 78-point gap is the entire space any retrieval system can compete in, and it is
+  wide — the single most important thing this benchmark had to determine.
+- **Reify recovers 49% of that gap. Grep recovers 13%.**
+- **The content does the work, not the framing.** A decoy context of identical shape and
+  size scores 25% against Reify's 60%.
+- **Contamination is modest** and subtracted above rather than ignored.
 
 ### Retrieval quality, without a model
 
@@ -89,61 +87,62 @@ Does the tool put the right file in front of the agent at all?
 
 | | content grep | path grep | **Reify** |
 |---|---:|---:|---:|
-| Tasks where a changed file was surfaced | 4/40 (10%) | 7/40 (18%) | **24/40 (60%)** |
-| Mean recall | 0.08 | 0.16 | **0.53** |
-| MRR of the first correct file | 0.07 | 0.12 | **0.20** |
-| Expected tokens to reach a changed file | 3,876 | 3,451 | **3,381** |
+| Tasks where a changed file was surfaced | 4/40 (10%) | 7/40 (18%) | **23/40 (57%)** |
+| Mean recall | 0.08 | 0.16 | **0.50** |
+| MRR of the first correct file | 0.07 | 0.12 | **0.23** |
 | Median files put in front of the agent | 3 | 88 | 13 |
 | Median latency | 43 ms | 0 ms | 57 ms |
 
 ### Does it generalise? A second repository, in a typed language
 
-**OpenMRS** — Java, 1,325 files, 13,182 commits, 22 tasks, same leakage-free method.
+**OpenMRS** — Java, 1,603 files, 13,182 commits, 22 tasks, same leakage-free method.
 
-| Condition | Hit rate |
-|---|---:|
-| No context at all | **0%** |
-| Content grep, budget-matched | 41% |
-| **Reify** | **50%** |
-| Decoy context | 5% |
-| Perfect context | 100% |
+| Condition | Hit rate | 95% CI |
+|---|---:|---:|
+| No context at all | **0%** | 0–15% |
+| Content grep, budget-matched | 41% | 23–61% |
+| **Reify** | **45%** | 27–65% |
+| Decoy context | 14% | 5–33% |
+| Perfect context | 100% | 85–100% |
 
-The direction holds and the controls are cleaner than ERPNext's — zero memorisation, and
-a decoy scores 5% against Reify's 50%. **But the margin is far smaller: 9 points over
-grep, against 40 points on ERPNext.**
+The controls are *cleaner* than ERPNext's — zero memorisation, and a decoy at 14%
+against 45%. **But the margin over grep is 4 points and the intervals overlap almost
+entirely. On this repository Reify is not measurably better than grep.**
 
-The cause is measurable rather than mysterious. Reify builds **579 concepts** on ERPNext
-and **10** on OpenMRS, because ERPNext declares its domain vocabulary in structured
-entity metadata and OpenMRS does not — in the form Reify currently reads. OpenMRS *does*
-ship 20 Hibernate mappings and 27 message bundles, which are the same shape and are not
-yet ingested.
+That difference between the two repositories is the most useful thing this benchmark
+found, and it is not mysterious. Reify builds **948 concepts on ERPNext and 568 on
+OpenMRS**, but ERPNext *declares* 528 of its own in entity metadata while OpenMRS
+declares 41. The rest are inferred, and inferred vocabulary is weaker evidence.
 
-So the honest summary is: **Reify's advantage scales with how much declared vocabulary a
-repository hands it.** On a repository that declares a lot, it is transformative. On one
-that declares little, it is a modest improvement over grep. Closing that gap is the
-clearest item on the roadmap.
+**So the honest claim is:** Reify's advantage scales with how much vocabulary a
+repository declares. Where a team has written its domain down — entity metadata, ORM
+mappings, a glossary, translation files — the gain is large. Where it has not, Reify is
+roughly grep with better structure. `reify concepts --suggest` exists precisely to move
+a repository from the second case toward the first.
+
 
 ### Measured performance
 
-Same repository, 8-core M-series laptop. Three targets are still missed, and say so.
+ERPNext, 5,064 files, 8-core M-series laptop.
 
 | | Measured | Target | |
 |---|---:|---:|---|
-| Full index (5,284 files, no model) | 78 s | < 10 min | ✅ |
+| Full index, no model | 4.6 s | < 10 min | ✅ |
+| Reindex, nothing changed | 0.6 s | — | ✅ |
+| Reindex, one file edited | 0.7 s | < 500 ms | ~ |
 | `reify context` | 57 ms | < 100 ms | ✅ |
 | `reify impact` | 0.2 ms | < 50 ms | ✅ |
 | `reify why` | 205 ms | < 20 ms | ❌ includes a `git log -L` subprocess; ~5 ms without |
-| Reindex, nothing changed | 0.6 s | — | ✅ early exit |
-| Reindex, one function edited | 5.9 s | < 500 ms | ❌ see below |
 | Peak memory, full index | 224 MB | < 2 GB | ✅ |
-| Store size | 45 MB (31% of the 144 MB working tree) | < 5% | ❌ |
+| Store size | 47 MB (33% of the 144 MB working tree) | < 5% | ❌ |
 
-**Why a one-file edit still costs 5.9 s.** Only the changed file is re-parsed, but three
-stages are rebuilt across the whole repository every run: reference resolution, the
-concept layer, and rule corroboration with conflict detection. Each depends on what
-*other* files say, and a property test asserts that an incremental index is
-byte-identical to a full rebuild. Making those stages incremental without breaking that
-guarantee is the next performance task, not a tuning knob.
+A full index took 78 seconds until the full-text index was keyed by node id. `uid` is
+`UNINDEXED` in FTS5, so `DELETE ... WHERE uid = ?` scanned the whole table once per
+node — quadratic, and invisible until it was timed per stage. Editing one file took
+5.9 seconds until the repository-wide stages learned to skip when their inputs are
+provably unchanged.
+
+---
 
 ## Install and use
 
@@ -182,21 +181,59 @@ the answer.
 
 ---
 
+## What it reads
+
+**Code — 11 languages.** Python, TypeScript, JavaScript, Java, Go, C#, Rust, Ruby, PHP,
+C/C++, Kotlin, plus SQL. Each has a test asserting it yields containers, callables and
+calls, because a missing grammar node produces an index that looks healthy while holding
+one symbol per file.
+
+**Documents — whatever the analyst wrote it in.** Markdown, plain text, HTML (including
+Confluence exports), DOCX, legacy binary DOC, ODT, RTF, XLSX, PPTX and PDF. Formats with
+no usable pure-Rust reader are delegated to an external converter, and when none is
+installed Reify **says so loudly** rather than indexing nothing quietly.
+
+**Structured metadata.** Frappe/ERPNext DocType JSON, Hibernate ORM mappings, Java and
+Spring `.properties` message bundles, and i18n CSV translation tables. These are the
+highest-precision vocabulary a repository can offer: a team declared them, and the
+application reads them, so they stay current.
+
 ## Multilingual
 
 Concept ids are opaque and every label carries a language tag, including English — no
-language is canonical. A Vietnamese requirement reaches English code through the
-concept layer, not through a multilingual embedding model, which is why it is
-deterministic and citable.
+language is canonical. A Vietnamese, Thai, Korean or German requirement reaches English
+code through the concept layer, not through a multilingual embedding model, which is why
+it is deterministic and citable.
 
-Three bridges, in precision order: a declared glossary (`.reify/glossary.toml`), the
-product's own structured metadata and translation files, and co-occurrence between
-document headings and code identifiers.
+Around sixty locales are recognised on translation files and message bundles. Obligation
+and exemption language is detected in English, Vietnamese, German, Spanish, French,
+Portuguese, Indonesian, Thai, Korean, Japanese and Chinese, so a rule written in any of
+them is mined as a rule.
 
-**Honest caveat:** ERPNext ships no translation files, so the translation bridge is
-covered by tests but is *not* exercised by the benchmark above.
+Three details that only matter once you leave Latin script, each of which was a real bug:
 
----
+- **Thai, Lao, Khmer, Japanese and Chinese are written without spaces**, so a word index
+  stores one enormous token and a query for a word inside it matches nothing. Reify keeps
+  a trigram substring index for non-ASCII content and falls back to it.
+- **Korean attaches particles to the stem** — `승인` becomes `승인을` — so whole-word
+  matching finds neither. Non-ASCII terms match by substring.
+- **Sentence length cannot be counted in spaces.** Where there is no spacing, characters
+  stand in for it, or every claim in those languages is rejected as too short to be a rule.
+
+## Four bridges from business vocabulary to code
+
+In precision order. The last one is what makes Reify work on a repository that declares
+nothing at all.
+
+| Bridge | Source | Available when |
+|---|---|---|
+| **Declared** | `.reify/glossary.toml`, entity metadata, ORM mappings | a human or a framework wrote it down |
+| **Translation** | i18n tables, message bundles | the product has been localised |
+| **Co-occurrence** | document headings that also name code | there is documentation |
+| **Code vocabulary** | phrases the identifiers keep repeating | **always** |
+
+The last runs only on what the others left uncovered, so it fills gaps rather than
+competing with better evidence.
 
 ## Privacy
 

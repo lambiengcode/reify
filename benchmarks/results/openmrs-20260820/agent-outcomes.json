@@ -6,7 +6,7 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 99,
-    "elapsed_ms": 759,
+    "elapsed_ms": 940,
     "error": null
   },
   {
@@ -19,7 +19,7 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 137,
-    "elapsed_ms": 836,
+    "elapsed_ms": 1059,
     "error": null
   },
   {
@@ -33,12 +33,12 @@
       "api/src/main/java/org/openmrs/module/ModuleUtil.java",
       "api/src/main/java/org/openmrs/scheduler/SchedulerUtil.java",
       "api/src/main/java/org/openmrs/util/OpenmrsUtil.java",
-      "api/src/main/java/org/openmrs/module/ModuleFactory.java"
+      "api/src/main/java/org/openmrs/Allergies.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 269,
-    "elapsed_ms": 1309,
+    "elapsed_ms": 1214,
     "error": null
   },
   {
@@ -57,7 +57,7 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 317,
-    "elapsed_ms": 1540,
+    "elapsed_ms": 1288,
     "error": null
   },
   {
@@ -69,7 +69,7 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 133,
-    "elapsed_ms": 732,
+    "elapsed_ms": 897,
     "error": null
   },
   {
@@ -77,17 +77,12 @@
     "condition": "N-no-context",
     "named": [
       "frappe/utils/logger.py",
-      "frappe/__init__.py",
-      "frappe/app.py",
-      "frappe/commands/utils.py",
-      "frappe/utils/error.py",
-      "frappe/utils/exception.py",
-      "frappe/utils/__init__.py"
+      "frappe/__init__.py"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 89,
-    "elapsed_ms": 1155,
+    "elapsed_ms": 762,
     "error": null
   },
   {
@@ -101,7 +96,7 @@
     "hit": true,
     "recall": 0.33333334,
     "prompt_tokens": 150,
-    "elapsed_ms": 1023,
+    "elapsed_ms": 813,
     "error": null
   },
   {
@@ -114,7 +109,7 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 386,
-    "elapsed_ms": 972,
+    "elapsed_ms": 943,
     "error": null
   },
   {
@@ -127,39 +122,31 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 292,
-    "elapsed_ms": 978,
+    "elapsed_ms": 762,
     "error": null
   },
   {
     "task": "t-eb0a1006",
     "condition": "O-oracle",
     "named": [
+      "api/src/main/java/org/openmrs/api/context/ServiceContext.java",
       "api/src/main/java/org/openmrs/logging/OpenmrsConfigurationFactory.java",
-      "api/src/main/java/org/openmrs/api/context/ServiceContext.java"
+      "api/src/test/java/org/openmrs/api/context/ServiceContextTest.java"
     ],
     "hit": true,
-    "recall": 0.6666667,
+    "recall": 1.0,
     "prompt_tokens": 155,
-    "elapsed_ms": 632,
+    "elapsed_ms": 846,
     "error": null
   },
   {
     "task": "t-c6fcdc5b",
     "condition": "N-no-context",
-    "named": [
-      "frappe/public/js/frappe/form/tests/test_form.js",
-      "frappe/public/js/frappe/list/tests/test_list_view.js",
-      "frappe/public/js/frappe/views/tests/test_view.js",
-      "frappe/public/js/frappe/desk/tests/test_desk.js",
-      "frappe/public/js/frappe/website/tests/test_website.js",
-      "frappe/public/js/frappe/automation/tests/test_auto_repeat.js",
-      "frappe/public/js/frappe/email/tests/test_email.js",
-      "frappe/public/js/frappe/integrations/tests/test_integrations.js"
-    ],
+    "named": [],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 86,
-    "elapsed_ms": 1558,
+    "elapsed_ms": 1128,
     "error": null
   },
   {
@@ -171,7 +158,7 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 109,
-    "elapsed_ms": 662,
+    "elapsed_ms": 819,
     "error": null
   },
   {
@@ -185,7 +172,7 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 130,
-    "elapsed_ms": 795,
+    "elapsed_ms": 819,
     "error": null
   },
   {
@@ -194,17 +181,14 @@
     "named": [
       "api/src/test/java/org/openmrs/OpenmrsTestsTest.java",
       "api/src/test/java/org/openmrs/api/AdministrationServiceTest.java",
-      "api/src/main/java/org/openmrs/validator/PersonValidator.java",
       "api/src/test/java/org/openmrs/api/UserServiceTest.java",
       "api/src/test/java/org/openmrs/propertyeditor/ConceptAnswersEditorTest.java",
-      "api/src/test/java/org/openmrs/ConceptTest.java",
-      "api/src/main/java/org/openmrs/Concept.java",
-      "api/src/main/java/org/openmrs/Allergies.java"
+      "api/src/test/java/org/openmrs/ConceptTest.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 241,
-    "elapsed_ms": 1751,
+    "elapsed_ms": 875,
     "error": null
   },
   {
@@ -217,19 +201,17 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 127,
-    "elapsed_ms": 735,
+    "elapsed_ms": 873,
     "error": null
   },
   {
     "task": "t-6783feb1",
     "condition": "N-no-context",
-    "named": [
-      "models/ConceptReferenceTerm.java"
-    ],
+    "named": [],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 89,
-    "elapsed_ms": 599,
+    "elapsed_ms": 778,
     "error": null
   },
   {
@@ -241,21 +223,26 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 127,
-    "elapsed_ms": 815,
+    "elapsed_ms": 658,
     "error": null
   },
   {
     "task": "t-6783feb1",
     "condition": "R-reify",
     "named": [
+      "api/src/main/java/org/openmrs/ConceptReferenceTerm.java",
+      "api/src/main/java/org/openmrs/ConceptReferenceTermMap.java",
       "api/src/main/java/org/openmrs/DrugReferenceMap.java",
       "api/src/main/java/org/openmrs/ConceptMap.java",
-      "api/src/main/java/org/openmrs/ConceptReferenceTermMap.java"
+      "api/src/main/java/org/openmrs/Cohort.java",
+      "api/src/main/java/org/openmrs/Allergies.java",
+      "api/src/main/java/org/openmrs/messagesource/PresentationMessageMap.java",
+      "api/src/main/java/org/openmrs/util/ThreadSafeCircularFifoQueue.java"
     ],
-    "hit": false,
-    "recall": 0.0,
+    "hit": true,
+    "recall": 1.0,
     "prompt_tokens": 193,
-    "elapsed_ms": 803,
+    "elapsed_ms": 1125,
     "error": null
   },
   {
@@ -267,7 +254,7 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 296,
-    "elapsed_ms": 760,
+    "elapsed_ms": 699,
     "error": null
   },
   {
@@ -279,17 +266,19 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 118,
-    "elapsed_ms": 916,
+    "elapsed_ms": 757,
     "error": null
   },
   {
     "task": "t-589cfcaf",
     "condition": "N-no-context",
-    "named": [],
+    "named": [
+      "test/schema_only_tuner_test.py"
+    ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 89,
-    "elapsed_ms": 778,
+    "elapsed_ms": 553,
     "error": null
   },
   {
@@ -301,7 +290,7 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 162,
-    "elapsed_ms": 906,
+    "elapsed_ms": 977,
     "error": null
   },
   {
@@ -313,7 +302,7 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 246,
-    "elapsed_ms": 860,
+    "elapsed_ms": 859,
     "error": null
   },
   {
@@ -325,7 +314,7 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 89,
-    "elapsed_ms": 767,
+    "elapsed_ms": 808,
     "error": null
   },
   {
@@ -337,22 +326,21 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 122,
-    "elapsed_ms": 918,
+    "elapsed_ms": 898,
     "error": null
   },
   {
     "task": "t-708c62c6",
     "condition": "N-no-context",
     "named": [
-      "www/app.py",
-      "www/openmrs/welcome.py",
+      "www/openmrs/desktop.py",
       "www/openmrs/__init__.py",
       "www/openmrs/index.py"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 90,
-    "elapsed_ms": 1180,
+    "elapsed_ms": 851,
     "error": null
   },
   {
@@ -360,24 +348,29 @@
     "condition": "B-content-grep",
     "named": [
       "web/src/main/java/org/openmrs/web/filter/startuperror/StartupErrorFilter.java",
-      "web/src/main/java/org/openmrs/web/WebConstants.java"
+      "web/src/main/java/org/openmrs/web/WebConstants.java",
+      "api/src/main/java/org/openmrs/api/StorageService.java",
+      "api/src/main/java/org/openmrs/module/ModuleMustStartException.java",
+      "api/src/main/java/org/openmrs/api/OpenmrsService.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 173,
-    "elapsed_ms": 962,
+    "elapsed_ms": 835,
     "error": null
   },
   {
     "task": "t-708c62c6",
     "condition": "R-reify",
     "named": [
-      "web/src/main/java/org/openmrs/module/web/ModuleResourcesServlet.java"
+      "web/src/main/java/org/openmrs/module/web/ModuleResourcesServlet.java",
+      "api/src/main/java/org/openmrs/module/ModuleUtil.java",
+      "api/src/main/java/org/openmrs/module/ModuleFactory.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 240,
-    "elapsed_ms": 1368,
+    "elapsed_ms": 777,
     "error": null
   },
   {
@@ -385,13 +378,12 @@
     "condition": "R-shuffled",
     "named": [
       "web/src/main/java/org/openmrs/web/WebDaemon.java",
-      "api/src/main/java/org/openmrs/api/context/Daemon.java",
-      "api/src/main/java/org/openmrs/scheduler/tasks/AlertReminderTask.java"
+      "api/src/main/java/org/openmrs/api/context/Daemon.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 200,
-    "elapsed_ms": 1163,
+    "elapsed_ms": 1078,
     "error": null
   },
   {
@@ -403,17 +395,26 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 117,
-    "elapsed_ms": 737,
+    "elapsed_ms": 789,
     "error": null
   },
   {
     "task": "t-d0308f34",
     "condition": "N-no-context",
-    "named": [],
+    "named": [
+      "app/models/doctype.py",
+      "app/models/docfield.py",
+      "app/models/custom_field.py",
+      "app/patches/upgrade_utils.py",
+      "app/controllers/files.py",
+      "app/controllers/upload.py",
+      "app/utils/file_manager.py",
+      "app/model/utils.py"
+    ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 89,
-    "elapsed_ms": 972,
+    "elapsed_ms": 1398,
     "error": null
   },
   {
@@ -426,7 +427,7 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 126,
-    "elapsed_ms": 927,
+    "elapsed_ms": 687,
     "error": null
   },
   {
@@ -434,12 +435,15 @@
     "condition": "R-reify",
     "named": [
       "api/src/main/java/org/openmrs/Person.java",
-      "api/src/main/java/org/openmrs/api/db/hibernate/DbSession.java"
+      "api/src/main/java/org/openmrs/api/db/hibernate/DbSession.java",
+      "api/src/main/java/org/openmrs/util/UpgradeUtil.java",
+      "api/src/main/java/org/openmrs/logic/LogicCriteria.java",
+      "api/src/main/java/org/openmrs/logic/op/After.java"
     ],
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 267,
-    "elapsed_ms": 1020,
+    "elapsed_ms": 1074,
     "error": null
   },
   {
@@ -448,15 +452,16 @@
     "named": [
       "api/src/main/java/org/openmrs/User.java",
       "api/src/main/java/org/openmrs/module/ModuleFileParser.java",
-      "api/src/test/java/org/openmrs/module/ModuleFileParserUnitTest.java",
       "api/src/test/java/org/openmrs/module/dtd/ModuleConfigDTDTest_V1_0.java",
       "api/src/test/java/org/openmrs/module/dtd/ConfigXmlBuilder.java",
-      "api/src/test/java/org/openmrs/module/dtd/DtdTestValidator.java"
+      "api/src/test/java/org/openmrs/module/dtd/DtdTestValidator.java",
+      "api/src/test/java/org/openmrs/module/ModuleFileParserUnitTest.java",
+      "api/src/main/java/org/openmrs/api/MissingRequiredPropertyException.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 205,
-    "elapsed_ms": 1517,
+    "elapsed_ms": 1431,
     "error": null
   },
   {
@@ -468,39 +473,39 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 114,
-    "elapsed_ms": 735,
+    "elapsed_ms": 844,
     "error": null
   },
   {
     "task": "t-ebdfb1b7",
     "condition": "N-no-context",
     "named": [
-      "frappe/erpnext/healthcare/doctype/patient/patient.py",
-      "frappe/erpnext/healthcare/doctype/patient/patient_identifier.py",
-      "frappe/erpnext/healthcare/doctype/patient/patient_identifier_unique.py",
-      "frappe/erpnext/healthcare/doctype/patient/patient.js",
-      "frappe/erpnext/healthcare/doctype/patient/patient_list.js",
-      "frappe/erpnext/healthcare/doctype/patient/patient.json",
-      "frappe/erpnext/healthcare/doctype/patient/patient_patient_identifier_table.py",
-      "frappe/erpnext/healthcare/doctype/patient/patient_patient_identifier_table.json"
+      "frappe/patient.py",
+      "frappe/patient_identifier.py",
+      "frappe/patient_identifier_type.py",
+      "frappe/patient_identifier_validation.py",
+      "frappe/patient_identifier_service.py",
+      "frappe/patient_identifier_controller.py",
+      "frappe/patient_identifier_doctype.py",
+      "frappe/patient_identifier_utils.py"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 102,
-    "elapsed_ms": 1491,
+    "elapsed_ms": 1260,
     "error": null
   },
   {
     "task": "t-ebdfb1b7",
     "condition": "B-content-grep",
     "named": [
-      "api/src/main/java/org/openmrs/PatientIdentifierType.java",
-      "api/src/main/java/org/openmrs/validator/PatientIdentifierValidator.java"
+      "api/src/main/java/org/openmrs/validator/PatientIdentifierValidator.java",
+      "api/src/main/java/org/openmrs/PatientIdentifierType.java"
     ],
     "hit": true,
     "recall": 0.2,
     "prompt_tokens": 140,
-    "elapsed_ms": 1203,
+    "elapsed_ms": 922,
     "error": null
   },
   {
@@ -508,10 +513,10 @@
     "condition": "R-reify",
     "named": [
       "api/src/main/java/org/openmrs/PatientIdentifier.java",
-      "api/src/main/java/org/openmrs/Patient.java",
       "api/src/main/java/org/openmrs/PatientIdentifierType.java",
+      "api/src/main/java/org/openmrs/Patient.java",
+      "api/src/main/java/org/openmrs/Location.java",
       "api/src/main/java/org/openmrs/validator/PatientIdentifierValidator.java",
-      "api/src/main/java/org/openmrs/validator/PatientValidator.java",
       "api/src/main/java/org/openmrs/api/PatientService.java",
       "api/src/main/java/org/openmrs/api/db/PatientDAO.java",
       "api/src/main/java/org/openmrs/api/impl/PatientServiceImpl.java"
@@ -519,26 +524,26 @@
     "hit": true,
     "recall": 0.4,
     "prompt_tokens": 241,
-    "elapsed_ms": 1504,
+    "elapsed_ms": 1457,
     "error": null
   },
   {
     "task": "t-ebdfb1b7",
     "condition": "R-shuffled",
     "named": [
-      "api/src/main/java/org/openmrs/api/PatientService.java",
-      "api/src/main/java/org/openmrs/api/db/PatientDAO.java",
-      "api/src/main/java/org/openmrs/api/db/hibernate/HibernatePatientDAO.java",
       "api/src/main/java/org/openmrs/PatientIdentifier.java",
-      "api/src/main/java/org/openmrs/PatientIdentifierType.java",
-      "api/src/main/java/org/openmrs/util/OpenmrsUtil.java",
+      "api/src/main/java/org/openmrs/api/PatientService.java",
+      "api/src/main/java/org/openmrs/api/db/hibernate/HibernatePatientDAO.java",
+      "api/src/main/java/org/openmrs/api/impl/PatientServiceImpl.java",
       "api/src/main/java/org/openmrs/validator/PatientIdentifierValidator.java",
-      "api/src/main/java/org/openmrs/api/impl/PatientServiceImpl.java"
+      "api/src/main/java/org/openmrs/PatientIdentifierType.java",
+      "api/src/main/java/org/openmrs/api/db/PatientDAO.java",
+      "api/src/main/java/org/openmrs/util/OpenmrsUtil.java"
     ],
     "hit": true,
     "recall": 0.4,
     "prompt_tokens": 371,
-    "elapsed_ms": 1845,
+    "elapsed_ms": 1600,
     "error": null
   },
   {
@@ -554,19 +559,19 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 203,
-    "elapsed_ms": 1309,
+    "elapsed_ms": 1269,
     "error": null
   },
   {
     "task": "t-52fd8bbb",
     "condition": "N-no-context",
     "named": [
-      "frappe/public/js/frappe/ui/tools/module_resource.js"
+      "app/src/main/java/org/erpnext/servlet/ModuleResourceServlet.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 84,
-    "elapsed_ms": 706,
+    "elapsed_ms": 897,
     "error": null
   },
   {
@@ -580,7 +585,7 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 151,
-    "elapsed_ms": 1071,
+    "elapsed_ms": 719,
     "error": null
   },
   {
@@ -588,28 +593,27 @@
     "condition": "R-reify",
     "named": [
       "api/src/main/java/org/openmrs/obs/handler/BinaryStreamHandler.java",
-      "api/src/main/java/org/openmrs/obs/handler/AbstractHandler.java"
+      "api/src/main/java/org/openmrs/obs/handler/AbstractHandler.java",
+      "api/src/main/java/org/openmrs/Obs.java",
+      "api/src/main/java/org/openmrs/util/OpenmrsUtil.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 279,
-    "elapsed_ms": 968,
+    "elapsed_ms": 984,
     "error": null
   },
   {
     "task": "t-52fd8bbb",
     "condition": "R-shuffled",
     "named": [
-      "api/src/main/java/org/openmrs/util/ThreadSafeCircularFifoQueue.java",
-      "api/src/test/java/org/openmrs/util/ThreadSafeCircularFifoQueueTest.java",
-      "api/src/test/java/org/openmrs/test/BaseContextSensitiveTest.java",
-      "api/src/test/java/org/openmrs/test/jupiter/BaseContextSensitiveTest.java",
-      "api/src/main/java/org/openmrs/web/Listener.java"
+      "api/src/main/java/org/openmrs/web/Listener.java",
+      "web/src/main/java/org/openmrs/web/Listener.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 289,
-    "elapsed_ms": 1143,
+    "elapsed_ms": 1102,
     "error": null
   },
   {
@@ -628,19 +632,12 @@
     "task": "t-1a5a9613",
     "condition": "N-no-context",
     "named": [
-      "apps/erpnext/selling/doctype/sales_order/sales_order.py",
-      "apps/erpnext/stock/doctype/delivery_note/delivery_note.py",
-      "apps/erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
-      "apps/erpnext/selling/doctype/quotation/quotation.py",
-      "apps/erpnext/purchase/doctype/purchase_order/purchase_order.py",
-      "apps/erpnext/stock/doctype/purchase_receipt/purchase_receipt.py",
-      "apps/erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
-      "apps/erpnext/setup/doctype/item/item.py"
+      "hibernate/src/main/java/org/erpnext/hibernate/HibernateContextDAO.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 101,
-    "elapsed_ms": 1654,
+    "elapsed_ms": 1018,
     "error": null
   },
   {
@@ -648,30 +645,30 @@
     "condition": "B-content-grep",
     "named": [
       "api/src/main/java/org/openmrs/api/db/hibernate/HibernateContextDAO.java",
-      "api/src/main/java/org/openmrs/api/db/hibernate/HibernateDatatypeDAO.java",
+      "api/src/main/java/org/openmrs/api/db/hibernate/HibernateUtil.java",
+      "api/src/main/java/org/openmrs/api/db/hibernate/HibernateSessionFactoryBean.java",
+      "api/src/main/java/org/openmrs/api/context/Context.java",
+      "api/src/main/java/org/openmrs/api/context/ServiceContext.java",
+      "api/src/main/java/org/openmrs/util/DatabaseUpdater.java",
+      "api/src/main/java/org/openmrs/api/db/ContextDAO.java",
       "api/src/test/java/org/openmrs/api/db/ContextDAOTest.java"
     ],
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 139,
-    "elapsed_ms": 1290,
+    "elapsed_ms": 1804,
     "error": null
   },
   {
     "task": "t-1a5a9613",
     "condition": "R-reify",
     "named": [
-      "api/src/main/java/org/openmrs/api/db/hibernate/HibernateDatatypeDAO.java",
-      "api/src/main/java/org/openmrs/api/db/hibernate/search/session/SearchSessionFactoryImpl.java",
-      "api/src/main/java/org/openmrs/api/db/hibernate/DbSessionFactory.java",
-      "api/src/main/java/org/openmrs/api/db/hibernate/HibernateVisitDAO.java",
-      "api/src/main/java/org/openmrs/api/context/Daemon.java",
-      "api/src/main/java/org/openmrs/api/context/Context.java"
+      "api/src/main/java/org/openmrs/api/db/hibernate/HibernateContextDAO.java"
     ],
-    "hit": false,
-    "recall": 0.0,
-    "prompt_tokens": 211,
-    "elapsed_ms": 1424,
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 230,
+    "elapsed_ms": 1010,
     "error": null
   },
   {
@@ -683,7 +680,7 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 324,
-    "elapsed_ms": 749,
+    "elapsed_ms": 842,
     "error": null
   },
   {
@@ -695,26 +692,20 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 133,
-    "elapsed_ms": 887,
+    "elapsed_ms": 851,
     "error": null
   },
   {
     "task": "t-95503da5",
     "condition": "N-no-context",
     "named": [
-      "frappe/public/js/doctype_js/drug_prescription.js",
-      "erpnext/healthcare/doctype/drug_prescription/drug_prescription.py",
-      "erpnext/healthcare/doctype/drug_prescription/drug_prescription.js",
-      "erpnext/healthcare/doctype/drug_prescription/drug_prescription.json",
-      "erpnext/healthcare/doctype/prescription_dosage/prescription_dosage.py",
-      "erpnext/healthcare/doctype/prescription_dosage/prescription_dosage.js",
-      "erpnext/healthcare/doctype/prescription_dosage/prescription_dosage.json",
-      "erpnext/healthcare/doctype/patient_encounter/patient_encounter.js"
+      "healthcare/pharmacy/doctype/drug_prescription/drug_prescription.py",
+      "healthcare/pharmacy/doctype/drug_prescription/drug_prescription.json"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 92,
-    "elapsed_ms": 1633,
+    "elapsed_ms": 842,
     "error": null
   },
   {
@@ -726,7 +717,7 @@
     "hit": true,
     "recall": 0.5,
     "prompt_tokens": 170,
-    "elapsed_ms": 919,
+    "elapsed_ms": 693,
     "error": null
   },
   {
@@ -734,13 +725,12 @@
     "condition": "R-reify",
     "named": [
       "api/src/main/java/org/openmrs/validator/DrugOrderValidator.java",
-      "api/src/main/java/org/openmrs/DrugOrder.java",
-      "api/src/test/java/org/openmrs/validator/DrugOrderValidatorTest.java"
+      "api/src/main/java/org/openmrs/DrugOrder.java"
     ],
     "hit": true,
-    "recall": 1.0,
-    "prompt_tokens": 258,
-    "elapsed_ms": 992,
+    "recall": 0.5,
+    "prompt_tokens": 282,
+    "elapsed_ms": 1060,
     "error": null
   },
   {
@@ -753,7 +743,7 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 283,
-    "elapsed_ms": 1098,
+    "elapsed_ms": 737,
     "error": null
   },
   {
@@ -766,26 +756,26 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 140,
-    "elapsed_ms": 1058,
+    "elapsed_ms": 788,
     "error": null
   },
   {
     "task": "t-d9f68276",
     "condition": "N-no-context",
     "named": [
+      "legacyui/hooks.py",
+      "legacyui/patches.txt",
       "legacyui/public/js/legacyui.js",
-      "legacyui/public/js/legacyui_list.js",
-      "legacyui/public/js/legacyui_form.js",
-      "legacyui/public/js/legacyui_toolbar.js",
       "legacyui/legacyui/doctype/legacyui_settings/legacyui_settings.py",
       "legacyui/legacyui/page/legacyui/legacyui.py",
-      "legacyui/legacyui/hooks.py",
-      "legacyui/legacyui/patches.txt"
+      "legacyui/legacyui/page/legacyui/legacyui.js",
+      "legacyui/legacyui/page/legacyui/legacyui.html",
+      "legacyui/legacyui/workspace/legacyui/legacyui.json"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 86,
-    "elapsed_ms": 1281,
+    "elapsed_ms": 1315,
     "error": null
   },
   {
@@ -798,45 +788,43 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 126,
-    "elapsed_ms": 1109,
+    "elapsed_ms": 1148,
     "error": null
   },
   {
     "task": "t-d9f68276",
     "condition": "R-reify",
     "named": [
-      "api/src/main/java/org/openmrs/api/context/Daemon.java",
       "api/src/main/java/org/openmrs/api/context/Context.java",
-      "api/src/main/java/org/openmrs/util/Security.java",
-      "web/src/main/java/org/openmrs/module/web/WebModuleUtil.java",
-      "web/src/main/java/org/openmrs/web/filter/initialization/InitializationFilter.java",
-      "web/src/main/java/org/openmrs/web/filter/update/UpdateFilter.java",
+      "api/src/main/java/org/openmrs/api/context/Daemon.java",
       "api/src/main/java/org/openmrs/hl7/Hl7InArchivesMigrateThread.java",
-      "api/src/main/java/org/openmrs/messagesource/PresentationMessageMap.java"
+      "api/src/main/java/org/openmrs/scheduler/timer/TimerSchedulerTask.java",
+      "api/src/main/java/org/openmrs/messagesource/PresentationMessageMap.java",
+      "api/src/main/java/org/openmrs/ImplementationId.java",
+      "web/src/main/java/org/openmrs/module/web/WebModuleUtil.java",
+      "web/src/main/java/org/openmrs/web/filter/util/FilterUtil.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 303,
-    "elapsed_ms": 1402,
+    "elapsed_ms": 1307,
     "error": null
   },
   {
     "task": "t-d9f68276",
     "condition": "R-shuffled",
     "named": [
-      "api/src/main/java/org/openmrs/module/ModuleUtil.java",
       "api/src/main/java/org/openmrs/module/ModuleFactory.java",
       "api/src/main/java/org/openmrs/module/ModuleFileParser.java",
-      "api/src/main/java/org/openmrs/api/context/Context.java",
-      "api/src/main/java/org/openmrs/api/db/ContextDAO.java",
-      "api/src/main/java/org/openmrs/api/db/hibernate/HibernateContextDAO.java",
+      "api/src/main/java/org/openmrs/module/ModuleUtil.java",
       "api/src/main/java/org/openmrs/scheduler/SchedulerUtil.java",
-      "api/src/main/java/org/openmrs/util/OpenmrsUtil.java"
+      "api/src/main/java/org/openmrs/util/OpenmrsUtil.java",
+      "api/src/main/java/org/openmrs/Allergies.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 256,
-    "elapsed_ms": 1240,
+    "elapsed_ms": 1278,
     "error": null
   },
   {
@@ -848,26 +836,26 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 113,
-    "elapsed_ms": 1140,
+    "elapsed_ms": 680,
     "error": null
   },
   {
     "task": "t-b7da8139",
     "condition": "N-no-context",
     "named": [
-      "frappe/public/js/frappe/views/workspace/workspace.js",
-      "frappe/public/js/frappe/views/workspace/blocks/block.js",
+      "frappe/public/js/frappe/ui/tools/page_builder.js",
+      "frappe/public/js/frappe/views/page.js",
+      "frappe/public/js/frappe/views/reportview.js",
+      "frappe/public/js/frappe/list/list_view.js",
+      "frappe/public/js/frappe/form/form.js",
+      "frappe/public/js/frappe/desk/desk.js",
       "frappe/public/scss/website.scss",
-      "frappe/public/js/frappe/views/report/query_report.js",
-      "frappe/public/js/frappe/form/controls/table.js",
-      "frappe/public/js/frappe/views/form/footer.js",
-      "frappe/public/scss/desk.scss",
-      "frappe/public/js/frappe/views/workspace/workspace_section.js"
+      "frappe/public/scss/portal.scss"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 81,
-    "elapsed_ms": 1636,
+    "elapsed_ms": 1673,
     "error": null
   },
   {
@@ -882,7 +870,7 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 144,
-    "elapsed_ms": 1225,
+    "elapsed_ms": 1213,
     "error": null
   },
   {
@@ -896,12 +884,12 @@
       "api/src/main/java/org/openmrs/parameter/VisitSearchCriteriaBuilder.java",
       "api/src/test/java/org/openmrs/PersonTest.java",
       "api/src/test/java/org/openmrs/api/builder/DrugOrderBuilder.java",
-      "api/src/test/java/org/openmrs/api/builder/MedicationDispenseBuilder.java"
+      "api/src/test/java/org/openmrs/module/ModuleFileParserUnitTest.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 284,
-    "elapsed_ms": 1242,
+    "elapsed_ms": 1160,
     "error": null
   },
   {
@@ -920,7 +908,7 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 378,
-    "elapsed_ms": 1528,
+    "elapsed_ms": 1426,
     "error": null
   },
   {
@@ -934,26 +922,19 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 140,
-    "elapsed_ms": 926,
+    "elapsed_ms": 1135,
     "error": null
   },
   {
     "task": "t-b384d8ad",
     "condition": "N-no-context",
     "named": [
-      "frappe/public/js/../../frappe/tests/test_workflow.py",
-      "frappe/public/js/../../frappe/tests/test_workflow_actions.py",
-      "frappe/public/js/../../frappe/tests/test_workflow_transitions.py",
-      "frappe/public/js/../../frappe/tests/test_workflow_state.py",
-      "frappe/public/js/../../frappe/tests/test_workflow_script.py",
-      "frappe/public/js/../../frappe/tests/test_workflow_notification.py",
-      "frappe/public/js/../../frappe/tests/test_workflow_document.py",
-      "frappe/public/js/../../frappe/tests/test_workflow_rule.py"
+      "frappe/erpnext/accounts/doctype/sales_invoice/test_sales_invoice.py"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 88,
-    "elapsed_ms": 1847,
+    "elapsed_ms": 786,
     "error": null
   },
   {
@@ -966,38 +947,36 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 121,
-    "elapsed_ms": 949,
+    "elapsed_ms": 740,
     "error": null
   },
   {
     "task": "t-b384d8ad",
     "condition": "R-reify",
     "named": [
+      "api/src/test/java/org/openmrs/ConceptTest.java",
       "api/src/test/java/org/openmrs/api/UserServiceTest.java",
       "api/src/test/java/org/openmrs/api/AdministrationServiceTest.java",
-      "api/src/test/java/org/openmrs/ConceptTest.java",
-      "api/src/test/java/org/openmrs/OpenmrsTestsTest.java",
-      "api/src/test/java/org/openmrs/propertyeditor/ConceptAnswersEditorTest.java",
-      "api/src/main/java/org/openmrs/validator/PersonValidator.java",
-      "api/src/main/java/org/openmrs/Concept.java",
-      "api/src/main/java/org/openmrs/Cohort.java"
+      "api/src/test/java/org/openmrs/api/OpenmrsTestsTest.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 243,
-    "elapsed_ms": 1988,
+    "elapsed_ms": 1100,
     "error": null
   },
   {
     "task": "t-b384d8ad",
     "condition": "R-shuffled",
     "named": [
+      "api/src/test/java/org/openmrs/ConceptProposalTest.java",
+      "api/src/test/java/org/openmrs/util/DatabaseUpdaterTest.java",
       "api/src/test/java/org/openmrs/AllergyTest.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 132,
-    "elapsed_ms": 993,
+    "elapsed_ms": 930,
     "error": null
   },
   {
@@ -1009,26 +988,17 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 114,
-    "elapsed_ms": 1090,
+    "elapsed_ms": 692,
     "error": null
   },
   {
     "task": "t-b276e078",
     "condition": "N-no-context",
-    "named": [
-      "erpnext/patches.txt",
-      "erpnext/patches/v13/initialize_envers_audit_tables.py",
-      "erpnext/setup/install.py",
-      "erpnext/setup/utils.py",
-      "erpnext/erpnext_integrations/connectors/erpnext_connector.py",
-      "erpnext/erpnext_integrations/doctype/envers_audit_log/envers_audit_log.py",
-      "erpnext/erpnext_integrations/doctype/envers_audit_log/envers_audit_log.json",
-      "erpnext/erpnext_integrations/doctype/envers_audit_log_table/envers_audit_log_table.py"
-    ],
+    "named": [],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 92,
-    "elapsed_ms": 2258,
+    "elapsed_ms": 724,
     "error": null
   },
   {
@@ -1041,26 +1011,23 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 126,
-    "elapsed_ms": 1525,
+    "elapsed_ms": 727,
     "error": null
   },
   {
     "task": "t-b276e078",
     "condition": "R-reify",
     "named": [
-      "api/src/main/java/org/openmrs/api/db/hibernate/search/session/EventPublisherDelegatingSearchSession.java",
       "api/src/main/java/org/openmrs/util/DatabaseUpdater.java",
       "liquibase/src/main/java/org/openmrs/liquibase/SchemaOnlyTuner.java",
       "api/src/main/java/org/openmrs/api/context/Context.java",
-      "web/src/main/java/org/openmrs/web/Listener.java",
       "web/src/main/java/org/openmrs/web/DispatcherServlet.java",
-      "liquibase/src/test/java/org/openmrs/liquibase/SchemaOnlyTunerTest.java",
-      "api/src/test/java/org/openmrs/util/DatabaseIT.java"
+      "web/src/main/java/org/openmrs/web/Listener.java"
     ],
-    "hit": true,
-    "recall": 0.5,
+    "hit": false,
+    "recall": 0.0,
     "prompt_tokens": 300,
-    "elapsed_ms": 1930,
+    "elapsed_ms": 954,
     "error": null
   },
   {
@@ -1069,8 +1036,6 @@
     "named": [
       "api/src/main/java/org/openmrs/Allergies.java",
       "api/src/main/java/org/openmrs/Cohort.java",
-      "api/src/main/java/org/openmrs/messagesource/PresentationMessageMap.java",
-      "api/src/main/java/org/openmrs/util/ThreadSafeCircularFifoQueue.java",
       "api/src/main/java/org/openmrs/DrugReferenceMap.java",
       "api/src/main/java/org/openmrs/ConceptMap.java",
       "api/src/main/java/org/openmrs/ConceptReferenceTermMap.java"
@@ -1078,7 +1043,7 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 196,
-    "elapsed_ms": 1821,
+    "elapsed_ms": 919,
     "error": null
   },
   {
@@ -1091,17 +1056,26 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 140,
-    "elapsed_ms": 1499,
+    "elapsed_ms": 892,
     "error": null
   },
   {
     "task": "t-73886ee0",
     "condition": "N-no-context",
-    "named": [],
+    "named": [
+      "app/controllers/__init__.py",
+      "app/models.py",
+      "app/services/order_service.py",
+      "app/views.py",
+      "app/urls.py",
+      "app/tests/test_orders.py",
+      "app/migrations/0001_initial.py",
+      "app/settings.py"
+    ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 89,
-    "elapsed_ms": 1418,
+    "elapsed_ms": 1269,
     "error": null
   },
   {
@@ -1115,7 +1089,7 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 141,
-    "elapsed_ms": 1500,
+    "elapsed_ms": 789,
     "error": null
   },
   {
@@ -1125,7 +1099,7 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 89,
-    "elapsed_ms": 1421,
+    "elapsed_ms": 635,
     "error": null
   },
   {
@@ -1135,16 +1109,13 @@
       "api/src/main/java/org/openmrs/Provider.java",
       "api/src/main/java/org/openmrs/Role.java",
       "api/src/main/java/org/openmrs/ConceptReferenceTerm.java",
-      "web/src/main/java/org/openmrs/module/web/WebModuleUtil.java",
       "api/src/main/java/org/openmrs/util/OpenmrsUtil.java",
-      "api/src/test/java/org/openmrs/util/OpenmrsUtilUnitTest.java",
-      "api/src/test/java/org/openmrs/validator/RoleValidatorTest.java",
-      "web/src/test/java/org/openmrs/module/web/WebModuleUtilTest.java"
+      "web/src/main/java/org/openmrs/module/web/WebModuleUtil.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 246,
-    "elapsed_ms": 1861,
+    "elapsed_ms": 884,
     "error": null
   },
   {
@@ -1156,21 +1127,22 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 120,
-    "elapsed_ms": 1152,
+    "elapsed_ms": 1098,
     "error": null
   },
   {
     "task": "t-93c63591",
     "condition": "N-no-context",
     "named": [
-      "frappe/tests/test_auditable_interceptor.py",
-      "frappe/frappe/model/auditable.py",
-      "frappe/frappe/utils/background_jobs.py"
+      "frappe/core/doctype/auditable_interceptor/auditable_interceptor.py",
+      "frappe/core/doctype/auditable_interceptor/test_auditable_interceptor.py",
+      "frappe/core/doctype/auditable_interceptor/auditable_interceptor.json",
+      "frappe/core/doctype/auditable_interceptor/daemon_task.py"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 89,
-    "elapsed_ms": 1384,
+    "elapsed_ms": 1388,
     "error": null
   },
   {
@@ -1184,7 +1156,7 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 154,
-    "elapsed_ms": 1411,
+    "elapsed_ms": 926,
     "error": null
   },
   {
@@ -1194,31 +1166,29 @@
       "api/src/test/java/org/openmrs/api/db/hibernate/AuditableInterceptorTest.java",
       "api/src/test/java/org/openmrs/api/context/DaemonTest.java",
       "api/src/main/java/org/openmrs/api/context/Daemon.java",
-      "api/src/main/java/org/openmrs/scheduler/tasks/AlertReminderTask.java",
       "web/src/test/java/org/openmrs/web/WebDaemonTest.java",
-      "api/src/main/java/org/openmrs/scheduler/Task.java",
       "web/src/main/java/org/openmrs/web/WebDaemon.java"
     ],
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 200,
-    "elapsed_ms": 1702,
+    "elapsed_ms": 1137,
     "error": null
   },
   {
     "task": "t-93c63591",
     "condition": "R-shuffled",
     "named": [
+      "api/src/main/java/org/openmrs/module/ModuleUtil.java",
+      "api/src/main/java/org/openmrs/module/ModuleFactory.java",
       "api/src/main/java/org/openmrs/api/context/Daemon.java",
       "api/src/test/java/org/openmrs/module/ModuleUtilTest.java",
-      "api/src/test/java/org/openmrs/module/ModuleUtilIT.java",
-      "api/src/main/java/org/openmrs/module/ModuleUtil.java",
-      "api/src/main/java/org/openmrs/module/ModuleFactory.java"
+      "api/src/test/java/org/openmrs/module/ModuleUtilIT.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 240,
-    "elapsed_ms": 1889,
+    "elapsed_ms": 899,
     "error": null
   },
   {
@@ -1230,33 +1200,30 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 123,
-    "elapsed_ms": 1375,
+    "elapsed_ms": 859,
     "error": null
   },
   {
     "task": "t-429f1311",
     "condition": "N-no-context",
-    "named": [
-      "erpnext/accounts/doctype/payment_entry/payment_entry.py",
-      "erpnext/accounts/doctype/payment_entry/payment_entry.js",
-      "erpnext/accounts/doctype/payment_entry/payment_entry.json"
-    ],
+    "named": [],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 91,
-    "elapsed_ms": 1362,
+    "elapsed_ms": 524,
     "error": null
   },
   {
     "task": "t-429f1311",
     "condition": "B-content-grep",
     "named": [
+      "api/src/main/java/org/openmrs/validator/PatientProgramValidator.java",
       "api/src/test/java/org/openmrs/validator/PatientProgramValidatorTest.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 114,
-    "elapsed_ms": 1137,
+    "elapsed_ms": 1075,
     "error": null
   },
   {
@@ -1269,7 +1236,7 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 208,
-    "elapsed_ms": 1357,
+    "elapsed_ms": 1061,
     "error": null
   },
   {
@@ -1277,12 +1244,17 @@
     "condition": "R-shuffled",
     "named": [
       "api/src/main/java/org/openmrs/Person.java",
-      "api/src/main/java/org/openmrs/api/db/hibernate/DbSession.java"
+      "api/src/main/java/org/openmrs/logic/LogicCriteria.java",
+      "api/src/main/java/org/openmrs/api/db/hibernate/DbSession.java",
+      "api/src/main/java/org/openmrs/util/UpgradeUtil.java",
+      "api/src/test/java/org/openmrs/module/ModuleFileParserUnitTest.java",
+      "api/src/test/java/org/openmrs/util/UpgradeUtilTest.java",
+      "api/src/test/java/org/openmrs/module/ModuleExtensionsTest.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 269,
-    "elapsed_ms": 1608,
+    "elapsed_ms": 1214,
     "error": null
   },
   {
@@ -1294,24 +1266,25 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 120,
-    "elapsed_ms": 1253,
+    "elapsed_ms": 1084,
     "error": null
   },
   {
     "task": "t-96dae963",
     "condition": "N-no-context",
     "named": [
-      "test/test_helpers.py",
-      "test/runner.py",
-      "frappe/tests/test_runner.py",
+      "test/test_utils.py",
+      "test/test_dependency_check.py",
       "frappe/tests/test_utils.py",
-      "frappe/tests/test_isolate.py",
-      "frappe/tests/dependency_check.py"
+      "frappe/tests/test_dependency_check.py",
+      "frappe/core/doctype/installed_applications/installed_applications.py",
+      "frappe/utils/install.py",
+      "frappe/core/doctype/installed_applications/installed_applications.json"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 87,
-    "elapsed_ms": 1285,
+    "elapsed_ms": 1364,
     "error": null
   },
   {
@@ -1325,45 +1298,45 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 146,
-    "elapsed_ms": 903,
+    "elapsed_ms": 1086,
     "error": null
   },
   {
     "task": "t-96dae963",
     "condition": "R-reify",
     "named": [
-      "api/src/main/java/org/openmrs/module/ModuleUtil.java",
-      "api/src/main/java/org/openmrs/util/DatabaseUtil.java",
-      "api/src/main/java/org/openmrs/util/UpgradeUtil.java",
-      "api/src/main/java/org/openmrs/web/Listener.java",
       "api/src/test/java/org/openmrs/module/ModuleUtilTest.java",
       "api/src/test/java/org/openmrs/module/ModuleFileParserTest.java",
+      "api/src/test/java/org/openmrs/module/UpdateFileParserTest.java",
       "api/src/test/java/org/openmrs/module/ModuleFileParserUnitTest.java",
-      "api/src/test/java/org/openmrs/module/UpdateFileParserTest.java"
+      "api/src/test/java/org/openmrs/api/context/ContextWithModuleTest.java",
+      "api/src/test/java/org/openmrs/module/ModuleInteroperabilityTest.java",
+      "api/src/main/java/org/openmrs/module/ModuleUtil.java",
+      "api/src/main/java/org/openmrs/util/DatabaseUtil.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 356,
-    "elapsed_ms": 1825,
+    "elapsed_ms": 1289,
     "error": null
   },
   {
     "task": "t-96dae963",
     "condition": "R-shuffled",
     "named": [
-      "api/src/main/java/org/openmrs/Patient.java",
-      "api/src/main/java/org/openmrs/PatientIdentifier.java",
-      "api/src/main/java/org/openmrs/PatientIdentifierType.java",
-      "api/src/main/java/org/openmrs/validator/VisitValidator.java",
-      "api/src/main/java/org/openmrs/parameter/VisitSearchCriteriaBuilder.java",
       "api/src/main/java/org/openmrs/logic/result/Result.java",
+      "api/src/main/java/org/openmrs/parameter/VisitSearchCriteriaBuilder.java",
       "api/src/main/java/org/openmrs/messagesource/PresentationMessageMap.java",
-      "api/src/main/java/org/openmrs/patient/IdentifierValidator.java"
+      "api/src/main/java/org/openmrs/validator/VisitValidator.java",
+      "api/src/main/java/org/openmrs/PatientIdentifierType.java",
+      "api/src/main/java/org/openmrs/patient/IdentifierValidator.java",
+      "api/src/main/java/org/openmrs/PatientIdentifier.java",
+      "api/src/main/java/org/openmrs/Patient.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 226,
-    "elapsed_ms": 1172,
+    "elapsed_ms": 1519,
     "error": null
   },
   {
@@ -1375,19 +1348,19 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 121,
-    "elapsed_ms": 920,
+    "elapsed_ms": 1142,
     "error": null
   },
   {
     "task": "t-e07341b3",
     "condition": "N-no-context",
     "named": [
-      "apps/erpnext/support/doctype/issue/issue.py"
+      "apps/hr/utils.py"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 88,
-    "elapsed_ms": 908,
+    "elapsed_ms": 1063,
     "error": null
   },
   {
@@ -1400,7 +1373,7 @@
     "hit": true,
     "recall": 0.33333334,
     "prompt_tokens": 142,
-    "elapsed_ms": 890,
+    "elapsed_ms": 891,
     "error": null
   },
   {
@@ -1413,22 +1386,26 @@
     "hit": true,
     "recall": 0.6666667,
     "prompt_tokens": 293,
-    "elapsed_ms": 812,
+    "elapsed_ms": 965,
     "error": null
   },
   {
     "task": "t-e07341b3",
     "condition": "R-shuffled",
     "named": [
+      "api/src/main/java/org/openmrs/obs/handler/BinaryStreamHandler.java",
+      "api/src/main/java/org/openmrs/notification/Alert.java",
       "api/src/main/java/org/openmrs/api/db/hibernate/HibernateUtil.java",
+      "api/src/main/java/org/openmrs/Allergies.java",
       "api/src/main/java/org/openmrs/api/db/hibernate/DbSession.java",
+      "api/src/main/java/org/openmrs/Obs.java",
       "api/src/main/java/org/openmrs/api/db/hibernate/HibernateObsDAO.java",
-      "api/src/main/java/org/openmrs/api/db/hibernate/HibernateFormDAO.java"
+      "api/src/main/java/org/openmrs/util/OpenmrsUtil.java"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 282,
-    "elapsed_ms": 1168,
+    "elapsed_ms": 1085,
     "error": null
   },
   {
@@ -1441,7 +1418,7 @@
     "hit": true,
     "recall": 0.6666667,
     "prompt_tokens": 152,
-    "elapsed_ms": 1037,
+    "elapsed_ms": 681,
     "error": null
   },
   {
@@ -1449,18 +1426,18 @@
     "condition": "N-no-context",
     "named": [
       "frappe/utils/file_lock.py",
-      "frappe/utils/safe_exec.py",
+      "frappe/utils/backups.py",
+      "frappe/utils/__init__.py",
+      "frappe/modules/export_file.py",
       "frappe/modules/utils.py",
       "frappe/modules/import_file.py",
-      "frappe/modules/export_file.py",
-      "frappe/utils/zip.py",
-      "frappe/core/doctype/package/package.py",
-      "frappe/core/doctype/package_import/package_import.py"
+      "frappe/core/doctype/data_import/data_import.py",
+      "frappe/core/doctype/export_records/export_records.py"
     ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 85,
-    "elapsed_ms": 1160,
+    "elapsed_ms": 1503,
     "error": null
   },
   {
@@ -1474,7 +1451,7 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 137,
-    "elapsed_ms": 857,
+    "elapsed_ms": 1281,
     "error": null
   },
   {
@@ -1482,12 +1459,15 @@
     "condition": "R-reify",
     "named": [
       "api/src/main/java/org/openmrs/module/ModuleFileParser.java",
-      "api/src/main/java/org/openmrs/module/ModuleUtil.java"
+      "api/src/main/java/org/openmrs/module/ModuleUtil.java",
+      "api/src/main/java/org/openmrs/util/OpenmrsUtil.java",
+      "api/src/test/java/org/openmrs/module/ModuleUtilIT.java",
+      "api/src/test/java/org/openmrs/module/ModuleUtilTest.java"
     ],
     "hit": true,
-    "recall": 0.5,
+    "recall": 1.0,
     "prompt_tokens": 308,
-    "elapsed_ms": 817,
+    "elapsed_ms": 1424,
     "error": null
   },
   {
@@ -1495,12 +1475,17 @@
     "condition": "R-shuffled",
     "named": [
       "api/src/main/java/org/openmrs/api/db/hibernate/HibernateDatatypeDAO.java",
-      "api/src/main/java/org/openmrs/api/db/hibernate/HibernateVisitDAO.java"
+      "api/src/main/java/org/openmrs/api/db/hibernate/search/session/SearchSessionFactoryImpl.java",
+      "api/src/main/java/org/openmrs/api/db/hibernate/DbSessionFactory.java",
+      "api/src/main/java/org/openmrs/api/db/hibernate/HibernateVisitDAO.java",
+      "api/src/main/java/org/openmrs/api/db/hibernate/HibernateContextDAO.java",
+      "api/src/main/java/org/openmrs/api/context/Daemon.java",
+      "api/src/main/java/org/openmrs/api/context/Context.java"
     ],
     "hit": false,
     "recall": 0.0,
-    "prompt_tokens": 196,
-    "elapsed_ms": 807,
+    "prompt_tokens": 214,
+    "elapsed_ms": 1431,
     "error": null
   },
   {
@@ -1513,17 +1498,19 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 128,
-    "elapsed_ms": 1203,
+    "elapsed_ms": 935,
     "error": null
   },
   {
     "task": "t-b6d9b960",
     "condition": "N-no-context",
-    "named": [],
+    "named": [
+      "frappe/email/doctype/notification/notification.py"
+    ],
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 86,
-    "elapsed_ms": 858,
+    "elapsed_ms": 1178,
     "error": null
   },
   {
@@ -1535,7 +1522,7 @@
     "hit": false,
     "recall": 0.0,
     "prompt_tokens": 138,
-    "elapsed_ms": 1073,
+    "elapsed_ms": 936,
     "error": null
   },
   {
@@ -1547,21 +1534,20 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 277,
-    "elapsed_ms": 1161,
+    "elapsed_ms": 916,
     "error": null
   },
   {
     "task": "t-b6d9b960",
     "condition": "R-shuffled",
     "named": [
-      "api/src/main/java/org/openmrs/api/FormService.java",
       "api/src/main/java/org/openmrs/Form.java",
-      "api/src/main/java/org/openmrs/api/db/FormDAO.java"
+      "api/src/main/java/org/openmrs/FormRecordable.java"
     ],
     "hit": false,
     "recall": 0.0,
-    "prompt_tokens": 252,
-    "elapsed_ms": 1073,
+    "prompt_tokens": 277,
+    "elapsed_ms": 1317,
     "error": null
   },
   {
@@ -1573,7 +1559,7 @@
     "hit": true,
     "recall": 1.0,
     "prompt_tokens": 115,
-    "elapsed_ms": 707,
+    "elapsed_ms": 918,
     "error": null
   }
 ]

@@ -3,15 +3,15 @@
     "condition": "N-no-context",
     "tasks": 40,
     "errors": 0,
-    "hits": 12,
-    "hit_rate": 0.3,
+    "hits": 9,
+    "hit_rate": 0.225,
     "hit_rate_ci": [
-      0.1807467,
-      0.45430312
+      0.12315953,
+      0.37503397
     ],
-    "mean_recall": 0.21499999,
+    "mean_recall": 0.15666667,
     "median_prompt_tokens": 88,
-    "median_elapsed_ms": 1322
+    "median_elapsed_ms": 1325
   },
   {
     "condition": "B-content-grep",
@@ -25,35 +25,35 @@
     ],
     "mean_recall": 0.27333334,
     "median_prompt_tokens": 142,
-    "median_elapsed_ms": 1053
+    "median_elapsed_ms": 1028
   },
   {
     "condition": "R-reify",
     "tasks": 40,
     "errors": 0,
-    "hits": 26,
-    "hit_rate": 0.65,
+    "hits": 24,
+    "hit_rate": 0.6,
     "hit_rate_ci": [
-      0.49505597,
-      0.77865666
+      0.4459562,
+      0.73651886
     ],
-    "mean_recall": 0.5733334,
-    "median_prompt_tokens": 252,
-    "median_elapsed_ms": 1230
+    "mean_recall": 0.5441667,
+    "median_prompt_tokens": 255,
+    "median_elapsed_ms": 1325
   },
   {
     "condition": "R-shuffled",
     "tasks": 40,
     "errors": 0,
-    "hits": 9,
-    "hit_rate": 0.225,
+    "hits": 10,
+    "hit_rate": 0.25,
     "hit_rate_ci": [
-      0.12315953,
-      0.37503397
+      0.14186968,
+      0.4019426
     ],
-    "mean_recall": 0.14000002,
-    "median_prompt_tokens": 248,
-    "median_elapsed_ms": 1312
+    "mean_recall": 0.17333335,
+    "median_prompt_tokens": 254,
+    "median_elapsed_ms": 1261
   },
   {
     "condition": "O-oracle",
@@ -67,6 +67,6 @@
     ],
     "mean_recall": 1.0,
     "median_prompt_tokens": 120,
-    "median_elapsed_ms": 899
+    "median_elapsed_ms": 933
   }
 ]
