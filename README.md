@@ -48,66 +48,90 @@ Every claim carries where it came from and how much to trust it:
 
 ## Measured results
 
-Run on **ERPNext at `2328e6da`** — 5,169 files, 60,946 commits, 18,900 symbols.
-40 tasks derived from real merged commits: the prompt is the developer's own
-description, the ground truth is the files they actually changed. Every condition is
-held to the same 4,000-token budget.
+Run on **ERPNext**, 5,284 files and 60,946 commits, with 40 tasks derived from real
+merged commits: the prompt is the developer's own description of the change, the ground
+truth is the files they actually changed.
 
-| Metric | content grep | path grep | **Reify** |
+**The index is built at a commit before any of those changes were made**, so the code
+being asked for is genuinely absent. Every condition is held to the same 4,000-token
+budget.
+
+### With a model in the loop
+
+The model is given the task and one context block, and asked which files must change.
+Three of the five conditions exist to try to falsify the result rather than support it.
+
+| Condition | | Hit rate | 95% CI | Recall |
+|---|---|---:|---:|---:|
+| No context at all | *memorisation control* | 22% | 12–38% | 0.15 |
+| Content grep, budget-matched | *baseline* | 25% | 14–40% | 0.20 |
+| **Reify** | | **65%** | **50–78%** | **0.59** |
+| Reify, context from a *different* task | *negative control* | 30% | 18–45% | 0.21 |
+| Perfect context | *ceiling* | 100% | 91–100% | 1.00 |
+
+**What the controls establish:**
+
+- **Context is the bottleneck.** Perfect context scores 100% where none scores 22%.
+  That 78-point gap is the entire space any retrieval system can compete in — and it is
+  wide, which is the single most important thing this benchmark had to determine.
+- **Reify recovers 55% of that gap. Grep recovers 3%.**
+- **The content is doing the work, not the framing.** A decoy context of identical
+  shape and size scores 30% against Reify's 65%.
+- **Contamination is modest.** With no repository access the model still scores 22%,
+  and that floor is subtracted above rather than ignored.
+
+Reify's confidence interval does not overlap the baseline's. It costs about 1.8× the
+prompt tokens for about 2.6× the hit rate — the gain is bought with tokens, not free.
+
+### Retrieval quality, without a model
+
+Does the tool put the right file in front of the agent at all?
+
+| | content grep | path grep | **Reify** |
 |---|---:|---:|---:|
-| Tasks where a changed file was surfaced | 9/40 (22%) | 7/40 (18%) | **16/40 (40%)** |
-| Mean recall of changed files | 0.19 | 0.16 | **0.35** |
-| Expected tokens to reach a changed file | 3,598 | 3,500 | 3,627 |
-| Median files put in front of the agent | 4 | 86 | 14 |
-| Median latency | 51 ms | 0 ms | 63 ms |
+| Tasks where a changed file was surfaced | 4/40 (10%) | 7/40 (18%) | **24/40 (60%)** |
+| Mean recall | 0.08 | 0.16 | **0.53** |
+| MRR of the first correct file | 0.07 | 0.12 | **0.20** |
+| Expected tokens to reach a changed file | 3,876 | 3,451 | **3,381** |
+| Median files put in front of the agent | 3 | 88 | 13 |
+| Median latency | 43 ms | 0 ms | 57 ms |
 
-**Read that honestly.** At an equal token budget Reify roughly **doubles the chance of
-surfacing the file that has to change** — and it does **not** reduce token cost.
-Expected cost is a dead heat, and on the four tasks both approaches solved, plain grep
-reached the answer for fewer tokens on three of them.
+The report names all four tasks where the baseline still beat Reify, and lists five
+limitations that bound what these numbers mean — the largest being that this is
+single-shot file identification, not an agent completing a task.
 
-So half the product thesis is supported by this experiment and half is not. The report
-names all 8 tasks where the baseline beat Reify, and lists five limitations that bound
-what these numbers mean — starting with the fact that this measures *retrieval*, not
-whether an agent then makes the change correctly.
-
-Everything is reproducible:
+Everything is reproducible, and the raw per-task outcomes are committed:
 
 ```bash
-reify-bench tasks  --repo <repo> --out benchmarks/tasks/erpnext.json
-reify-bench run    --repo <repo> --tasks benchmarks/tasks/erpnext.json --out results/
+reify-bench tasks  --repo <repo> --after <base-sha> --out benchmarks/tasks/erpnext.json
+reify-bench run    --repo <repo> --tasks ... --out results/     # retrieval
+reify-bench agent  --repo <repo> --tasks ... --out results/     # with a model
 reify-bench report --in results/ --out benchmarks/REPORT.md
 ```
 
-Full report and raw per-task outcomes: [`benchmarks/REPORT.md`](benchmarks/REPORT.md).
+Full report: [`benchmarks/REPORT.md`](benchmarks/REPORT.md).
 
 ### Measured performance
 
-Same repository, 8-core M-series laptop. These are what the tool actually did, not
-what the plan hoped for — three of them miss their target and say so.
+Same repository, 8-core M-series laptop. Three targets are still missed, and say so.
 
 | | Measured | Target | |
 |---|---:|---:|---|
-| Full index (5,169 files, no model) | 78 s | < 10 min | ✅ |
-| `reify context` | 68 ms | < 100 ms | ✅ |
-| `reify why` | 205 ms | < 20 ms | ❌ includes a `git log -L` subprocess; ~5 ms without it |
-| Incremental index, one function edited | 5.9 s | < 500 ms | ❌ see below |
-| Peak memory during full index | 224 MB | < 2 GB | ✅ |
-| Store size | 80 MB (56% of the 144 MB working tree) | < 5% | ❌ |
+| Full index (5,284 files, no model) | 78 s | < 10 min | ✅ |
+| `reify context` | 57 ms | < 100 ms | ✅ |
+| `reify impact` | 0.2 ms | < 50 ms | ✅ |
+| `reify why` | 205 ms | < 20 ms | ❌ includes a `git log -L` subprocess; ~5 ms without |
+| Reindex, nothing changed | 0.6 s | — | ✅ early exit |
+| Reindex, one function edited | 5.9 s | < 500 ms | ❌ see below |
+| Peak memory, full index | 224 MB | < 2 GB | ✅ |
+| Store size | 45 MB (31% of the 144 MB working tree) | < 5% | ❌ |
 
-**Why incremental indexing misses by 12×.** Only the changed file is re-parsed, but
-three stages are rebuilt across the whole repository on every run: reference
-resolution, the concept layer, and rule corroboration with conflict detection. That is
-a deliberate correctness choice — each depends on what *other* files say, and a
-property test asserts that an incremental index is byte-identical to a full rebuild.
-Making those stages incremental without breaking that guarantee is the next
-performance task, not a tuning knob.
-
-**Why the store is large.** It keeps a full-text index and every symbol's search body.
-Dropping the stored bodies in favour of on-demand re-reads is the obvious fix and is
-not done yet.
-
----
+**Why a one-file edit still costs 5.9 s.** Only the changed file is re-parsed, but three
+stages are rebuilt across the whole repository every run: reference resolution, the
+concept layer, and rule corroboration with conflict detection. Each depends on what
+*other* files say, and a property test asserts that an incremental index is
+byte-identical to a full rebuild. Making those stages incremental without breaking that
+guarantee is the next performance task, not a tuning knob.
 
 ## Install and use
 

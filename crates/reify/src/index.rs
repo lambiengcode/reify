@@ -139,6 +139,29 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     report.files_parsed = changed.len();
     report.files_unchanged = found.files.len() - changed.len();
 
+    // Nothing changed, and `HEAD` has not moved: the store is already correct, and
+    // every repository-wide stage below would rebuild an identical result. This is the
+    // common case when `reify index` runs from a git hook, so it is worth an early
+    // exit rather than seven seconds of recomputing what is already there.
+    let head_now = gitlog::head_sha(&opts.root);
+    let head_unchanged = head_now == store.meta("head_sha")?;
+    if !opts.force
+        && changed.is_empty()
+        && report.files_removed == 0
+        && head_unchanged
+        && store.count_of_kind(NodeKind::Symbol)? > 0
+    {
+        report.symbols = store.count_of_kind(NodeKind::Symbol)?;
+        report.doc_sections = store.count_of_kind(NodeKind::DocSection)?;
+        report.database_objects = store.count_of_kind(NodeKind::DatabaseObject)?;
+        report.concepts = store.count_of_kind(NodeKind::Concept)?;
+        report.entities = report.database_objects;
+        report.commits = store.count_of_kind(NodeKind::Commit)?;
+        report.edges = store.count_edges()?;
+        report.elapsed_ms = started.elapsed().as_millis();
+        return Ok(report);
+    }
+
     for file in &changed {
         store.forget_file_content(&file.path)?;
     }
@@ -774,14 +797,45 @@ class SalesOrder:
     }
 
     #[test]
-    fn reindexing_an_unchanged_tree_parses_nothing() {
+    fn reindexing_an_unchanged_tree_parses_nothing_and_rebuilds_nothing() {
         let root = fixture("noop");
         let mut store = Store::in_memory().unwrap();
         let opts = IndexOptions::new(&root);
-        index(&mut store, &opts).unwrap();
+        let first = index(&mut store, &opts).unwrap();
         let second = index(&mut store, &opts).unwrap();
+
         assert_eq!(second.files_parsed, 0);
         assert!(second.files_unchanged > 0);
+        assert!(second.was_noop());
+        // The early exit must not lose counts: a caller reads them either way.
+        assert_eq!(second.symbols, first.symbols);
+        assert_eq!(second.concepts, first.concepts);
+        assert_eq!(second.edges, first.edges);
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn the_early_exit_leaves_the_store_byte_identical() {
+        // The exit is only safe because a rebuild would produce the same thing.
+        let root = fixture("noop-identical");
+        let mut store = Store::in_memory().unwrap();
+        let opts = IndexOptions::new(&root);
+        index(&mut store, &opts).unwrap();
+        let before = store.canonical_dump().unwrap();
+        index(&mut store, &opts).unwrap();
+        assert_eq!(before, store.canonical_dump().unwrap());
+
+        // And a forced rebuild must reach the same state the exit preserved.
+        let mut rebuilt = Store::in_memory().unwrap();
+        index(
+            &mut rebuilt,
+            &IndexOptions {
+                force: true,
+                ..IndexOptions::new(&root)
+            },
+        )
+        .unwrap();
+        assert_eq!(before, rebuilt.canonical_dump().unwrap());
         let _ = fs::remove_dir_all(&root);
     }
 

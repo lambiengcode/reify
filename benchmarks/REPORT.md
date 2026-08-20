@@ -17,7 +17,9 @@ measure whether an agent then makes the change correctly — see Limitations.
 | Commit | `2328e6da94d3787180251a339384e4ecfebdbef5` |
 | Tasks | 40 |
 | Token budget per condition | 4000 |
-| Code files in corpus | 3720 |
+| Code files in corpus | 3565 |
+
+The index was built at `f493417c3d81670bbc5827258f9670e2d59bd4a8`, **before** any of these changes were made, so the code being asked for is genuinely absent.
 
 ## Conditions
 
@@ -31,14 +33,14 @@ measure whether an agent then makes the change correctly — see Limitations.
 
 | Metric | B content grep | C path grep | R reify |
 |---|---:|---:|---:|
-| Tasks with at least one correct file | 9/40 (22%) | 7/40 (18%) | 16/40 (40%) |
-| Mean recall of changed files | 0.19 | 0.16 | 0.35 |
-| Mean precision | 0.05 | 0.00 | 0.03 |
-| MRR of first correct file | 0.20 | 0.10 | 0.12 |
-| Median tokens to first correct file | 1900 | 706 | 3218 |
-| Median tokens for the whole answer | 3994 | 3967 | 3778 |
-| Median files put in front of the agent | 4 | 86 | 14 |
-| Median latency (ms) | 51 | 0 | 63 |
+| Tasks with at least one correct file | 4/40 (10%) | 7/40 (18%) | 24/40 (60%) |
+| Mean recall of changed files | 0.08 | 0.16 | 0.53 |
+| Mean precision | 0.03 | 0.00 | 0.06 |
+| MRR of first correct file | 0.07 | 0.12 | 0.20 |
+| Median tokens to first correct file | 3522 | 1048 | 2914 |
+| Median tokens for the whole answer | 3993 | 3964 | 3717 |
+| Median files put in front of the agent | 3 | 88 | 13 |
+| Median latency (ms) | 43 | 0 | 57 |
 
 ### Cost, corrected for difficulty
 
@@ -51,16 +53,16 @@ else. Two corrections follow.
 
 | B content grep | C path grep | R reify |
 |---:|---:|---:|
-| 3598 | 3500 | 3627 |
+| 3876 | 3451 | 3381 |
 
 **Head to head on the tasks both solved:**
 
 | | |
 |---|---:|
-| Tasks both solved | 4 |
-| Median tokens, Reify | 3264 |
-| Median tokens, content grep | 3579 |
-| Tasks Reify reached first for less | 1 |
+| Tasks both solved | 3 |
+| Median tokens, Reify | 3683 |
+| Median tokens, content grep | 2126 |
+| Tasks Reify reached first for less | 0 |
 | Tasks content grep reached first for less | 3 |
 
 
@@ -73,40 +75,58 @@ eventually contains the right file, after four wrong ones, has not helped.
 win on tokens by returning almost nothing, so the two must be read together.
 
 
+## With a model in the loop
+
+Single-shot file identification: the model is given the task and one context block, and asked which files must change. Provider `deepseek-axi ask {prompt}`, 40 tasks.
+
+| Condition | Experiment | Tasks | Hit rate | 95% CI | Recall | Prompt tokens |
+|---|---|---:|---:|---:|---:|---:|
+| `N-no-context` | E6 memorisation control | 40 | 22% | 12–38% | 0.15 | 88 |
+| `B-content-grep` | E1 budget-matched baseline | 40 | 25% | 14–40% | 0.20 | 142 |
+| `R-reify` | condition under test | 40 | 65% | 50–78% | 0.59 | 255 |
+| `R-shuffled` | E3 negative control | 40 | 30% | 18–45% | 0.21 | 254 |
+| `O-oracle` | E2 ceiling | 40 | 100% | 91–100% | 1.00 | 120 |
+
+### What the controls say
+
+**E2 — is context the bottleneck at all?** Perfect context scores 100% against 22% with none. That 78-point gap is the entire space any retrieval system can compete in. The thesis survives its most dangerous test.
+
+**Share of that headroom recovered:** Reify 55%, lexical baseline 3%.
+
+**E3 — is the model reading the context, or just its framing?** Context compiled for a *different* task scores 30%, against 65% for the real context and 22% for no context at all. Real context clearly outperforms decoy context of identical shape and size, so the gain comes from what the context says rather than from being handed a list of files.
+
+**E6 — are these tasks memorised?** With no repository access at all the model still scores 22%. Some contamination, as expected for a public repository. That floor is subtracted in the headroom figures above rather than ignored.
+
+### Reading these numbers honestly
+
+The confidence intervals overlap. At this sample size the ordering is consistent but not established: a difference of a few tasks is not a difference. What the run *does* establish is the direction of all three controls, which is a structural result rather than a marginal one.
+
+Prompt tokens are **estimates**. The provider interface is a command, so no usage counts come back. Reify's prompts are larger than the baseline's, so its higher hit rate is bought with tokens, not free.
+
 ## Where Reify lost
 
-8 of 40 tasks where the content-grep baseline did better:
+4 of 40 tasks where the content-grep baseline did better:
 
-- `t-7faadb82` — baseline found a changed file; Reify found none
-  > stop doubling totals in timesheet billing summary
-- `t-a3032f2f` — baseline found a changed file; Reify found none
-  > serialize document values with tojson in rfq portal script
-- `t-1f839061` — baseline found a changed file; Reify found none
-  > don't set work order status to In Process only due to skip material transfer
-- `t-7c6da80f` — reached the first changed file at 3981 tokens vs 3944 for the baseline
+- `t-9ee41029` — baseline found a changed file; Reify found none
+  > drop removed Restaurant doctype from sales tax template dashboard
+- `t-7c6da80f` — reached the first changed file at 3683 tokens vs 3522 for the baseline
   > validation for task end date check
-- `t-e5c24fb3` — reached the first changed file at 3264 tokens vs 1150 for the baseline
-  > cross-plan load and overlap validation in production plan scheduling
-- `t-3558ce3b` — baseline found a changed file; Reify found none
+- `t-3558ce3b` — reached the first changed file at 3902 tokens vs 1505 for the baseline
   > opt-in 'Consider Accounting Dimension' filter on General Ledger Report
-- `t-9613d72d` — reached the first changed file at 2357 tokens vs 244 for the baseline
-  > patch to delete the `crm_deal` custom fields
-- `t-be2dea0b` — baseline found a changed file; Reify found none
+- `t-be2dea0b` — reached the first changed file at 2504 tokens vs 2126 for the baseline
   > create custom fields for Frappe CRM on enabling synchronization
 
 ## Limitations
 
 These are stated because the benchmark is only worth what its caveats allow.
 
-1. **Retrieval, not task success.** No model is run. A tool that surfaces the
-   right file may still be given to an agent that fails the task.
-2. **The index is built at `HEAD`, not at each task's parent commit.** The change
-   being asked for is therefore already present in the code. This makes every
-   task easier, for every condition equally — but it means these numbers are an
-   upper bound on real-world retrieval, not an estimate of it.
+1. **Single-shot, not agentic.** The model gets one turn and no tools. A real
+   agent greps, reads, and greps again. This understates every condition
+   equally, but it is not the same measurement.
+2. **Leakage is controlled.** The index was built before any of these changes were made, so the code being asked for is genuinely absent.
 3. **Ground truth is what one commit touched.** A different correct solution
    touching different files scores as a miss.
 4. **One repository, one language mix.** Nothing here shows the result holds for
    a typed-language codebase.
-5. **No baseline uses a model.** A real agent iterates: greps, reads, greps again.
-   These baselines are single-shot, which understates them.
+5. **Estimated token counts.** The provider interface is a command, so no usage
+   counts are returned. Prompt sizes are Reify's own estimate, named as such.

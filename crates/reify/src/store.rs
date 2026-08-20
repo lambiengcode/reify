@@ -15,7 +15,7 @@ use crate::tokens;
 
 /// Bumped whenever the schema changes shape. A store whose version differs from the
 /// binary's is rebuilt rather than migrated in place; rebuilds are cheap by design.
-pub const SCHEMA_VERSION: i64 = 1;
+pub const SCHEMA_VERSION: i64 = 2;
 
 /// Edge kinds derived from a single file's content, invalidated when its hash changes.
 pub const CONTENT_EDGE_KINDS: &[EdgeKind] = &[
@@ -89,14 +89,23 @@ CREATE TABLE IF NOT EXISTS evidence (
 );
 CREATE INDEX IF NOT EXISTS idx_evidence_node ON evidence(node_id);
 
-CREATE TABLE IF NOT EXISTS refs (
-    id       INTEGER PRIMARY KEY,
-    from_uid TEXT NOT NULL,
-    name     TEXT NOT NULL,
-    path     TEXT NOT NULL,
-    kind     TEXT NOT NULL
+-- Unresolved references. There is one row per call site in the repository, so this
+-- is the largest table by a wide margin and its column types matter: storing the
+-- source symbol as its rowid rather than its uid, and the file as a rowid into
+-- `paths`, removes two long repeated strings from every one of ~10^6 rows.
+CREATE TABLE IF NOT EXISTS paths (
+    id   INTEGER PRIMARY KEY,
+    path TEXT NOT NULL UNIQUE
 );
-CREATE INDEX IF NOT EXISTS idx_refs_path ON refs(path);
+
+CREATE TABLE IF NOT EXISTS refs (
+    id      INTEGER PRIMARY KEY,
+    from_id INTEGER NOT NULL,
+    name    TEXT NOT NULL,
+    path_id INTEGER NOT NULL,
+    kind    TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_refs_path ON refs(path_id);
 CREATE INDEX IF NOT EXISTS idx_refs_name ON refs(name);
 
 CREATE TABLE IF NOT EXISTS facts (
@@ -111,7 +120,13 @@ CREATE INDEX IF NOT EXISTS idx_facts_kind ON facts(kind, path);
 CREATE VIRTUAL TABLE IF NOT EXISTS search USING fts5(
     uid UNINDEXED,
     body,
-    tokenize = "unicode61 remove_diacritics 2"
+    tokenize = "unicode61 remove_diacritics 2",
+    -- `detail=none` drops per-token position data, which roughly halves the index.
+    -- Positions are only needed for phrase and NEAR queries, and Reify issues neither:
+    -- every query is rewritten into single quoted terms joined by OR (see
+    -- `fts_expression`), because user text is full of punctuation FTS5 reads as
+    -- operators. bm25 ranking is unaffected.
+    detail = none
 );
 "#;
 
@@ -348,8 +363,10 @@ impl Store {
             "DELETE FROM nodes WHERE path = ?1 AND kind <> 'File'",
             params![path],
         )?;
-        self.conn
-            .execute("DELETE FROM refs WHERE path = ?1", params![path])?;
+        self.conn.execute(
+            "DELETE FROM refs WHERE path_id IN (SELECT id FROM paths WHERE path = ?1)",
+            params![path],
+        )?;
         self.conn
             .execute("DELETE FROM facts WHERE path = ?1", params![path])?;
         Ok(())
@@ -477,10 +494,43 @@ impl Store {
     pub fn put_refs(&mut self, refs: &[(String, String, String, EdgeKind)]) -> Result<()> {
         let tx = self.conn.transaction()?;
         {
-            let mut stmt =
-                tx.prepare("INSERT INTO refs(from_uid, name, path, kind) VALUES (?1, ?2, ?3, ?4)")?;
+            let mut intern_path =
+                tx.prepare("INSERT INTO paths(path) VALUES (?1) ON CONFLICT(path) DO NOTHING")?;
+            let mut path_id = tx.prepare("SELECT id FROM paths WHERE path = ?1")?;
+            let mut node_id = tx.prepare("SELECT id FROM nodes WHERE uid = ?1")?;
+            let mut insert = tx.prepare(
+                "INSERT INTO refs(from_id, name, path_id, kind) VALUES (?1, ?2, ?3, ?4)",
+            )?;
+
+            // Both lookups are cached: a file contributes hundreds of references, all
+            // sharing one path and often one enclosing symbol.
+            let mut paths: HashMap<String, i64> = HashMap::new();
+            let mut nodes: HashMap<String, Option<i64>> = HashMap::new();
+
             for (from_uid, name, path, kind) in refs {
-                stmt.execute(params![from_uid, name, path, kind.as_str()])?;
+                let path_key = match paths.get(path) {
+                    Some(id) => *id,
+                    None => {
+                        intern_path.execute(params![path])?;
+                        let id: i64 = path_id.query_row(params![path], |r| r.get(0))?;
+                        paths.insert(path.clone(), id);
+                        id
+                    }
+                };
+                let from = match nodes.get(from_uid) {
+                    Some(id) => *id,
+                    None => {
+                        let id: Option<i64> = node_id
+                            .query_row(params![from_uid], |r| r.get(0))
+                            .optional()?;
+                        nodes.insert(from_uid.clone(), id);
+                        id
+                    }
+                };
+                // A reference from a symbol that was not staged has no anchor and could
+                // never produce an edge, so dropping it here saves storing it at all.
+                let Some(from) = from else { continue };
+                insert.execute(params![from, name, path_key, kind.as_str()])?;
             }
         }
         tx.commit()?;
@@ -489,9 +539,12 @@ impl Store {
 
     /// Every stored reference, for a repository-wide re-resolve.
     pub fn all_refs(&self) -> Result<Vec<(String, String, String, EdgeKind)>> {
-        let mut stmt = self
-            .conn
-            .prepare("SELECT from_uid, name, path, kind FROM refs")?;
+        let mut stmt = self.conn.prepare(
+            "SELECT n.uid, r.name, p.path, r.kind
+             FROM refs r
+             JOIN nodes n ON n.id = r.from_id
+             JOIN paths p ON p.id = r.path_id",
+        )?;
         let rows = stmt.query_map([], |r| {
             Ok((
                 r.get::<_, String>(0)?,
@@ -879,13 +932,24 @@ fn row_to_node(r: &rusqlite::Row<'_>) -> rusqlite::Result<Node> {
 /// Turn a free-text query into an FTS5 expression.
 ///
 /// User queries contain quotes, hyphens and punctuation that FTS5 reads as operators,
-/// so every term is quoted and joined with OR. Returns `None` when nothing usable is
-/// left, which the caller treats as "no lexical hits" rather than as an error.
+/// so the query is split into bare alphanumeric terms joined with OR. Returns `None`
+/// when nothing usable is left, which the caller treats as "no lexical hits" rather
+/// than as an error.
+///
+/// Terms are emitted **unquoted and lowercased**, which matters for two reasons that
+/// pull in the same direction. A quoted term is a phrase, and the index is built with
+/// `detail=none` — half the size, no phrase support. And FTS5's operators are
+/// recognised only in upper case, so a lowercased term can never be mistaken for one:
+/// a query containing the word "or" searches for "or".
 fn fts_expression(query: &str) -> Option<String> {
+    // Split exactly where the `unicode61` tokenizer splits, underscores included. A
+    // term the tokenizer would break into several tokens is a *phrase*, which a
+    // `detail=none` index cannot answer — so `customer_group` must arrive as two
+    // terms, which is also how it was indexed.
     let terms: Vec<String> = query
-        .split(|c: char| !c.is_alphanumeric() && c != '_')
+        .split(|c: char| !c.is_alphanumeric())
         .filter(|t| !t.is_empty())
-        .map(|t| format!("\"{}\"", t.replace('"', "")))
+        .map(str::to_lowercase)
         .collect();
     if terms.is_empty() {
         None
@@ -1055,15 +1119,37 @@ mod tests {
     #[test]
     fn refs_survive_until_their_file_changes_then_are_replaced() {
         let mut s = Store::in_memory().unwrap();
+        let mut b = Batch::default();
+        b.node(sym("a.py", "f"));
+        s.commit(b).unwrap();
+
         s.put_refs(&[(
-            "sym:a.py#f".into(),
+            uid::symbol("a.py", "f"),
             "helper".into(),
             "a.py".into(),
             EdgeKind::Calls,
         )])
         .unwrap();
-        assert_eq!(s.all_refs().unwrap().len(), 1);
+        let stored = s.all_refs().unwrap();
+        assert_eq!(stored.len(), 1);
+        assert_eq!(stored[0].0, uid::symbol("a.py", "f"), "round trips by uid");
+        assert_eq!(stored[0].2, "a.py");
+
         s.forget_file_content("a.py").unwrap();
+        assert!(s.all_refs().unwrap().is_empty());
+    }
+
+    #[test]
+    fn a_reference_from_an_unknown_symbol_is_not_stored() {
+        // It could never resolve to an edge, so storing it costs space for nothing.
+        let mut s = Store::in_memory().unwrap();
+        s.put_refs(&[(
+            "sym:ghost.py#nobody".into(),
+            "helper".into(),
+            "ghost.py".into(),
+            EdgeKind::Calls,
+        )])
+        .unwrap();
         assert!(s.all_refs().unwrap().is_empty());
     }
 
@@ -1203,6 +1289,32 @@ mod tests {
         s.commit(b).unwrap();
         assert!(!s.search("khach hang", 10).unwrap().is_empty());
         assert!(!s.search("khách hàng", 10).unwrap().is_empty());
+    }
+
+    #[test]
+    fn an_underscored_identifier_is_searchable() {
+        // `customer_group` tokenises to two tokens, so passing it through whole would
+        // make it a phrase query the index cannot answer.
+        let mut s = Store::in_memory().unwrap();
+        let mut b = Batch::default();
+        b.node(sym("a.py", "alpha").search("customer_group is the tier column"));
+        s.commit(b).unwrap();
+        assert!(!s.search("customer_group", 10).unwrap().is_empty());
+        assert!(s.search("quantum_flux_capacitor", 10).unwrap().is_empty());
+    }
+
+    #[test]
+    fn fts5_operator_words_in_a_query_are_searched_for_not_obeyed() {
+        // "AND", "OR", "NOT" and "NEAR" are operators only in upper case, so
+        // lowercasing every term makes an ordinary English query safe.
+        let mut s = Store::in_memory().unwrap();
+        let mut b = Batch::default();
+        b.node(sym("a.py", "alpha").search("orders and invoices near the warehouse"));
+        s.commit(b).unwrap();
+        for query in ["AND", "OR NOT", "orders AND invoices", "NEAR warehouse"] {
+            let hits = s.search(query, 10);
+            assert!(hits.is_ok(), "query {query:?} failed: {:?}", hits.err());
+        }
     }
 
     #[test]
