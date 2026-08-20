@@ -15,10 +15,30 @@ use std::path::{Path, PathBuf};
 /// Crates that exist to talk to a network. Any of these in the lockfile means the
 /// offline guarantee is no longer structural.
 const NETWORK_CRATES: &[&str] = &[
-    "reqwest", "hyper", "ureq", "curl", "curl-sys", "isahc", "surf", "attohttpc",
-    "tokio", "async-std", "smol", "mio", "socket2", "trust-dns-resolver",
-    "hickory-resolver", "rustls", "native-tls", "openssl", "openssl-sys", "tungstenite",
-    "async-tungstenite", "quinn", "h2", "h3",
+    "reqwest",
+    "hyper",
+    "ureq",
+    "curl",
+    "curl-sys",
+    "isahc",
+    "surf",
+    "attohttpc",
+    "tokio",
+    "async-std",
+    "smol",
+    "mio",
+    "socket2",
+    "trust-dns-resolver",
+    "hickory-resolver",
+    "rustls",
+    "native-tls",
+    "openssl",
+    "openssl-sys",
+    "tungstenite",
+    "async-tungstenite",
+    "quinn",
+    "h2",
+    "h3",
 ];
 
 /// Source constructs that open a socket without any dependency at all.
@@ -47,7 +67,10 @@ fn no_networking_crate_is_in_the_dependency_tree() {
 
     let mut present: BTreeSet<&str> = BTreeSet::new();
     for line in text.lines() {
-        let Some(name) = line.strip_prefix("name = \"").and_then(|r| r.strip_suffix('"')) else {
+        let Some(name) = line
+            .strip_prefix("name = \"")
+            .and_then(|r| r.strip_suffix('"'))
+        else {
             continue;
         };
         if let Some(found) = NETWORK_CRATES.iter().find(|c| **c == name) {
@@ -80,9 +103,17 @@ fn no_source_file_opens_a_socket_directly() {
 
 #[test]
 fn the_only_subprocess_reify_runs_is_git() {
-    // Reify never executes anything from the repository it indexes. The single
-    // exception is `git`, invoked for history; anything else appearing here would be
-    // both a network risk and an arbitrary-execution risk.
+    // Reify never executes anything *from the repository it indexes*. It does invoke
+    // a small set of system tools, each named here so adding another is a deliberate,
+    // reviewed act rather than a silent one:
+    //   git        — history, the only thing that can produce it
+    //   pdftotext  — PDF text extraction, absent any usable pure-Rust option
+    //   program    — the model provider the *user* configured, which is the whole
+    //                point of the design: Reify opens no socket, and the one command
+    //                that can reach a network is named by the user, logged on every
+    //                call, and unreachable under REIFY_OFFLINE=1
+    // Neither can open a network connection on Reify's behalf, and both are given a
+    // repository file as *input* rather than being loaded from the repository.
     let mut commands: BTreeSet<String> = BTreeSet::new();
     visit(&workspace_root().join("crates"), &mut |path, text| {
         if path.ends_with("offline.rs") {
@@ -95,14 +126,16 @@ fn the_only_subprocess_reify_runs_is_git() {
             }
         }
     });
-    let allowed: BTreeSet<String> = ["\"git\"", "\"sleep\""]
+    let allowed: BTreeSet<String> = ["\"git\"", "\"pdftotext\"", "\"sleep\"", "program"]
         .iter()
         .map(|s| s.to_string())
         .collect();
     let unexpected: Vec<&String> = commands.difference(&allowed).collect();
     assert!(
         unexpected.is_empty(),
-        "unexpected subprocesses: {unexpected:?} (only git is allowed; sleep is a test)"
+        "unexpected subprocesses: {unexpected:?}\n\
+         Only git and pdftotext are allowed, and adding one means updating this test \
+         and the privacy section of the README. (`sleep` is a timeout test.)"
     );
 }
 

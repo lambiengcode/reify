@@ -513,6 +513,255 @@ fn truncate_all(answer: &mut WhyAnswer) {
     answer.history.truncate(WHY_COMMIT_LIMIT);
 }
 
+/// Everything known about one business concept.
+#[derive(Debug, Clone, Serialize)]
+pub struct Explanation {
+    pub schema: &'static str,
+    pub query: String,
+    pub id: String,
+    pub status: Status,
+    /// Language code to label. English has no privileged position here.
+    pub labels: serde_json::Value,
+    pub bridge: String,
+    pub code: Vec<Citation>,
+    pub data: Vec<Citation>,
+    pub documents: Vec<Citation>,
+    pub rules: Vec<Citation>,
+    /// Other concepts matching the same query, so an ambiguous term is visible as
+    /// ambiguous rather than silently resolved to one answer.
+    pub also_matched: Vec<String>,
+    pub unknowns: Vec<String>,
+}
+
+/// Explain a business concept across every language, code path and table it touches.
+pub fn explain(store: &Store, term: &str) -> Result<Explanation> {
+    let matches = resolve_concepts(store, term)?;
+    let concept = matches
+        .first()
+        .cloned()
+        .ok_or_else(|| anyhow!("no concept matches `{term}`; try `reify context \"{term}\"`"))?;
+
+    let mut explanation = Explanation {
+        schema: "reify.explain/1",
+        query: term.to_string(),
+        id: concept
+            .data
+            .get("concept_id")
+            .and_then(|v| v.as_str())
+            .unwrap_or(&concept.name)
+            .to_string(),
+        status: concept.status,
+        labels: concept
+            .data
+            .get("labels")
+            .cloned()
+            .unwrap_or(serde_json::Value::Null),
+        bridge: concept
+            .data
+            .get("bridge")
+            .and_then(|v| v.as_str())
+            .unwrap_or("unknown")
+            .to_string(),
+        code: Vec::new(),
+        data: Vec::new(),
+        documents: Vec::new(),
+        rules: Vec::new(),
+        also_matched: matches
+            .iter()
+            .skip(1)
+            .take(6)
+            .map(|n| n.uid.clone())
+            .collect(),
+        unknowns: Vec::new(),
+    };
+
+    for node in outgoing(store, concept.id, EdgeKind::MapsTo)? {
+        match node.kind {
+            NodeKind::Symbol => {
+                // A symbol's own rules are part of what the concept means.
+                for rule in outgoing(store, node.id, EdgeKind::ImplementsRule)? {
+                    explanation.rules.push(citation(&rule));
+                }
+                for doc in outgoing(store, node.id, EdgeKind::DocumentedBy)? {
+                    explanation.documents.push(citation(&doc));
+                }
+                explanation.code.push(citation(&node));
+            }
+            NodeKind::DatabaseObject => explanation.data.push(citation(&node)),
+            NodeKind::DocSection => explanation.documents.push(citation(&node)),
+            _ => {}
+        }
+    }
+
+    for list in [
+        &mut explanation.code,
+        &mut explanation.data,
+        &mut explanation.documents,
+        &mut explanation.rules,
+    ] {
+        list.sort_by(|a, b| a.location.cmp(&b.location));
+        list.dedup_by(|a, b| a.location == b.location);
+        list.truncate(WHY_LIST_LIMIT * 2);
+    }
+    if explanation.code.is_empty() {
+        explanation
+            .unknowns
+            .push("no code is linked to this concept".into());
+    }
+    if explanation.documents.is_empty() {
+        explanation
+            .unknowns
+            .push("no document describes this concept".into());
+    }
+    Ok(explanation)
+}
+
+/// One step of a derived process.
+#[derive(Debug, Clone, Serialize)]
+pub struct FlowStep {
+    pub order: usize,
+    pub location: String,
+    pub symbol: String,
+    /// How this step was reached: an entry point, or called by the previous step.
+    pub reached_by: String,
+    pub status: Status,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct FlowAnswer {
+    pub schema: &'static str,
+    pub process: String,
+    /// Where the sequence came from. Currently always the call graph — Reify does not
+    /// invent a process that the code does not perform.
+    pub derived_from: &'static str,
+    pub steps: Vec<FlowStep>,
+    pub unknowns: Vec<String>,
+}
+
+/// Derive the sequence of code that carries out a business process.
+///
+/// The ordering is the call graph's, not a guess: entry points first — symbols nothing
+/// else in the matched set calls — then the symbols they reach, breadth first. A
+/// repository that does not encode the process as calls will produce a short answer
+/// rather than a fabricated one.
+pub fn flow(store: &Store, process: &str) -> Result<FlowAnswer> {
+    let mut answer = FlowAnswer {
+        schema: "reify.flow/1",
+        process: process.to_string(),
+        derived_from: "call graph",
+        steps: Vec::new(),
+        unknowns: Vec::new(),
+    };
+
+    let seeds = resolve_origins(store, process)?;
+    if seeds.is_empty() {
+        answer
+            .unknowns
+            .push(format!("nothing in the index matches `{process}`"));
+        return Ok(answer);
+    }
+
+    // Everything within one call hop of a seed forms the candidate set.
+    let mut members: HashMap<i64, Node> = seeds.iter().map(|n| (n.id, n.clone())).collect();
+    for seed in &seeds {
+        for node in outgoing(store, seed.id, EdgeKind::Calls)? {
+            members.entry(node.id).or_insert(node);
+        }
+    }
+
+    // Entry points are members nothing else in the set calls.
+    let mut called_by_member: HashSet<i64> = HashSet::new();
+    for id in members.keys().copied().collect::<Vec<_>>() {
+        for node in outgoing(store, id, EdgeKind::Calls)? {
+            if members.contains_key(&node.id) {
+                called_by_member.insert(node.id);
+            }
+        }
+    }
+    let mut frontier: Vec<Node> = members
+        .values()
+        .filter(|n| !called_by_member.contains(&n.id))
+        .cloned()
+        .collect();
+    frontier.sort_by(|a, b| a.uid.cmp(&b.uid));
+    if frontier.is_empty() {
+        // A cycle: every member is called by another. Start somewhere deterministic.
+        frontier = seeds.clone();
+    }
+
+    let mut visited: HashSet<i64> = HashSet::new();
+    let mut order = 0usize;
+    while let Some(node) = frontier.first().cloned() {
+        frontier.remove(0);
+        if !visited.insert(node.id) {
+            continue;
+        }
+        order += 1;
+        let reached_by = if order == 1 {
+            "entry point".to_string()
+        } else {
+            "called during the process".to_string()
+        };
+        answer.steps.push(FlowStep {
+            order,
+            location: node.location(),
+            symbol: node
+                .data
+                .get("qualified")
+                .and_then(|v| v.as_str())
+                .unwrap_or(&node.name)
+                .to_string(),
+            reached_by,
+            status: node.status,
+        });
+        if answer.steps.len() >= WHY_LIST_LIMIT * 2 {
+            break;
+        }
+        let mut next = outgoing(store, node.id, EdgeKind::Calls)?;
+        next.retain(|n| members.contains_key(&n.id) && !visited.contains(&n.id));
+        next.sort_by(|a, b| a.uid.cmp(&b.uid));
+        frontier.extend(next);
+    }
+
+    if answer.steps.len() < 2 {
+        answer.unknowns.push(
+            "the code does not encode this as a sequence of calls; it may be event driven \
+             or configured rather than called"
+                .into(),
+        );
+    }
+    Ok(answer)
+}
+
+/// Concepts whose labels, id or code hints match `term`, best first.
+fn resolve_concepts(store: &Store, term: &str) -> Result<Vec<Node>> {
+    let asked = crate::concepts::meaningful_words(term);
+    let mut scored: Vec<(f32, Node)> = Vec::new();
+    for node in store.nodes_of_kind(NodeKind::Concept)? {
+        let mut haystack = node.name.to_lowercase();
+        if let Some(labels) = node.data.get("labels").and_then(|v| v.as_object()) {
+            for label in labels.values().filter_map(|v| v.as_str()) {
+                haystack.push(' ');
+                haystack.push_str(&label.to_lowercase());
+            }
+        }
+        haystack.push(' ');
+        haystack.push_str(&node.uid.to_lowercase());
+        let words = crate::concepts::meaningful_words(&haystack);
+        let matched = asked.iter().filter(|w| words.contains(*w)).count();
+        if matched == 0 {
+            continue;
+        }
+        // Full coverage of the query beats a partial match; a shorter concept beats a
+        // longer one at equal coverage, since it is the more specific answer.
+        let score =
+            matched as f32 / asked.len().max(1) as f32 + 1.0 / (words.len().max(1) as f32 * 100.0);
+        scored.push((score, node));
+    }
+    scored.sort_by(|a, b| b.0.total_cmp(&a.0).then(a.1.uid.cmp(&b.1.uid)));
+    Ok(scored.into_iter().map(|(_, n)| n).collect())
+}
+
 /// A documentation/implementation disagreement, as stored.
 #[derive(Debug, Clone, Serialize)]
 pub struct StoredConflict {
@@ -574,6 +823,243 @@ pub fn rules(store: &Store, min_confidence: f32) -> Result<Vec<Node>> {
             .then(a.uid.cmp(&b.uid))
     });
     Ok(out)
+}
+
+/// A compact risk header for a file about to be edited.
+#[derive(Debug, Clone, Serialize)]
+pub struct Preflight {
+    pub schema: &'static str,
+    pub path: String,
+    pub symbols: usize,
+    pub rules: usize,
+    pub concepts: usize,
+    pub tables: usize,
+    pub dependants: usize,
+    pub conflicts: usize,
+    /// `LOW`, `MEDIUM` or `HIGH`.
+    pub risk: &'static str,
+    /// Why the risk is what it is, in one sentence.
+    pub reason: String,
+    /// The rules an editor should read first.
+    pub highest_risk_rules: Vec<Citation>,
+    /// What to run next to get the full picture.
+    pub suggested_command: String,
+}
+
+/// Summarise what an editor is about to touch.
+///
+/// Deliberately cheap and deliberately small: this runs on every edit in a hook, so it
+/// must cost a few milliseconds and a few dozen tokens. Anything larger belongs in
+/// `reify context`, which the header points at.
+pub fn preflight(store: &Store, path: &str) -> Result<Preflight> {
+    let symbols = store.symbols_in_file(path)?;
+    let mut rules: Vec<Citation> = Vec::new();
+    let mut concepts: HashSet<i64> = HashSet::new();
+    let mut tables: HashSet<i64> = HashSet::new();
+    let mut dependants: HashSet<i64> = HashSet::new();
+    let mut conflicts = 0usize;
+
+    for symbol in &symbols {
+        for rule in outgoing(store, symbol.id, EdgeKind::ImplementsRule)? {
+            if rule.status == Status::Conflicted {
+                conflicts += 1;
+            }
+            rules.push(citation(&rule));
+        }
+        for concept in incoming(store, symbol.id, EdgeKind::MapsTo)? {
+            concepts.insert(concept.id);
+        }
+        for table in store.neighbors(
+            symbol.id,
+            Direction::Out,
+            &[EdgeKind::Reads, EdgeKind::Writes],
+        )? {
+            tables.insert(table.0.id);
+        }
+        for caller in incoming(store, symbol.id, EdgeKind::Calls)? {
+            // A symbol calling its own sibling is not an external dependant.
+            if caller.path.as_deref() != Some(path) {
+                dependants.insert(caller.id);
+            }
+        }
+    }
+
+    rules.sort_by(|a, b| a.location.cmp(&b.location));
+    rules.dedup_by(|a, b| a.location == b.location);
+
+    // Thresholds encode a claim about danger, so they are named rather than inlined.
+    let (risk, reason) = if conflicts > 0 {
+        (
+            "HIGH",
+            "documentation and implementation disagree about this file".to_string(),
+        )
+    } else if dependants.len() >= 10 || rules.len() >= 5 {
+        (
+            "HIGH",
+            format!(
+                "{} dependants and {} business rules meet here",
+                dependants.len(),
+                rules.len()
+            ),
+        )
+    } else if !rules.is_empty() || dependants.len() >= 3 {
+        (
+            "MEDIUM",
+            format!(
+                "{} dependants and {} business rules",
+                dependants.len(),
+                rules.len()
+            ),
+        )
+    } else {
+        (
+            "LOW",
+            "nothing else in the index depends on this file".to_string(),
+        )
+    };
+
+    let highest_risk_rules = rules.iter().take(3).cloned().collect();
+    Ok(Preflight {
+        schema: "reify.preflight/1",
+        path: path.to_string(),
+        symbols: symbols.len(),
+        rules: rules.len(),
+        concepts: concepts.len(),
+        tables: tables.len(),
+        dependants: dependants.len(),
+        conflicts,
+        risk,
+        reason,
+        highest_risk_rules,
+        suggested_command: format!("reify context \"<your change to {path}>\""),
+    })
+}
+
+/// One row of the concept layer, for `reify concepts`.
+#[derive(Debug, Clone, Serialize)]
+pub struct ConceptRow {
+    pub id: String,
+    pub display: String,
+    pub languages: Vec<String>,
+    pub bridge: String,
+    pub status: Status,
+    /// How many symbols and tables this concept names.
+    pub links: usize,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct ConceptOverview {
+    pub schema: &'static str,
+    pub total: usize,
+    pub by_bridge: HashMap<String, usize>,
+    pub concepts: Vec<ConceptRow>,
+}
+
+pub fn concept_overview(store: &Store) -> Result<ConceptOverview> {
+    let mut rows = Vec::new();
+    let mut by_bridge: HashMap<String, usize> = HashMap::new();
+    for node in store.nodes_of_kind(NodeKind::Concept)? {
+        let bridge = node
+            .data
+            .get("bridge")
+            .and_then(|v| v.as_str())
+            .unwrap_or("unknown")
+            .to_string();
+        *by_bridge.entry(bridge.clone()).or_default() += 1;
+        let languages = node
+            .data
+            .get("labels")
+            .and_then(|v| v.as_object())
+            .map(|m| m.keys().cloned().collect())
+            .unwrap_or_default();
+        rows.push(ConceptRow {
+            id: node
+                .data
+                .get("concept_id")
+                .and_then(|v| v.as_str())
+                .unwrap_or(&node.name)
+                .to_string(),
+            display: node.name.clone(),
+            languages,
+            bridge,
+            status: node.status,
+            links: store
+                .neighbors(node.id, Direction::Out, &[EdgeKind::MapsTo])?
+                .len(),
+        });
+    }
+    rows.sort_by(|a, b| b.links.cmp(&a.links).then(a.id.cmp(&b.id)));
+    Ok(ConceptOverview {
+        schema: "reify.concepts/1",
+        total: rows.len(),
+        by_bridge,
+        concepts: rows,
+    })
+}
+
+/// Concepts worth promoting into the declared glossary.
+///
+/// Mined concepts are the raw material; a declared one is trusted above everything
+/// else in the system. Hand-writing a glossary from nothing is the reason most teams
+/// never have one, so this proposes the best-grounded mined concepts as a starting
+/// point for a human to edit down.
+pub fn concept_suggestions(store: &Store) -> Result<Vec<crate::concepts::Concept>> {
+    use crate::concepts::{Bridge, Concept};
+    use std::collections::{BTreeMap, BTreeSet};
+
+    let mut suggestions: Vec<(usize, Concept)> = Vec::new();
+    for node in store.nodes_of_kind(NodeKind::Concept)? {
+        let bridge = node
+            .data
+            .get("bridge")
+            .and_then(|v| v.as_str())
+            .unwrap_or("");
+        // Already declared: nothing to propose.
+        if bridge == Bridge::Declared.as_str() {
+            continue;
+        }
+        let links = store.neighbors(node.id, Direction::Out, &[EdgeKind::MapsTo])?;
+        // A concept naming nothing is not worth a human's attention.
+        if links.is_empty() {
+            continue;
+        }
+        let labels: BTreeMap<String, String> = node
+            .data
+            .get("labels")
+            .and_then(|v| serde_json::from_value(v.clone()).ok())
+            .unwrap_or_default();
+        let code: BTreeSet<String> = links
+            .iter()
+            .filter(|(n, _, _)| n.kind == NodeKind::Symbol)
+            .map(|(n, _, _)| n.name.clone())
+            .take(6)
+            .collect();
+        let db: BTreeSet<String> = links
+            .iter()
+            .filter(|(n, _, _)| n.kind == NodeKind::DatabaseObject)
+            .map(|(n, _, _)| n.name.clone())
+            .take(4)
+            .collect();
+        suggestions.push((
+            links.len(),
+            Concept {
+                id: node
+                    .data
+                    .get("concept_id")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or(&node.name)
+                    .to_string(),
+                labels,
+                code,
+                db,
+                status: node.status,
+                confidence: node.confidence,
+                bridge: Bridge::Declared,
+            },
+        ));
+    }
+    suggestions.sort_by(|a, b| b.0.cmp(&a.0).then(a.1.id.cmp(&b.1.id)));
+    Ok(suggestions.into_iter().take(60).map(|(_, c)| c).collect())
 }
 
 /// Counts used by `reify report`, all of them defined in `docs/metrics.md`.
@@ -831,6 +1317,145 @@ class SalesOrder:
         let answer = impact(&store, "quantum_flux_capacitor").unwrap();
         assert!(answer.affected.is_empty());
         assert!(!answer.unknowns.is_empty());
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn explain_gathers_a_concept_across_code_and_documents() {
+        let (store, root) = indexed();
+        let answer = explain(&store, "sales order").unwrap();
+        assert_eq!(answer.id, "SALES_ORDER");
+        assert!(
+            !answer.code.is_empty(),
+            "a concept with no code is not explained"
+        );
+        assert!(
+            answer.labels.get("vie").is_some(),
+            "every language must be kept"
+        );
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn explain_reaches_the_same_concept_from_any_language() {
+        let (store, root) = indexed();
+        let english = explain(&store, "sales order").unwrap();
+        let vietnamese = explain(&store, "đơn bán hàng").unwrap();
+        assert_eq!(english.id, vietnamese.id, "no language is canonical");
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn explain_on_an_unknown_term_is_an_error_not_a_guess() {
+        let (store, root) = indexed();
+        assert!(explain(&store, "quantum flux capacitor").is_err());
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn flow_orders_steps_by_the_call_graph_starting_at_an_entry_point() {
+        let (store, root) = indexed();
+        let answer = flow(&store, "requires_approval").unwrap();
+        assert!(answer.steps.len() >= 2, "steps: {:?}", answer.steps);
+        assert_eq!(answer.steps[0].order, 1);
+        assert_eq!(answer.steps[0].reached_by, "entry point");
+        let symbols: Vec<&str> = answer.steps.iter().map(|s| s.symbol.as_str()).collect();
+        let caller = symbols.iter().position(|s| s.contains("requires_approval"));
+        let callee = symbols.iter().position(|s| s.contains("bypass_level_two"));
+        if let (Some(a), Some(b)) = (caller, callee) {
+            assert!(a < b, "a caller must precede what it calls: {symbols:?}");
+        }
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn flow_says_so_when_the_code_does_not_encode_a_sequence() {
+        let (store, root) = indexed();
+        let answer = flow(&store, "quantum flux capacitor").unwrap();
+        assert!(answer.steps.is_empty());
+        assert!(!answer.unknowns.is_empty());
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn flow_output_is_deterministic() {
+        let (store, root) = indexed();
+        let a = serde_json::to_string(&flow(&store, "requires_approval").unwrap()).unwrap();
+        let b = serde_json::to_string(&flow(&store, "requires_approval").unwrap()).unwrap();
+        assert_eq!(a, b);
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn preflight_summarises_what_an_edit_is_about_to_touch() {
+        let (store, root) = indexed();
+        let answer = preflight(&store, "app/order.py").unwrap();
+        assert!(answer.symbols > 0);
+        assert!(answer.dependants > 0, "batch.py depends on this file");
+        assert!(["LOW", "MEDIUM", "HIGH"].contains(&answer.risk));
+        assert!(answer.suggested_command.starts_with("reify context"));
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn preflight_stays_small_enough_for_an_edit_hook() {
+        // It runs on every edit, so its cost is the whole design constraint.
+        let (store, root) = indexed();
+        let answer = preflight(&store, "app/order.py").unwrap();
+        let rendered = serde_json::to_string(&answer).unwrap();
+        assert!(
+            crate::tokens::estimate(&rendered) < 300,
+            "preflight cost {} tokens",
+            crate::tokens::estimate(&rendered)
+        );
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn a_file_nothing_depends_on_is_low_risk() {
+        let (store, root) = indexed();
+        let answer = preflight(&store, "app/report.py").unwrap();
+        assert_eq!(answer.risk, "LOW", "{answer:?}");
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn preflight_on_an_unindexed_file_reports_nothing_rather_than_failing() {
+        let (store, root) = indexed();
+        let answer = preflight(&store, "app/does_not_exist.py").unwrap();
+        assert_eq!(answer.symbols, 0);
+        assert_eq!(answer.risk, "LOW");
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn concept_suggestions_are_declarable_and_grounded() {
+        let (store, root) = indexed();
+        let suggestions = concept_suggestions(&store).unwrap();
+        assert!(!suggestions.is_empty());
+        for concept in &suggestions {
+            assert_eq!(concept.bridge, crate::concepts::Bridge::Declared);
+            assert!(
+                !concept.code.is_empty() || !concept.db.is_empty(),
+                "a suggestion naming nothing wastes a human's attention: {concept:?}"
+            );
+        }
+        // The output must be pasteable straight into the glossary.
+        let rendered = crate::concepts::Glossary::render(&suggestions);
+        assert!(crate::concepts::Glossary::parse(&rendered).is_ok());
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn the_concept_overview_counts_every_bridge() {
+        let (store, root) = indexed();
+        let overview = concept_overview(&store).unwrap();
+        assert_eq!(overview.total, overview.concepts.len());
+        assert_eq!(
+            overview.by_bridge.values().sum::<usize>(),
+            overview.total,
+            "every concept must be attributed to a bridge"
+        );
         let _ = fs::remove_dir_all(&root);
     }
 

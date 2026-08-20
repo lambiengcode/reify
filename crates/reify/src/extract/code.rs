@@ -34,6 +34,7 @@ pub fn extract(path: &str, text: &str, lang: Lang) -> Result<FileExtract> {
         Lang::Python => tree_sitter_python::LANGUAGE.into(),
         Lang::TypeScript => tree_sitter_typescript::LANGUAGE_TYPESCRIPT.into(),
         Lang::JavaScript => tree_sitter_typescript::LANGUAGE_TSX.into(),
+        Lang::Java => tree_sitter_java::LANGUAGE.into(),
         other => return Err(anyhow!("no code grammar for {}", other.as_str())),
     };
     parser
@@ -91,8 +92,10 @@ impl<'a> Ctx<'a> {
             return;
         }
         match node.kind() {
-            "call" | "call_expression" => self.record_call(node),
-            "import_statement" | "import_from_statement" => self.record_import(node),
+            "call" | "call_expression" | "method_invocation" => self.record_call(node),
+            "import_statement" | "import_from_statement" | "import_declaration" => {
+                self.record_import(node)
+            }
             _ => {}
         }
         let mut cursor = node.walk();
@@ -259,12 +262,12 @@ impl<'a> Ctx<'a> {
             anchor = anchor.parent().expect("checked by the loop condition");
         }
         let mut prev = anchor.prev_named_sibling()?;
-        if prev.kind() != "comment" {
+        if !matches!(prev.kind(), "comment" | "block_comment" | "line_comment") {
             return None;
         }
         let mut parts = vec![clean_comment(self.slice(prev))];
         while let Some(p) = prev.prev_named_sibling() {
-            if p.kind() != "comment" {
+            if !matches!(p.kind(), "comment" | "block_comment" | "line_comment") {
                 break;
             }
             parts.push(clean_comment(self.slice(p)));
@@ -283,6 +286,19 @@ impl<'a> Ctx<'a> {
                 "argument_list" => child
                     .named_children(&mut child.walk())
                     .filter(|c| c.kind() == "identifier" || c.kind() == "attribute")
+                    .map(|c| self.slice(c))
+                    .collect(),
+                // Java: `class A extends Base implements I`
+                "superclass" | "super_interfaces" | "extends_interfaces" => child
+                    .named_children(&mut child.walk())
+                    .flat_map(|c| {
+                        if c.kind() == "type_identifier" {
+                            vec![c]
+                        } else {
+                            c.named_children(&mut c.walk()).collect()
+                        }
+                    })
+                    .filter(|c| c.kind() == "type_identifier")
                     .map(|c| self.slice(c))
                     .collect(),
                 // TypeScript: `class A extends Base implements I`
@@ -310,10 +326,15 @@ impl<'a> Ctx<'a> {
         let Some(from) = self.enclosing.last().cloned() else {
             return; // a call at module level belongs to no symbol
         };
-        let Some(func) = node.child_by_field_name("function") else {
+        // Java names the callee in `name`; the JS and Python grammars use `function`.
+        let Some(func) = node
+            .child_by_field_name("function")
+            .or_else(|| node.child_by_field_name("name"))
+        else {
             return;
         };
         let name = match func.kind() {
+            "identifier" if node.kind() == "method_invocation" => self.slice(func).to_string(),
             "identifier" => self.slice(func).to_string(),
             "attribute" | "member_expression" => match self
                 .named_child_text(func, "property")
@@ -387,6 +408,7 @@ fn clean_docstring(raw: &str) -> String {
 fn clean_comment(raw: &str) -> String {
     let t = raw
         .trim_start_matches("//")
+        .trim_start_matches("/**")
         .trim_start_matches("/*")
         .trim_end_matches("*/")
         .replace("\n *", " ")

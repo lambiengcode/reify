@@ -360,14 +360,37 @@ struct ParsedFile {
     rows: Option<(String, Vec<(String, String)>)>,
 }
 
-/// Extract one file. Pure: no store access, no shared mutable state.
+/// Extract one file. Pure with respect to Reify's own state: no store access and no
+/// shared mutable state. Rich document formats may invoke an external text extractor.
 fn extract_file(file: &Discovered) -> FileOutcome {
+    // Binary document formats are read as bytes, never as UTF-8 text.
+    if file.lang == Lang::Docx {
+        return match std::fs::read(&file.abs)
+            .map_err(|e| anyhow::anyhow!("{e}"))
+            .and_then(|bytes| extract::richdoc::docx_to_markdown(&bytes))
+        {
+            Ok(markdown) => document_outcome(file, &markdown),
+            Err(e) => FileOutcome::Failed(e.to_string()),
+        };
+    }
+    if file.lang == Lang::Pdf {
+        return match extract::richdoc::pdf_to_text(&file.abs) {
+            Ok(text) => document_outcome(file, &text),
+            Err(e) => FileOutcome::Failed(e.to_string()),
+        };
+    }
+
     let text = match file.read() {
         Ok(t) => t,
         Err(e) => return FileOutcome::Failed(e.to_string()),
     };
+    let text = if file.lang == Lang::Html {
+        extract::richdoc::html_to_markdown(&text)
+    } else {
+        text
+    };
     match file.lang {
-        Lang::Python | Lang::TypeScript | Lang::JavaScript => {
+        Lang::Python | Lang::TypeScript | Lang::JavaScript | Lang::Java => {
             match extract::code::extract(&file.path, &text, file.lang) {
                 Ok(mut fx) => {
                     // SQL embedded in source is attributed to the enclosing symbol, so
@@ -387,13 +410,9 @@ fn extract_file(file: &Discovered) -> FileOutcome {
             extract: extract::sqlish::extract_file(&file.path, &text),
             rows: None,
         })),
-        Lang::Markdown | Lang::Text => match extract::docs::extract(&file.path, &text, file.lang) {
-            Ok(fx) => FileOutcome::Parsed(Box::new(ParsedFile {
-                extract: fx,
-                rows: None,
-            })),
-            Err(e) => FileOutcome::Failed(e.to_string()),
-        },
+        Lang::Markdown | Lang::Text | Lang::Html | Lang::Docx | Lang::Pdf => {
+            document_outcome(file, &text)
+        }
         Lang::Csv => {
             let rows = concepts::translation_language(&file.path)
                 .map(|lang| (lang, concepts::parse_translation_csv(&text)));
@@ -410,6 +429,17 @@ fn extract_file(file: &Discovered) -> FileOutcome {
             extract: FileExtract::default(),
             rows: None,
         })),
+    }
+}
+
+/// Stage a document, whatever format it arrived in.
+fn document_outcome(file: &Discovered, text: &str) -> FileOutcome {
+    match extract::docs::extract(&file.path, text, file.lang) {
+        Ok(fx) => FileOutcome::Parsed(Box::new(ParsedFile {
+            extract: fx,
+            rows: None,
+        })),
+        Err(e) => FileOutcome::Failed(e.to_string()),
     }
 }
 

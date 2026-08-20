@@ -6,6 +6,7 @@
 
 pub mod code;
 pub mod docs;
+pub mod richdoc;
 pub mod schema;
 pub mod sqlish;
 

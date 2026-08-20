@@ -5,6 +5,7 @@
 //! no network call at all in this build, which is asserted by a test rather than
 //! promised in a README.
 
+mod mcp;
 mod render;
 
 use anyhow::{bail, Context, Result};
@@ -13,6 +14,7 @@ use std::path::{Path, PathBuf};
 
 use reify::context::{self, ContextOptions};
 use reify::index::{self, IndexOptions};
+use reify::llm;
 use reify::query;
 use reify::store::Store;
 
@@ -87,6 +89,59 @@ enum Command {
 
     /// A system-level scorecard.
     Report,
+
+    /// Everything known about a business concept, in every language it appears in.
+    Explain {
+        /// A business term, in any language.
+        term: String,
+    },
+
+    /// The sequence of code that carries out a business process.
+    Flow {
+        /// A process or symbol name.
+        process: String,
+    },
+
+    /// Inspect and extend the concept glossary.
+    Concepts {
+        /// Print concepts that could be declared, in glossary syntax.
+        #[arg(long)]
+        suggest: bool,
+        /// Append the suggestions to `.reify/glossary.toml` instead of printing them.
+        #[arg(long)]
+        write: bool,
+    },
+
+    /// A compact risk header for a file about to be edited. Designed for an editor hook.
+    Preflight {
+        /// The file about to be changed.
+        path: String,
+    },
+
+    /// Model-assistance status and prompt inspection.
+    Llm {
+        #[command(subcommand)]
+        action: LlmAction,
+    },
+
+    /// Serve the Model Context Protocol on stdio.
+    Serve {
+        /// Speak MCP. Present so the flag is explicit rather than implied.
+        #[arg(long)]
+        mcp: bool,
+    },
+}
+
+#[derive(Subcommand, Debug)]
+enum LlmAction {
+    /// Is a provider configured, and what would be run?
+    Status,
+    /// Print the exact bytes that would be sent for a task. Nothing is sent.
+    Preview {
+        task: String,
+        #[arg(long, default_value_t = context::DEFAULT_BUDGET)]
+        budget: u32,
+    },
 }
 
 fn main() {
@@ -151,7 +206,71 @@ fn run() -> Result<()> {
             let store = open_existing(&root)?;
             render::report(&query::report(&store)?, cli.json)
         }
+        Command::Explain { term } => {
+            let store = open_existing(&root)?;
+            render::explain(&query::explain(&store, term)?, cli.json)
+        }
+        Command::Flow { process } => {
+            let store = open_existing(&root)?;
+            render::flow(&query::flow(&store, process)?, cli.json)
+        }
+        Command::Concepts { suggest, write } => {
+            let store = open_existing(&root)?;
+            concepts(&store, &root, *suggest, *write, cli.json)
+        }
+        Command::Preflight { path } => {
+            let store = open_existing(&root)?;
+            render::preflight(&query::preflight(&store, path)?, cli.json)
+        }
+        Command::Llm { action } => match action {
+            LlmAction::Status => render::llm_status(&root, cli.json),
+            LlmAction::Preview { task, budget } => {
+                let store = open_existing(&root)?;
+                let compiled = context::compile(
+                    &store,
+                    task,
+                    &ContextOptions {
+                        budget: *budget,
+                        ..Default::default()
+                    },
+                )?;
+                let prompt = llm::synthesis_prompt(task, &render::facts_for_synthesis(&compiled));
+                render::llm_preview(&prompt, cli.json)
+            }
+        },
+        Command::Serve { mcp } => {
+            anyhow::ensure!(*mcp, "only `--mcp` is supported; pass `reify serve --mcp`");
+            mcp::serve(&root)
+        }
     }
+}
+
+/// Show the concept layer, and optionally propose glossary entries for it.
+///
+/// A declared glossary is the highest-precision knowledge Reify can hold, and hand
+/// writing one from nothing is the reason most teams never do. This turns what was
+/// mined into a starting point a human edits down.
+fn concepts(store: &Store, root: &Path, suggest: bool, write: bool, json: bool) -> Result<()> {
+    let proposals = query::concept_suggestions(store)?;
+    if !suggest && !write {
+        return render::concepts(&query::concept_overview(store)?, json);
+    }
+    let rendered = reify::concepts::Glossary::render(&proposals);
+    if !write {
+        print!("{rendered}");
+        return Ok(());
+    }
+    let path = root.join(index::REIFY_DIR).join(index::GLOSSARY_FILE);
+    let mut existing = std::fs::read_to_string(&path).unwrap_or_default();
+    existing.push_str("\n# --- suggested by `reify concepts --write`; edit freely ---\n");
+    existing.push_str(&rendered);
+    std::fs::write(&path, existing).with_context(|| format!("writing {}", path.display()))?;
+    eprintln!(
+        "Appended {} suggested concepts to {}",
+        proposals.len(),
+        path.display()
+    );
+    Ok(())
 }
 
 /// Find the repository root.
@@ -268,6 +387,11 @@ mod tests {
             vec!["reify", "--json", "conflicts"],
             vec!["reify", "--json", "rules"],
             vec!["reify", "--json", "report"],
+            vec!["reify", "--json", "explain", "x"],
+            vec!["reify", "--json", "flow", "x"],
+            vec!["reify", "--json", "concepts"],
+            vec!["reify", "--json", "preflight", "a.py"],
+            vec!["reify", "--json", "llm", "status"],
         ] {
             let cli = Cli::try_parse_from(&args).expect("should parse");
             assert!(cli.json, "{args:?}");

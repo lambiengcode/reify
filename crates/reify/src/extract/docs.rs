@@ -28,8 +28,11 @@ pub struct Section {
 
 /// Extract a document's sections and stage them as nodes.
 pub fn extract(path: &str, text: &str, lang: Lang) -> Result<FileExtract> {
+    // HTML, DOCX and PDF arrive already converted to the Markdown-shaped
+    // intermediate, so one splitter serves every document format and a Confluence
+    // export cites exactly like a `.md` file.
     let sections = match lang {
-        Lang::Markdown => split_markdown(text),
+        Lang::Markdown | Lang::Html | Lang::Docx => split_markdown(text),
         _ => split_plain(text),
     };
 

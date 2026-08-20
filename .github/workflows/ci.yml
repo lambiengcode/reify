@@ -1,0 +1,61 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Format
+        run: cargo fmt --all -- --check
+
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Test
+        run: cargo test --all
+
+      # The offline guarantee is a README claim, so it is a build gate. This runs the
+      # whole suite again with outbound network blocked: anything that tries to open a
+      # connection fails here rather than in a user's repository.
+      - name: Test with network egress blocked
+        run: |
+          sudo iptables -A OUTPUT -m owner --uid-owner $(id -u) -p tcp -j REJECT || true
+          sudo iptables -A OUTPUT -m owner --uid-owner $(id -u) -p udp --dport 53 -j REJECT || true
+          cargo test --all --offline
+          sudo iptables -F OUTPUT || true
+
+  deny:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check bans licenses sources advisories
+
+  bench-smoke:
+    # The full benchmark is too slow and too costly for CI. This proves the harness
+    # still runs end to end on a fixture repository, so a broken runner is caught here
+    # rather than at release time.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test -p reify-bench
+      - run: cargo run --release -p reify-cli -- -C fixtures/minierp init
+      - run: cargo run --release -p reify-cli -- -C fixtures/minierp index
+      - run: cargo run --release -p reify-cli -- -C fixtures/minierp --json context "strategic account discount"

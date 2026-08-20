@@ -1,0 +1,38 @@
+# cargo-deny: licence and advisory policy.
+#
+# The licence allowlist is deliberately narrow. Reify is Apache-2.0 and is meant to be
+# embeddable by agent vendors; a copyleft dependency would defeat that, so one must be
+# a conscious decision rather than an accident of `cargo add`.
+
+[advisories]
+yanked = "deny"
+
+[licenses]
+allow = [
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "MIT",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Unicode-3.0",
+    "Zlib",
+    "CC0-1.0",
+]
+confidence-threshold = 0.9
+
+[bans]
+multiple-versions = "warn"
+# Networking crates are banned outright, not merely unused. The offline guarantee in
+# crates/reify/tests/offline.rs is the enforcement; this is the second lock on the door.
+deny = [
+    { name = "reqwest" },
+    { name = "hyper" },
+    { name = "ureq" },
+    { name = "curl" },
+    { name = "tokio" },
+]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"

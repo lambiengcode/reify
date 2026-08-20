@@ -15,8 +15,12 @@ use serde::Serialize;
 use reify::context::Context;
 use reify::discover::Discovery;
 use reify::index::IndexReport;
+use reify::llm;
 use reify::model::{Node, Status};
-use reify::query::{ImpactAnswer, Report, StoredConflict, WhyAnswer};
+use reify::query::{
+    ConceptOverview, Explanation, FlowAnswer, ImpactAnswer, Preflight, Report, StoredConflict,
+    WhyAnswer,
+};
 use reify::store::Store;
 
 /// Print `value` as indented JSON.
@@ -515,9 +519,246 @@ pub fn report(report: &Report, json: bool) -> Result<()> {
     Ok(())
 }
 
+pub fn explain(answer: &Explanation, json: bool) -> Result<()> {
+    if json {
+        return emit_json(answer);
+    }
+    println!("{} {}", tag(answer.status), answer.id);
+    if let Some(labels) = answer.labels.as_object() {
+        for (lang, label) in labels {
+            println!("  {lang:<6}{}", label.as_str().unwrap_or(""));
+        }
+    }
+    println!("  source  {}", answer.bridge);
+
+    let section = |title: &str, items: &[reify::query::Citation]| {
+        if items.is_empty() {
+            return;
+        }
+        heading(title);
+        for item in items {
+            println!("  {} {}  {}", tag(item.status), item.location, item.what);
+        }
+    };
+    section("Code", &answer.code);
+    section("Data", &answer.data);
+    section("Documents", &answer.documents);
+    section("Rules", &answer.rules);
+
+    if !answer.also_matched.is_empty() {
+        heading("Also matched");
+        for other in &answer.also_matched {
+            println!("  {other}");
+        }
+    }
+    if !answer.unknowns.is_empty() {
+        heading("Not determined");
+        for unknown in &answer.unknowns {
+            println!("  - {unknown}");
+        }
+    }
+    Ok(())
+}
+
+pub fn flow(answer: &FlowAnswer, json: bool) -> Result<()> {
+    if json {
+        return emit_json(answer);
+    }
+    println!("FLOW  {}", answer.process);
+    println!("      derived from the {}", answer.derived_from);
+    for step in &answer.steps {
+        println!(
+            "\n  {:>2}. {} {}\n      {}  ({})",
+            step.order,
+            tag(step.status),
+            step.symbol,
+            step.location,
+            step.reached_by
+        );
+    }
+    if !answer.unknowns.is_empty() {
+        heading("Not determined");
+        for unknown in &answer.unknowns {
+            println!("  - {unknown}");
+        }
+    }
+    Ok(())
+}
+
+/// A single dense block, sized for injection into an editor hook.
+pub fn preflight(answer: &Preflight, json: bool) -> Result<()> {
+    if json {
+        return emit_json(answer);
+    }
+    println!("PREFLIGHT  {}", answer.path);
+    println!(
+        "  rules {} · concepts {} · tables {} · dependants {} · conflicts {}",
+        answer.rules, answer.concepts, answer.tables, answer.dependants, answer.conflicts
+    );
+    for rule in &answer.highest_risk_rules {
+        println!("  · {}", rule.what);
+    }
+    let risk = if colours_wanted() {
+        match answer.risk {
+            "HIGH" => answer.risk.red().bold().to_string(),
+            "MEDIUM" => answer.risk.yellow().to_string(),
+            _ => answer.risk.green().to_string(),
+        }
+    } else {
+        answer.risk.to_string()
+    };
+    println!("  RISK: {risk} — {}", answer.reason);
+    println!("  next: {}", answer.suggested_command);
+    Ok(())
+}
+
+pub fn concepts(overview: &ConceptOverview, json: bool) -> Result<()> {
+    if json {
+        return emit_json(overview);
+    }
+    println!("{} concepts", overview.total);
+    let mut bridges: Vec<(&String, &usize)> = overview.by_bridge.iter().collect();
+    bridges.sort();
+    for (bridge, count) in bridges {
+        println!("  {count:>6}  from {bridge}");
+    }
+    heading("Most connected");
+    for row in overview.concepts.iter().take(25) {
+        println!(
+            "  {} {:<34} {:>3} links  [{}]  {}",
+            tag(row.status),
+            row.id,
+            row.links,
+            row.languages.join(","),
+            row.display
+        );
+    }
+    println!("\nRun `reify concepts --suggest` to turn these into glossary entries.");
+    Ok(())
+}
+
+/// The facts a synthesis prompt is allowed to draw on.
+///
+/// Built from the compiled context and nothing else. The model receives retrieved
+/// facts and is asked to phrase them; it is never asked what it knows.
+pub fn facts_for_synthesis(compiled: &Context) -> Vec<String> {
+    let mut facts = Vec::new();
+    for conflict in &compiled.conflicts {
+        facts.push(format!(
+            "CONFLICT about {}: documentation says \"{}\" ({}), the code does \"{}\" ({})",
+            conflict.subject,
+            conflict.documented,
+            conflict.documented_at,
+            conflict.observed,
+            conflict.observed_at
+        ));
+    }
+    for rule in &compiled.rules {
+        facts.push(format!(
+            "RULE [{}] {} (evidence: {})",
+            rule.status,
+            rule.claim,
+            rule.evidence.join(", ")
+        ));
+    }
+    for concept in &compiled.concepts {
+        facts.push(format!("CONCEPT {} labels={}", concept.id, concept.labels));
+    }
+    for item in &compiled.code {
+        facts.push(format!(
+            "CODE {}:{} {} — {}",
+            item.path, item.lines, item.symbol, item.why
+        ));
+    }
+    for doc in &compiled.documents {
+        facts.push(format!("DOC {} — {}", doc.location, doc.excerpt));
+    }
+    for table in &compiled.data {
+        facts.push(format!("TABLE {} — {}", table.table, table.why));
+    }
+    facts
+}
+
+pub fn llm_status(root: &std::path::Path, json: bool) -> Result<()> {
+    let (configured, detail) = match llm::provider(root) {
+        Ok(provider) => (true, provider.label),
+        Err(reason) => (false, reason.explain()),
+    };
+    if json {
+        return emit_json(&serde_json::json!({
+            "configured": configured,
+            "detail": detail,
+            "log": llm::log_path(root).display().to_string(),
+            "derived_status": llm::DERIVED_STATUS.as_str(),
+        }));
+    }
+    if configured {
+        println!("Model provider: {detail}");
+        println!("Every call is logged to {}", llm::log_path(root).display());
+        println!("Anything a model produces is recorded as INFERRED and must be verified.");
+    } else {
+        println!("{detail}");
+    }
+    Ok(())
+}
+
+pub fn llm_preview(prompt: &str, json: bool) -> Result<()> {
+    if json {
+        return emit_json(&serde_json::json!({
+            "prompt": prompt,
+            "bytes": prompt.len(),
+            "sent": false,
+        }));
+    }
+    println!("{prompt}");
+    eprintln!(
+        "\n-- {} bytes. Nothing was sent; this is exactly what a provider would receive. --",
+        prompt.len()
+    );
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn synthesis_facts_carry_their_status_and_citation() {
+        // A model must never be handed a claim stripped of its footing.
+        let compiled = Context {
+            schema: "reify.context/1",
+            task: "t".into(),
+            budget: reify::context::BudgetInfo {
+                requested: 100,
+                context: 10,
+                reads: 0,
+                used: 10,
+                unit: "tokens",
+                estimator: "heuristic-v1",
+            },
+            concepts: vec![],
+            rules: vec![reify::context::RuleOut {
+                id: "rule:1".into(),
+                status: Status::Inferred,
+                confidence: 0.8,
+                claim: "corporate orders require approval".into(),
+                subject: "approval".into(),
+                source: "document".into(),
+                evidence: vec!["docs/BRD.md:4".into()],
+            }],
+            code: vec![],
+            documents: vec![],
+            data: vec![],
+            history: vec![],
+            conflicts: vec![],
+            unknowns: vec![],
+            next_reads: vec![],
+        };
+        let facts = facts_for_synthesis(&compiled);
+        assert_eq!(facts.len(), 1);
+        assert!(facts[0].contains("INFERRED"));
+        assert!(facts[0].contains("docs/BRD.md:4"));
+    }
 
     #[test]
     fn every_status_renders_a_visible_marker() {

@@ -233,9 +233,13 @@ pub fn classify(path: &str) -> Lang {
         "py" | "pyi" => Lang::Python,
         "ts" | "tsx" => Lang::TypeScript,
         "js" | "jsx" | "mjs" | "cjs" => Lang::JavaScript,
+        "java" => Lang::Java,
         "sql" => Lang::Sql,
         "md" | "markdown" | "mdx" => Lang::Markdown,
         "txt" | "rst" | "adoc" => Lang::Text,
+        "html" | "htm" | "xhtml" => Lang::Html,
+        "docx" => Lang::Docx,
+        "pdf" => Lang::Pdf,
         "csv" => Lang::Csv,
         "json" => Lang::Json,
         "yaml" | "yml" => Lang::Yaml,
@@ -260,7 +264,11 @@ mod tests {
         assert_eq!(classify("a/b/order.py"), Lang::Python);
         assert_eq!(classify("app/x.tsx"), Lang::TypeScript);
         assert_eq!(classify("app/x.mjs"), Lang::JavaScript);
+        assert_eq!(classify("src/main/java/Order.java"), Lang::Java);
         assert_eq!(classify("db/schema.sql"), Lang::Sql);
+        assert_eq!(classify("docs/BRD.docx"), Lang::Docx);
+        assert_eq!(classify("docs/spec.pdf"), Lang::Pdf);
+        assert_eq!(classify("wiki/export.html"), Lang::Html);
         assert_eq!(classify("docs/BRD.md"), Lang::Markdown);
         assert_eq!(classify("i18n/vi.csv"), Lang::Csv);
         assert_eq!(classify("bin/tool"), Lang::Other);

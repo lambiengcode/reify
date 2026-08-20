@@ -191,9 +191,13 @@ pub enum Lang {
     Python,
     TypeScript,
     JavaScript,
+    Java,
     Sql,
     Markdown,
     Text,
+    Html,
+    Docx,
+    Pdf,
     Csv,
     Json,
     Yaml,
@@ -206,9 +210,13 @@ impl Lang {
             Lang::Python => "python",
             Lang::TypeScript => "typescript",
             Lang::JavaScript => "javascript",
+            Lang::Java => "java",
             Lang::Sql => "sql",
             Lang::Markdown => "markdown",
             Lang::Text => "text",
+            Lang::Html => "html",
+            Lang::Docx => "docx",
+            Lang::Pdf => "pdf",
             Lang::Csv => "csv",
             Lang::Json => "json",
             Lang::Yaml => "yaml",
@@ -221,9 +229,13 @@ impl Lang {
             "python" => Lang::Python,
             "typescript" => Lang::TypeScript,
             "javascript" => Lang::JavaScript,
+            "java" => Lang::Java,
             "sql" => Lang::Sql,
             "markdown" => Lang::Markdown,
             "text" => Lang::Text,
+            "html" => Lang::Html,
+            "docx" => Lang::Docx,
+            "pdf" => Lang::Pdf,
             "csv" => Lang::Csv,
             "json" => Lang::Json,
             "yaml" => Lang::Yaml,
@@ -234,12 +246,26 @@ impl Lang {
     pub fn is_code(self) -> bool {
         matches!(
             self,
-            Lang::Python | Lang::TypeScript | Lang::JavaScript | Lang::Sql
+            Lang::Python | Lang::TypeScript | Lang::JavaScript | Lang::Java | Lang::Sql
+        )
+    }
+
+    /// Does a tree-sitter grammar exist for this language?
+    ///
+    /// Distinct from [`is_code`](Self::is_code): SQL is code but is handled by pattern
+    /// extraction rather than a grammar.
+    pub fn has_grammar(self) -> bool {
+        matches!(
+            self,
+            Lang::Python | Lang::TypeScript | Lang::JavaScript | Lang::Java
         )
     }
 
     pub fn is_doc(self) -> bool {
-        matches!(self, Lang::Markdown | Lang::Text)
+        matches!(
+            self,
+            Lang::Markdown | Lang::Text | Lang::Html | Lang::Docx | Lang::Pdf
+        )
     }
 }
 
@@ -403,6 +429,33 @@ pub mod uid {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn every_language_round_trips_and_classifies_consistently() {
+        for lang in [
+            Lang::Python,
+            Lang::TypeScript,
+            Lang::JavaScript,
+            Lang::Java,
+            Lang::Sql,
+            Lang::Markdown,
+            Lang::Text,
+            Lang::Html,
+            Lang::Docx,
+            Lang::Pdf,
+            Lang::Csv,
+            Lang::Json,
+            Lang::Yaml,
+        ] {
+            assert_eq!(Lang::parse(lang.as_str()), lang);
+            assert!(
+                !(lang.is_code() && lang.is_doc()),
+                "{lang:?} cannot be both code and a document"
+            );
+            assert!(!lang.has_grammar() || lang.is_code(), "{lang:?}");
+        }
+        assert_eq!(Lang::parse("nonsense"), Lang::Other);
+    }
 
     #[test]
     fn status_round_trips_through_string() {
