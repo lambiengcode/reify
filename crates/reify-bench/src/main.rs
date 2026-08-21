@@ -166,7 +166,8 @@ fn charts(results: &[String], out: &Path) -> Result<()> {
             .ok_or_else(|| anyhow::anyhow!("expected LABEL=DIR, got `{spec}`"))?;
         let dir = Path::new(dir);
 
-        if let Ok(summaries) = read_json::<Vec<agent::AgentSummary>>(&dir.join("agent-summary.json"))
+        if let Ok(summaries) =
+            read_json::<Vec<agent::AgentSummary>>(&dir.join("agent-summary.json"))
         {
             agent_series.push(chart::agent_series(label, &summaries));
         }

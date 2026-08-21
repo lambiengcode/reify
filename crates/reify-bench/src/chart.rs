@@ -73,13 +73,12 @@ pub fn agent_chart(series: &[Series]) -> String {
     let right = WIDTH - 28.0;
 
     let mut svg = String::new();
-    let _ = write!(
+    let _ = writeln!(
         svg,
         r#"<svg viewBox="0 0 {WIDTH} {height}" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
   <title>Share of tasks where the model named a file that actually had to change, by condition, for each repository. Whiskers are 95% confidence intervals.</title>
   <text x="{mid}" y="26" font-size="15" font-weight="600" fill="{INK}" text-anchor="middle">Did the model name a file that actually had to change?</text>
-  <text x="{mid}" y="46" font-size="12" fill="{INK}" text-anchor="middle">Tasks from real merged commits, indexed before those commits existed. Whiskers: 95% CI.</text>
-"#,
+  <text x="{mid}" y="46" font-size="12" fill="{INK}" text-anchor="middle">Tasks from real merged commits, indexed before those commits existed. Whiskers: 95% CI.</text>"#,
         mid = WIDTH / 2.0
     );
 
@@ -98,10 +97,9 @@ pub fn agent_chart(series: &[Series]) -> String {
     for (index, (colour, text)) in legend.iter().enumerate() {
         let x = 66.0 + (index % columns) as f32 * column_width;
         let y = 62.0 + (index / columns) as f32 * 19.0;
-        let _ = write!(
+        let _ = writeln!(
             svg,
-            r#"  <rect x="{x:.1}" y="{y:.1}" width="11" height="11" rx="2" fill="{colour}"/><text x="{tx:.1}" y="{ty:.1}" font-size="11" fill="{INK}">{text}</text>
-"#,
+            r#"  <rect x="{x:.1}" y="{y:.1}" width="11" height="11" rx="2" fill="{colour}"/><text x="{tx:.1}" y="{ty:.1}" font-size="11" fill="{INK}">{text}</text>"#,
             tx = x + 16.0,
             ty = y + 10.0
         );
@@ -112,19 +110,17 @@ pub fn agent_chart(series: &[Series]) -> String {
         let value = step as f32 * 25.0;
         let y = plot_bottom - (value / 100.0) * plot_height;
         let opacity = if step == 0 { 0.55 } else { 0.16 };
-        let _ = write!(
+        let _ = writeln!(
             svg,
             r#"  <line x1="{left}" y1="{y:.1}" x2="{right}" y2="{y:.1}" stroke="{GRID}" stroke-opacity="{opacity}"/>
-  <text x="{tx}" y="{ty:.1}" font-size="11" fill="{INK}" text-anchor="end">{value:.0}%</text>
-"#,
+  <text x="{tx}" y="{ty:.1}" font-size="11" fill="{INK}" text-anchor="end">{value:.0}%</text>"#,
             tx = left - 8.0,
             ty = y + 4.0
         );
     }
-    let _ = write!(
+    let _ = writeln!(
         svg,
-        r#"  <text x="24" y="{mid:.0}" font-size="12" fill="{INK}" text-anchor="middle" transform="rotate(-90 24 {mid:.0})">tasks with a correct file</text>
-"#,
+        r#"  <text x="24" y="{mid:.0}" font-size="12" fill="{INK}" text-anchor="middle" transform="rotate(-90 24 {mid:.0})">tasks with a correct file</text>"#,
         mid = (plot_top + plot_bottom) / 2.0
     );
 
@@ -149,38 +145,34 @@ pub fn agent_chart(series: &[Series]) -> String {
             } else {
                 (top + 16.0, "#ffffff")
             };
-            let _ = write!(
+            let _ = writeln!(
                 svg,
                 r#"  <rect x="{bx:.1}" y="{top:.1}" width="{bar_width:.1}" height="{h:.1}" rx="2" fill="{colour}"/>
-  <text x="{cx:.1}" y="{label_y:.1}" font-size="11" font-weight="600" fill="{label_fill}" text-anchor="middle">{value:.0}%</text>
-"#,
+  <text x="{cx:.1}" y="{label_y:.1}" font-size="11" font-weight="600" fill="{label_fill}" text-anchor="middle">{value:.0}%</text>"#,
                 h = (plot_bottom - top).max(1.0)
             );
             // Interval whisker.
             let ly = plot_bottom - (low / 100.0) * plot_height;
-            let _ = write!(
+            let _ = writeln!(
                 svg,
                 r#"  <line x1="{cx:.1}" y1="{hy:.1}" x2="{cx:.1}" y2="{ly:.1}" stroke="{INK}" stroke-opacity="0.85"/>
   <line x1="{a:.1}" y1="{hy:.1}" x2="{b:.1}" y2="{hy:.1}" stroke="{INK}" stroke-opacity="0.85"/>
-  <line x1="{a:.1}" y1="{ly:.1}" x2="{b:.1}" y2="{ly:.1}" stroke="{INK}" stroke-opacity="0.85"/>
-"#,
+  <line x1="{a:.1}" y1="{ly:.1}" x2="{b:.1}" y2="{ly:.1}" stroke="{INK}" stroke-opacity="0.85"/>"#,
                 a = cx - 5.0,
                 b = cx + 5.0
             );
-            let _ = write!(
+            let _ = writeln!(
                 svg,
-                r#"  <text x="{cx:.1}" y="{ly2:.1}" font-size="10" fill="{INK}" text-anchor="middle">{label}</text>
-"#,
+                r#"  <text x="{cx:.1}" y="{ly2:.1}" font-size="10" fill="{INK}" text-anchor="middle">{label}</text>"#,
                 ly2 = plot_bottom + 16.0,
                 label = label_for(&group.bars[slot_index].0)
             );
         }
 
-        let _ = write!(
+        let _ = writeln!(
             svg,
             r#"  <text x="{cx:.1}" y="{y:.1}" font-size="13" font-weight="600" fill="{INK}" text-anchor="middle">{repo}</text>
-  <text x="{cx:.1}" y="{y2:.1}" font-size="11" fill="{INK}" text-anchor="middle">n = {tasks}</text>
-"#,
+  <text x="{cx:.1}" y="{y2:.1}" font-size="11" fill="{INK}" text-anchor="middle">n = {tasks}</text>"#,
             cx = group_left + group_width / 2.0,
             y = plot_bottom + 44.0,
             y2 = plot_bottom + 60.0,
@@ -188,21 +180,19 @@ pub fn agent_chart(series: &[Series]) -> String {
             tasks = group.tasks
         );
         if index > 0 {
-            let _ = write!(
+            let _ = writeln!(
                 svg,
-                r#"  <line x1="{x:.1}" y1="{plot_top}" x2="{x:.1}" y2="{b:.1}" stroke="{GRID}" stroke-opacity="0.25"/>
-"#,
+                r#"  <line x1="{x:.1}" y1="{plot_top}" x2="{x:.1}" y2="{b:.1}" stroke="{GRID}" stroke-opacity="0.25"/>"#,
                 x = group_left,
                 b = plot_bottom + 66.0
             );
         }
     }
 
-    let _ = write!(
+    let _ = writeln!(
         svg,
         r#"  <text x="{mid}" y="{y:.0}" font-size="11" fill="{INK}" text-anchor="middle">Overlapping whiskers mean the difference is not established. On OpenMRS, reify and grep overlap.</text>
-</svg>
-"#,
+</svg>"#,
         mid = WIDTH / 2.0,
         y = height - 12.0
     );
@@ -219,13 +209,12 @@ pub fn retrieval_chart(series: &[Series]) -> String {
     let right = WIDTH - 28.0;
 
     let mut svg = String::new();
-    let _ = write!(
+    let _ = writeln!(
         svg,
         r#"<svg viewBox="0 0 {WIDTH} {height}" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
   <title>Retrieval quality with no model involved: the share of tasks where the tool put a changed file in front of the agent, per repository.</title>
   <text x="{mid}" y="26" font-size="15" font-weight="600" fill="{INK}" text-anchor="middle">Retrieval only, no model: was the changed file offered at all?</text>
-  <text x="{mid}" y="46" font-size="12" fill="{INK}" text-anchor="middle">Every condition held to the same 4,000-token budget.</text>
-"#,
+  <text x="{mid}" y="46" font-size="12" fill="{INK}" text-anchor="middle">Every condition held to the same 4,000-token budget.</text>"#,
         mid = WIDTH / 2.0
     );
 
@@ -233,11 +222,10 @@ pub fn retrieval_chart(series: &[Series]) -> String {
         let value = step as f32 * 25.0;
         let y = plot_bottom - (value / 100.0) * plot_height;
         let opacity = if step == 0 { 0.55 } else { 0.16 };
-        let _ = write!(
+        let _ = writeln!(
             svg,
             r#"  <line x1="{left}" y1="{y:.1}" x2="{right}" y2="{y:.1}" stroke="{GRID}" stroke-opacity="{opacity}"/>
-  <text x="{tx}" y="{ty:.1}" font-size="11" fill="{INK}" text-anchor="end">{value:.0}%</text>
-"#,
+  <text x="{tx}" y="{ty:.1}" font-size="11" fill="{INK}" text-anchor="end">{value:.0}%</text>"#,
             tx = left - 8.0,
             ty = y + 4.0
         );
@@ -251,12 +239,11 @@ pub fn retrieval_chart(series: &[Series]) -> String {
         for (slot_index, (condition, value, _, _, colour)) in group.bars.iter().enumerate() {
             let cx = group_left + 45.0 + slot * (slot_index as f32 + 0.5);
             let top = plot_bottom - (value / 100.0) * plot_height;
-            let _ = write!(
+            let _ = writeln!(
                 svg,
                 r#"  <rect x="{bx:.1}" y="{top:.1}" width="{bar_width:.1}" height="{h:.1}" rx="2" fill="{colour}"/>
   <text x="{cx:.1}" y="{vy:.1}" font-size="11" font-weight="600" fill="{INK}" text-anchor="middle">{value:.0}%</text>
-  <text x="{cx:.1}" y="{ly:.1}" font-size="10" fill="{INK}" text-anchor="middle">{label}</text>
-"#,
+  <text x="{cx:.1}" y="{ly:.1}" font-size="10" fill="{INK}" text-anchor="middle">{label}</text>"#,
                 bx = cx - bar_width / 2.0,
                 h = (plot_bottom - top).max(1.0),
                 vy = top - 8.0,
@@ -264,21 +251,19 @@ pub fn retrieval_chart(series: &[Series]) -> String {
                 label = label_for(condition)
             );
         }
-        let _ = write!(
+        let _ = writeln!(
             svg,
-            r#"  <text x="{cx:.1}" y="{y:.1}" font-size="13" font-weight="600" fill="{INK}" text-anchor="middle">{repo}</text>
-"#,
+            r#"  <text x="{cx:.1}" y="{y:.1}" font-size="13" font-weight="600" fill="{INK}" text-anchor="middle">{repo}</text>"#,
             cx = group_left + group_width / 2.0,
             y = plot_bottom + 42.0,
             repo = group.repository
         );
     }
 
-    let _ = write!(
+    let _ = writeln!(
         svg,
         r#"  <text x="{mid}" y="{y:.0}" font-size="11" fill="{INK}" text-anchor="middle">Path grep offers 88 files to reach 18%. Offering everything is not retrieval.</text>
-</svg>
-"#,
+</svg>"#,
         mid = WIDTH / 2.0,
         y = height - 14.0
     );
@@ -287,7 +272,13 @@ pub fn retrieval_chart(series: &[Series]) -> String {
 
 /// Build a chart series from a repository's agent summaries.
 pub fn agent_series(repository: &str, summaries: &[AgentSummary]) -> Series {
-    let order = ["N-no-context", "B-content-grep", "R-reify", "R-shuffled", "O-oracle"];
+    let order = [
+        "N-no-context",
+        "B-content-grep",
+        "R-reify",
+        "R-shuffled",
+        "O-oracle",
+    ];
     let mut bars = Vec::new();
     let mut tasks = 0usize;
     for name in order {
@@ -367,7 +358,10 @@ mod tests {
     #[test]
     fn a_chart_carries_a_title_for_screen_readers() {
         let svg = agent_chart(&series());
-        assert!(svg.contains("<title>"), "a chart with no title is unreadable aloud");
+        assert!(
+            svg.contains("<title>"),
+            "a chart with no title is unreadable aloud"
+        );
     }
 
     #[test]
@@ -385,7 +379,10 @@ mod tests {
         // that omits them is arguing rather than reporting.
         let svg = agent_chart(&series());
         let whiskers = svg.matches("stroke-opacity=\"0.85\"").count();
-        assert!(whiskers >= 9, "expected three whiskers per bar, got {whiskers}");
+        assert!(
+            whiskers >= 9,
+            "expected three whiskers per bar, got {whiskers}"
+        );
     }
 
     #[test]

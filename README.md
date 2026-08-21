@@ -73,12 +73,12 @@ Three of the five conditions exist to try to break the result rather than suppor
 Before asking whether a model uses the context, ask whether the right file is in it.
 
 <p align="center">
-  <img src="assets/benchmark-retrieval.svg" width="860" alt="Share of tasks where a changed file was offered at all. ERPNext: content grep 10%, path grep 18%, reify 57%. OpenMRS: content grep 32%, path grep 18%, reify 41%.">
+  <img src="assets/benchmark-retrieval.svg" width="860" alt="Share of tasks where a changed file was offered at all. ERPNext: content grep 10%, path grep 18%, reify 58%. OpenMRS: content grep 32%, path grep 18%, reify 41%.">
 </p>
 
 | ERPNext, n=40 | content grep | path grep | **reify** |
 |---|--:|--:|--:|
-| a changed file was offered | 10% | 18% | **57%** |
+| a changed file was offered | 4/40 (10%) | 7/40 (18%) | **23/40 (58%)** |
 | mean recall | 0.08 | 0.16 | **0.50** |
 | rank of the first correct file (MRR) | 0.07 | 0.12 | **0.23** |
 | files put in front of the agent | 3 | 88 | 13 |
