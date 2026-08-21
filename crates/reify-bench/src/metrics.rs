@@ -74,7 +74,7 @@ pub fn score(task: &str, condition: &str, answer: &Answer, truth: &[String]) -> 
 }
 
 /// Aggregate figures for one condition across the whole task set.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Summary {
     pub condition: String,
     pub tasks: usize,

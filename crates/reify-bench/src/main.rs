@@ -13,6 +13,7 @@
 //! computed anywhere except from those files.
 
 mod agent;
+mod chart;
 mod conditions;
 mod metrics;
 mod tasks;
@@ -79,6 +80,18 @@ enum Command {
         #[arg(long, default_value_t = 20)]
         limit: usize,
     },
+    /// Render the benchmark charts from committed result files.
+    ///
+    /// Generated rather than drawn: a chart that can drift from its data is a picture,
+    /// not a measurement.
+    Chart {
+        /// Result directories, as `Label=path`, in the order they should appear.
+        #[arg(long = "results", value_name = "LABEL=DIR", num_args = 1..)]
+        results: Vec<String>,
+        /// Directory to write the SVGs into.
+        #[arg(long)]
+        out: PathBuf,
+    },
     /// Render a report from raw results.
     Report {
         #[arg(long = "in")]
@@ -137,8 +150,48 @@ fn run() -> Result<()> {
             budget,
             limit,
         } => agent_experiments(&repo, &task_file, &out, budget, limit),
+        Command::Chart { results, out } => charts(&results, &out),
         Command::Report { input, out } => report(&input, &out),
     }
+}
+
+/// Generate every chart the README embeds.
+fn charts(results: &[String], out: &Path) -> Result<()> {
+    let mut agent_series = Vec::new();
+    let mut retrieval_series = Vec::new();
+
+    for spec in results {
+        let (label, dir) = spec
+            .split_once('=')
+            .ok_or_else(|| anyhow::anyhow!("expected LABEL=DIR, got `{spec}`"))?;
+        let dir = Path::new(dir);
+
+        if let Ok(summaries) = read_json::<Vec<agent::AgentSummary>>(&dir.join("agent-summary.json"))
+        {
+            agent_series.push(chart::agent_series(label, &summaries));
+        }
+        if let Ok(summaries) = read_json::<Vec<metrics::Summary>>(&dir.join("summary.json")) {
+            retrieval_series.push(chart::retrieval_series(label, &summaries));
+        }
+    }
+
+    anyhow::ensure!(
+        !agent_series.is_empty() || !retrieval_series.is_empty(),
+        "no result files found in the given directories"
+    );
+
+    std::fs::create_dir_all(out)?;
+    if !agent_series.is_empty() {
+        let path = out.join("benchmark-agent.svg");
+        std::fs::write(&path, chart::agent_chart(&agent_series))?;
+        eprintln!("wrote {}", path.display());
+    }
+    if !retrieval_series.is_empty() {
+        let path = out.join("benchmark-retrieval.svg");
+        std::fs::write(&path, chart::retrieval_chart(&retrieval_series))?;
+        eprintln!("wrote {}", path.display());
+    }
+    Ok(())
 }
 
 /// Run every model condition over a task subset.
