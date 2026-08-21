@@ -5,7 +5,7 @@
 //! the codebases Reify targets. Cross-lingual retrieval happens in concept space, which
 //! is why it is deterministic and citable rather than an embedding lookup.
 //!
-//! Three bridges, in precision order (`docs/PLAN.md` §K.2):
+//! Three bridges, in precision order:
 //!   1. a declared glossary — human authored, `CONFIRMED`;
 //!   2. the product's own translation files — `OBSERVED`;
 //!   3. co-occurrence between document headings and code identifiers — `OBSERVED`.

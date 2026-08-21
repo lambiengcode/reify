@@ -5,7 +5,7 @@ data, documents and history into a typed graph in a single SQLite file, and answ
 questions by seeding from a lexical index, spreading across that graph, and selecting
 what fits a token budget.
 
-The full design rationale lives in [`PLAN.md`](PLAN.md). This document is the map.
+This document is the map.
 
 ## Layers, and their cost ordering
 

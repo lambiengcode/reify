@@ -874,7 +874,7 @@ fn agent_section(input: &Path) -> String {
             if headroom > 0.3 {
                 "The thesis survives its most dangerous test."
             } else {
-                "**This is small. The thesis is in trouble: see the kill criteria in PLAN.md §Y.**"
+                "**This is small. The thesis is in trouble.**"
             }
         ));
         if let Some(reify) = find("R-reify") {

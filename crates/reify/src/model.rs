@@ -2,7 +2,7 @@
 //!
 //! Everything Reify knows is a [`Node`] or an [`Edge`]. Both carry an epistemic
 //! [`Status`] and a confidence, because the product promise is that an agent can tell
-//! a parsed fact from a guess. See `docs/PLAN.md` §G.
+//! a parsed fact from a guess.
 
 use serde::{Deserialize, Serialize};
 use std::fmt;

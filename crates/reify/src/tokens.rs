@@ -2,7 +2,7 @@
 //!
 //! Budgeting tolerates a ±10% error, so a heuristic is enough and keeps a tokenizer
 //! dependency out of the hot path. Benchmarks that report token counts use the real
-//! counts returned by the model provider, never this estimate — see `docs/PLAN.md` §Q.
+//! counts returned by the model provider, never this estimate.
 
 /// Estimator identity, echoed in JSON output so a number can be traced to how it was counted.
 pub const ESTIMATOR: &str = "heuristic-v1";

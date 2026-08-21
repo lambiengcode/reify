@@ -20,7 +20,7 @@
 
 <p align="center">
   <strong>At the same token cost, the model finds the file that had to change 75% of the time — grep manages 50% &middot; measured on four repositories &middot; never opens a socket</strong><br>
-  <sub>A real model on 142 tasks from real merged commits across ERPNext, OFBiz, OpenMRS and Medusa, each index built at a commit <em>before</em> those changes existed. Three of the four repositories show wins of 25–50 points at matched cost; the fourth shows none, and <a href="#numbers">Numbers</a> says so with the same prominence. Pre-registered targets and what was actually hit: <a href="docs/ROADMAP.md">the scorecard</a>. <a href="benchmarks/REPORT.md">Full writeup</a> &middot; <a href="#reproducing-the-benchmark">reproduce it</a>.</sub>
+  <sub>A real model on 142 tasks from real merged commits across ERPNext, OFBiz, OpenMRS and Medusa, each index built at a commit <em>before</em> those changes existed. Three of the four repositories show wins of 25–50 points at matched cost; the fourth shows none, and <a href="#numbers">Numbers</a> says so with the same prominence. <a href="benchmarks/REPORT.md">Full writeup</a> &middot; <a href="#reproducing-the-benchmark">reproduce it</a>.</sub>
 </p>
 
 ---
@@ -159,12 +159,11 @@ single budget — on OFBiz a *single* reify round already beats grep by 56 point
 
 ### The scorecard, against targets set before the work
 
-[docs/ROADMAP.md](docs/ROADMAP.md) pre-registered seven targets. **One of seven was
-met** (four repositories measured). Hit rate, headroom share, cross-repo gap, MRR,
-precision and end-to-end completion all fell short of their bars, and the roadmap
-reports each number next to its target rather than rounding the story up. The gains
-are real — the targets were set high on purpose, and unmet targets with honest numbers
-beat met targets with soft ones.
+Seven targets were pre-registered before the improvement work began. **One of seven
+was met** (four repositories measured). Hit rate, headroom share, cross-repo gap, MRR,
+precision and end-to-end completion all fell short of their bars. The gains are real —
+the targets were set high on purpose, and unmet targets with honest numbers beat met
+targets with soft ones.
 
 ### Where it doesn't work
 
@@ -273,6 +272,13 @@ Three things that only break once you leave Latin script, each of which broke he
 - **Sentence length cannot be counted in spaces**, or every Thai requirement is rejected as too short to be a rule.
 
 ## Install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/lambiengcode/reify/main/install.sh | sh
+```
+
+Prebuilt binaries for macOS (Apple Silicon and Intel) and Linux (x86_64 and aarch64).
+Or build from source:
 
 ```bash
 cargo install --path crates/reify-cli
@@ -432,22 +438,22 @@ One SQLite file per repository. No graph database, no vector store, no daemon.
   LAYER 0  Substrate    walk, classify, hash, store      discover.rs · store.rs
 ```
 
-**An incremental index is byte-identical to a full rebuild**, asserted by a property test that applies random edit sequences and compares canonical dumps. Each stage owns a disjoint set of edge kinds and its own invalidation trigger, which is what makes that true. Details: [docs/architecture.md](docs/architecture.md), design rationale and kill criteria: [docs/PLAN.md](docs/PLAN.md).
+**An incremental index is byte-identical to a full rebuild**, asserted by a property test that applies random edit sequences and compares canonical dumps. Each stage owns a disjoint set of edge kinds and its own invalidation trigger, which is what makes that true. Details: [docs/architecture.md](docs/architecture.md).
 
 ### Measured performance
 
 ERPNext, 5,064 files, 8-core M-series laptop.
 
-| | measured | target | |
-|---|--:|--:|---|
-| full index, no model | 4.6 s | < 10 min | ✅ |
-| reindex, nothing changed | 0.6 s | — | ✅ |
-| reindex, one file edited | 0.7 s | < 500 ms | ~ |
-| `reify context` | 57 ms | < 100 ms | ✅ |
-| `reify impact` | 0.2 ms | < 50 ms | ✅ |
-| `reify why` | 205 ms | < 20 ms | ❌ a `git log -L` subprocess; ~5 ms without |
-| peak memory, full index | 224 MB | < 2 GB | ✅ |
-| store size | 47 MB (33% of a 144 MB working tree) | < 5% | ❌ |
+| | measured |
+|---|--:|
+| full index, no model | 4.6 s |
+| reindex, nothing changed | 0.6 s |
+| reindex, one file edited | 0.7 s |
+| `reify context` | 57 ms |
+| `reify impact` | 0.2 ms |
+| `reify why` | 205 ms — a `git log -L` subprocess; ~5 ms without |
+| peak memory, full index | 224 MB |
+| store size | 47 MB (33% of a 144 MB working tree) |
 
 A full index took **78 seconds** until the full-text index was keyed by node id. `uid` is `UNINDEXED` in FTS5, so `DELETE ... WHERE uid = ?` scanned the whole table once per node — quadratic, and invisible until it was timed per stage. Editing one file took **5.9 seconds** until the repository-wide stages learned to skip when their inputs are provably unchanged.
 
@@ -540,10 +546,7 @@ To make an abstract thing concrete. The knowledge was always there; it just wasn
 
 ## Roadmap
 
-Where this goes next, with the targets committed **before** the work rather than after:
-[docs/ROADMAP.md](docs/ROADMAP.md).
-
-The short version — the first pass through it is done. The history prior (every merged
+The first improvement pass is done. The history prior (every merged
 commit is a labelled example: message ≈ ticket, changed files = answer), test-to-code
 edges, iterative refinement and a fourth repository all shipped; the weight fit failed
 its held-out validation and was reverted per its own pre-registration; and the
@@ -554,8 +557,6 @@ gap between how people describe UI changes and how the code spells them.
 ## Status
 
 Early, and measured. Known misses, all documented rather than buried: the store is 33% of the working tree against a 5% target, `reify why` is 205 ms against 20 ms, and Windows is untested.
-
-[docs/PLAN.md](docs/PLAN.md) contains the kill criteria — the conditions under which this project should be considered a failure and the thesis changed. They are written down because a project that cannot say when to stop is not being engineered, it is being believed in.
 
 ## License
 

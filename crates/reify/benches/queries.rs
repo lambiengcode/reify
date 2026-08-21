@@ -1,4 +1,4 @@
-//! Latency benchmarks for the targets in `docs/PLAN.md` §Q.
+//! Latency benchmarks for the query paths.
 //!
 //! These run against the committed `fixtures/minierp`, so they are reproducible on any
 //! machine and in CI. They measure the *shape* of the cost — a regression shows up as a

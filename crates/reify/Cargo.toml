@@ -38,7 +38,9 @@ tree-sitter-ruby = "0.23.1"
 tree-sitter-rust = "0.24.2"
 tree-sitter-typescript = "0.23.2"
 whatlang = "0.18.0"
-zip = "8.6.0"
+# default features pull in bzip2/lzma/zstd codecs we never read; Office archives are
+# deflate, and the bzip2 backend carries a licence outside deny.toml's allowlist.
+zip = { version = "8.6.0", default-features = false, features = ["deflate"] }
 
 [dev-dependencies]
 criterion = { version = "0.8.2", default-features = false, features = ["cargo_bench_support"] }

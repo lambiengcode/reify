@@ -2,7 +2,7 @@
 //!
 //! Both run entirely on the graph, with no lexical scoring and no model. `why`
 //! additionally reaches for git at query time to get precise line-range history, which
-//! is the one place indexing deliberately left work undone (`docs/PLAN.md` §H.5).
+//! is the one place indexing deliberately left work undone.
 
 use anyhow::{anyhow, Result};
 use serde::Serialize;

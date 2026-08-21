@@ -1,7 +1,7 @@
 //! The indexing pipeline.
 //!
 //! Ten stages, of which the first seven are deterministic and always run. Nothing here
-//! touches the network. See `docs/PLAN.md` §H.
+//! touches the network.
 //!
 //! The load-bearing property is that an incremental run produces the same store as a
 //! full rebuild. That is achieved by giving every stage a disjoint set of edge kinds

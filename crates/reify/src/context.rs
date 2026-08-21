@@ -8,7 +8,7 @@
 //! lines; an agent that receives the file reads two thousand. `next_reads` turns the
 //! answer into a reading plan, which is where the token saving actually comes from.
 //!
-//! Four stages (`docs/PLAN.md` §F.3): seed, spread, select, render.
+//! Four stages: seed, spread, select, render.
 
 use anyhow::Result;
 use serde::Serialize;

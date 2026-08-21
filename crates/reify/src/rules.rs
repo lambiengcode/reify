@@ -5,7 +5,7 @@
 //! involved, and every candidate carries the evidence that produced it. Phrasing a
 //! candidate more fluently is the one place an LLM would help, and it is optional.
 //!
-//! Precision is weighted far above recall throughout (`docs/PLAN.md` §N.6). A missing
+//! Precision is weighted far above recall throughout. A missing
 //! rule costs an agent one search. A wrong rule stated confidently costs an incident.
 
 use serde::{Deserialize, Serialize};
@@ -550,7 +550,7 @@ pub struct Conflict {
 
 /// Detect conflicts, conservatively.
 ///
-/// All five conditions must hold (`docs/PLAN.md` §G.6):
+/// All five conditions must hold:
 /// same subject, opposite polarity, both sides above threshold, different source
 /// kinds, and overlapping concept vocabulary. Anything weaker is a divergence, and a
 /// divergence is not reported.

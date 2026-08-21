@@ -4,7 +4,7 @@
 
 ## Context
 
-`PLAN.md` §H.3 proposed ingesting a SCIP or LSIF index when one exists, to replace
+The original plan proposed ingesting a SCIP or LSIF index when one exists, to replace
 heuristic call resolution with precise cross-references. It is listed as the
 highest-leverage "do not reinvent" decision in the plan.
 

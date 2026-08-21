@@ -3,7 +3,7 @@
 //! Why SQLite and not a graph database: at the scale Reify targets (roughly 10^5 nodes
 //! and 10^6 edges) a covering index on `edges(src, kind)` outperforms a graph engine's
 //! traversal machinery, and we get transactions, FTS5 and a single copyable file for
-//! free. See `docs/PLAN.md` §P.2.
+//! free.
 
 use anyhow::{Context, Result};
 use rusqlite::{params, Connection, OptionalExtension};

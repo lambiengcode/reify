@@ -14,7 +14,7 @@ liability, not marketing.
 | **Database objects** | Distinct tables named in SQL, plus entities declared by structured model metadata. Counted once regardless of how many places reference them. |
 | **Concepts** | Distinct business concepts. Broken down by the bridge that produced each: `declared` (glossary or structured metadata), `translation` (mined from localisation files), `co-occurrence` (document headings that also name code). |
 | **Business rules** | Rule candidates surviving the length and classification filters. Excludes conflicts. Every one carries at least one evidence citation. |
-| **Contradictions** | Conflicts passing all five conditions in `docs/PLAN.md` §G.6. Deliberately biased toward silence: zero does not prove agreement. |
+| **Contradictions** | Conflicts passing all five confirmation conditions. Deliberately biased toward silence: zero does not prove agreement. |
 | **Commits linked** | Commits attached to at least one indexed file as `INTRODUCED_BY` or `CHANGED_BY`. Bounded by `--max-commits`. |
 | **Relationships** | Total edges. |
 | **Documented symbols** | Symbols with a docstring or leading comment, over all symbols. |

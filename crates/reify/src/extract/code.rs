@@ -2,7 +2,7 @@
 //!
 //! tree-sitter is chosen over per-language compilers because it is error tolerant —
 //! mature repositories contain files that do not fully parse — and because adding a
-//! language becomes "add a grammar", not "write a front end". See `docs/PLAN.md` §H.2.
+//! language becomes "add a grammar", not "write a front end".
 //!
 //! Call resolution here is a *heuristic*, and says so in the data: every produced edge
 //! carries a confidence derived from how many candidates the name matched.

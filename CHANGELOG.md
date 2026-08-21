@@ -6,7 +6,7 @@ versions may break the store schema, and `reify index --force` rebuilds it.
 
 ## [Unreleased]
 
-## [0.1.0]
+## [0.1.0] - 2026-08-21
 
 First vertical slice: a repository can be compiled, queried and benchmarked end to end.
 

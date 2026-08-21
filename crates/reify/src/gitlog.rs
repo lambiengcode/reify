@@ -3,7 +3,7 @@
 //! Two granularities, deliberately. Indexing walks file-level history, which is cheap
 //! and bounded. Precise symbol history is computed lazily at query time with
 //! `git log -L`, because eagerly blaming a mature repository costs minutes and almost
-//! all of it is never read. See `docs/PLAN.md` §H.5.
+//! all of it is never read.
 //!
 //! Git is invoked as a subprocess rather than through a binding: a repository always
 //! has `git`, the output formats used here are stable, and it keeps a large native

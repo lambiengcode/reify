@@ -5,7 +5,7 @@
 //! product claim from both sides.
 //!
 //! Four of the five conditions exist to try to falsify the thesis rather than support
-//! it (`docs/PLAN.md` §D):
+//! it:
 //!
 //! | Condition | Experiment | What a result would mean |
 //! |---|---|---|
