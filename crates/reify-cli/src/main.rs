@@ -76,6 +76,10 @@ enum Command {
         /// offered, and the freed budget goes to the next-best candidates.
         #[arg(long)]
         exclude: Vec<String>,
+        /// Emit TOON, the agent-facing format: columns stated once, one row per
+        /// record. Roughly a third of the JSON envelope's tokens for the same facts.
+        #[arg(long)]
+        toon: bool,
     },
 
     /// Why does this exist: rules, concepts, documents, history and blast radius.
@@ -212,6 +216,7 @@ fn run() -> Result<()> {
             task,
             budget,
             exclude,
+            toon,
         } => {
             let store = open_existing(&root)?;
             let compiled = context::compile(
@@ -223,6 +228,10 @@ fn run() -> Result<()> {
                     ..Default::default()
                 },
             )?;
+            if *toon {
+                print!("{}", render::context_toon(&compiled));
+                return Ok(());
+            }
             render::context(&compiled, cli.json)
         }
         Command::Why { target } => {
@@ -435,7 +444,7 @@ fn find_agent_instruction_file(root: &Path) -> Option<PathBuf> {
 pub const AGENT_INSTRUCTIONS: &str = r#"
 ## Before changing code in this repository
 
-Run `reify context "<what you are about to do>"` and read its output first.
+Run `reify context "<what you are about to do>" --toon` and read its output first.
 Run `reify why <file>:<line>` before modifying unfamiliar logic.
 Run `reify impact "<symbol>"` before changing anything shared.
 

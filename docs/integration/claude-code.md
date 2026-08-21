@@ -10,7 +10,7 @@ used, and is what the benchmark measured.
 
 ```markdown
 ## Before changing code in this repo
-Run `reify context "<what you are about to do>"` and read its output first.
+Run `reify context "<what you are about to do>" --toon` and read its output first.
 Run `reify why <file>:<line>` before modifying unfamiliar logic.
 Run `reify impact "<symbol>"` before changing anything shared.
 Treat `status: INFERRED` claims as leads to verify, not as facts.

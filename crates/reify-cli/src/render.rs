@@ -863,3 +863,300 @@ mod tests {
         assert_ne!(tag(Status::Conflicted), tag(Status::Confirmed));
     }
 }
+
+/// Render a compiled context as TOON — the agent-facing format.
+///
+/// The measurement that forced this: for one representative task the JSON envelope
+/// cost ~2.9× the tokens `budget.context` claimed, because JSON repeats every field
+/// name on every record and the budget was computed from content previews, not the
+/// serialization. That is a broken promise in the one number this tool exists to
+/// keep. TOON states each section's columns once and then one row per record, which
+/// lands within a few percent of the claimed cost — and the header it prints is the
+/// *measured* estimate of the very bytes being emitted, so the claim and the payload
+/// can no longer drift apart.
+///
+/// Format: `section[N]{col,col}: ` then one `|`-separated row per record. `status`
+/// is always the first column — the safety rule that an agent can tell a parsed fact
+/// from a guess survives the compression.
+pub fn context_toon(compiled: &Context) -> String {
+    fn cell(value: &str) -> String {
+        // `|` is the delimiter and newlines are row boundaries; both are replaced,
+        // never escaped, because a reader of this format is a model, not a parser.
+        let mut cleaned = value.replace('|', "/").replace(['\n', '\r'], " ");
+        const MAX: usize = 220;
+        if cleaned.chars().count() > MAX {
+            cleaned = cleaned.chars().take(MAX).collect();
+        }
+        cleaned
+    }
+    fn section(out: &mut String, name: &str, columns: &[&str], rows: Vec<Vec<String>>) {
+        if rows.is_empty() {
+            return;
+        }
+        out.push_str(&format!(
+            "{name}[{}]{{{}}}:\n",
+            rows.len(),
+            columns.join(",")
+        ));
+        for row in rows {
+            out.push_str("  ");
+            out.push_str(
+                &row.iter()
+                    .map(|value| cell(value))
+                    .collect::<Vec<_>>()
+                    .join("|"),
+            );
+            out.push('\n');
+        }
+    }
+
+    let mut body = String::new();
+    body.push_str(&format!("task: {}\n", compiled.task));
+
+    section(
+        &mut body,
+        "conflicts",
+        &[
+            "status",
+            "subject",
+            "documented",
+            "documented_at",
+            "observed",
+            "observed_at",
+        ],
+        compiled
+            .conflicts
+            .iter()
+            .map(|c| {
+                vec![
+                    c.status.as_str().to_string(),
+                    c.subject.clone(),
+                    c.documented.clone(),
+                    c.documented_at.clone(),
+                    c.observed.clone(),
+                    c.observed_at.clone(),
+                ]
+            })
+            .collect(),
+    );
+    section(
+        &mut body,
+        "rules",
+        &["status", "confidence", "claim", "evidence"],
+        compiled
+            .rules
+            .iter()
+            .map(|r| {
+                vec![
+                    r.status.as_str().to_string(),
+                    format!("{:.2}", r.confidence),
+                    r.claim.clone(),
+                    r.evidence.join("; "),
+                ]
+            })
+            .collect(),
+    );
+    section(
+        &mut body,
+        "concepts",
+        &["status", "id", "labels"],
+        compiled
+            .concepts
+            .iter()
+            .map(|c| {
+                let labels = c
+                    .labels
+                    .as_object()
+                    .map(|m| {
+                        m.iter()
+                            .map(|(k, v)| format!("{k}:{}", v.as_str().unwrap_or("")))
+                            .collect::<Vec<_>>()
+                            .join(" ")
+                    })
+                    .unwrap_or_default();
+                vec![c.status.as_str().to_string(), c.id.clone(), labels]
+            })
+            .collect(),
+    );
+    section(
+        &mut body,
+        "code",
+        &["status", "path", "lines", "symbol", "why"],
+        compiled
+            .code
+            .iter()
+            .map(|c| {
+                vec![
+                    c.status.as_str().to_string(),
+                    c.path.clone(),
+                    c.lines.clone(),
+                    c.symbol.clone(),
+                    c.why.clone(),
+                ]
+            })
+            .collect(),
+    );
+    section(
+        &mut body,
+        "documents",
+        &["status", "location", "lang", "excerpt"],
+        compiled
+            .documents
+            .iter()
+            .map(|d| {
+                vec![
+                    d.status.as_str().to_string(),
+                    d.location.clone(),
+                    d.lang.clone().unwrap_or_default(),
+                    d.excerpt.clone(),
+                ]
+            })
+            .collect(),
+    );
+    section(
+        &mut body,
+        "data",
+        &["status", "table", "why"],
+        compiled
+            .data
+            .iter()
+            .map(|d| {
+                vec![
+                    d.status.as_str().to_string(),
+                    d.table.clone(),
+                    d.why.clone(),
+                ]
+            })
+            .collect(),
+    );
+    section(
+        &mut body,
+        "history",
+        &["commit", "date", "subject"],
+        compiled
+            .history
+            .iter()
+            .map(|h| vec![h.commit.clone(), h.date.clone(), h.subject.clone()])
+            .collect(),
+    );
+    section(
+        &mut body,
+        "next_reads",
+        &["path", "lines", "est_tokens"],
+        compiled
+            .next_reads
+            .iter()
+            .map(|r| vec![r.path.clone(), r.lines.clone(), r.est_tokens.to_string()])
+            .collect(),
+    );
+    if !compiled.unknowns.is_empty() {
+        body.push_str(&format!("unknowns[{}]:\n", compiled.unknowns.len()));
+        for unknown in &compiled.unknowns {
+            body.push_str("  ");
+            body.push_str(unknown);
+            body.push('\n');
+        }
+    }
+    body.push_str("note: INFERRED claims are leads to verify against their citation, not facts\n");
+
+    // The header carries the *measured* cost of the body being emitted, so the
+    // budget line and the payload cannot disagree.
+    let envelope = reify::tokens::estimate(&body);
+    format!(
+        "reify.context/1 toon  envelope~{envelope}tok  reads~{}tok  budget {}\n{body}",
+        compiled.budget.reads, compiled.budget.requested
+    )
+}
+
+#[cfg(test)]
+mod toon_tests {
+    use super::*;
+    use reify::context::{BudgetInfo, ConflictOut, NextRead, RuleOut};
+
+    fn sample() -> Context {
+        Context {
+            schema: "reify.context/1",
+            task: "add a discount tier".into(),
+            budget: BudgetInfo {
+                requested: 4000,
+                context: 100,
+                reads: 700,
+                used: 800,
+                unit: "tokens",
+                estimator: "heuristic-v1",
+            },
+            concepts: vec![],
+            rules: vec![RuleOut {
+                id: "rule:1".into(),
+                status: Status::Inferred,
+                confidence: 0.8,
+                claim: "corporate orders | require approval".into(),
+                subject: "approval".into(),
+                source: "document".into(),
+                evidence: vec!["docs/BRD.md:4".into()],
+            }],
+            code: vec![],
+            documents: vec![],
+            data: vec![],
+            history: vec![],
+            conflicts: vec![ConflictOut {
+                id: "conflict:1".into(),
+                status: Status::Conflicted,
+                subject: "approval".into(),
+                documented: "requires approval".into(),
+                documented_at: "docs/BRD.md:6".into(),
+                observed: "bypasses approval".into(),
+                observed_at: "app/order.py:12".into(),
+                resolution: "UNRESOLVED".into(),
+            }],
+            unknowns: vec!["no document describes this".into()],
+            next_reads: vec![NextRead {
+                path: "app/order.py".into(),
+                lines: "10-30".into(),
+                est_tokens: 210,
+            }],
+        }
+    }
+
+    #[test]
+    fn every_row_leads_with_its_status() {
+        let toon = context_toon(&sample());
+        assert!(toon.contains("  INFERRED|0.80|"), "{toon}");
+        assert!(toon.contains("  CONFLICTED|approval|"), "{toon}");
+    }
+
+    #[test]
+    fn the_delimiter_cannot_be_forged_by_content() {
+        // A claim containing `|` must not create phantom columns.
+        let toon = context_toon(&sample());
+        assert!(
+            toon.contains("corporate orders / require approval"),
+            "{toon}"
+        );
+    }
+
+    #[test]
+    fn the_envelope_cost_is_measured_from_the_actual_bytes() {
+        let toon = context_toon(&sample());
+        let header = toon.lines().next().unwrap().to_string();
+        let body: String = toon.lines().skip(1).collect::<Vec<_>>().join("\n") + "\n";
+        let claimed: u32 = header
+            .split("envelope~")
+            .nth(1)
+            .and_then(|r| r.split("tok").next())
+            .and_then(|n| n.parse().ok())
+            .expect("header carries the envelope estimate");
+        let measured = reify::tokens::estimate(&body);
+        assert!(
+            claimed.abs_diff(measured) <= measured / 10 + 2,
+            "claimed {claimed} vs measured {measured}"
+        );
+    }
+
+    #[test]
+    fn unknowns_and_the_verification_note_survive_compression() {
+        let toon = context_toon(&sample());
+        assert!(toon.contains("no document describes this"));
+        assert!(toon.contains("INFERRED claims are leads to verify"));
+    }
+}

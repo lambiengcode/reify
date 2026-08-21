@@ -351,7 +351,7 @@ cp .git/hooks/post-merge .git/hooks/post-checkout
 No adapter needed — Reify is a CLI. Put this in whatever instruction file the tool reads (`AGENTS.md`, `.cursorrules`, `CONVENTIONS.md`, `.windsurfrules`, `.clinerules/`):
 
 ```markdown
-Before changing code here, run `reify context "<what you are about to do>"`.
+Before changing code here, run `reify context "<what you are about to do>" --toon`.
 Run `reify why <file>:<line>` before modifying unfamiliar logic.
 Run `reify impact "<symbol>"` before changing anything shared.
 Treat INFERRED claims as leads to verify, not facts.
@@ -380,7 +380,7 @@ Reify writes the prompt to that command's stdin, or substitutes a `{prompt}` arg
 
 | Command | What it does |
 |---|---|
-| `reify context "<task>"` | The minimum knowledge for a change, plus a reading plan. **The one that matters.** |
+| `reify context "<task>"` | The minimum knowledge for a change, plus a reading plan. **The one that matters.** `--toon` emits the agent format |
 | `reify why <file>:<line>` | What this is, what calls it, what data it touches, what changed it |
 | `reify impact "<symbol>"` | What depends on it — including through the database, where no call edge exists |
 | `reify explain "<term>"` | A business concept across every language, table and file it appears in |
@@ -395,7 +395,15 @@ Reify writes the prompt to that command's stdin, or substitutes a `{prompt}` arg
 | `reify serve --mcp` | Model Context Protocol over stdio |
 | `reify completions <shell>` | Completion script |
 
-Everything takes `--json` against a versioned schema and `--budget <tokens>`. Full output shapes: [docs/json-schema/](docs/json-schema/).
+Everything takes `--json` against a versioned schema and `--budget <tokens>`. Full
+output shapes: [docs/json-schema/](docs/json-schema/).
+
+**Agents should ask for `--toon`.** JSON repeats every field name on every record;
+TOON states each section's columns once, then one row per record — measured at **57%
+fewer tokens for identical facts**, with `status` still the first column of every row.
+The header carries the measured token cost of the very bytes being emitted, so the
+budget claim and the payload cannot drift apart. MCP's `reify_context` answers in TOON
+already.
 
 ## Privacy
 

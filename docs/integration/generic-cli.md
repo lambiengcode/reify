@@ -3,7 +3,7 @@
 Reify is a CLI. If your agent can run a command, it is integrated.
 
 ```bash
-reify context "add a discount tier for strategic customers" --json --budget 4000
+reify context "add a discount tier for strategic customers" --toon --budget 4000
 reify why erpnext/selling/doctype/customer/customer.py:514 --json
 reify impact "check_credit_limit" --json
 ```
@@ -32,7 +32,7 @@ Three fields deserve attention:
 
 ```markdown
 Before editing an unfamiliar area, run:
-    reify context "<what you are about to do>" --json
+    reify context "<what you are about to do>" --toon --json
 Read `rules` and `conflicts` first, then open the spans in `next_reads`.
 Claims marked INFERRED are leads to verify, not facts.
 If `conflicts` is non-empty, resolve the disagreement before changing behaviour.

@@ -143,6 +143,27 @@ fn call_tool(root: &Path, params: &Value) -> Result<Value> {
     }
 
     let store = open(root)?;
+    // The consumer of an MCP tool result is a model, so `reify_context` answers in
+    // TOON — measured at roughly a third of the JSON envelope's tokens for the same
+    // facts — and the structural queries answer in compact JSON.
+    if name == "reify_context" {
+        let budget = arguments
+            .get("budget")
+            .and_then(Value::as_u64)
+            .unwrap_or(context::DEFAULT_BUDGET as u64) as u32;
+        let compiled = context::compile(
+            &store,
+            &string_arg("task")?,
+            &ContextOptions {
+                budget,
+                ..Default::default()
+            },
+        )?;
+        return Ok(json!({
+            "content": [{"type": "text", "text": crate::render::context_toon(&compiled)}],
+            "isError": false
+        }));
+    }
     let payload = match name {
         "reify_context" => {
             let budget = arguments
@@ -167,7 +188,7 @@ fn call_tool(root: &Path, params: &Value) -> Result<Value> {
     // MCP carries tool results as content blocks. JSON is handed over as text so the
     // client's own renderer does not reshape it.
     Ok(json!({
-        "content": [{"type": "text", "text": serde_json::to_string_pretty(&payload)?}],
+        "content": [{"type": "text", "text": serde_json::to_string(&payload)?}],
         "isError": false
     }))
 }
