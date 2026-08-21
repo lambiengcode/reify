@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <em>Your agent doesn't know why that line is there. Reify does.</em>
+  <em>The business logic lives in one person's head.<br>Reify gets it out, without asking them to write documentation.</em>
 </p>
 
 <p align="center">
@@ -25,13 +25,69 @@
 
 ---
 
-Every mature team has one. Eleven years on the same system. You point at a line and ask why it's there; they don't read the code, they say "the 2019 invoice thing" and walk off. Nothing they know is written down anywhere you can grep.
+## The one-person problem
 
-Reify puts them inside your AI agent.
+Your system is eleven years old. The business logic is enormous and mostly
+undocumented — there are BA documents in SharePoint from 2019, and some of them are
+still true.
 
-## Contents
+**One person understands it.** They can't take a holiday without a phone. You can't
+hire around them, because a new developer needs the better part of a year before they
+are useful, and the knowledge they would need to absorb isn't written down anywhere —
+it's in that one person's head, and they are far too busy to write it down.
 
-[Before / after](#before--after) · [Numbers](#numbers) · [How it works](#how-it-works) · [What it reads](#what-it-reads) · [Multilingual](#multilingual) · [Install](#install) · [Commands](#commands) · [Privacy](#privacy) · [Architecture](#architecture) · [Reproducing the benchmark](#reproducing-the-benchmark) · [Development](#development) · [FAQ](#faq)
+So you point an AI coding agent at it. The agent is brilliant on new code and useless
+here. It reads the wrong forty files, misses the rule that mattered, and confidently
+changes behaviour a customer depends on. Then the one person has to review it, which
+was the bottleneck you were trying to remove.
+
+**Reify gets that knowledge out of one head and into a form your agents and your new
+hires can both use — without asking anyone to write documentation they will never
+write.** It compiles what already exists: the code, the BA documents nobody reads, the
+database schema, and eleven years of commit messages explaining why.
+
+### Does this sound like your codebase?
+
+- [x] Older than the newest person on the team
+- [x] Business rules spread across code, stored procedures, config and someone's memory
+- [x] No developer documentation. Some BA documents in Word or PDF, of uncertain age
+- [x] "Ask Minh, he wrote that" is a normal answer to a technical question
+- [x] Onboarding is measured in months
+- [x] The documentation you *do* have disagrees with the code, and nobody knows where
+- [x] AI agents work fine on your side projects and fall apart on this
+- [x] Source code cannot leave the building
+
+Reify was built for exactly this. If none of it sounds familiar, you probably don't
+need it — see the [FAQ](#faq).
+
+## What it actually gives you
+
+Three questions, answered from evidence rather than from a model's recollection:
+
+| Question | Command | Who asks it |
+|---|---|---|
+| *Why does this code exist?* | `reify why <file>:<line>` | the new hire, on day two |
+| *What breaks if I change it?* | `reify impact "<symbol>"` | the person doing the change |
+| *What must I know before I start?* | `reify context "<task>"` | **your AI agent, every time** |
+
+The third is the one that matters. It hands an agent the smallest set of rules,
+citations, code spans and known contradictions it needs — and nothing else.
+
+### For the person everything depends on
+
+You don't have to write the documentation. Reify reads what is already there and, where
+it has guessed, `reify concepts --suggest` hands you a draft glossary to correct in an
+afternoon instead of authoring one from nothing. Ten minutes of your corrections is
+worth more to the system than a week of anyone else's archaeology.
+
+### For the person who just joined
+
+```bash
+reify report                       # what am I even looking at
+reify explain "credit limit"       # in every language it appears in
+reify flow "order approval"        # the code path, in order
+reify conflicts                    # where the docs are lying to me
+```
 
 ## Before / after
 
@@ -161,7 +217,8 @@ The last runs only on what the others left uncovered, so it fills gaps instead o
 
 **Code, 11 languages.** Python, TypeScript, JavaScript, Java, Go, C#, Rust, Ruby, PHP, C/C++, Kotlin, plus SQL. Each has a test asserting it yields containers, callables *and* calls — because a missing grammar node gives you an index that looks healthy and holds one symbol per file. That is not hypothetical; it shipped for Java, and the test now catches it.
 
-**Documents, however the analyst wrote them.**
+**Documents, however the analyst wrote them.** This is the part most code tools skip,
+and it is the only documentation many of these systems have.
 
 | | |
 |---|---|
@@ -306,7 +363,12 @@ Everything takes `--json` against a versioned schema and `--budget <tokens>`. Fu
 
 ## Privacy
 
-**Reify opens no network connection.** Not "by default" — at all. There is no HTTP client in the dependency tree, and `cargo test` fails if one appears.
+**Your source code and your business documents never leave the machine.** Reify opens
+no network connection — not "by default", at all. There is no HTTP client in the
+dependency tree, and `cargo test` fails the build if one appears.
+
+For a company that will not let proprietary code near a cloud service, that is the
+difference between a tool they can evaluate and one they cannot.
 
 | | |
 |---|---|
@@ -394,6 +456,25 @@ Adding a language is a grammar, a node-kind mapping, a `classify` case and a gol
 
 ## FAQ
 
+**We have no developer documentation at all. Only BA documents, and they're old.**
+That is the case Reify was built for. It reads DOCX, PDF, XLSX and the rest, splits
+them into citable sections, and — critically — tells you where they *disagree* with the
+code, so an old document becomes evidence rather than a trap. With no documents at all
+it falls back to the code's own vocabulary, and still gives you `why`, `impact` and
+history.
+
+**Our one expert has no time to help set this up.**
+They don't need to. `reify init && reify index` needs nothing from them. If you can
+borrow an afternoon, `reify concepts --suggest` turns what Reify mined into a draft
+glossary they correct rather than author — and [Numbers](#numbers) shows that declared
+vocabulary is exactly where the gains come from.
+
+**Will this actually let us hire?**
+It removes one specific bottleneck: a new developer, or an agent, being unable to find
+out *why* code is the way it is without interrupting someone. That is a real part of
+the ramp, not all of it. Anyone claiming a tool replaces eleven years of context is
+selling something.
+
 **Do I have to write a glossary?**
 No, and Reify works without one. It also gets visibly better with one, which is the entire finding in [Numbers](#numbers). `reify concepts --suggest` writes you a first draft to edit down.
 
@@ -414,6 +495,17 @@ Probably not. Detection requires five conditions to hold at once and is biased h
 
 **What does "reify" mean?**
 To make an abstract thing concrete. The knowledge was always there; it just wasn't a file.
+
+## Roadmap
+
+Where this goes next, with the targets committed **before** the work rather than after:
+[docs/ROADMAP.md](docs/ROADMAP.md).
+
+The short version — the ceiling is wide open. Perfect context wins every task, so
+roughly half the available gap is still unclaimed, and the biggest single opportunity is
+sitting in `.git` already: every merged commit is a labelled example of *"when someone
+described a change like this, these are the files they touched."* Reify does not yet
+read it.
 
 ## Status
 
