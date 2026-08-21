@@ -4,7 +4,7 @@
 |---|---|---|
 | `logo.svg` / `logo-dark.svg` | Wordmark, light and dark | **Generated** by `make-logo.py` |
 | `mark.svg` / `mark-dark.svg` | Square mark, for avatars and favicons | **Generated** by `make-logo.py` |
-| `social-preview.png` | 1280×640 link card | Rendered from `mark-dark` + the tagline |
+| `social-preview.png` / `.svg` | 1280×640 link card | **Generated** by `make-social-preview.py` |
 | `demo.gif` / `demo.tape` | The README's terminal demo | **Generated** by `vhs assets/demo.tape` |
 | `benchmark-agent.svg` | The headline chart | **Generated** by `reify-bench chart` |
 | `benchmark-retrieval.svg` | Retrieval-only chart | **Generated** by `reify-bench chart` |
@@ -22,6 +22,19 @@ in, so the logo wears the colour it was measured in.
 
 The wordmark stays neutral. A green mark beside an ink wordmark reads at any size; an
 all-green lockup loses contrast on white, where the tagline sits directly beneath it.
+
+The link card reads its two headline percentages out of
+`benchmarks/results/nolek-eval/agent-summary.json` rather than having them typed in,
+for the same reason the charts are generated: the card is the half people screenshot,
+so it must not be able to drift from the results. Regenerate it after a new benchmark
+run:
+
+```bash
+python3 assets/make-social-preview.py   # needs rsvg-convert (brew install librsvg)
+```
+
+Setting it on the repository is a manual step — GitHub exposes no API for the social
+preview, only the image picker in **Settings → General → Social preview**.
 
 Change any of this in `make-logo.py` and rerun it — the palette lives in one place
 because a colour changed in one variant and not the others is the usual way a logo set
