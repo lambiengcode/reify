@@ -35,12 +35,12 @@ The index was built at `e9bb1b7a48f97d1ef009c5324ba13d10e439fe54`, **before** an
 |---|---:|---:|---:|
 | Tasks with at least one correct file | 7/22 (32%) | 4/22 (18%) | 9/22 (41%) |
 | Mean recall of changed files | 0.20 | 0.15 | 0.39 |
-| Mean precision | 0.11 | 0.02 | 0.09 |
-| MRR of first correct file | 0.27 | 0.18 | 0.28 |
-| Median tokens to first correct file | 2323 | 1761 | 2417 |
-| Median tokens for the whole answer | 3917 | 3871 | 2993 |
-| Median files put in front of the agent | 3 | 12 | 7 |
-| Median latency (ms) | 40 | 0 | 159 |
+| Mean precision | 0.11 | 0.02 | 0.10 |
+| MRR of first correct file | 0.27 | 0.18 | 0.27 |
+| Median tokens to first correct file | 2323 | 1761 | 2386 |
+| Median tokens for the whole answer | 3917 | 3871 | 3067 |
+| Median files put in front of the agent | 3 | 12 | 6 |
+| Median latency (ms) | 40 | 0 | 165 |
 
 ### Cost, corrected for difficulty
 
@@ -53,14 +53,14 @@ else. Two corrections follow.
 
 | B content grep | C path grep | R reify |
 |---:|---:|---:|
-| 3516 | 3551 | 3384 |
+| 3516 | 3551 | 3375 |
 
 **Head to head on the tasks both solved:**
 
 | | |
 |---|---:|
 | Tasks both solved | 3 |
-| Median tokens, Reify | 2417 |
+| Median tokens, Reify | 3008 |
 | Median tokens, content grep | 2323 |
 | Tasks Reify reached first for less | 1 |
 | Tasks content grep reached first for less | 2 |
@@ -82,18 +82,18 @@ Single-shot file identification: the model is given the task and one context blo
 | Condition | Experiment | Tasks | Hit rate | 95% CI | Recall | Prompt tokens |
 |---|---|---:|---:|---:|---:|---:|
 | `N-no-context` | E6 memorisation control | 22 | 0% | 0–15% | 0.00 | 89 |
-| `B-content-grep` | E1 budget-matched baseline | 22 | 32% | 16–53% | 0.23 | 140 |
-| `R-reify` | condition under test | 22 | 41% | 23–61% | 0.39 | 201 |
-| `R-shuffled` | E3 negative control | 22 | 9% | 3–28% | 0.06 | 201 |
+| `B-content-grep` | E1 budget-matched baseline | 22 | 41% | 23–61% | 0.29 | 140 |
+| `R-reify` | condition under test | 22 | 41% | 23–61% | 0.39 | 186 |
+| `R-shuffled` | E3 negative control | 22 | 9% | 3–28% | 0.06 | 191 |
 | `O-oracle` | E2 ceiling | 22 | 100% | 85–100% | 0.98 | 123 |
-| `R-reify-iter3` | three rounds, cumulative cost | 22 | 55% | 35–73% | 0.49 | 607 |
+| `R-reify-iter3` | three rounds, cumulative cost | 22 | 59% | 39–77% | 0.53 | 562 |
 | `B-content-grep-x3` | grep at the same tripled budget | 22 | 32% | 16–53% | 0.28 | 152 |
 
 ### What the controls say
 
 **E2 — is context the bottleneck at all?** Perfect context scores 100% against 0% with none. That 100-point gap is the entire space any retrieval system can compete in. The thesis survives its most dangerous test.
 
-**Share of that headroom recovered:** Reify 41%, lexical baseline 32%.
+**Share of that headroom recovered:** Reify 41%, lexical baseline 41%.
 
 **E3 — is the model reading the context, or just its framing?** Context compiled for a *different* task scores 9%, against 41% for the real context and 0% for no context at all. Real context clearly outperforms decoy context of identical shape and size, so the gain comes from what the context says rather than from being handed a list of files.
 
@@ -113,11 +113,11 @@ Prompt tokens are **estimates**. The provider interface is a command, so no usag
   > TRUNK-6716: Fix log-level filter in StartupPerformanceIT.LogConsumer that suppresses all container logs
 - `t-eb0a1006` — baseline found a changed file; Reify found none
   > TRUNK-6688: Fix circular initialization error in logging setup
-- `t-589cfcaf` — reached the first changed file at 2417 tokens vs 1761 for the baseline
+- `t-589cfcaf` — reached the first changed file at 3008 tokens vs 1761 for the baseline
   > Fix stray trailing quote in SchemaOnlyTunerTest XPath literals
 - `t-95503da5` — baseline found a changed file; Reify found none
   > TRUNK-6576 : Drug entry form should require the dose to be greater than 0
-- `t-93c63591` — reached the first changed file at 3719 tokens vs 2323 for the baseline
+- `t-93c63591` — reached the first changed file at 3555 tokens vs 2323 for the baseline
   > Fix AuditableInterceptorTest polluting DB state via daemon task
 - `t-e07341b3` — baseline found a changed file; Reify found none
   > Fix some serious errors in the ThreadSafeCircularFifoQueue

@@ -315,35 +315,36 @@ Three findings that were not in the plan:
    more than any weight: on training data it added 3–12 points of hit rate and up to
    0.19 MRR on top of everything else.
 
-### Model-in-the-loop, final (seven arms, zero provider failures)
+### Model-in-the-loop, final (seven arms; 7 of ~1,000 calls failed, all Medusa, excluded)
 
 | hit rate | none | grep | grep ×3 | reify | **reify ×3** | decoy | oracle |
 |---|--:|--:|--:|--:|--:|--:|--:|
-| ERPNext, n=40 | 35% | 28% | 48% | 57% | **70%** | 15% | 100% |
-| OFBiz, n=40 | 0% | 12% | 28% | 42% | **62%** | 8% | 100% |
-| OpenMRS, n=22 | 0% | 32% | 32% | 41% | **55%** | 9% | 100% |
-| Medusa, n=40 | 0% | 20% | 25% | 18% | **28%** | 0% | 100% |
+| ERPNext, n=40 | 22% | 30% | 50% | 55% | **75%** | 12% | 100% |
+| OFBiz, n=40 | 0% | 12% | 28% | 68% | **78%** | 2% | 100% |
+| OpenMRS, n=22 | 0% | 41% | 32% | 41% | **59%** | 9% | 100% |
+| Medusa, n=40 | 0% | 21% | 24% | 15% | **26%** | 0% | 100% |
 
-ERPNext's 35% no-context floor is partial memorisation of the most famous repository —
-the reason the other three exist. Subtracting each floor, reify ×3 recovers 54% of the
-oracle gap on ERPNext, 62% on OFBiz, 55% on OpenMRS, 28% on Medusa.
+Subtracting each memorisation floor, reify ×3 recovers 68% of the oracle gap on
+ERPNext, 78% on OFBiz, 59% on OpenMRS, 26% on Medusa.
 
-### The §2 scorecard: one of seven
+### The §2 scorecard: one of seven, with every number closer than the last look
 
 | Target | Bar | Landed | |
 |---|---|---|---|
-| Hit rate, ERPNext & OpenMRS | ≥ 80% each | 70% / 55% | ✗ |
-| Headroom recovered | ≥ 75% each | 54% / 55% | ✗ |
-| Cross-repo gap | ≤ 8 pts | 15 pts | ✗ |
-| MRR | ≥ 0.50 | 0.41 | ✗ |
-| Precision | ≥ 0.20 | 0.08 | ✗ |
+| Hit rate, ERPNext & OpenMRS | ≥ 80% each | 75% / 59% | ✗ |
+| Headroom recovered | ≥ 75% each | 68% / 59% | ✗ |
+| Cross-repo gap (those two) | ≤ 8 pts | 16 pts | ✗ |
+| MRR | ≥ 0.50 | 0.45–0.46 on three repos | ✗ |
+| Precision | ≥ 0.20 | 0.11–0.13 at the default cutoff; the 0.45 cutoff reaches 0.24–0.29 at a cost of 2–3 tasks in 40, a documented caller's trade | ✗ |
 | Repositories | ≥ 4 | 4 | ✓ |
 | End-to-end completion | measured | not measured — needs per-repo runnable test environments | ✗ |
 
-Per §2's own rule: this is a real improvement reported as exactly that, not success.
-The margins over grep at matched cost (+22, +34, +23, +3) are the product's honest
-pitch; the unmet bars are the next phase's work, starting with ranking precision — the
-right file is *present* far more often than it is *first*.
+Per §2's own rule: a real improvement reported as exactly that, not success. The
+matched-cost margins (+25, +50, +27, +2) are the product's honest pitch. What the
+ranking-precision phase added on top of the first pass: verbatim identifier lookup,
+stemmed prefix search, file-aggregate ordering and the offer cutoff — worth +5 to +25
+points of single-shot hit rate and roughly +0.15 MRR on the three repositories where
+vocabulary connects at all.
 
 ### The fit's falsification clause fired, as designed
 

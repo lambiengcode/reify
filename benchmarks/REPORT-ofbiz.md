@@ -33,14 +33,14 @@ The index was built at `66b4ddda54e6c138ca2f675f7f4f00e52a54b45f`, **before** an
 
 | Metric | B content grep | C path grep | R reify |
 |---|---:|---:|---:|
-| Tasks with at least one correct file | 5/40 (12%) | 6/40 (15%) | 18/40 (45%) |
-| Mean recall of changed files | 0.11 | 0.13 | 0.40 |
-| Mean precision | 0.06 | 0.05 | 0.06 |
-| MRR of first correct file | 0.11 | 0.15 | 0.31 |
-| Median tokens to first correct file | 2732 | 2037 | 2946 |
-| Median tokens for the whole answer | 3935 | 3804 | 3631 |
-| Median files put in front of the agent | 2 | 6 | 8 |
-| Median latency (ms) | 62 | 0 | 168 |
+| Tasks with at least one correct file | 5/40 (12%) | 6/40 (15%) | 28/40 (70%) |
+| Mean recall of changed files | 0.11 | 0.13 | 0.62 |
+| Mean precision | 0.06 | 0.05 | 0.13 |
+| MRR of first correct file | 0.11 | 0.15 | 0.45 |
+| Median tokens to first correct file | 2732 | 2037 | 3144 |
+| Median tokens for the whole answer | 3935 | 3804 | 3394 |
+| Median files put in front of the agent | 2 | 6 | 7 |
+| Median latency (ms) | 61 | 0 | 180 |
 
 ### Cost, corrected for difficulty
 
@@ -53,17 +53,17 @@ else. Two corrections follow.
 
 | B content grep | C path grep | R reify |
 |---:|---:|---:|
-| 3834 | 3713 | 3559 |
+| 3834 | 3713 | 3391 |
 
 **Head to head on the tasks both solved:**
 
 | | |
 |---|---:|
-| Tasks both solved | 3 |
-| Median tokens, Reify | 2946 |
+| Tasks both solved | 5 |
+| Median tokens, Reify | 3022 |
 | Median tokens, content grep | 2732 |
-| Tasks Reify reached first for less | 1 |
-| Tasks content grep reached first for less | 2 |
+| Tasks Reify reached first for less | 2 |
+| Tasks content grep reached first for less | 3 |
 
 
 ## Reading the table
@@ -82,20 +82,20 @@ Single-shot file identification: the model is given the task and one context blo
 | Condition | Experiment | Tasks | Hit rate | 95% CI | Recall | Prompt tokens |
 |---|---|---:|---:|---:|---:|---:|
 | `N-no-context` | E6 memorisation control | 40 | 0% | 0–9% | 0.00 | 91 |
-| `B-content-grep` | E1 budget-matched baseline | 40 | 12% | 5–26% | 0.12 | 143 |
-| `R-reify` | condition under test | 40 | 42% | 29–58% | 0.38 | 251 |
-| `R-shuffled` | E3 negative control | 40 | 8% | 3–20% | 0.07 | 251 |
-| `O-oracle` | E2 ceiling | 40 | 100% | 91–100% | 1.00 | 129 |
-| `R-reify-iter3` | three rounds, cumulative cost | 40 | 62% | 47–76% | 0.60 | 823 |
-| `B-content-grep-x3` | grep at the same tripled budget | 40 | 28% | 16–43% | 0.25 | 162 |
+| `B-content-grep` | E1 budget-matched baseline | 40 | 12% | 5–26% | 0.11 | 143 |
+| `R-reify` | condition under test | 40 | 68% | 52–80% | 0.61 | 233 |
+| `R-shuffled` | E3 negative control | 40 | 2% | 0–13% | 0.02 | 235 |
+| `O-oracle` | E2 ceiling | 40 | 100% | 91–100% | 0.99 | 129 |
+| `R-reify-iter3` | three rounds, cumulative cost | 40 | 78% | 62–88% | 0.74 | 819 |
+| `B-content-grep-x3` | grep at the same tripled budget | 40 | 28% | 16–43% | 0.24 | 162 |
 
 ### What the controls say
 
 **E2 — is context the bottleneck at all?** Perfect context scores 100% against 0% with none. That 100-point gap is the entire space any retrieval system can compete in. The thesis survives its most dangerous test.
 
-**Share of that headroom recovered:** Reify 42%, lexical baseline 12%.
+**Share of that headroom recovered:** Reify 68%, lexical baseline 12%.
 
-**E3 — is the model reading the context, or just its framing?** Context compiled for a *different* task scores 8%, against 42% for the real context and 0% for no context at all. Real context clearly outperforms decoy context of identical shape and size, so the gain comes from what the context says rather than from being handed a list of files.
+**E3 — is the model reading the context, or just its framing?** Context compiled for a *different* task scores 2%, against 68% for the real context and 0% for no context at all. Real context clearly outperforms decoy context of identical shape and size, so the gain comes from what the context says rather than from being handed a list of files.
 
 **E6 — are these tasks memorised?** With no repository access at all the model still scores 0%. Effectively none: the model cannot answer these from memory, so the remaining conditions measure retrieval rather than recall. That floor is subtracted in the headroom figures above rather than ignored.
 
@@ -107,15 +107,13 @@ Prompt tokens are **estimates**. The provider interface is a command, so no usag
 
 ## Where Reify lost
 
-4 of 40 tasks where the content-grep baseline did better:
+3 of 40 tasks where the content-grep baseline did better:
 
-- `t-192510b3` — baseline found a changed file; Reify found none
+- `t-192510b3` — reached the first changed file at 2683 tokens vs 1509 for the baseline
   > URLConnector.openUntrustedConnection public overloads silently performed trusted SSL connections
-- `t-be630727` — reached the first changed file at 3977 tokens vs 2732 for the baseline
+- `t-be630727` — reached the first changed file at 3982 tokens vs 2732 for the baseline
   > The port offset is being applied twice when loading WebSite properties
-- `t-6868d3ab` — baseline found a changed file; Reify found none
-  > Escape HTML output in SOAPEventHandler to prevent XSS
-- `t-cdf18bb2` — reached the first changed file at 2877 tokens vs 2037 for the baseline
+- `t-cdf18bb2` — reached the first changed file at 3144 tokens vs 2037 for the baseline
   > EntityDateFilterCondition causes the entity cache to return false matches
 
 ## Limitations

@@ -19,16 +19,8 @@
 </p>
 
 <p align="center">
-  <strong>At the same token cost, the model finds the file that had to change 70% of the time — grep manages 48% &middot; measured on four repositories &middot; never opens a socket</strong><br>
-  <sub>A real model on 142 tasks from real merged commits across ERPNext, OFBiz, OpenMRS and Medusa, each index built at a commit <em>before</em> those changes existed. Three of the four repositories show wins of 22–34 points at matched cost; the fourth shows none, and <a href="#numbers">Numbers</a> says so with the same prominence. Pre-registered targets and what was actually hit: <a href="docs/ROADMAP.md">the scorecard</a>. <a href="benchmarks/REPORT.md">Full writeup</a> &middot; <a href="#reproducing-the-benchmark">reproduce it</a>.</sub>
-</p>
-
-<p align="center">
-  <img src="assets/demo.gif" width="920" alt="A 50-second terminal demo. A grep for check_credit_limit returns 49 raw matches and zero answers. reify why on the same line returns its callers, the tables it writes, the files it historically changes with, and the 2023 fix commits that explain it, in about 200 milliseconds. reify context then compiles a 1,290-token briefing for the task 'add a discount tier for strategic customers', with every claim carrying its evidence.">
-</p>
-
-<p align="center">
-  <sub>Every command in the demo is real, against a real ERPNext index. The recording script is <a href="assets/demo.tape">committed</a>; if the GIF ever disagrees with the tool, re-render the GIF.</sub>
+  <strong>At the same token cost, the model finds the file that had to change 75% of the time — grep manages 50% &middot; measured on four repositories &middot; never opens a socket</strong><br>
+  <sub>A real model on 142 tasks from real merged commits across ERPNext, OFBiz, OpenMRS and Medusa, each index built at a commit <em>before</em> those changes existed. Three of the four repositories show wins of 25–50 points at matched cost; the fourth shows none, and <a href="#numbers">Numbers</a> says so with the same prominence. Pre-registered targets and what was actually hit: <a href="docs/ROADMAP.md">the scorecard</a>. <a href="benchmarks/REPORT.md">Full writeup</a> &middot; <a href="#reproducing-the-benchmark">reproduce it</a>.</sub>
 </p>
 
 ---
@@ -127,7 +119,7 @@ Four repositories, chosen partly to hurt; several conditions exist to break the 
 rather than support it.
 
 <p align="center">
-  <img src="assets/benchmark-agent.svg" width="860" alt="Hit rate by condition for four repositories, whiskers are 95% confidence intervals. ERPNext, 40 tasks: no context 35%, grep at tripled budget 48%, reify three rounds 70%, perfect context 100%. OFBiz, 40 tasks: 0%, 28%, 62%, 100%. OpenMRS, 22 tasks: 0%, 32%, 55%, 100%. Medusa, 40 tasks: 0%, 25%, 28%, 100% — reify and grep overlap on Medusa.">
+  <img src="assets/benchmark-agent.svg" width="860" alt="Hit rate by condition for four repositories, whiskers are 95% confidence intervals. ERPNext, 40 tasks: no context 22%, grep at tripled budget 50%, reify three rounds 75%, perfect context 100%. OFBiz, 40 tasks: 0%, 28%, 78%, 100%. OpenMRS, 22 tasks: 0%, 32%, 59%, 100%. Medusa, 40 tasks: 0%, 24%, 26%, 100% — reify and grep overlap on Medusa.">
 </p>
 
 The headline comparison is cost-matched: Reify iterates three rounds (an agent that
@@ -136,33 +128,34 @@ control is grep handed the same tripled budget outright.
 
 | model-in-the-loop, hit rate | grep ×3 budget | **reify ×3 rounds** | margin | 95% CIs overlap? |
 |---|--:|--:|--:|---|
-| ERPNext (Python/JS), n=40 | 48% | **70%** | +22 | no |
-| OFBiz (Java + XML), n=40 | 28% | **62%** | +34 | no |
-| OpenMRS (Java), n=22 | 32% | **55%** | +23 | barely |
-| Medusa (modern TS), n=40 | 25% | **28%** | +3 | **fully — no win** |
+| ERPNext (Python/JS), n=40 | 50% | **75%** | +25 | barely |
+| OFBiz (Java + XML), n=40 | 28% | **78%** | +50 | no |
+| OpenMRS (Java), n=22 | 32% | **59%** | +27 | barely |
+| Medusa (modern TS), n=40 | 24% | **26%** | +2 | **fully — no win** |
 
 **The controls, on every repository:** perfect context scores 100% everywhere, so
-retrieval quality is the entire game. A decoy context of identical shape scores 0–15%,
+retrieval quality is the entire game. A decoy context of identical shape scores 0–12%,
 so the content is doing the work, not the format. With no repository access the model
-scores 0% on three repositories and **35% on ERPNext** — it has partially memorised the
+scores 0% on three repositories and **22% on ERPNext** — it has partially memorised the
 most famous repo, which is exactly why the other three exist and why every headroom
-figure subtracts that floor.
+figure subtracts that floor. Seven of ~1,000 provider calls failed, all on Medusa runs;
+failed calls are excluded from rates, never scored as misses.
 
-Single-shot, for the record: reify 57/42/41/18 against grep 28/12/32/20 at equal
-single budget.
+Single-shot, for the record: reify 55/68/41/15 against grep 30/12/41/21 at equal
+single budget — on OFBiz a *single* reify round already beats grep by 56 points.
 
 ### Retrieval on its own, no model involved
 
 <p align="center">
-  <img src="assets/benchmark-retrieval.svg" width="860" alt="Share of tasks where a changed file was offered, per repository. ERPNext: grep 10%, path grep 18%, reify 55%, reify three rounds 72%. OFBiz: 12%, 15%, 45%, 62%. OpenMRS: 32%, 18%, 41%, 50%. Medusa: 18%, 18%, 18%, 28%.">
+  <img src="assets/benchmark-retrieval.svg" width="860" alt="Share of tasks where a changed file was offered, per repository. ERPNext: grep 10%, path grep 18%, reify 57%, reify three rounds 75%. OFBiz: 12%, 15%, 70%, 78%. OpenMRS: 32%, 18%, 41%, 55%. Medusa: 18%, 18%, 18%, 28%.">
 </p>
 
-| a changed file was offered | grep | reify | **reify ×3** |
+| a changed file was offered | grep | reify (MRR) | **reify ×3** |
 |---|--:|--:|--:|
-| ERPNext | 10% | 55% | **72%** |
-| OFBiz | 12% | 45% | **62%** |
-| OpenMRS | 32% | 41% | **50%** |
-| Medusa | 18% | 18% | **28%** |
+| ERPNext | 10% | 57% (0.45) | **75%** |
+| OFBiz | 12% | 70% (0.45) | **78%** |
+| OpenMRS | 32% | 41% (0.27) | **55%** |
+| Medusa | 18% | 18% (0.09) | **28%** |
 
 ### The scorecard, against targets set before the work
 
@@ -180,7 +173,8 @@ inverts the project's founding assumption. The legacy Java systems were supposed
 the hard case; they are the *best* cases. Medusa's tasks describe UI behaviour
 ("remove the duplicate cloud auth button") whose vocabulary barely intersects the
 code, its history is squashed PR merges, and nothing Reify currently reads closes that
-gap. Iteration lifts it 18→28%; grep sits at 25%; the intervals overlap completely.
+gap. Iteration lifts it 18→28% on retrieval; with the model, 26% against grep's 24%; the
+intervals overlap completely.
 
 The earlier hypothesis — "Reify's advantage scales with declared vocabulary" — did not
 survive the four-repo test either. OFBiz declares little the way ERPNext does, yet

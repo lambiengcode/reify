@@ -18,11 +18,11 @@
   <rect x="150.1" y="215.9" width="12.4" height="30.1" rx="2" fill="#bf8700"/>
   <text x="156.3" y="207.9" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">18%</text>
   <text x="156.3" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">path grep</text>
-  <rect x="175.0" y="151.4" width="12.4" height="94.6" rx="2" fill="#2da44e"/>
-  <text x="181.2" y="143.4" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">55%</text>
+  <rect x="175.0" y="147.1" width="12.4" height="98.9" rx="2" fill="#2da44e"/>
+  <text x="181.2" y="139.1" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">58%</text>
   <text x="181.2" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">reify</text>
-  <rect x="199.8" y="121.3" width="12.4" height="124.7" rx="2" fill="#2da44e"/>
-  <text x="206.1" y="113.3" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">72%</text>
+  <rect x="199.8" y="117.0" width="12.4" height="129.0" rx="2" fill="#2da44e"/>
+  <text x="206.1" y="109.0" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">75%</text>
   <text x="206.1" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">reify ×3</text>
   <text x="168.8" y="288.0" font-size="13" font-weight="600" fill="#8b949e" text-anchor="middle">ERPNext (Python/JS)</text>
   <rect x="314.7" y="224.5" width="12.4" height="21.5" rx="2" fill="#d9822b"/>
@@ -31,11 +31,11 @@
   <rect x="339.6" y="220.2" width="12.4" height="25.8" rx="2" fill="#bf8700"/>
   <text x="345.8" y="212.2" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">15%</text>
   <text x="345.8" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">path grep</text>
-  <rect x="364.5" y="168.6" width="12.4" height="77.4" rx="2" fill="#2da44e"/>
-  <text x="370.7" y="160.6" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">45%</text>
+  <rect x="364.5" y="125.6" width="12.4" height="120.4" rx="2" fill="#2da44e"/>
+  <text x="370.7" y="117.6" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">70%</text>
   <text x="370.7" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">reify</text>
-  <rect x="389.3" y="138.5" width="12.4" height="107.5" rx="2" fill="#2da44e"/>
-  <text x="395.6" y="130.5" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">62%</text>
+  <rect x="389.3" y="112.7" width="12.4" height="133.3" rx="2" fill="#2da44e"/>
+  <text x="395.6" y="104.7" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">78%</text>
   <text x="395.6" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">reify ×3</text>
   <text x="358.2" y="288.0" font-size="13" font-weight="600" fill="#8b949e" text-anchor="middle">OFBiz (Java+XML)</text>
   <rect x="504.2" y="191.3" width="12.4" height="54.7" rx="2" fill="#d9822b"/>
@@ -47,8 +47,8 @@
   <rect x="554.0" y="175.6" width="12.4" height="70.4" rx="2" fill="#2da44e"/>
   <text x="560.2" y="167.6" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">41%</text>
   <text x="560.2" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">reify</text>
-  <rect x="578.8" y="160.0" width="12.4" height="86.0" rx="2" fill="#2da44e"/>
-  <text x="585.1" y="152.0" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">50%</text>
+  <rect x="578.8" y="152.2" width="12.4" height="93.8" rx="2" fill="#2da44e"/>
+  <text x="585.1" y="144.2" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">55%</text>
   <text x="585.1" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">reify ×3</text>
   <text x="547.8" y="288.0" font-size="13" font-weight="600" fill="#8b949e" text-anchor="middle">OpenMRS (Java)</text>
   <rect x="693.7" y="215.9" width="12.4" height="30.1" rx="2" fill="#d9822b"/>

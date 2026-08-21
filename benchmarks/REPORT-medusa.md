@@ -34,13 +34,13 @@ The index was built at `7bcc892914220fb0f959fa93ba8e3dbc81829eed`, **before** an
 | Metric | B content grep | C path grep | R reify |
 |---|---:|---:|---:|
 | Tasks with at least one correct file | 7/40 (18%) | 7/40 (18%) | 7/40 (18%) |
-| Mean recall of changed files | 0.12 | 0.11 | 0.10 |
-| Mean precision | 0.04 | 0.01 | 0.01 |
+| Mean recall of changed files | 0.12 | 0.11 | 0.11 |
+| Mean precision | 0.04 | 0.01 | 0.02 |
 | MRR of first correct file | 0.16 | 0.04 | 0.09 |
-| Median tokens to first correct file | 3078 | 1532 | 2484 |
-| Median tokens for the whole answer | 3998 | 3996 | 2609 |
+| Median tokens to first correct file | 3078 | 1532 | 3363 |
+| Median tokens for the whole answer | 3998 | 3996 | 2525 |
 | Median files put in front of the agent | 5 | 48 | 16 |
-| Median latency (ms) | 122 | 1 | 74 |
+| Median latency (ms) | 118 | 1 | 87 |
 
 ### Cost, corrected for difficulty
 
@@ -53,17 +53,17 @@ else. Two corrections follow.
 
 | B content grep | C path grep | R reify |
 |---:|---:|---:|
-| 3810 | 3582 | 3718 |
+| 3810 | 3582 | 3757 |
 
 **Head to head on the tasks both solved:**
 
 | | |
 |---|---:|
-| Tasks both solved | 1 |
-| Median tokens, Reify | 3414 |
+| Tasks both solved | 2 |
+| Median tokens, Reify | 3985 |
 | Median tokens, content grep | 3078 |
 | Tasks Reify reached first for less | 0 |
-| Tasks content grep reached first for less | 1 |
+| Tasks content grep reached first for less | 2 |
 
 
 ## Reading the table
@@ -81,21 +81,21 @@ Single-shot file identification: the model is given the task and one context blo
 
 | Condition | Experiment | Tasks | Hit rate | 95% CI | Recall | Prompt tokens |
 |---|---|---:|---:|---:|---:|---:|
-| `N-no-context` | E6 memorisation control | 40 | 0% | 0–9% | 0.00 | 88 |
-| `B-content-grep` | E1 budget-matched baseline | 40 | 20% | 10–35% | 0.13 | 176 |
-| `R-reify` | condition under test | 40 | 18% | 9–32% | 0.10 | 304 |
-| `R-shuffled` | E3 negative control | 40 | 0% | 0–9% | 0.00 | 305 |
-| `O-oracle` | E2 ceiling | 40 | 100% | 91–100% | 0.99 | 134 |
-| `R-reify-iter3` | three rounds, cumulative cost | 40 | 28% | 16–43% | 0.18 | 668 |
-| `B-content-grep-x3` | grep at the same tripled budget | 40 | 25% | 14–40% | 0.19 | 199 |
+| `N-no-context` | E6 memorisation control | 39 | 0% | 0–9% | 0.00 | 88 |
+| `B-content-grep` | E1 budget-matched baseline | 39 | 21% | 11–36% | 0.13 | 176 |
+| `R-reify` | condition under test | 39 | 15% | 7–30% | 0.09 | 295 |
+| `R-shuffled` | E3 negative control | 39 | 0% | 0–9% | 0.00 | 300 |
+| `O-oracle` | E2 ceiling | 39 | 100% | 91–100% | 0.98 | 133 |
+| `R-reify-iter3` | three rounds, cumulative cost | 38 | 26% | 15–42% | 0.18 | 654 |
+| `B-content-grep-x3` | grep at the same tripled budget | 38 | 24% | 13–39% | 0.17 | 199 |
 
 ### What the controls say
 
 **E2 — is context the bottleneck at all?** Perfect context scores 100% against 0% with none. That 100-point gap is the entire space any retrieval system can compete in. The thesis survives its most dangerous test.
 
-**Share of that headroom recovered:** Reify 18%, lexical baseline 20%.
+**Share of that headroom recovered:** Reify 15%, lexical baseline 21%.
 
-**E3 — is the model reading the context, or just its framing?** Context compiled for a *different* task scores 0%, against 18% for the real context and 0% for no context at all. Real context clearly outperforms decoy context of identical shape and size, so the gain comes from what the context says rather than from being handed a list of files.
+**E3 — is the model reading the context, or just its framing?** Context compiled for a *different* task scores 0%, against 15% for the real context and 0% for no context at all. Real context clearly outperforms decoy context of identical shape and size, so the gain comes from what the context says rather than from being handed a list of files.
 
 **E6 — are these tasks memorised?** With no repository access at all the model still scores 0%. Effectively none: the model cannot answer these from memory, so the remaining conditions measure retrieval rather than recall. That floor is subtracted in the headroom figures above rather than ignored.
 
@@ -109,7 +109,7 @@ Prompt tokens are **estimates**. The provider interface is a command, so no usag
 
 7 of 40 tasks where the content-grep baseline did better:
 
-- `t-1a9fe477` — baseline found a changed file; Reify found none
+- `t-1a9fe477` — reached the first changed file at 3985 tokens vs 1835 for the baseline
   > remove duplicate Medusa Cloud auth button
 - `t-23878406` — baseline found a changed file; Reify found none
   > Run search migration in test runner
@@ -119,7 +119,7 @@ Prompt tokens are **estimates**. The provider interface is a command, so no usag
   > fix: delete auth identity when possible upon customer/user deletion
 - `t-8f03b13a` — baseline found a changed file; Reify found none
   > fix: add missing gift_card.list.side injection zone
-- `t-c02bcaba` — reached the first changed file at 3414 tokens vs 3078 for the baseline
+- `t-c02bcaba` — reached the first changed file at 3363 tokens vs 3078 for the baseline
   > feat: detect nub package manager
 - `t-fc8d4665` — baseline found a changed file; Reify found none
   > fix: fix ajv error in npm installation

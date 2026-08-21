@@ -11,7 +11,7 @@
     ],
     "mean_recall": 0.0,
     "median_prompt_tokens": 91,
-    "median_elapsed_ms": 1674
+    "median_elapsed_ms": 1257
   },
   {
     "condition": "B-content-grep",
@@ -23,37 +23,37 @@
       0.054594196,
       0.26112422
     ],
-    "mean_recall": 0.11666666,
+    "mean_recall": 0.108333334,
     "median_prompt_tokens": 143,
-    "median_elapsed_ms": 1311
+    "median_elapsed_ms": 871
   },
   {
     "condition": "R-reify",
     "tasks": 40,
     "errors": 0,
-    "hits": 17,
-    "hit_rate": 0.425,
+    "hits": 27,
+    "hit_rate": 0.675,
     "hit_rate_ci": [
-      0.2850917,
-      0.578052
+      0.52017456,
+      0.79915684
     ],
-    "mean_recall": 0.38333333,
-    "median_prompt_tokens": 251,
-    "median_elapsed_ms": 1552
+    "mean_recall": 0.60833335,
+    "median_prompt_tokens": 233,
+    "median_elapsed_ms": 925
   },
   {
     "condition": "R-shuffled",
     "tasks": 40,
     "errors": 0,
-    "hits": 3,
-    "hit_rate": 0.075,
+    "hits": 1,
+    "hit_rate": 0.025,
     "hit_rate_ci": [
-      0.025835559,
-      0.19864531
+      0.0044267215,
+      0.1288166
     ],
-    "mean_recall": 0.06666667,
-    "median_prompt_tokens": 251,
-    "median_elapsed_ms": 1628
+    "mean_recall": 0.016666668,
+    "median_prompt_tokens": 235,
+    "median_elapsed_ms": 1162
   },
   {
     "condition": "O-oracle",
@@ -65,23 +65,23 @@
       0.91237545,
       1.0
     ],
-    "mean_recall": 1.0,
+    "mean_recall": 0.9875,
     "median_prompt_tokens": 129,
-    "median_elapsed_ms": 1270
+    "median_elapsed_ms": 819
   },
   {
     "condition": "R-reify-iter3",
     "tasks": 40,
     "errors": 0,
-    "hits": 25,
-    "hit_rate": 0.625,
+    "hits": 31,
+    "hit_rate": 0.775,
     "hit_rate_ci": [
-      0.4703216,
-      0.75777227
+      0.624966,
+      0.8768405
     ],
-    "mean_recall": 0.6041666,
-    "median_prompt_tokens": 823,
-    "median_elapsed_ms": 1669
+    "mean_recall": 0.7416667,
+    "median_prompt_tokens": 819,
+    "median_elapsed_ms": 1393
   },
   {
     "condition": "B-content-grep-x3",
@@ -93,8 +93,8 @@
       0.16107854,
       0.4283525
     ],
-    "mean_recall": 0.25416666,
+    "mean_recall": 0.24166667,
     "median_prompt_tokens": 162,
-    "median_elapsed_ms": 1346
+    "median_elapsed_ms": 900
   }
 ]
