@@ -5,6 +5,7 @@
 | `logo.svg` / `logo-dark.svg` | Wordmark, light and dark | **Generated** by `make-logo.py` |
 | `mark.svg` / `mark-dark.svg` | Square mark, for avatars and favicons | **Generated** by `make-logo.py` |
 | `social-preview.png` | 1280×640 link card | Rendered from `mark-dark` + the tagline |
+| `demo.gif` / `demo.tape` | The README's terminal demo | **Generated** by `vhs assets/demo.tape` |
 | `benchmark-agent.svg` | The headline chart | **Generated** by `reify-bench chart` |
 | `benchmark-retrieval.svg` | Retrieval-only chart | **Generated** by `reify-bench chart` |
 
@@ -39,6 +40,20 @@ seams stay, because Reify compiles knowledge without dissolving where it came fr
 Every colour is a neutral that stays legible on GitHub's light and dark backgrounds,
 and the SVGs reference nothing external, since GitHub strips scripts and remote refs
 from rendered markdown.
+
+## Regenerating the demo
+
+```bash
+REIFY_DEMO_REPO=/path/to/an/indexed/erpnext \
+REIFY_DEMO_BIN=target/release \
+vhs assets/demo.tape
+```
+
+Every command in the tape runs for real against the named index. vhs was chosen over
+terminalizer deliberately: terminalizer's `node-pty` dependency ships no prebuilt
+binary for current Node on Apple Silicon and its renderer needs Electron, while vhs is
+a single binary whose input is a committed script — the same generated-not-drawn rule
+the charts follow.
 
 ## Regenerating the charts
 

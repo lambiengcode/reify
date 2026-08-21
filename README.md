@@ -23,6 +23,14 @@
   <sub>A real model on 142 tasks from real merged commits across ERPNext, OFBiz, OpenMRS and Medusa, each index built at a commit <em>before</em> those changes existed. Three of the four repositories show wins of 22–34 points at matched cost; the fourth shows none, and <a href="#numbers">Numbers</a> says so with the same prominence. Pre-registered targets and what was actually hit: <a href="docs/ROADMAP.md">the scorecard</a>. <a href="benchmarks/REPORT.md">Full writeup</a> &middot; <a href="#reproducing-the-benchmark">reproduce it</a>.</sub>
 </p>
 
+<p align="center">
+  <img src="assets/demo.gif" width="920" alt="A 50-second terminal demo. A grep for check_credit_limit returns 49 raw matches and zero answers. reify why on the same line returns its callers, the tables it writes, the files it historically changes with, and the 2023 fix commits that explain it, in about 200 milliseconds. reify context then compiles a 1,290-token briefing for the task 'add a discount tier for strategic customers', with every claim carrying its evidence.">
+</p>
+
+<p align="center">
+  <sub>Every command in the demo is real, against a real ERPNext index. The recording script is <a href="assets/demo.tape">committed</a>; if the GIF ever disagrees with the tool, re-render the GIF.</sub>
+</p>
+
 ---
 
 ## The one-person problem

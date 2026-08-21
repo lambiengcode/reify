@@ -957,7 +957,7 @@ fn reading_plan(selected: &[Scored], limit: usize, budget: u32, cutoff: f32) -> 
 /// cannot outvote a file with one strong hit. Files whose aggregate falls below
 /// `cutoff` of the best file's are dropped entirely — a weak tail of guesses costs
 /// the reader more than an honest gap.
-fn ranked_files<'a>(selected: &'a [Scored], cutoff: f32) -> Vec<(String, Vec<&'a Scored>)> {
+fn ranked_files(selected: &[Scored], cutoff: f32) -> Vec<(String, Vec<&Scored>)> {
     let mut by_file: Vec<(String, f32, Vec<&Scored>)> = Vec::new();
     for item in selected {
         if item.node.kind != NodeKind::Symbol {

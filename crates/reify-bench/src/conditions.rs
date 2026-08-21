@@ -258,6 +258,53 @@ pub fn reify_context_iterative(
     Ok(merged)
 }
 
+/// Where the first ground-truth file lands, at two stages of the pipeline.
+///
+/// Ranking precision cannot be improved by guessing which stage loses the file, so
+/// this measures both: the *scoring* rank (a near-unbounded budget, so selection and
+/// cutoffs play no part) and the *offered* rank (the normal budget). The difference
+/// attributes the loss: absent from scoring is a recall gap, present-but-cut is a
+/// selection problem, offered-but-late is an ordering problem.
+pub struct RankAudit {
+    /// 1-based rank of the first truth file with selection effectively disabled.
+    pub scored_rank: Option<usize>,
+    /// 1-based rank with the normal budget.
+    pub offered_rank: Option<usize>,
+    /// Files offered at the normal budget.
+    pub offered: usize,
+}
+
+pub fn rank_audit(
+    store: &Store,
+    prompt: &str,
+    truth: &[std::string::String],
+    budget: u32,
+) -> Result<RankAudit> {
+    let rank_of = |answer: &Answer| -> Option<usize> {
+        answer
+            .files
+            .iter()
+            .position(|f| truth.iter().any(|t| t == f))
+            .map(|i| i + 1)
+    };
+    // 40× the budget and a deep reading plan: close enough to "everything scored".
+    let wide = context::compile(
+        store,
+        prompt,
+        &ContextOptions {
+            budget: budget * 40,
+            max_next_reads: 200,
+            ..Default::default()
+        },
+    )?;
+    let narrow = reify_context(store, prompt, budget)?;
+    Ok(RankAudit {
+        scored_rank: rank_of(&answer_from_context(&wide)),
+        offered_rank: rank_of(&narrow),
+        offered: narrow.files.len(),
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -327,51 +374,4 @@ mod tests {
         assert!(answer.files.is_empty());
         assert_eq!(answer.total_tokens(), 0);
     }
-}
-
-/// Where the first ground-truth file lands, at two stages of the pipeline.
-///
-/// Ranking precision cannot be improved by guessing which stage loses the file, so
-/// this measures both: the *scoring* rank (a near-unbounded budget, so selection and
-/// cutoffs play no part) and the *offered* rank (the normal budget). The difference
-/// attributes the loss: absent from scoring is a recall gap, present-but-cut is a
-/// selection problem, offered-but-late is an ordering problem.
-pub struct RankAudit {
-    /// 1-based rank of the first truth file with selection effectively disabled.
-    pub scored_rank: Option<usize>,
-    /// 1-based rank with the normal budget.
-    pub offered_rank: Option<usize>,
-    /// Files offered at the normal budget.
-    pub offered: usize,
-}
-
-pub fn rank_audit(
-    store: &Store,
-    prompt: &str,
-    truth: &[std::string::String],
-    budget: u32,
-) -> Result<RankAudit> {
-    let rank_of = |answer: &Answer| -> Option<usize> {
-        answer
-            .files
-            .iter()
-            .position(|f| truth.iter().any(|t| t == f))
-            .map(|i| i + 1)
-    };
-    // 40× the budget and a deep reading plan: close enough to "everything scored".
-    let wide = context::compile(
-        store,
-        prompt,
-        &ContextOptions {
-            budget: budget * 40,
-            max_next_reads: 200,
-            ..Default::default()
-        },
-    )?;
-    let narrow = reify_context(store, prompt, budget)?;
-    Ok(RankAudit {
-        scored_rank: rank_of(&answer_from_context(&wide)),
-        offered_rank: rank_of(&narrow),
-        offered: narrow.files.len(),
-    })
 }
