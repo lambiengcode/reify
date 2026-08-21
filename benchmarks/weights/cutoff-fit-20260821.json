@@ -1,0 +1,150 @@
+{
+  "best": {
+    "concept_expansion": 0.5,
+    "coverage_floor": 0.3499999940395355,
+    "history_prior": 0.8999999761581421,
+    "history_symbols_per_file": 6,
+    "offer_cutoff": 0.0,
+    "path_affinity": 1.0,
+    "score": 1.0723809003829956
+  },
+  "budget_tokens": 4000,
+  "grid": [
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.675000011920929,
+          "label": "erpnext",
+          "median_offered": 7,
+          "mrr": 0.625,
+          "precision": 0.11042280495166779
+        },
+        {
+          "hit_rate": 0.47999998927116394,
+          "label": "openmrs",
+          "median_offered": 9,
+          "mrr": 0.3647618889808655,
+          "precision": 0.09731876105070114
+        }
+      ],
+      "score": 1.0723809003829956,
+      "weights": {
+        "concept_expansion": 0.5,
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 0.8999999761581421,
+        "history_symbols_per_file": 6,
+        "offer_cutoff": 0.0,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.675000011920929,
+          "label": "erpnext",
+          "median_offered": 7,
+          "mrr": 0.625,
+          "precision": 0.11058305203914642
+        },
+        {
+          "hit_rate": 0.47999998927116394,
+          "label": "openmrs",
+          "median_offered": 9,
+          "mrr": 0.3647618889808655,
+          "precision": 0.09731876105070114
+        }
+      ],
+      "score": 1.0723809003829956,
+      "weights": {
+        "concept_expansion": 0.5,
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 0.8999999761581421,
+        "history_symbols_per_file": 6,
+        "offer_cutoff": 0.10000000149011612,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.675000011920929,
+          "label": "erpnext",
+          "median_offered": 6,
+          "mrr": 0.625,
+          "precision": 0.1405753791332245
+        },
+        {
+          "hit_rate": 0.47999998927116394,
+          "label": "openmrs",
+          "median_offered": 7,
+          "mrr": 0.3647618889808655,
+          "precision": 0.09931876510381699
+        }
+      ],
+      "score": 1.0723809003829956,
+      "weights": {
+        "concept_expansion": 0.5,
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 0.8999999761581421,
+        "history_symbols_per_file": 6,
+        "offer_cutoff": 0.20000000298023224,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.6499999761581421,
+          "label": "erpnext",
+          "median_offered": 3,
+          "mrr": 0.6208332777023315,
+          "precision": 0.2360713928937912
+        },
+        {
+          "hit_rate": 0.4000000059604645,
+          "label": "openmrs",
+          "median_offered": 4,
+          "mrr": 0.35333335399627686,
+          "precision": 0.17000000178813934
+        }
+      ],
+      "score": 1.0120832920074463,
+      "weights": {
+        "concept_expansion": 0.5,
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 0.8999999761581421,
+        "history_symbols_per_file": 6,
+        "offer_cutoff": 0.30000001192092896,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.6499999761581421,
+          "label": "erpnext",
+          "median_offered": 3,
+          "mrr": 0.6208332777023315,
+          "precision": 0.28833332657814026
+        },
+        {
+          "hit_rate": 0.36000001430511475,
+          "label": "openmrs",
+          "median_offered": 3,
+          "mrr": 0.3400000035762787,
+          "precision": 0.1666666865348816
+        }
+      ],
+      "score": 0.9854166507720947,
+      "weights": {
+        "concept_expansion": 0.5,
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 0.8999999761581421,
+        "history_symbols_per_file": 6,
+        "offer_cutoff": 0.44999998807907104,
+        "path_affinity": 1.0
+      }
+    }
+  ],
+  "purpose": "fitted ranking weights; training data is commits earlier than every benchmark task"
+}

@@ -31,24 +31,24 @@
     "tasks_with_a_hit": 9,
     "hit_rate": 0.4090909,
     "mean_recall": 0.3909091,
-    "mean_precision": 0.087427855,
-    "mrr": 0.27651516,
-    "median_tokens_to_first_hit": 2417,
-    "median_tokens_total": 2993,
-    "median_files_inspected": 7,
-    "median_elapsed_ms": 159
+    "mean_precision": 0.09962121,
+    "mrr": 0.26515153,
+    "median_tokens_to_first_hit": 2386,
+    "median_tokens_total": 3067,
+    "median_files_inspected": 6,
+    "median_elapsed_ms": 165
   },
   {
     "condition": "R-reify-iter3",
     "tasks": 22,
-    "tasks_with_a_hit": 11,
-    "hit_rate": 0.5,
-    "mean_recall": 0.46666667,
-    "mean_precision": 0.021134632,
-    "mrr": 0.28373015,
-    "median_tokens_to_first_hit": 4535,
-    "median_tokens_total": 9513,
-    "median_files_inspected": 35,
-    "median_elapsed_ms": 450
+    "tasks_with_a_hit": 12,
+    "hit_rate": 0.54545456,
+    "mean_recall": 0.51212126,
+    "mean_precision": 0.025276333,
+    "mrr": 0.27849144,
+    "median_tokens_to_first_hit": 4618,
+    "median_tokens_total": 8806,
+    "median_files_inspected": 31,
+    "median_elapsed_ms": 478
   }
 ]

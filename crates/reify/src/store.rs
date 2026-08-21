@@ -1097,7 +1097,19 @@ fn fts_expression(query: &str) -> Option<String> {
     let terms: Vec<String> = query
         .split(|c: char| c.is_whitespace() || (c.is_ascii() && !c.is_ascii_alphanumeric()))
         .filter(|t| !t.is_empty())
-        .map(str::to_lowercase)
+        .map(|t| {
+            let lowered = t.to_lowercase();
+            // Longer terms are stemmed and searched as prefixes, so "repost" reaches
+            // "reposting" and "valuations" reaches "valuation" — a ticket's verb and
+            // the code's noun differ by exactly these endings. Short terms stay
+            // exact: "log*" would match login, logic and logging, noise wearing a
+            // wildcard.
+            if lowered.chars().count() >= 5 && lowered.is_ascii() {
+                format!("{}*", crate::concepts::stem(&lowered))
+            } else {
+                lowered
+            }
+        })
         .collect();
     if terms.is_empty() {
         None
@@ -1546,6 +1558,30 @@ mod tests {
         s.commit(b).unwrap();
         assert!(!s.search("customer_group", 10).unwrap().is_empty());
         assert!(s.search("quantum_flux_capacitor", 10).unwrap().is_empty());
+    }
+
+    #[test]
+    fn longer_terms_match_as_prefixes_so_morphology_does_not_hide_a_file() {
+        // "repost" must reach "reposting": derivational endings are how a ticket's
+        // verb differs from the code's noun.
+        let mut s = Store::in_memory().unwrap();
+        let mut b = Batch::default();
+        b.node(sym("a.py", "reposting").search("stock reposting settings for valuation"));
+        s.commit(b).unwrap();
+        assert!(!s.search("repost the stock entries", 10).unwrap().is_empty());
+        assert!(!s.search("valuations", 10).unwrap().is_empty());
+    }
+
+    #[test]
+    fn short_terms_stay_exact_rather_than_becoming_wildcards() {
+        let mut s = Store::in_memory().unwrap();
+        let mut b = Batch::default();
+        b.node(sym("a.py", "login").search("the login page"));
+        s.commit(b).unwrap();
+        assert!(
+            s.search("log", 10).unwrap().is_empty(),
+            "three characters must not match login/logic/logging"
+        );
     }
 
     #[test]

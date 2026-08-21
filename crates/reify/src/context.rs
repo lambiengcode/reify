@@ -56,11 +56,44 @@ const COVERAGE_FLOOR: f32 = 0.35;
 /// Concepts whose other surface forms get searched too.
 const CONCEPT_EXPANSIONS: usize = 3;
 
+/// Tokens in a task that look like identifiers rather than prose.
+///
+/// A token containing an underscore, interior capitals, or a dot-path is something
+/// the user copied out of the code, and deserves an exact lookup in one piece.
+fn identifier_tokens(task: &str) -> Vec<String> {
+    task.split_whitespace()
+        .map(|t| t.trim_matches(|c: char| !c.is_alphanumeric() && c != '_' && c != '.'))
+        .filter(|t| t.len() >= 4)
+        .flat_map(|t| {
+            // `PackedItem.update_info` names two things worth looking up.
+            let mut out: Vec<String> = t.split('.').map(str::to_string).collect();
+            if out.len() > 1 {
+                out.push(t.to_string());
+            }
+            out
+        })
+        .filter(|t| {
+            t.contains('_')
+                || (t.chars().any(|c| c.is_lowercase())
+                    && t.chars().skip(1).any(|c| c.is_uppercase()))
+        })
+        .collect()
+}
+
 /// Seeded files whose symbols get lifted, and how many symbols each may lift.
 const FILE_FANOUT: usize = 6;
 const FILE_FANOUT_SYMBOLS: usize = 8;
 /// A symbol inherits this share of its file's seed score.
 const FILE_TO_SYMBOL: f32 = 0.8;
+
+/// Default share of the top offered file's score below which files are not offered.
+///
+/// 0.2 by the training-only rule "the largest cutoff that costs zero hit rate":
+/// on both training corpora it trimmed the weakest offers without dropping a single
+/// found task (`/tmp` fit surface committed as `benchmarks/weights/`). Raising it
+/// buys precision at the price of recall — 0.45 roughly doubles precision and costs
+/// two to three tasks in forty — which is the caller's trade to make, not a default.
+const OFFER_CUTOFF: f32 = 0.2;
 /// A hit found through an expansion is worth this much of the concept that found it.
 const CONCEPT_EXPANSION_DECAY: f32 = 0.5;
 
@@ -141,6 +174,12 @@ pub struct RankWeights {
     pub path_affinity: f32,
     /// Strength of concept-driven query expansion; zero disables it.
     pub concept_expansion: f32,
+    /// Offered files below this share of the top file's score are dropped.
+    ///
+    /// This is the precision knob: a task whose vocabulary matches nothing produces a
+    /// tail of weak candidates, and offering seven wrong files is worse than offering
+    /// two plausible ones plus an honest "unknown". Zero disables the cutoff.
+    pub offer_cutoff: f32,
 }
 
 impl Default for RankWeights {
@@ -151,6 +190,7 @@ impl Default for RankWeights {
             coverage_floor: COVERAGE_FLOOR,
             path_affinity: PATH_AFFINITY_WEIGHT,
             concept_expansion: CONCEPT_EXPANSION_DECAY,
+            offer_cutoff: OFFER_CUTOFF,
         }
     }
 }
@@ -340,10 +380,18 @@ pub fn compile(store: &Store, task: &str, opts: &ContextOptions) -> Result<Conte
         next_reads: Vec::new(),
     };
 
+    // Symbols render in ranked-file order, so the code list, the reading plan and the
+    // offered files all agree about which file comes first — the agent reads them in
+    // presentation order, and MRR is measured on it.
+    for (_, items) in ranked_files(&selected, opts.weights.offer_cutoff) {
+        for item in items {
+            context.code.push(code_out(&item.node, &item.reason));
+        }
+    }
     for item in &selected {
         match item.node.kind {
             NodeKind::Concept => context.concepts.push(concept_out(&item.node)),
-            NodeKind::Symbol => context.code.push(code_out(&item.node, &item.reason)),
+            NodeKind::Symbol => {}
             NodeKind::DocSection => context.documents.push(doc_out(&item.node)),
             NodeKind::DatabaseObject => context.data.push(DataOut {
                 table: item.node.name.clone(),
@@ -361,7 +409,12 @@ pub fn compile(store: &Store, task: &str, opts: &ContextOptions) -> Result<Conte
 
     // Whatever the context did not spend funds the reading plan.
     let read_budget = opts.budget.saturating_sub(context_cost);
-    context.next_reads = reading_plan(&selected, opts.max_next_reads, read_budget);
+    context.next_reads = reading_plan(
+        &selected,
+        opts.max_next_reads,
+        read_budget,
+        opts.weights.offer_cutoff,
+    );
     context.budget.reads = context.next_reads.iter().map(|r| r.est_tokens).sum();
     context.budget.used = context.budget.context + context.budget.reads;
 
@@ -425,6 +478,22 @@ fn rank(store: &Store, task: &str, weights: &RankWeights) -> Result<Vec<Scored>>
 
     // Exact identifier hits beat anything lexical scoring can express: naming a symbol
     // is a statement of intent, not a coincidence of vocabulary.
+    //
+    // Whole tokens are looked up *before* word-splitting, because splitting is exactly
+    // what destroys them: a task quoting `update_packed_item_with_pick_list_info`
+    // reduces to a handful of stopword-filtered fragments, and the one perfect signal
+    // in the sentence — the user typed the symbol's name — is gone.
+    for token in identifier_tokens(task) {
+        for node in store.symbols_named(&token)? {
+            bump(
+                &mut scores,
+                &mut nodes,
+                node,
+                1.2,
+                "named verbatim in the task",
+            );
+        }
+    }
     for word in meaningful_words(task) {
         for node in store.symbols_named(&word)? {
             bump(&mut scores, &mut nodes, node, 0.9, "named in the task");
@@ -846,32 +915,75 @@ fn select(scored: &[Scored], budget: u32) -> Vec<Scored> {
 /// A span that does not fit is skipped rather than truncated, and a cheaper span
 /// further down the list may still be taken — a 400-line class must not block six
 /// precise 20-line methods.
-fn reading_plan(selected: &[Scored], limit: usize, budget: u32) -> Vec<NextRead> {
+fn reading_plan(selected: &[Scored], limit: usize, budget: u32, cutoff: f32) -> Vec<NextRead> {
+    // Ordered by *file aggregate* rather than by individual symbol score: three
+    // moderately-scored symbols in one file are stronger evidence about that file
+    // than one well-scored symbol elsewhere, and the agent opens files, not symbols.
+    let ranked = ranked_files(selected, cutoff);
+
     let mut plan: Vec<NextRead> = Vec::new();
     let mut spent = 0u32;
-    for item in selected {
-        if plan.len() >= limit {
-            break;
+    for (_, items) in &ranked {
+        for item in items {
+            if plan.len() >= limit {
+                return plan;
+            }
+            if item.node.line_start == 0 {
+                continue;
+            }
+            let Some(path) = &item.node.path else {
+                continue;
+            };
+            let span = item.node.line_end.saturating_sub(item.node.line_start) + 1;
+            let cost = span * TOKENS_PER_LINE;
+            if spent + cost > budget {
+                continue;
+            }
+            spent += cost;
+            plan.push(NextRead {
+                path: path.clone(),
+                lines: format!("{}-{}", item.node.line_start, item.node.line_end),
+                est_tokens: cost,
+            });
         }
-        if item.node.kind != NodeKind::Symbol || item.node.line_start == 0 {
+    }
+    plan
+}
+
+/// Selected symbols grouped by file, files ordered by aggregate score, weak tail cut.
+///
+/// The aggregate is the sum of a file's top three symbol scores: enough to reward
+/// several signals agreeing on one file, bounded so a file with twenty weak symbols
+/// cannot outvote a file with one strong hit. Files whose aggregate falls below
+/// `cutoff` of the best file's are dropped entirely — a weak tail of guesses costs
+/// the reader more than an honest gap.
+fn ranked_files<'a>(selected: &'a [Scored], cutoff: f32) -> Vec<(String, Vec<&'a Scored>)> {
+    let mut by_file: Vec<(String, f32, Vec<&Scored>)> = Vec::new();
+    for item in selected {
+        if item.node.kind != NodeKind::Symbol {
             continue;
         }
         let Some(path) = &item.node.path else {
             continue;
         };
-        let span = item.node.line_end.saturating_sub(item.node.line_start) + 1;
-        let cost = span * TOKENS_PER_LINE;
-        if spent + cost > budget {
-            continue;
+        match by_file.iter_mut().find(|(p, _, _)| p == path) {
+            Some((_, aggregate, items)) => {
+                if items.len() < 3 {
+                    *aggregate += item.score;
+                }
+                items.push(item);
+            }
+            None => by_file.push((path.clone(), item.score, vec![item])),
         }
-        spent += cost;
-        plan.push(NextRead {
-            path: path.clone(),
-            lines: format!("{}-{}", item.node.line_start, item.node.line_end),
-            est_tokens: cost,
-        });
     }
-    plan
+    by_file.sort_by(|a, b| b.1.total_cmp(&a.1).then(a.0.cmp(&b.0)));
+    if let Some(best) = by_file.first().map(|(_, score, _)| *score) {
+        by_file.retain(|(_, aggregate, _)| *aggregate >= best * cutoff);
+    }
+    by_file
+        .into_iter()
+        .map(|(path, _, items)| (path, items))
+        .collect()
 }
 
 /// A rule node, with the evidence rows that justify it.

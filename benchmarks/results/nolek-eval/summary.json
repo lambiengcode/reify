@@ -10,7 +10,7 @@
     "median_tokens_to_first_hit": 3522,
     "median_tokens_total": 3993,
     "median_files_inspected": 3,
-    "median_elapsed_ms": 44
+    "median_elapsed_ms": 43
   },
   {
     "condition": "C-path-grep",
@@ -28,27 +28,27 @@
   {
     "condition": "R-reify",
     "tasks": 40,
-    "tasks_with_a_hit": 22,
-    "hit_rate": 0.55,
-    "mean_recall": 0.45250002,
-    "mean_precision": 0.08040224,
-    "mrr": 0.388125,
-    "median_tokens_to_first_hit": 2619,
-    "median_tokens_total": 3533,
-    "median_files_inspected": 8,
-    "median_elapsed_ms": 111
+    "tasks_with_a_hit": 23,
+    "hit_rate": 0.575,
+    "mean_recall": 0.48583335,
+    "mean_precision": 0.11082431,
+    "mrr": 0.44583336,
+    "median_tokens_to_first_hit": 2485,
+    "median_tokens_total": 3539,
+    "median_files_inspected": 7,
+    "median_elapsed_ms": 121
   },
   {
     "condition": "R-reify-iter3",
     "tasks": 40,
-    "tasks_with_a_hit": 29,
-    "hit_rate": 0.725,
-    "mean_recall": 0.6408333,
-    "mean_precision": 0.02361108,
-    "mrr": 0.4066201,
-    "median_tokens_to_first_hit": 4814,
-    "median_tokens_total": 11131,
-    "median_files_inspected": 39,
-    "median_elapsed_ms": 341
+    "tasks_with_a_hit": 30,
+    "hit_rate": 0.75,
+    "mean_recall": 0.6491667,
+    "mean_precision": 0.026161939,
+    "mrr": 0.4629969,
+    "median_tokens_to_first_hit": 5125,
+    "median_tokens_total": 10728,
+    "median_files_inspected": 36,
+    "median_elapsed_ms": 368
   }
 ]

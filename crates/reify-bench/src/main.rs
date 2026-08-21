@@ -80,6 +80,15 @@ enum Command {
         #[arg(long, default_value_t = 20)]
         limit: usize,
     },
+    /// Attribute ranking losses on training tasks: recall gap vs selection vs ordering.
+    Audit {
+        #[arg(long)]
+        repo: PathBuf,
+        #[arg(long)]
+        tasks: PathBuf,
+        #[arg(long, default_value_t = DEFAULT_BUDGET)]
+        budget: u32,
+    },
     /// Fit the ranking weights against training tasks, by exhaustive grid search.
     ///
     /// The trap this command is built around: fitting on the evaluation set is the
@@ -166,10 +175,57 @@ fn run() -> Result<()> {
             budget,
             limit,
         } => agent_experiments(&repo, &task_file, &out, budget, limit),
+        Command::Audit {
+            repo,
+            tasks,
+            budget,
+        } => audit(&repo, &tasks, budget),
         Command::Fit { train, out, budget } => fit(&train, &out, budget),
         Command::Chart { results, out } => charts(&results, &out),
         Command::Report { input, out } => report(&input, &out),
     }
+}
+
+/// Attribute every training task's ranking outcome to a stage.
+fn audit(repo: &Path, task_file: &Path, budget: u32) -> Result<()> {
+    let set: tasks::TaskSet = read_json(task_file)?;
+    let store = Store::open(
+        repo.join(reify::index::REIFY_DIR)
+            .join(reify::index::STORE_FILE),
+    )?;
+    let (mut unscored, mut cut, mut late, mut top3, mut first) = (0, 0, 0, 0, 0);
+    let mut offered_sizes = Vec::new();
+    for task in &set.tasks {
+        let a = conditions::rank_audit(&store, &task.prompt, &task.ground_truth, budget)?;
+        offered_sizes.push(a.offered);
+        match (a.scored_rank, a.offered_rank) {
+            (None, _) => unscored += 1,
+            (Some(s), None) => {
+                cut += 1;
+                eprintln!(
+                    "  CUT   scored#{s:<3} {}",
+                    task.prompt.chars().take(60).collect::<String>()
+                );
+            }
+            (Some(_), Some(1)) => first += 1,
+            (Some(_), Some(o)) if o <= 3 => top3 += 1,
+            (Some(_), Some(o)) => {
+                late += 1;
+                eprintln!(
+                    "  LATE  offered#{o:<3} {}",
+                    task.prompt.chars().take(60).collect::<String>()
+                );
+            }
+        }
+    }
+    let n = set.tasks.len();
+    offered_sizes.sort_unstable();
+    eprintln!(
+        "
+{n} tasks: first={first} top3={top3} late={late} cut={cut} unscored={unscored}  (median offered: {})",
+        offered_sizes.get(n / 2).copied().unwrap_or(0)
+    );
+    Ok(())
 }
 
 /// One training corpus: an opened store and its task set.
@@ -212,99 +268,93 @@ fn fit(train: &[String], out: &Path, budget: u32) -> Result<()> {
         });
     }
 
-    // The first full grid showed the surface's shape: the prior dominates and was
-    // still climbing at the old edge, symbols mildly favours few, and the coverage
-    // floor and path affinity are flat to within noise. So the search follows the
-    // gradient upward on the dimension that matters and pins the ones that do not —
-    // searching a flat dimension only lets noise pick a winner.
-    let history_prior = [0.9f32, 2.2];
+    // Grids from earlier phases established the surface's shape: the prior dominates
+    // (and its fitted peak failed held-out validation, so it is pinned at the pre-fit
+    // default), symbols mildly favours few, floor and affinity are flat to noise.
+    // The open dimension now is the offer cutoff — the precision knob.
+    let history_prior = [0.9f32];
     let symbols_per_file = [6usize];
     let coverage_floor = [0.35f32];
     let path_affinity = [1.0f32];
-    let concept_expansion = [0.0f32, 0.5];
+    let concept_expansion = [0.5f32];
+    let offer_cutoff = [0.0f32, 0.1, 0.2, 0.3, 0.45];
 
-    let total = history_prior.len()
-        * symbols_per_file.len()
-        * coverage_floor.len()
-        * path_affinity.len()
-        * concept_expansion.len();
-    let mut grid: Vec<serde_json::Value> = Vec::with_capacity(total);
-    let mut best: Option<(f32, RankWeights)> = None;
-    let mut done = 0usize;
-
+    // A flat cross-product rather than nested loops: six levels of nesting is where
+    // a formatter and a patch stop agreeing about what the code looks like.
+    let mut combos: Vec<RankWeights> = Vec::new();
     for &hp in &history_prior {
         for &spf in &symbols_per_file {
             for &cf in &coverage_floor {
                 for &pa in &path_affinity {
                     for &ce in &concept_expansion {
-                        let weights = RankWeights {
-                            history_prior: hp,
-                            history_symbols_per_file: spf,
-                            coverage_floor: cf,
-                            path_affinity: pa,
-                            concept_expansion: ce,
-                        };
-                        // The score is the mean over corpora of (hit rate + MRR), so a
-                        // gain on one repository cannot pay for a loss on another.
-                        let mut per_set = Vec::new();
-                        let mut score_sum = 0.0f32;
-                        for set in &sets {
-                            let mut outcomes = Vec::new();
-                            for task in &set.tasks {
-                                let answer = conditions::reify_context_weighted(
-                                    &set.store,
-                                    &task.prompt,
-                                    budget,
-                                    &weights,
-                                )?;
-                                outcomes.push(metrics::score(
-                                    &task.id,
-                                    "fit",
-                                    &answer,
-                                    &task.ground_truth,
-                                ));
-                            }
-                            let summary = metrics::summarise("fit", &outcomes);
-                            score_sum += summary.hit_rate + summary.mrr;
-                            per_set.push(serde_json::json!({
-                                "label": set.label,
-                                "hit_rate": summary.hit_rate,
-                                "mrr": summary.mrr,
-                            }));
+                        for &oc in &offer_cutoff {
+                            combos.push(RankWeights {
+                                history_prior: hp,
+                                history_symbols_per_file: spf,
+                                coverage_floor: cf,
+                                path_affinity: pa,
+                                concept_expansion: ce,
+                                offer_cutoff: oc,
+                            });
                         }
-                        let score = score_sum / sets.len() as f32;
-                        grid.push(serde_json::json!({
-                            "weights": {
-                                "history_prior": hp,
-                                "history_symbols_per_file": spf,
-                                "coverage_floor": cf,
-                                "path_affinity": pa,
-                                "concept_expansion": ce,
-                            },
-                            "score": score,
-                            "per_set": per_set,
-                        }));
-                        // Strictly-greater keeps the first of equals, so ties resolve by
-                        // grid order and the result is reproducible.
-                        if best.as_ref().is_none_or(|(b, _)| score > *b) {
-                            best = Some((score, weights));
-                        }
-                        done += 1;
-                        eprint!("\r  {done}/{total} combos");
                     }
                 }
             }
         }
     }
+
+    let total = combos.len();
+    let mut grid: Vec<serde_json::Value> = Vec::with_capacity(total);
+    let mut best: Option<(f32, RankWeights)> = None;
+
+    for (done, weights) in combos.into_iter().enumerate() {
+        // The score is the mean over corpora of (hit rate + MRR), so a gain on one
+        // repository cannot pay for a loss on another.
+        let mut per_set = Vec::new();
+        let mut score_sum = 0.0f32;
+        for set in &sets {
+            let mut outcomes = Vec::new();
+            for task in &set.tasks {
+                let answer =
+                    conditions::reify_context_weighted(&set.store, &task.prompt, budget, &weights)?;
+                outcomes.push(metrics::score(&task.id, "fit", &answer, &task.ground_truth));
+            }
+            let summary = metrics::summarise("fit", &outcomes);
+            score_sum += summary.hit_rate + summary.mrr;
+            per_set.push(serde_json::json!({
+                "label": set.label,
+                "hit_rate": summary.hit_rate,
+                "mrr": summary.mrr,
+                "precision": summary.mean_precision,
+                "median_offered": summary.median_files_inspected,
+            }));
+        }
+        let score = score_sum / sets.len() as f32;
+        grid.push(serde_json::json!({
+            "weights": {
+                "history_prior": weights.history_prior,
+                "history_symbols_per_file": weights.history_symbols_per_file,
+                "coverage_floor": weights.coverage_floor,
+                "path_affinity": weights.path_affinity,
+                "concept_expansion": weights.concept_expansion,
+                "offer_cutoff": weights.offer_cutoff,
+            },
+            "score": score,
+            "per_set": per_set,
+        }));
+        // Strictly-greater keeps the first of equals, so ties resolve by grid order
+        // and the result is reproducible.
+        if best.as_ref().is_none_or(|(b, _)| score > *b) {
+            best = Some((score, weights));
+        }
+        eprint!("\r  {}/{total} combos", done + 1);
+    }
     eprintln!();
 
     let (score, weights) = best.expect("the grid is never empty");
     eprintln!(
-        "best score {score:.3}: prior={} symbols={} floor={} affinity={}",
-        weights.history_prior,
-        weights.history_symbols_per_file,
-        weights.coverage_floor,
-        weights.path_affinity
+        "best score {score:.3}: prior={} symbols={} cutoff={}",
+        weights.history_prior, weights.history_symbols_per_file, weights.offer_cutoff
     );
     write_json(
         out,
@@ -318,6 +368,7 @@ fn fit(train: &[String], out: &Path, budget: u32) -> Result<()> {
                 "coverage_floor": weights.coverage_floor,
                 "path_affinity": weights.path_affinity,
                 "concept_expansion": weights.concept_expansion,
+                "offer_cutoff": weights.offer_cutoff,
             },
             "grid": grid,
         }),
