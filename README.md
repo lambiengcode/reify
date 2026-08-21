@@ -1,4 +1,9 @@
-<h1 align="center">Reify</h1>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
+    <img src="assets/logo.svg" width="260" alt="Reify">
+  </picture>
+</p>
 
 <p align="center">
   <em>Your agent doesn't know why that line is there. Reify does.</em>
