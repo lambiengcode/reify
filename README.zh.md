@@ -24,6 +24,14 @@
 </p>
 
 <p align="center">
+  <img src="assets/demo.gif" width="920" alt="一段 50 秒的终端演示。grep 搜索 check_credit_limit 返回 49 条原始匹配，没有任何答案。在同一行上运行 reify why，约 200 毫秒内返回它的调用方、它写入的表、历史上与它一同变更的文件，以及解释它的 2023 年修复提交。随后 reify context 为任务「为战略客户增加折扣档位」编译出一份 1290 token 的简报，每条结论都附带证据。">
+</p>
+
+<p align="center">
+  <sub>demo 中的每一条命令都是真实执行的，跑在真实的 ERPNext 索引上。录制脚本已<a href="assets/demo.tape">提交入库</a>；如果这段动图哪天与工具本身对不上，就重新录制动图。</sub>
+</p>
+
+<p align="center">
   <a href="README.md">English</a> &middot; <a href="README.vi.md">Tiếng Việt</a> &middot; <strong>简体中文</strong>
 </p>
 

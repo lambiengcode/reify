@@ -24,6 +24,14 @@
 </p>
 
 <p align="center">
+  <img src="assets/demo.gif" width="920" alt="Đoạn demo terminal dài 50 giây. Lệnh grep tìm check_credit_limit trả về 49 kết quả thô và không câu trả lời nào. reify why trên cùng dòng đó trả về những nơi gọi nó, các bảng nó ghi vào, những file thường thay đổi cùng nó, và các commit sửa lỗi năm 2023 giải thích nó, trong khoảng 200 mili giây. Sau đó reify context biên dịch một bản tóm tắt 1.290 token cho task 'thêm bậc chiết khấu cho khách hàng chiến lược', với mọi khẳng định đều kèm bằng chứng.">
+</p>
+
+<p align="center">
+  <sub>Mọi lệnh trong đoạn demo đều là thật, chạy trên một index ERPNext thật. Kịch bản ghi hình đã được <a href="assets/demo.tape">commit</a>; nếu ảnh động có bao giờ mâu thuẫn với công cụ, hãy dựng lại ảnh động.</sub>
+</p>
+
+<p align="center">
   <a href="README.md">English</a> &middot; <strong>Tiếng Việt</strong> &middot; <a href="README.zh.md">简体中文</a>
 </p>
 
