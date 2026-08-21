@@ -566,6 +566,7 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
         let history = gitlog::history(&opts.root, opts.max_commits)?;
         report.history_truncated = history.truncated;
         store.commit(stage_history(&history, &present))?;
+        store.put_history_terms(&history_term_associations(&history, &present))?;
         if let Some(sha) = &head {
             store.set_meta("head_sha", sha)?;
         }
@@ -798,6 +799,93 @@ fn expand_extensions(stem: &str) -> Vec<String> {
     ]
     .into_iter()
     .collect()
+}
+
+/// A term must co-occur with a file this often before the pair is believed.
+const PRIOR_MIN_SUPPORT: u32 = 2;
+/// Files kept per term. Beyond this a term is too diffuse to point anywhere.
+const PRIOR_MAX_FILES_PER_TERM: usize = 40;
+/// Terms taken from one commit subject. Subjects are one line; more is noise.
+const PRIOR_MAX_TERMS_PER_COMMIT: usize = 12;
+/// A commit touching more files than this is a sweep and teaches nothing.
+const PRIOR_MAX_FILES_PER_COMMIT: usize = 20;
+
+/// Build the history prior: which files change when commit messages use a term.
+///
+/// Every merged commit is a labelled example nobody had to label — the message is a
+/// ticket description and the changed files are the correct answer. Scored by
+/// pointwise mutual information rather than raw frequency, so a file that changes in
+/// every commit earns nothing, then damped by ln(1+count) so a pair seen twenty times
+/// outranks one seen twice at equal PMI.
+fn history_term_associations(
+    history: &gitlog::History,
+    present: &HashSet<&str>,
+) -> Vec<(String, String, f32)> {
+    let mut pair_counts: HashMap<(String, String), u32> = HashMap::new();
+    let mut term_totals: HashMap<String, u32> = HashMap::new();
+    let mut file_totals: HashMap<String, u32> = HashMap::new();
+    let mut total: u64 = 0;
+
+    for commit in &history.commits {
+        if commit.files.len() > PRIOR_MAX_FILES_PER_COMMIT {
+            continue;
+        }
+        // Stored stemmed, and queried stemmed, so "discounts" in a subject still
+        // answers a task that says "discount".
+        let terms: Vec<String> = concepts::meaningful_words(&commit.subject)
+            .into_iter()
+            .map(|w| concepts::stem(&w).to_string())
+            .collect::<std::collections::BTreeSet<_>>()
+            .into_iter()
+            .take(PRIOR_MAX_TERMS_PER_COMMIT)
+            .collect();
+        let files: Vec<&String> = commit
+            .files
+            .iter()
+            .filter(|f| present.contains(f.as_str()))
+            .collect();
+        for term in &terms {
+            for file in &files {
+                *pair_counts
+                    .entry((term.clone(), (*file).clone()))
+                    .or_default() += 1;
+                *term_totals.entry(term.clone()).or_default() += 1;
+                *file_totals.entry((*file).clone()).or_default() += 1;
+                total += 1;
+            }
+        }
+    }
+    if total == 0 {
+        return Vec::new();
+    }
+
+    let mut scored: Vec<(String, String, f32)> = pair_counts
+        .into_iter()
+        .filter(|(_, count)| *count >= PRIOR_MIN_SUPPORT)
+        .filter_map(|((term, file), count)| {
+            let pmi = ((count as f64 * total as f64)
+                / (term_totals[&term] as f64 * file_totals[&file] as f64))
+                .ln();
+            (pmi > 0.0).then(|| (term, file, (pmi * (1.0 + count as f64).ln()) as f32))
+        })
+        .collect();
+
+    // Deterministic order, then a per-term cap so a diffuse term cannot flood the table.
+    scored.sort_by(|a, b| a.0.cmp(&b.0).then(b.2.total_cmp(&a.2)).then(a.1.cmp(&b.1)));
+    let mut kept: Vec<(String, String, f32)> = Vec::with_capacity(scored.len());
+    let mut run_term = String::new();
+    let mut run_len = 0usize;
+    for row in scored {
+        if row.0 != run_term {
+            run_term = row.0.clone();
+            run_len = 0;
+        }
+        if run_len < PRIOR_MAX_FILES_PER_TERM {
+            kept.push(row);
+            run_len += 1;
+        }
+    }
+    kept
 }
 
 /// Stage commit nodes and the history edges that point at indexed files.
@@ -1379,6 +1467,128 @@ class SalesOrder:
             "force must not change the result"
         );
         let _ = fs::remove_dir_all(&root);
+    }
+
+    fn commit_for(subject: &str, files: &[&str]) -> gitlog::Commit {
+        gitlog::Commit {
+            sha: "a".repeat(40),
+            timestamp: 0,
+            author: "x".into(),
+            class: gitlog::classify(subject),
+            subject: subject.into(),
+            files: files.iter().map(|f| f.to_string()).collect(),
+        }
+    }
+
+    #[test]
+    fn the_history_prior_links_a_term_to_the_files_its_commits_touch() {
+        let history = gitlog::History {
+            commits: vec![
+                commit_for(
+                    "fix: credit limit check on orders",
+                    &["a/credit.py", "a/order.py"],
+                ),
+                commit_for("fix: credit limit rounding", &["a/credit.py"]),
+                commit_for("feat: invoice printing", &["a/invoice.py"]),
+                commit_for("fix: invoice totals", &["a/invoice.py"]),
+            ],
+            ..Default::default()
+        };
+        let present: HashSet<&str> = ["a/credit.py", "a/order.py", "a/invoice.py"]
+            .into_iter()
+            .collect();
+        let rows = history_term_associations(&history, &present);
+        assert!(
+            rows.iter()
+                .any(|(t, f, _)| t == "credit" && f == "a/credit.py"),
+            "the pair seen twice must survive: {rows:?}"
+        );
+        assert!(
+            !rows
+                .iter()
+                .any(|(t, f, _)| t == "credit" && f == "a/order.py"),
+            "a pair seen once is below support: {rows:?}"
+        );
+        assert!(rows
+            .iter()
+            .any(|(t, f, _)| t == "invoice" && f == "a/invoice.py"));
+    }
+
+    #[test]
+    fn a_file_changed_in_every_commit_earns_no_prior() {
+        // PMI is the whole point: `version.py` touched by everything predicts nothing.
+        let history = gitlog::History {
+            commits: (0..12)
+                .map(|i| {
+                    commit_for(
+                        if i % 2 == 0 {
+                            "fix: credit limit"
+                        } else {
+                            "feat: invoice totals"
+                        },
+                        &[
+                            if i % 2 == 0 {
+                                "a/credit.py"
+                            } else {
+                                "a/invoice.py"
+                            },
+                            "version.py",
+                        ],
+                    )
+                })
+                .collect(),
+            ..Default::default()
+        };
+        let present: HashSet<&str> = ["a/credit.py", "a/invoice.py", "version.py"]
+            .into_iter()
+            .collect();
+        let rows = history_term_associations(&history, &present);
+        let version_score = rows
+            .iter()
+            .filter(|(t, f, _)| t == "credit" && f == "version.py")
+            .map(|(_, _, s)| *s)
+            .next()
+            .unwrap_or(0.0);
+        let credit_score = rows
+            .iter()
+            .filter(|(t, f, _)| t == "credit" && f == "a/credit.py")
+            .map(|(_, _, s)| *s)
+            .next()
+            .unwrap_or(0.0);
+        assert!(
+            credit_score > version_score,
+            "the specific file must outrank the ubiquitous one: {credit_score} vs {version_score}"
+        );
+    }
+
+    #[test]
+    fn a_sweeping_commit_contributes_nothing_to_the_prior() {
+        let wide: Vec<String> = (0..30).map(|i| format!("f{i}.py")).collect();
+        let wide_refs: Vec<&str> = wide.iter().map(String::as_str).collect();
+        let history = gitlog::History {
+            commits: vec![
+                commit_for("chore: reformat credit invoice order files", &wide_refs),
+                commit_for("chore: reformat credit invoice order again", &wide_refs),
+            ],
+            ..Default::default()
+        };
+        let present: HashSet<&str> = wide_refs.iter().copied().collect();
+        assert!(history_term_associations(&history, &present).is_empty());
+    }
+
+    #[test]
+    fn the_prior_is_deterministic() {
+        let history = gitlog::History {
+            commits: vec![
+                commit_for("fix: credit limit check", &["a.py", "b.py"]),
+                commit_for("fix: credit limit again", &["a.py", "b.py"]),
+            ],
+            ..Default::default()
+        };
+        let present: HashSet<&str> = ["a.py", "b.py"].into_iter().collect();
+        let first = history_term_associations(&history, &present);
+        let second = history_term_associations(&history, &present);
+        assert_eq!(first, second);
     }
 
     #[test]

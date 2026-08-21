@@ -1,0 +1,54 @@
+[
+  {
+    "condition": "B-content-grep",
+    "tasks": 22,
+    "tasks_with_a_hit": 7,
+    "hit_rate": 0.3181818,
+    "mean_recall": 0.19848488,
+    "mean_precision": 0.11363637,
+    "mrr": 0.27272728,
+    "median_tokens_to_first_hit": 2323,
+    "median_tokens_total": 3917,
+    "median_files_inspected": 3,
+    "median_elapsed_ms": 40
+  },
+  {
+    "condition": "C-path-grep",
+    "tasks": 22,
+    "tasks_with_a_hit": 4,
+    "hit_rate": 0.18181819,
+    "mean_recall": 0.15151514,
+    "mean_precision": 0.024747474,
+    "mrr": 0.18181819,
+    "median_tokens_to_first_hit": 1761,
+    "median_tokens_total": 3871,
+    "median_files_inspected": 12,
+    "median_elapsed_ms": 0
+  },
+  {
+    "condition": "R-reify",
+    "tasks": 22,
+    "tasks_with_a_hit": 9,
+    "hit_rate": 0.4090909,
+    "mean_recall": 0.3909091,
+    "mean_precision": 0.087427855,
+    "mrr": 0.27651516,
+    "median_tokens_to_first_hit": 2417,
+    "median_tokens_total": 2993,
+    "median_files_inspected": 7,
+    "median_elapsed_ms": 159
+  },
+  {
+    "condition": "R-reify-iter3",
+    "tasks": 22,
+    "tasks_with_a_hit": 11,
+    "hit_rate": 0.5,
+    "mean_recall": 0.46666667,
+    "mean_precision": 0.021134632,
+    "mrr": 0.28373015,
+    "median_tokens_to_first_hit": 4535,
+    "median_tokens_total": 9513,
+    "median_files_inspected": 35,
+    "median_elapsed_ms": 450
+  }
+]

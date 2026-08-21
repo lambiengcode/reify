@@ -503,7 +503,7 @@ pub fn from_translations(
 /// A heading naming something the code also names is, by construction, shared
 /// vocabulary. A heading naming nothing in the code is prose.
 pub fn from_headings(headings: &[String], grounding: &TermIndex) -> Vec<Concept> {
-    let mut by_id: BTreeMap<String, Concept> = BTreeMap::new();
+    let mut scored: BTreeMap<String, (String, usize)> = BTreeMap::new();
     for heading in headings {
         let words = meaningful_words(heading);
         if words.len() < 2 || !words.iter().any(|w| w.len() >= MIN_LABEL_WORD_LEN) {
@@ -511,23 +511,37 @@ pub fn from_headings(headings: &[String], grounding: &TermIndex) -> Vec<Concept>
         }
         // Headings are prose, so connective words must not veto an otherwise sound
         // match; two grounded words are still required to keep precision up.
-        if grounding.matching_grounded(&words, 2).len() < MIN_GROUNDING {
+        let grounded = grounding.matching_grounded(&words, 2);
+        if grounded.len() < MIN_GROUNDING {
             continue;
         }
         let id = normalize_id(heading);
-        let entry = by_id.entry(id.clone()).or_insert_with(|| Concept {
+        let entry = scored.entry(id).or_insert_with(|| (heading.clone(), 0));
+        entry.1 = entry.1.max(grounded.len());
+    }
+
+    // Bounded, best-grounded first. A repository that ships its documentation site
+    // in-tree has tens of thousands of headings, and an unbounded bridge turns each
+    // into a concept — thousands of them — until the graph is mostly heading noise
+    // and relevance has nowhere sharp to spread.
+    let mut ranked: Vec<(String, String, usize)> = scored
+        .into_iter()
+        .map(|(id, (label, grounded))| (id, label, grounded))
+        .collect();
+    ranked.sort_by(|a, b| b.2.cmp(&a.2).then(a.0.cmp(&b.0)));
+    ranked.truncate(MAX_HEADING_CONCEPTS);
+
+    ranked
+        .into_iter()
+        .map(|(id, label, _)| Concept {
             id,
+            labels: BTreeMap::from([("eng".to_string(), label)]),
             status: Status::Observed,
             confidence: 0.65,
             bridge: Bridge::CoOccurrence,
             ..Concept::default()
-        });
-        entry
-            .labels
-            .entry("eng".into())
-            .or_insert_with(|| heading.clone());
-    }
-    by_id.into_values().collect()
+        })
+        .collect()
 }
 
 /// A phrase must name this many distinct symbols before it counts as vocabulary.
@@ -554,6 +568,9 @@ const UBIQUITOUS_FLOOR: usize = 25;
 /// The most vocabulary concepts to mine. Enough to cover a domain, few enough that the
 /// concept layer stays a vocabulary rather than a second symbol table.
 const MAX_VOCABULARY_CONCEPTS: usize = 400;
+
+/// The most concepts the heading bridge may contribute, best-grounded first.
+const MAX_HEADING_CONCEPTS: usize = 400;
 
 /// Mine concepts from the code's own identifiers.
 ///
@@ -1122,6 +1139,26 @@ mod tests {
             .map(|s| s.to_string())
             .collect();
         assert!(idx.matching_grounded(&words, 2).is_empty());
+    }
+
+    #[test]
+    fn a_documentation_site_cannot_flood_the_concept_layer() {
+        let mut idx = TermIndex::default();
+        for i in 0..1200 {
+            idx.add(
+                &format!("topic_{i}_handler_name"),
+                &format!("sym:f{i}.ts#topic_{i}_handler_name"),
+            );
+        }
+        let headings: Vec<String> = (0..1200)
+            .map(|i| format!("Topic {i} handler name guide"))
+            .collect();
+        let concepts = from_headings(&headings, &idx);
+        assert!(
+            concepts.len() <= MAX_HEADING_CONCEPTS,
+            "unbounded heading mining drowns the graph: {}",
+            concepts.len()
+        );
     }
 
     #[test]

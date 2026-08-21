@@ -1,0 +1,378 @@
+{
+  "repository": "/Users/lambiengcode/Documents/reify/projects/reify/.bench/ofbiz",
+  "head": "fac1ba4911c16d84cf25424318af126e5e78b8d2",
+  "generated_from_commits": 400,
+  "base": "66b4ddda54e6c138ca2f675f7f4f00e52a54b45f",
+  "tasks": [
+    {
+      "id": "t-574313ab",
+      "prompt": "Removes a bug where queryParamter get appended twice to url on retrys due to CertificateException",
+      "ground_truth": [
+        "framework/base/src/main/java/org/apache/ofbiz/base/util/HttpClient.java"
+      ],
+      "commit": "574313ab0541ba1a6d91b099e1c39a8ada10f6bd",
+      "date": "2026-08-19"
+    },
+    {
+      "id": "t-3e204182",
+      "prompt": "Add missing permission and path checks across ImageManagementServices methods",
+      "ground_truth": [
+        "applications/product/src/main/java/org/apache/ofbiz/product/imagemanagement/ImageManagementServices.java"
+      ],
+      "commit": "3e2041827a47c2e7c35327bcb0a5e677da191b88",
+      "date": "2026-08-19"
+    },
+    {
+      "id": "t-9525ae7d",
+      "prompt": "Add permission check and path validation to imageCrop and imageRotate services",
+      "ground_truth": [
+        "applications/product/src/main/java/org/apache/ofbiz/product/imagemanagement/CropImage.java",
+        "applications/product/src/main/java/org/apache/ofbiz/product/imagemanagement/RotateImage.java"
+      ],
+      "commit": "9525ae7dae5f22dc4c5722b73f2209f59731a9a5",
+      "date": "2026-08-18"
+    },
+    {
+      "id": "t-4d02372e",
+      "prompt": "Add validation and permission check to replaceImageToExistImage service",
+      "ground_truth": [
+        "applications/product/src/main/java/org/apache/ofbiz/product/imagemanagement/ImageManagementServices.java",
+        "applications/product/src/main/java/org/apache/ofbiz/product/imagemanagement/ReplaceImage.java"
+      ],
+      "commit": "4d02372e9ccaefc39a428681ff0d700ec8252d85",
+      "date": "2026-08-18"
+    },
+    {
+      "id": "t-b9dfe95a",
+      "prompt": "Fix webtools Run Suite/Run Case: missing prerequisites and shared ambient transaction",
+      "ground_truth": [
+        "framework/testtools/src/main/java/org/apache/ofbiz/testtools/ModelTestSuite.java",
+        "framework/webapp/src/main/java/org/apache/ofbiz/webapp/event/JavaEventHandler.java"
+      ],
+      "commit": "b9dfe95aa10b2857110d6d7c0db2a689d0d1fb65",
+      "date": "2026-08-15"
+    },
+    {
+      "id": "t-a7c6cc25",
+      "prompt": "ControlFilter's FreeMarker-interpolation guard was unreachable due to fail-open security check",
+      "ground_truth": [
+        "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/LoginWorker.java",
+        "framework/webapp/src/test/java/org/apache/ofbiz/webapp/control/ControlFilterTests.java"
+      ],
+      "commit": "a7c6cc258404340cd3cfef22bbe67acfea7bbcaa",
+      "date": "2026-08-14"
+    },
+    {
+      "id": "t-ee52aa8a",
+      "prompt": "Improve controller request/view resolution - suffix-selected",
+      "ground_truth": [
+        "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/RequestHandler.java",
+        "framework/webapp/src/test/java/org/apache/ofbiz/webapp/control/RequestHandlerTests.java"
+      ],
+      "commit": "ee52aa8a8d8e1594f02a39a7d68cc09a167004f9",
+      "date": "2026-08-13"
+    },
+    {
+      "id": "t-d50791ab",
+      "prompt": "OFBIZ-13457 Add REST list query helper utilities",
+      "ground_truth": [
+        "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilHttp.java",
+        "framework/base/src/test/java/org/apache/ofbiz/base/util/UtilHttpTest.java"
+      ],
+      "commit": "d50791ab95c71b0eef9ceba3fa13c5b1611c09ff",
+      "date": "2026-08-13"
+    },
+    {
+      "id": "t-c762bc84",
+      "prompt": "Fix EntityXmlAssertTest test-count inflation and its masked servicetests dependency",
+      "ground_truth": [
+        "framework/testtools/src/main/java/org/apache/ofbiz/testtools/EntityXmlAssertTest.java"
+      ],
+      "commit": "c762bc847667fc712f1700e3474f84b85c9d78c4",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "t-90c5ae72",
+      "prompt": "Add DKIM signing for outgoing SMTP mail",
+      "ground_truth": [
+        "framework/common/src/main/java/org/apache/ofbiz/common/email/EmailServices.java"
+      ],
+      "commit": "90c5ae72dfef79cae62adbf06e3d65ef1af31ea1",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "t-7b8bc02d",
+      "prompt": "noWebshellInMetadata NPEs when readMetadata can't parse the file",
+      "ground_truth": [
+        "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java"
+      ],
+      "commit": "7b8bc02d31089601676dc65fbd822098790611be",
+      "date": "2026-08-10"
+    },
+    {
+      "id": "t-70b9901e",
+      "prompt": "HashMaps are not properly rendered in FTL with current FTL integration",
+      "ground_truth": [
+        "framework/base/src/main/java/org/apache/ofbiz/base/util/template/FreeMarkerWorker.java",
+        "framework/widget/src/main/java/org/apache/ofbiz/widget/model/HtmlWidget.java"
+      ],
+      "commit": "70b9901e4559d45eef186963b974b3f01fb3a142",
+      "date": "2026-08-10"
+    },
+    {
+      "id": "t-d5d01f8e",
+      "prompt": "Escape possibility to override serviceName at vcard import",
+      "ground_truth": [
+        "applications/marketing/src/main/java/org/apache/ofbiz/sfa/vcard/VCard.java"
+      ],
+      "commit": "d5d01f8e6a14616631fefc93b135c093af4b220a",
+      "date": "2026-08-10"
+    },
+    {
+      "id": "t-37345ed4",
+      "prompt": "isExecutable missed Tika's ELF sub-types, letting real Linux binaries through the check",
+      "ground_truth": [
+        "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java"
+      ],
+      "commit": "37345ed4f1e2eb421f988cb789646fabe86a5685",
+      "date": "2026-08-07"
+    },
+    {
+      "id": "t-4901ab0c",
+      "prompt": "isExecutable mime-type comparisons never matched Tika's actual types",
+      "ground_truth": [
+        "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java"
+      ],
+      "commit": "4901ab0c1ee37a564417468882f761ad2dd4277e",
+      "date": "2026-08-07"
+    },
+    {
+      "id": "t-110ae1e9",
+      "prompt": "Add OAuth2/XOAUTH2 authentication for outgoing SMTP",
+      "ground_truth": [
+        "framework/common/src/main/java/org/apache/ofbiz/common/email/EmailServices.java"
+      ],
+      "commit": "110ae1e985f7d6f2749c7d15d6b318dd31902882",
+      "date": "2026-08-07"
+    },
+    {
+      "id": "t-460b0317",
+      "prompt": "MultiTrustManager doing flat cert-equality checks instead of real X.509 chain validation",
+      "ground_truth": [
+        "framework/base/src/main/java/org/apache/ofbiz/base/util/MultiTrustManager.java"
+      ],
+      "commit": "460b031756875e6234b313f38744fa5ec02ee669",
+      "date": "2026-08-07"
+    },
+    {
+      "id": "t-4b6b36b8",
+      "prompt": "sendFailureNotification NPEs on default sendFrom, masking the original SMTP error",
+      "ground_truth": [
+        "framework/common/src/main/java/org/apache/ofbiz/common/email/EmailServices.java"
+      ],
+      "commit": "4b6b36b87fa615b72b1e091a7bc19ef5f0b53c2c",
+      "date": "2026-08-07"
+    },
+    {
+      "id": "t-192510b3",
+      "prompt": "URLConnector.openUntrustedConnection public overloads silently performed trusted SSL connections",
+      "ground_truth": [
+        "framework/base/src/main/java/org/apache/ofbiz/base/util/URLConnector.java"
+      ],
+      "commit": "192510b305269e3eb4a7ddc0226f297b3e01cd0d",
+      "date": "2026-08-07"
+    },
+    {
+      "id": "t-55a38798",
+      "prompt": "PDF upload accepted embedded attachments when ZUGFeRD upload was disabled",
+      "ground_truth": [
+        "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java"
+      ],
+      "commit": "55a3879895057c81841b6ef2eb29ed7ed72b6f51",
+      "date": "2026-08-07"
+    },
+    {
+      "id": "t-c8170e9f",
+      "prompt": "OFBIZ-13468 Improved: add BOM management service APIs",
+      "ground_truth": [
+        "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/bom/BOMServices.java"
+      ],
+      "commit": "c8170e9fff55bff50eec5b55e35a3890fdbf195a",
+      "date": "2026-07-31"
+    },
+    {
+      "id": "t-b1a86de9",
+      "prompt": "OFBIZ-13468 Improved: add generic entity lookup helpers",
+      "ground_truth": [
+        "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityUtil.java"
+      ],
+      "commit": "b1a86de910cdb0cea266264812f6fc8a6fcfa8f1",
+      "date": "2026-07-31"
+    },
+    {
+      "id": "t-0bb30afe",
+      "prompt": "Fix Party CSV import failure caused by trailing commas.",
+      "ground_truth": [
+        "applications/party/src/main/java/org/apache/ofbiz/party/party/PartyServices.java"
+      ],
+      "commit": "0bb30afed486ce9910349047967083eb3ca6b9df",
+      "date": "2026-07-31"
+    },
+    {
+      "id": "t-03aeb0db",
+      "prompt": "Reject shipments mixing ship groups with different destinations",
+      "ground_truth": [
+        "applications/product/src/main/java/org/apache/ofbiz/shipment/packing/PackingSession.java"
+      ],
+      "commit": "03aeb0dbd42879afb61ca9dac339673da809b21a",
+      "date": "2026-07-31"
+    },
+    {
+      "id": "t-187d5512",
+      "prompt": "Gift card purchase copyMe can never work",
+      "ground_truth": [
+        "applications/accounting/src/main/java/org/apache/ofbiz/accounting/payment/GiftCertificateServices.java"
+      ],
+      "commit": "187d55121b7561a3018a300198742e1ee813a109",
+      "date": "2026-07-31"
+    },
+    {
+      "id": "t-cff2b47b",
+      "prompt": "OFBIZ-13460: Add durable MRP run history and provenance",
+      "ground_truth": [
+        "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpServices.java"
+      ],
+      "commit": "cff2b47bb22effc2dea8963e4d67eb76c2b18664",
+      "date": "2026-07-24"
+    },
+    {
+      "id": "t-dd2d941b",
+      "prompt": "OFBIZ-13463: Fixed false late flag on REQUIRED_MRP proposed supply in MRP engine",
+      "ground_truth": [
+        "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpServices.java"
+      ],
+      "commit": "dd2d941b338098842dc0498c4fcc4a881a1c02ad",
+      "date": "2026-07-24"
+    },
+    {
+      "id": "t-c7853869",
+      "prompt": "Never let entity import move a SequenceValueItem counter backward",
+      "ground_truth": [
+        "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntitySaxReader.java"
+      ],
+      "commit": "c7853869aa35989e96fd6708117e5548c66dcc6c",
+      "date": "2026-07-23"
+    },
+    {
+      "id": "t-6ff5306e",
+      "prompt": "Fixed reservation logic for Auto Inventory allocation process. OFBIZ-13386",
+      "ground_truth": [
+        "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/ShoppingCart.java"
+      ],
+      "commit": "6ff5306eeab9f57471e017b923569b3d2c6d8c99",
+      "date": "2026-07-10"
+    },
+    {
+      "id": "t-d9fe8931",
+      "prompt": "StringToTimestamp now accepts ISO 8601 timestamps",
+      "ground_truth": [
+        "framework/base/src/main/java/org/apache/ofbiz/base/conversion/DateTimeConverters.java"
+      ],
+      "commit": "d9fe893119d78c1531a3a6f300513d55a9f8e8e6",
+      "date": "2026-07-01"
+    },
+    {
+      "id": "t-3eaef2fd",
+      "prompt": "ComplexAliasField default value not quoted for non-numeric fields in SQL COALESCE The defaultValue in ComplexAliasField.makeAliasColName was inserted raw into COALESCE SQL, causing syntax errors for date-time and string field types. Numeric literals worked fine but timestamp/string values were unquoted.",
+      "ground_truth": [
+        "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelViewEntity.java"
+      ],
+      "commit": "3eaef2fdbf3cbd6c1c7ef61e81a4789df1597fc9",
+      "date": "2026-06-30"
+    },
+    {
+      "id": "t-be630727",
+      "prompt": "The port offset is being applied twice when loading WebSite properties",
+      "ground_truth": [
+        "framework/webapp/src/main/java/org/apache/ofbiz/webapp/website/WebSiteProperties.java"
+      ],
+      "commit": "be630727a56480a08aa9f22759f464ffd633b496",
+      "date": "2026-06-30"
+    },
+    {
+      "id": "t-0b9cbae4",
+      "prompt": "Add header screen for the screenlet",
+      "ground_truth": [
+        "framework/widget/src/main/java/org/apache/ofbiz/widget/model/ModelScreenWidget.java",
+        "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/macro/MacroScreenRenderer.java"
+      ],
+      "commit": "0b9cbae4cb808453971ec9bb3163579b1eb09599",
+      "date": "2026-06-19"
+    },
+    {
+      "id": "t-6868d3ab",
+      "prompt": "Escape HTML output in SOAPEventHandler to prevent XSS",
+      "ground_truth": [
+        "framework/webapp/src/main/java/org/apache/ofbiz/webapp/event/SOAPEventHandler.java"
+      ],
+      "commit": "6868d3ab07b6cfeff2c8a42c5621eb132d6e506f",
+      "date": "2026-06-16"
+    },
+    {
+      "id": "t-a8563259",
+      "prompt": "Invoice import is not visible from UI and not working",
+      "ground_truth": [
+        "applications/accounting/src/main/java/org/apache/ofbiz/accounting/invoice/InvoiceServices.java"
+      ],
+      "commit": "a8563259163990849bf013ce4c72f095b66ddc3d",
+      "date": "2026-06-06"
+    },
+    {
+      "id": "t-50c0216b",
+      "prompt": "Remove unnecessary Javadoc paragraph tags",
+      "ground_truth": [
+        "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/ShoppingCart.java"
+      ],
+      "commit": "50c0216b86e817771a0fdf00ad2ce360455a5105",
+      "date": "2026-05-30"
+    },
+    {
+      "id": "t-cdf18bb2",
+      "prompt": "EntityDateFilterCondition causes the entity cache to return false matches",
+      "ground_truth": [
+        "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityCondition.java",
+        "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityDateFilterCondition.java",
+        "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityUtil.java"
+      ],
+      "commit": "cdf18bb2645e24036ee6e9d9193570636cfd0061",
+      "date": "2026-05-29"
+    },
+    {
+      "id": "t-45fc6d15",
+      "prompt": "view-entity complex-alias field name bug when view-entities reference other view-entities",
+      "ground_truth": [
+        "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelViewEntity.java"
+      ],
+      "commit": "45fc6d156309b08180434d941510d39f2bba1b44",
+      "date": "2026-05-29"
+    },
+    {
+      "id": "t-bcbb8be9",
+      "prompt": "Wrong OrderAdjustments when cancelling an Order",
+      "ground_truth": [
+        "applications/order/src/main/java/org/apache/ofbiz/order/order/OrderReadHelper.java"
+      ],
+      "commit": "bcbb8be970168284716969b702e56f36613ffb62",
+      "date": "2026-05-29"
+    },
+    {
+      "id": "t-a794822d",
+      "prompt": "Deserializing ModelPermission.java throws an error",
+      "ground_truth": [
+        "framework/base/src/main/java/org/apache/ofbiz/base/util/SafeObjectInputStream.java"
+      ],
+      "commit": "a794822d58e36dba4eca497527c78ee4c16d4825",
+      "date": "2026-05-29"
+    }
+  ]
+}

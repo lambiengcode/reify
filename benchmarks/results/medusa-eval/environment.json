@@ -1,0 +1,13 @@
+{
+  "budget_tokens": 4000,
+  "code_files_in_corpus": 11164,
+  "conditions": [
+    "B-content-grep",
+    "C-path-grep",
+    "R-reify",
+    "R-reify-iter3"
+  ],
+  "head": "a6fff7ec920f3fa15b2f35429e186ebd76d0f1d4",
+  "reify_version": "0.1.0",
+  "repository": "/Users/lambiengcode/Documents/reify/projects/reify/.bench/medusa"
+}

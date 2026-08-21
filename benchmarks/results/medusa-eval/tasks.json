@@ -1,0 +1,414 @@
+{
+  "repository": "/Users/lambiengcode/Documents/reify/projects/reify/.bench/medusa",
+  "head": "a6fff7ec920f3fa15b2f35429e186ebd76d0f1d4",
+  "generated_from_commits": 400,
+  "base": "7bcc892914220fb0f959fa93ba8e3dbc81829eed",
+  "tasks": [
+    {
+      "id": "t-1a9fe477",
+      "prompt": "remove duplicate Medusa Cloud auth button",
+      "ground_truth": [
+        "packages/admin/dashboard/src/routes/login/components/cloud-auth-login.tsx"
+      ],
+      "commit": "1a9fe477d265e8861ca68ef9a445b40d006b28ca",
+      "date": "2026-08-20"
+    },
+    {
+      "id": "t-9dd56bf5",
+      "prompt": "fix create fulfillment form select pagination issues",
+      "ground_truth": [
+        "packages/admin/dashboard/src/hooks/api/shipping-options.tsx",
+        "packages/admin/dashboard/src/routes/orders/order-create-fulfillment/components/order-create-fulfillment-form/order-create-fulfillment-form.tsx"
+      ],
+      "commit": "9dd56bf579747aa1f191c4990c90e91a168b634e",
+      "date": "2026-08-20"
+    },
+    {
+      "id": "t-7479b070",
+      "prompt": "block field expansion pivots on the store order routes",
+      "ground_truth": [
+        "integration-tests/http/__tests__/order/store/order.spec.ts",
+        "packages/medusa/src/api/store/orders/query-config.ts"
+      ],
+      "commit": "7479b07071e51f4fc6a7ddafe2c778e85c6eb61d",
+      "date": "2026-08-18"
+    },
+    {
+      "id": "t-4e5a02bd",
+      "prompt": "Simplify how redis cache data is stored",
+      "ground_truth": [
+        "packages/modules/caching/src/loaders/hash.ts",
+        "packages/modules/providers/caching-redis/src/loaders/hash.ts",
+        "packages/modules/providers/caching-redis/src/services/__tests__/redis-cache.spec.ts",
+        "packages/modules/providers/caching-redis/src/services/redis-cache.ts"
+      ],
+      "commit": "4e5a02bdcb47a410ac427a23f3d2a50440ab5379",
+      "date": "2026-08-18"
+    },
+    {
+      "id": "t-2101adb7",
+      "prompt": "fix: allow zooming in the generated admin HTML",
+      "ground_truth": [
+        "packages/admin/admin-bundler/src/utils/write-static-files.ts"
+      ],
+      "commit": "2101adb7eac34bdb90fa9606e875995105cf7f7c",
+      "date": "2026-08-15"
+    },
+    {
+      "id": "t-e528fc5b",
+      "prompt": "set the lang attribute on the html element",
+      "ground_truth": [
+        "packages/admin/dashboard/src/providers/i18n-provider/i18n-provider.tsx"
+      ],
+      "commit": "e528fc5bd2cbcd9995694953580a20e525eafb9c",
+      "date": "2026-08-15"
+    },
+    {
+      "id": "t-5796a0c0",
+      "prompt": "handle deleted stock locations in order fulfillment section",
+      "ground_truth": [
+        "packages/admin/dashboard/src/routes/orders/order-detail/components/order-fulfillment-section/order-fulfillment-section.tsx"
+      ],
+      "commit": "5796a0c00f35eba2533847f6697fae8d7c282ae7",
+      "date": "2026-08-15"
+    },
+    {
+      "id": "t-23878406",
+      "prompt": "Run search migration in test runner",
+      "ground_truth": [
+        "packages/medusa-test-utils/src/medusa-test-runner-utils/use-db.ts",
+        "packages/medusa-test-utils/src/medusa-test-runner.ts"
+      ],
+      "commit": "23878406803e27954b88952def0ea04ffc919650",
+      "date": "2026-08-14"
+    },
+    {
+      "id": "t-094b2ed4",
+      "prompt": "fix: lock account on debit",
+      "ground_truth": [
+        "packages/plugins/loyalty/src/modules/store-credit/service.ts"
+      ],
+      "commit": "094b2ed4e1442f67a345269ba32bbc1a26dacf97",
+      "date": "2026-08-13"
+    },
+    {
+      "id": "t-6d9c5a74",
+      "prompt": "Allow for shortcut-only entries in search",
+      "ground_truth": [
+        "packages/admin/dashboard/src/components/search/use-search-results.tsx",
+        "packages/admin/dashboard/src/providers/keybind-provider/hooks.tsx"
+      ],
+      "commit": "6d9c5a7489bbdcf4d66b5f6dfb8ae8aebed7073c",
+      "date": "2026-08-13"
+    },
+    {
+      "id": "t-aeea1f46",
+      "prompt": "fix: delete auth identity when possible upon customer/user deletion",
+      "ground_truth": [
+        "integration-tests/http/__tests__/customer/admin/customer.spec.ts",
+        "integration-tests/http/__tests__/user/admin/user.spec.ts",
+        "packages/core/core-flows/src/auth/steps/index.ts",
+        "packages/core/core-flows/src/customer/workflows/remove-customer-account.ts",
+        "packages/core/core-flows/src/user/workflows/remove-user-account.ts"
+      ],
+      "commit": "aeea1f46bf4947ca36577e950b4c79a1faba8ba1",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "t-941fd67d",
+      "prompt": "allow updating prices with an empty rules object",
+      "ground_truth": [
+        "packages/modules/pricing/integration-tests/__tests__/services/pricing-module/price-list.spec.ts",
+        "packages/modules/pricing/src/services/pricing-module.ts"
+      ],
+      "commit": "941fd67d59b6f506efc18e255b051c4d3ab14f64",
+      "date": "2026-08-06"
+    },
+    {
+      "id": "t-5641bab6",
+      "prompt": "document the invite accept token as a query parameter",
+      "ground_truth": [
+        "packages/medusa/src/api/admin/invites/accept/route.ts"
+      ],
+      "commit": "5641bab6ea2d6f0eb7cb9188486656d555ce4d60",
+      "date": "2026-08-06"
+    },
+    {
+      "id": "t-1fb31df2",
+      "prompt": "support array and dynamic types for `.json` fields in DML",
+      "ground_truth": [
+        "packages/core/utils/src/dml/__tests__/entity-builder.spec.ts",
+        "packages/core/utils/src/dml/__tests__/json-property.spec.ts",
+        "packages/core/utils/src/dml/entity-builder.ts",
+        "packages/core/utils/src/dml/properties/json.ts"
+      ],
+      "commit": "1fb31df2728659578b2aab697322b80b7501b66b",
+      "date": "2026-08-06"
+    },
+    {
+      "id": "t-11d58f75",
+      "prompt": "fetch totals with all fields + fix inconsistent total calculation",
+      "ground_truth": [
+        "integration-tests/modules/__tests__/cart/store/cart.workflows.spec.ts",
+        "packages/modules/cart/integration-tests/__tests__/services/cart-module/index.spec.ts",
+        "packages/modules/cart/src/services/cart-module.ts"
+      ],
+      "commit": "11d58f75f22691e63ef4258f8c40d63a3d12332b",
+      "date": "2026-08-05"
+    },
+    {
+      "id": "t-4f2b8a2b",
+      "prompt": "fix: guard calculated price set before reading it in cart line-item prep",
+      "ground_truth": [
+        "integration-tests/http/__tests__/cart/store/cart.spec.ts",
+        "packages/core/core-flows/src/cart/workflows/get-variants-and-items-with-prices.ts"
+      ],
+      "commit": "4f2b8a2b435870a379b029d5e6348a3c06cc4093",
+      "date": "2026-08-05"
+    },
+    {
+      "id": "t-0e1ccf49",
+      "prompt": "allow admin draft orders without an email or customer_id",
+      "ground_truth": [
+        "integration-tests/http/__tests__/draft-order/admin/draft-order.spec.ts",
+        "packages/medusa/src/api/admin/draft-orders/route.ts",
+        "packages/medusa/src/api/admin/draft-orders/validators.ts"
+      ],
+      "commit": "0e1ccf49654caefa8305fe91a4c9abd573ca1143",
+      "date": "2026-08-04"
+    },
+    {
+      "id": "t-f2c9d7d3",
+      "prompt": "fix: honor item-level allow_backorder when confirming inventory",
+      "ground_truth": [
+        "integration-tests/http/__tests__/draft-order/admin/draft-order.spec.ts",
+        "packages/core/core-flows/src/cart/utils/__tests__/prepare-confirm-inventory-input.spec.ts",
+        "packages/core/core-flows/src/cart/utils/prepare-confirm-inventory-input.ts",
+        "packages/core/types/src/cart/workflows.ts",
+        "packages/core/types/src/workflow/order/items.ts"
+      ],
+      "commit": "f2c9d7d3c11507f92142b440a1d90ad74c2a03de",
+      "date": "2026-08-03"
+    },
+    {
+      "id": "t-b0520082",
+      "prompt": "hide Property Labels settings item unless view_configurations is enabled",
+      "ground_truth": [
+        "packages/admin/dashboard/src/components/layout/settings-layout/settings-layout.tsx"
+      ],
+      "commit": "b0520082670752ec09b34ea9fac2a1b9422b8cdd",
+      "date": "2026-07-31"
+    },
+    {
+      "id": "t-8f03b13a",
+      "prompt": "fix: add missing gift_card.list.side injection zone",
+      "ground_truth": [
+        "packages/admin/admin-shared/src/extensions/widgets/constants.ts"
+      ],
+      "commit": "8f03b13a6137047ce36f61a9bb033879395f9345",
+      "date": "2026-07-30"
+    },
+    {
+      "id": "t-43827181",
+      "prompt": "fetch currency_code for visible currency columns in configurable tables",
+      "ground_truth": [
+        "packages/admin/dashboard/src/lib/table/field-utils.ts"
+      ],
+      "commit": "438271818d8a3d10470fe838a6ac5c994019620c",
+      "date": "2026-07-29"
+    },
+    {
+      "id": "t-01f31bc5",
+      "prompt": "delete individual variant metadata fields",
+      "ground_truth": [
+        "packages/modules/product/integration-tests/__tests__/product-module-service/product-variants.spec.ts",
+        "packages/modules/product/src/services/product-module-service.ts"
+      ],
+      "commit": "01f31bc58b1ff729a7326bdf54c65f92e35b0725",
+      "date": "2026-07-28"
+    },
+    {
+      "id": "t-a42ee082",
+      "prompt": "fix: pass the cart's currency and region to fulfillment providers when calculating shipping option prices",
+      "ground_truth": [
+        "integration-tests/http/__tests__/shipping-option/store/shipping-option-calculated.spec.ts",
+        "integration-tests/http/src/utils/providers/fulfillment-manual-calculated/services/manual-fulfillment.ts",
+        "packages/core/core-flows/src/cart/utils/fields.ts",
+        "packages/core/core-flows/src/cart/workflows/list-shipping-options-for-cart-with-pricing.ts"
+      ],
+      "commit": "a42ee0825b07409cab68cd351516c35b74238150",
+      "date": "2026-07-28"
+    },
+    {
+      "id": "t-fb4a498f",
+      "prompt": "add tooltip for full product/variant name in pricing data grids",
+      "ground_truth": [
+        "packages/admin/dashboard/src/routes/price-lists/common/hooks/use-price-list-grid-columns.tsx",
+        "packages/admin/dashboard/src/routes/products/common/variant-pricing-form.tsx"
+      ],
+      "commit": "fb4a498f3a425b2a13a41de65ac3d88b25dc4793",
+      "date": "2026-07-28"
+    },
+    {
+      "id": "t-f16a505c",
+      "prompt": "fix: remove dead product-option methods from admin.product",
+      "ground_truth": [
+        "packages/core/core-flows/src/product/workflows/delete-product-options.ts",
+        "packages/core/js-sdk/src/admin/product.ts"
+      ],
+      "commit": "f16a505cb0ccfc103ca393847bb819e8f7c6255a",
+      "date": "2026-07-27"
+    },
+    {
+      "id": "t-60346987",
+      "prompt": "fix active sidebar link detection",
+      "ground_truth": [
+        "packages/admin/dashboard/src/components/layout/nav-item/nav-item.tsx"
+      ],
+      "commit": "60346987f74cc606d6864df765e7d4b007def3fe",
+      "date": "2026-07-27"
+    },
+    {
+      "id": "t-c6188c23",
+      "prompt": "fix: preserve directory portion of filename in object key",
+      "ground_truth": [
+        "packages/modules/providers/file-s3/src/services/__tests__/s3-file-url-encoding.spec.ts",
+        "packages/modules/providers/file-s3/src/services/s3-file.ts"
+      ],
+      "commit": "c6188c23f2efda5dafcb8bea83f71dc02d375f19",
+      "date": "2026-07-24"
+    },
+    {
+      "id": "t-bb9ddf96",
+      "prompt": "Support cross module filtering on belongs to foreign key",
+      "ground_truth": [
+        "packages/core/utils/src/modules-sdk/__tests__/joiner-config-builder.spec.ts",
+        "packages/core/utils/src/modules-sdk/joiner-config-builder.ts"
+      ],
+      "commit": "bb9ddf968d4f5462ca69f191714dcfeec755266b",
+      "date": "2026-07-23"
+    },
+    {
+      "id": "t-0731abc3",
+      "prompt": "honor configured admin auth type in admin SDK",
+      "ground_truth": [
+        "packages/plugins/loyalty/src/admin/lib/sdk.ts"
+      ],
+      "commit": "0731abc3827d729b4999d056034a7c7c84df1ee2",
+      "date": "2026-07-23"
+    },
+    {
+      "id": "t-306c22d4",
+      "prompt": "prevent product option badges from overlapping with long option values",
+      "ground_truth": [
+        "packages/admin/dashboard/src/components/common/section/section-row.tsx",
+        "packages/admin/dashboard/src/components/inputs/chip-input/chip-input.tsx",
+        "packages/admin/dashboard/src/components/inputs/combobox/combobox.tsx",
+        "packages/admin/dashboard/src/routes/products/product-detail/components/product-option-section/product-option-section.tsx"
+      ],
+      "commit": "306c22d4adab81d8041fc38d50addc60064cba37",
+      "date": "2026-07-23"
+    },
+    {
+      "id": "t-c02bcaba",
+      "prompt": "feat: detect nub package manager",
+      "ground_truth": [
+        "packages/cli/create-medusa-app/src/utils/__tests__/package-manager.test.ts",
+        "packages/cli/create-medusa-app/src/utils/package-manager.ts"
+      ],
+      "commit": "c02bcabae8658c615d403e52314d985b166a86ed",
+      "date": "2026-07-23"
+    },
+    {
+      "id": "t-dd5b3ee6",
+      "prompt": "fix: refresh cart tax lines on any tax-relevant shipping address change",
+      "ground_truth": [
+        "integration-tests/http/__tests__/cart/store/cart.spec.ts",
+        "packages/core/core-flows/src/cart/workflows/update-cart.ts",
+        "packages/core/types/src/cart/workflows.ts",
+        "packages/medusa/src/api/store/carts/validators.ts"
+      ],
+      "commit": "dd5b3ee61ed5e4a8965c39eb34e2141908c664ce",
+      "date": "2026-07-23"
+    },
+    {
+      "id": "t-cd0aeef3",
+      "prompt": "fix: validate link uniqueness on batch links being created",
+      "ground_truth": [
+        "packages/core/modules-sdk/src/__tests__/remote-link.spec.ts",
+        "packages/core/modules-sdk/src/link.ts"
+      ],
+      "commit": "cd0aeef37c3d553d6121f7b933e9a06c3a5ae697",
+      "date": "2026-07-23"
+    },
+    {
+      "id": "t-36915a5f",
+      "prompt": "pass order ID as a query parameter in storefront payment link",
+      "ground_truth": [
+        "packages/admin/dashboard/src/routes/orders/order-detail/components/copy-payment-link/copy-payment-link.tsx",
+        "packages/admin/dashboard/src/routes/profile/profile-edit/components/edit-profile-form/edit-profile-form.tsx"
+      ],
+      "commit": "36915a5f02b7ec25bc5aba757c11e92187aa1bb6",
+      "date": "2026-07-22"
+    },
+    {
+      "id": "t-0b678b4c",
+      "prompt": "fix: serialize concurrent money guards to prevent over-capture, over-refund and budget overspend",
+      "ground_truth": [
+        "packages/modules/payment/integration-tests/__tests__/services/payment-module/index.spec.ts",
+        "packages/modules/payment/src/services/payment-module.ts",
+        "packages/modules/promotion/integration-tests/__tests__/services/promotion-module/register-usage.spec.ts",
+        "packages/modules/promotion/src/services/promotion-module.ts"
+      ],
+      "commit": "0b678b4c8b3f22d5fa1a63d1cfefd2bb78cdef47",
+      "date": "2026-07-22"
+    },
+    {
+      "id": "t-1ffae136",
+      "prompt": "fix edit reservartion form not showing anything",
+      "ground_truth": [
+        "packages/admin/dashboard/src/routes/reservations/reservation-detail/components/edit-reservation/edit-reservation-modal.tsx"
+      ],
+      "commit": "1ffae136d60f0c4e881fa9a0c80b51838e198205",
+      "date": "2026-07-22"
+    },
+    {
+      "id": "t-a207803c",
+      "prompt": "allow same conditional shipping price amount for different conditions",
+      "ground_truth": [
+        "packages/admin/dashboard/src/routes/locations/common/schema.ts"
+      ],
+      "commit": "a207803c49a9d0c93e6fcb388e58ec7ccfedee32",
+      "date": "2026-07-22"
+    },
+    {
+      "id": "t-d75e69a5",
+      "prompt": "fix: avoid Vite import-analysis conflict with Product.import method",
+      "ground_truth": [
+        "packages/core/js-sdk/src/admin/product.ts"
+      ],
+      "commit": "d75e69a5492e1d9915fce3f117668d08c78faefd",
+      "date": "2026-07-21"
+    },
+    {
+      "id": "t-dea11e3d",
+      "prompt": "emit PRODUCT_CATEGORY_DELETED event on soft delete",
+      "ground_truth": [
+        "packages/modules/product/integration-tests/__tests__/product-module-service/events.spec.ts",
+        "packages/modules/product/src/services/product-module-service.ts"
+      ],
+      "commit": "dea11e3d011a0dd1c95b1fc4ab2292fd07ec4857",
+      "date": "2026-07-21"
+    },
+    {
+      "id": "t-fc8d4665",
+      "prompt": "fix: fix ajv error in npm installation",
+      "ground_truth": [
+        "packages/cli/create-medusa-app/src/utils/__tests__/package-manager.test.ts",
+        "packages/cli/create-medusa-app/src/utils/package-manager.ts"
+      ],
+      "commit": "fc8d46652eaeaf7fa6862e20bfd84b8e64c77cc5",
+      "date": "2026-07-21"
+    }
+  ]
+}

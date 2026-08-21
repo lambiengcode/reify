@@ -70,6 +70,12 @@ enum Command {
         /// Token budget for the compiled context.
         #[arg(long, default_value_t = context::DEFAULT_BUDGET)]
         budget: u32,
+        /// Files already read or ruled out; repeat the flag per file.
+        ///
+        /// This is how an agent iterates: call again excluding what the first answer
+        /// offered, and the freed budget goes to the next-best candidates.
+        #[arg(long)]
+        exclude: Vec<String>,
     },
 
     /// Why does this exist: rules, concepts, documents, history and blast radius.
@@ -202,13 +208,18 @@ fn run() -> Result<()> {
             let store = open_existing(&root)?;
             render::status(&store, &root, cli.json)
         }
-        Command::Context { task, budget } => {
+        Command::Context {
+            task,
+            budget,
+            exclude,
+        } => {
             let store = open_existing(&root)?;
             let compiled = context::compile(
                 &store,
                 task,
                 &ContextOptions {
                     budget: *budget,
+                    exclude: exclude.clone(),
                     ..Default::default()
                 },
             )?;

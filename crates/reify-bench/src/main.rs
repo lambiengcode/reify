@@ -80,6 +80,22 @@ enum Command {
         #[arg(long, default_value_t = 20)]
         limit: usize,
     },
+    /// Fit the ranking weights against training tasks, by exhaustive grid search.
+    ///
+    /// The trap this command is built around: fitting on the evaluation set is the
+    /// easiest way to fake a benchmark. Training tasks must come from commits
+    /// *earlier* than every benchmark task, the evaluation set stays frozen, and the
+    /// chosen weights are judged there exactly once.
+    Fit {
+        /// Training pairs, as `LABEL=repo_dir=tasks_file`. Several pairs fit jointly,
+        /// so one repository cannot pull the weights toward itself.
+        #[arg(long = "train", value_name = "LABEL=REPO=TASKS", num_args = 1..)]
+        train: Vec<String>,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long, default_value_t = DEFAULT_BUDGET)]
+        budget: u32,
+    },
     /// Render the benchmark charts from committed result files.
     ///
     /// Generated rather than drawn: a chart that can drift from its data is a picture,
@@ -150,9 +166,162 @@ fn run() -> Result<()> {
             budget,
             limit,
         } => agent_experiments(&repo, &task_file, &out, budget, limit),
+        Command::Fit { train, out, budget } => fit(&train, &out, budget),
         Command::Chart { results, out } => charts(&results, &out),
         Command::Report { input, out } => report(&input, &out),
     }
+}
+
+/// One training corpus: an opened store and its task set.
+struct TrainingSet {
+    label: String,
+    store: Store,
+    tasks: Vec<tasks::Task>,
+}
+
+/// Exhaustive grid search over the ranking weights.
+///
+/// Exhaustive rather than clever on purpose: the grid is small enough to enumerate,
+/// enumeration cannot get stuck in a local optimum, and the full surface is written
+/// out so a later reader can see how flat or sharp the optimum was — a fit that
+/// barely beats its neighbours is noise wearing a crown.
+fn fit(train: &[String], out: &Path, budget: u32) -> Result<()> {
+    use reify::context::RankWeights;
+
+    let mut sets = Vec::new();
+    for spec in train {
+        let mut parts = spec.splitn(3, '=');
+        let (label, repo, task_file) = (
+            parts.next().unwrap_or_default(),
+            parts.next().unwrap_or_default(),
+            parts.next().unwrap_or_default(),
+        );
+        anyhow::ensure!(
+            !task_file.is_empty(),
+            "expected LABEL=REPO=TASKS, got `{spec}`"
+        );
+        let set: tasks::TaskSet = read_json(Path::new(task_file))?;
+        let store_path = Path::new(repo)
+            .join(reify::index::REIFY_DIR)
+            .join(reify::index::STORE_FILE);
+        anyhow::ensure!(store_path.exists(), "no index at {}", store_path.display());
+        sets.push(TrainingSet {
+            label: label.to_string(),
+            store: Store::open(&store_path)?,
+            tasks: set.tasks,
+        });
+    }
+
+    // The first full grid showed the surface's shape: the prior dominates and was
+    // still climbing at the old edge, symbols mildly favours few, and the coverage
+    // floor and path affinity are flat to within noise. So the search follows the
+    // gradient upward on the dimension that matters and pins the ones that do not —
+    // searching a flat dimension only lets noise pick a winner.
+    let history_prior = [0.9f32, 2.2];
+    let symbols_per_file = [6usize];
+    let coverage_floor = [0.35f32];
+    let path_affinity = [1.0f32];
+    let concept_expansion = [0.0f32, 0.5];
+
+    let total = history_prior.len()
+        * symbols_per_file.len()
+        * coverage_floor.len()
+        * path_affinity.len()
+        * concept_expansion.len();
+    let mut grid: Vec<serde_json::Value> = Vec::with_capacity(total);
+    let mut best: Option<(f32, RankWeights)> = None;
+    let mut done = 0usize;
+
+    for &hp in &history_prior {
+        for &spf in &symbols_per_file {
+            for &cf in &coverage_floor {
+                for &pa in &path_affinity {
+                    for &ce in &concept_expansion {
+                        let weights = RankWeights {
+                            history_prior: hp,
+                            history_symbols_per_file: spf,
+                            coverage_floor: cf,
+                            path_affinity: pa,
+                            concept_expansion: ce,
+                        };
+                        // The score is the mean over corpora of (hit rate + MRR), so a
+                        // gain on one repository cannot pay for a loss on another.
+                        let mut per_set = Vec::new();
+                        let mut score_sum = 0.0f32;
+                        for set in &sets {
+                            let mut outcomes = Vec::new();
+                            for task in &set.tasks {
+                                let answer = conditions::reify_context_weighted(
+                                    &set.store,
+                                    &task.prompt,
+                                    budget,
+                                    &weights,
+                                )?;
+                                outcomes.push(metrics::score(
+                                    &task.id,
+                                    "fit",
+                                    &answer,
+                                    &task.ground_truth,
+                                ));
+                            }
+                            let summary = metrics::summarise("fit", &outcomes);
+                            score_sum += summary.hit_rate + summary.mrr;
+                            per_set.push(serde_json::json!({
+                                "label": set.label,
+                                "hit_rate": summary.hit_rate,
+                                "mrr": summary.mrr,
+                            }));
+                        }
+                        let score = score_sum / sets.len() as f32;
+                        grid.push(serde_json::json!({
+                            "weights": {
+                                "history_prior": hp,
+                                "history_symbols_per_file": spf,
+                                "coverage_floor": cf,
+                                "path_affinity": pa,
+                                "concept_expansion": ce,
+                            },
+                            "score": score,
+                            "per_set": per_set,
+                        }));
+                        // Strictly-greater keeps the first of equals, so ties resolve by
+                        // grid order and the result is reproducible.
+                        if best.as_ref().is_none_or(|(b, _)| score > *b) {
+                            best = Some((score, weights));
+                        }
+                        done += 1;
+                        eprint!("\r  {done}/{total} combos");
+                    }
+                }
+            }
+        }
+    }
+    eprintln!();
+
+    let (score, weights) = best.expect("the grid is never empty");
+    eprintln!(
+        "best score {score:.3}: prior={} symbols={} floor={} affinity={}",
+        weights.history_prior,
+        weights.history_symbols_per_file,
+        weights.coverage_floor,
+        weights.path_affinity
+    );
+    write_json(
+        out,
+        &serde_json::json!({
+            "purpose": "fitted ranking weights; training data is commits earlier than every benchmark task",
+            "budget_tokens": budget,
+            "best": {
+                "score": score,
+                "history_prior": weights.history_prior,
+                "history_symbols_per_file": weights.history_symbols_per_file,
+                "coverage_floor": weights.coverage_floor,
+                "path_affinity": weights.path_affinity,
+                "concept_expansion": weights.concept_expansion,
+            },
+            "grid": grid,
+        }),
+    )
 }
 
 /// Generate every chart the README embeds.
@@ -367,15 +536,24 @@ fn execute(repo: &Path, task_file: &Path, out: &Path, budget: u32) -> Result<()>
             &compiled,
             &task.ground_truth,
         ));
+
+        let iterated = conditions::reify_context_iterative(&store, &task.prompt, budget, 3)?;
+        outcomes.push(metrics::score(
+            &task.id,
+            "R-reify-iter3",
+            &iterated,
+            &task.ground_truth,
+        ));
     }
     eprintln!();
 
     std::fs::create_dir_all(out)?;
     write_json(&out.join("outcomes.json"), &outcomes)?;
-    let summaries: Vec<metrics::Summary> = ["B-content-grep", "C-path-grep", "R-reify"]
-        .iter()
-        .map(|n| metrics::summarise(n, &outcomes))
-        .collect();
+    let summaries: Vec<metrics::Summary> =
+        ["B-content-grep", "C-path-grep", "R-reify", "R-reify-iter3"]
+            .iter()
+            .map(|n| metrics::summarise(n, &outcomes))
+            .collect();
     write_json(&out.join("summary.json"), &summaries)?;
     write_json(&out.join("tasks.json"), &set)?;
     write_json(
@@ -385,7 +563,7 @@ fn execute(repo: &Path, task_file: &Path, out: &Path, budget: u32) -> Result<()>
             "repository": set.repository,
             "head": set.head,
             "budget_tokens": budget,
-            "conditions": ["B-content-grep", "C-path-grep", "R-reify"],
+            "conditions": ["B-content-grep", "C-path-grep", "R-reify", "R-reify-iter3"],
             "code_files_in_corpus": corpus.len(),
         }),
     )?;
@@ -398,7 +576,7 @@ fn report(input: &Path, out: &Path) -> Result<()> {
     let set: tasks::TaskSet = read_json(&input.join("tasks.json"))?;
     let environment: serde_json::Value = read_json(&input.join("environment.json"))?;
 
-    let names = ["B-content-grep", "C-path-grep", "R-reify"];
+    let names = ["B-content-grep", "C-path-grep", "R-reify", "R-reify-iter3"];
     let summaries: Vec<metrics::Summary> = names
         .iter()
         .map(|n| metrics::summarise(n, &outcomes))

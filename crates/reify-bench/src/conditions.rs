@@ -144,6 +144,16 @@ fn take_within_budget(
 /// Charged for both halves — the context output itself *and* the reads it recommends —
 /// so the comparison against a baseline that only pays for file reads is not rigged.
 pub fn reify_context(store: &Store, prompt: &str, budget: u32) -> Result<Answer> {
+    reify_context_weighted(store, prompt, budget, &context::RankWeights::default())
+}
+
+/// The same condition with explicit ranking weights, for the fitting harness.
+pub fn reify_context_weighted(
+    store: &Store,
+    prompt: &str,
+    budget: u32,
+    weights: &context::RankWeights,
+) -> Result<Answer> {
     let started = std::time::Instant::now();
     let compiled = context::compile(
         store,
@@ -151,11 +161,22 @@ pub fn reify_context(store: &Store, prompt: &str, budget: u32) -> Result<Answer>
         &ContextOptions {
             budget,
             max_next_reads: 12,
+            weights: weights.clone(),
+            exclude: Vec::new(),
         },
     )?;
 
-    // Order: the reading plan first, then any other file the context names. A span is
-    // charged for the span, not for the whole file — that is the point of the plan.
+    let mut answer = answer_from_context(&compiled);
+    answer.elapsed_ms = started.elapsed().as_millis();
+    Ok(answer)
+}
+
+/// Turn a compiled context into the benchmark's answer shape.
+///
+/// Order: the reading plan first, then any other file the context names. A span is
+/// charged for the span, not for the whole file — that is the point of the plan — and
+/// files the context names without funding cost nothing beyond the context itself.
+fn answer_from_context(compiled: &context::Context) -> Answer {
     let mut files: Vec<String> = Vec::new();
     let mut read_tokens: Vec<u32> = Vec::new();
     let mut seen: BTreeSet<String> = BTreeSet::new();
@@ -170,9 +191,6 @@ pub fn reify_context(store: &Store, prompt: &str, budget: u32) -> Result<Answer>
             read_tokens.push(*per_file.get(&read.path).unwrap_or(&0));
         }
     }
-    // Files the context names but the reading plan did not fund. The agent is told
-    // about them but is not told to read them, so they cost nothing extra beyond the
-    // context line already charged.
     for item in &compiled.code {
         if item.path.is_empty() || !seen.insert(item.path.clone()) {
             continue;
@@ -181,14 +199,63 @@ pub fn reify_context(store: &Store, prompt: &str, budget: u32) -> Result<Answer>
         read_tokens.push(0);
     }
 
-    Ok(Answer {
+    Answer {
         files,
-        // Charged for the context output only; the reads are itemised above, exactly
-        // as the budget contract splits them.
         answer_tokens: compiled.budget.context,
         read_tokens,
-        elapsed_ms: started.elapsed().as_millis(),
-    })
+        elapsed_ms: 0,
+    }
+}
+
+/// Reify, iterated: each round excludes every file already offered.
+///
+/// This simulates the agent that reads an answer, does not find what it needs, and
+/// asks again. The cost is **cumulative** across rounds — iteration must never be free
+/// in the measurement when it is expensive in reality — and the offered files keep
+/// their round order, because the agent would read them in that order.
+pub fn reify_context_iterative(
+    store: &Store,
+    prompt: &str,
+    budget: u32,
+    rounds: usize,
+) -> Result<Answer> {
+    let started = std::time::Instant::now();
+    let mut merged = Answer {
+        files: Vec::new(),
+        answer_tokens: 0,
+        read_tokens: Vec::new(),
+        elapsed_ms: 0,
+    };
+    let mut exclude: Vec<String> = Vec::new();
+
+    for _ in 0..rounds {
+        let compiled = context::compile(
+            store,
+            prompt,
+            &ContextOptions {
+                budget,
+                max_next_reads: 12,
+                exclude: exclude.clone(),
+                ..Default::default()
+            },
+        )?;
+        let round = answer_from_context(&compiled);
+        if round.files.is_empty() {
+            break; // nothing new to offer; a further round would repeat the silence
+        }
+        merged.answer_tokens += round.answer_tokens;
+        for (file, cost) in round.files.iter().zip(&round.read_tokens) {
+            if !merged.files.contains(file) {
+                merged.files.push(file.clone());
+                merged.read_tokens.push(*cost);
+            }
+            if !exclude.contains(file) {
+                exclude.push(file.clone());
+            }
+        }
+    }
+    merged.elapsed_ms = started.elapsed().as_millis();
+    Ok(merged)
 }
 
 #[cfg(test)]

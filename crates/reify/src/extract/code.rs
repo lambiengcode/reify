@@ -98,6 +98,25 @@ impl<'a> Ctx<'a> {
             self.enter_declaration(node, decl);
             return;
         }
+        // Modern JavaScript and TypeScript declare most functions as values:
+        // `const submitOrder = async () => {...}`. A matcher that only sees
+        // `function_declaration` misses the majority of such a codebase while the
+        // index still *looks* healthy — the files parse, the file nodes exist, and
+        // almost nothing inside them does.
+        if node.kind() == "variable_declarator" {
+            let is_function = node.child_by_field_name("value").is_some_and(|value| {
+                matches!(
+                    value.kind(),
+                    "arrow_function" | "function_expression" | "function" | "generator_function"
+                )
+            });
+            if is_function {
+                if let Some(name) = self.named_child_text(node, "name") {
+                    self.enter_declaration(node, ("function", name.to_string()));
+                    return;
+                }
+            }
+        }
         match node.kind() {
             "call"
             | "call_expression"
@@ -513,6 +532,35 @@ fn normalize_ws(s: &str) -> String {
     s.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
+/// Is this path a test file, by the conventions the supported languages use?
+///
+/// Deliberately a path heuristic rather than an analysis: every ecosystem marks its
+/// tests in the filename or the directory, and that convention is exactly what makes
+/// a test findable by the humans it was written for.
+pub fn is_test_path(path: &str) -> bool {
+    let lowered = path.to_ascii_lowercase();
+    let name = lowered.rsplit('/').next().unwrap_or(&lowered);
+    // Directory names are checked as whole segments, not substrings, so a top-level
+    // `tests/` counts and a package named `attestation` does not.
+    let in_test_dir = lowered
+        .split('/')
+        .any(|seg| matches!(seg, "test" | "tests" | "__tests__" | "spec" | "specs"));
+    in_test_dir
+        || name.starts_with("test_")
+        || name.starts_with("test.")
+        || name.contains("_test.")
+        || name.contains(".test.")
+        || name.contains(".spec.")
+        || name.ends_with("test.java")
+        || name.ends_with("tests.java")
+        || name.ends_with("it.java")
+        || name.ends_with("test.cs")
+        || name.ends_with("tests.cs")
+        || name.ends_with("test.kt")
+        || name.ends_with("_spec.rb")
+        || name.ends_with("test.php")
+}
+
 /// Split an identifier into lowercase words.
 ///
 /// This is the first bridge from code vocabulary to business vocabulary: without it,
@@ -585,6 +633,7 @@ pub fn resolve(pending: &[PendingRef], symbols: &SymbolIndex) -> Batch {
         } else {
             continue; // too ambiguous to be worth an edge
         };
+        let from_is_test = is_test_path(&r.file);
         for target in chosen {
             if target == &r.from {
                 continue;
@@ -596,6 +645,23 @@ pub fn resolve(pending: &[PendingRef], symbols: &SymbolIndex) -> Batch {
                 Status::Observed,
                 confidence,
             ));
+            // A call out of a test into production code is more than a call: the test
+            // states, in requirement vocabulary, what that code is supposed to do.
+            // `test_corporate_order_requires_approval` is often the only place the
+            // business language and the implementation sit in the same file, so the
+            // edge lets relevance travel between them.
+            if r.kind == EdgeKind::Calls
+                && from_is_test
+                && !symbols.file_of(target).is_some_and(is_test_path)
+            {
+                batch.edge(NewEdge::new(
+                    target.clone(),
+                    r.from.clone(),
+                    EdgeKind::TestedBy,
+                    Status::Observed,
+                    confidence,
+                ));
+            }
         }
     }
     batch
@@ -959,6 +1025,19 @@ export function helper(a: number) { return a; }
 
         let cases = [
             Case {
+                // The dominant form in modern TS codebases; a matcher without it
+                // silently loses most of the repository.
+                lang: Lang::TypeScript,
+                file: "order.ts",
+                source: "export class OrderService {}\n\
+                         export const requiresApproval = async (o: Order) => {\n\
+                         \treturn bypassApproval(o);\n};\n\
+                         const bypassApproval = (o: Order) => false;\n",
+                container: "OrderService",
+                callable: "requiresApproval",
+                callee: "bypassApproval",
+            },
+            Case {
                 lang: Lang::Go,
                 file: "order.go",
                 source: "package main\n\ntype OrderService struct{ total int }\n\n\
@@ -1105,6 +1184,94 @@ export function helper(a: number) { return a; }
                 "{lang:?} claims a grammar it cannot load"
             );
         }
+    }
+
+    #[test]
+    fn test_paths_are_recognised_across_ecosystem_conventions() {
+        for path in [
+            "tests/test_order.py",
+            "app/order_test.go",
+            "src/order.test.ts",
+            "src/Order.spec.tsx",
+            "src/test/java/org/x/OrderServiceTest.java",
+            "api/src/test/java/OrderServiceIT.java",
+            "spec/models/order_spec.rb",
+            "Tests/OrderTests.cs",
+        ] {
+            assert!(is_test_path(path), "{path} should be a test");
+        }
+        for path in [
+            "app/order.py",
+            "src/OrderService.java",
+            "attestation/service.py",
+            "src/contest_results.ts",
+        ] {
+            assert!(!is_test_path(path), "{path} should not be a test");
+        }
+    }
+
+    #[test]
+    fn a_call_from_a_test_also_records_what_the_code_is_tested_by() {
+        let mut idx = SymbolIndex::default();
+        idx.add(
+            "requires_approval",
+            "sym:app/order.py#requires_approval",
+            "app/order.py",
+            Lang::Python,
+        );
+        idx.add(
+            "test_requires_approval",
+            "sym:tests/test_order.py#test_requires_approval",
+            "tests/test_order.py",
+            Lang::Python,
+        );
+        let pending = vec![PendingRef {
+            from: "sym:tests/test_order.py#test_requires_approval".into(),
+            name: "requires_approval".into(),
+            file: "tests/test_order.py".into(),
+            kind: EdgeKind::Calls,
+        }];
+        let batch = resolve(&pending, &idx);
+        let tested: Vec<&crate::model::NewEdge> = batch
+            .edges
+            .iter()
+            .filter(|e| e.kind == EdgeKind::TestedBy)
+            .collect();
+        assert_eq!(tested.len(), 1, "edges: {:?}", batch.edges);
+        assert_eq!(tested[0].src, "sym:app/order.py#requires_approval");
+        assert_eq!(
+            tested[0].dst,
+            "sym:tests/test_order.py#test_requires_approval"
+        );
+    }
+
+    #[test]
+    fn a_test_calling_a_test_helper_is_not_a_tested_by_edge() {
+        let mut idx = SymbolIndex::default();
+        idx.add(
+            "make_order",
+            "sym:tests/factories.py#make_order",
+            "tests/factories.py",
+            Lang::Python,
+        );
+        idx.add(
+            "test_totals",
+            "sym:tests/test_order.py#test_totals",
+            "tests/test_order.py",
+            Lang::Python,
+        );
+        let pending = vec![PendingRef {
+            from: "sym:tests/test_order.py#test_totals".into(),
+            name: "make_order".into(),
+            file: "tests/test_order.py".into(),
+            kind: EdgeKind::Calls,
+        }];
+        let batch = resolve(&pending, &idx);
+        assert!(
+            !batch.edges.iter().any(|e| e.kind == EdgeKind::TestedBy),
+            "a fixture helper is not the code under test: {:?}",
+            batch.edges
+        );
     }
 
     #[test]

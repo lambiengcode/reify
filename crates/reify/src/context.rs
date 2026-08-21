@@ -50,6 +50,43 @@ const TOKENS_PER_LINE: u32 = 10;
 /// How much a directory path agreeing with the task lifts everything inside it.
 const PATH_AFFINITY_WEIGHT: f32 = 1.0;
 
+/// Floor of the question-coverage factor in seed scoring.
+const COVERAGE_FLOOR: f32 = 0.35;
+
+/// Concepts whose other surface forms get searched too.
+const CONCEPT_EXPANSIONS: usize = 3;
+
+/// Seeded files whose symbols get lifted, and how many symbols each may lift.
+const FILE_FANOUT: usize = 6;
+const FILE_FANOUT_SYMBOLS: usize = 8;
+/// A symbol inherits this share of its file's seed score.
+const FILE_TO_SYMBOL: f32 = 0.8;
+/// A hit found through an expansion is worth this much of the concept that found it.
+const CONCEPT_EXPANSION_DECAY: f32 = 0.5;
+
+/// Weight of the repository's own history as a retrieval signal.
+///
+/// The prior is independent evidence — commits that used the task's words touched
+/// these files — so it *adds* to a node's score rather than competing under max().
+///
+/// 0.9 — the pre-fit default, kept after the fit **failed validation**.
+///
+/// `reify-bench fit` preferred 2.2–5.5 on training tasks (commits before the
+/// benchmark base; `benchmarks/weights/fit-20260821.json`), and every value in that
+/// range scored *worse* than 0.9 on the held-out frozen tasks. That is the fit's own
+/// pre-registered falsification clause firing: the association between commit
+/// vocabulary and files is real but nonstationary, and a weight tuned on one window
+/// overshoots the next. Per the clause, the result is published and the default
+/// reverts to the value chosen before any evaluation was seen. Do not raise this from
+/// training evidence alone.
+const HISTORY_PRIOR_WEIGHT: f32 = 0.9;
+/// Files taken from the prior per query.
+const HISTORY_PRIOR_FILES: usize = 8;
+/// Symbols boosted per prior file. Fitted alongside [`HISTORY_PRIOR_WEIGHT`]: six,
+/// so a single strong prior file cannot spend the symbol quota before the second-best
+/// file — which is sometimes the right one — gets a seat.
+const HISTORY_PRIOR_SYMBOLS_PER_FILE: usize = 6;
+
 /// How many items of each kind a compiled context may contain.
 ///
 /// A token share alone does not shape the answer, because the cheapest kinds are the
@@ -84,10 +121,51 @@ fn budget_share(kind: NodeKind) -> f32 {
     }
 }
 
+/// The tunable half of the ranking function.
+///
+/// These were hand-picked numbers defended by comments until `reify-bench fit`
+/// existed; now they are parameters so the repository's own history can choose them.
+/// The defaults are the fitted values — provenance in `benchmarks/weights/` — and the
+/// fit must only ever run against commits *earlier* than any benchmark task, because
+/// fitting on the evaluation set is the easiest way to fake a benchmark.
+#[derive(Debug, Clone, PartialEq)]
+pub struct RankWeights {
+    /// Weight of the repository's-own-history prior.
+    pub history_prior: f32,
+    /// Symbols boosted per prior file.
+    pub history_symbols_per_file: usize,
+    /// Floor of the question-coverage factor: how much a candidate scores when it
+    /// matches the task lexically but names none of the task's words itself.
+    pub coverage_floor: f32,
+    /// How much a directory path agreeing with the task lifts everything inside it.
+    pub path_affinity: f32,
+    /// Strength of concept-driven query expansion; zero disables it.
+    pub concept_expansion: f32,
+}
+
+impl Default for RankWeights {
+    fn default() -> Self {
+        RankWeights {
+            history_prior: HISTORY_PRIOR_WEIGHT,
+            history_symbols_per_file: HISTORY_PRIOR_SYMBOLS_PER_FILE,
+            coverage_floor: COVERAGE_FLOOR,
+            path_affinity: PATH_AFFINITY_WEIGHT,
+            concept_expansion: CONCEPT_EXPANSION_DECAY,
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct ContextOptions {
     pub budget: u32,
     pub max_next_reads: usize,
+    pub weights: RankWeights,
+    /// Files the agent has already read or ruled out.
+    ///
+    /// This is the whole iteration mechanism: Reify stays a pure function and the
+    /// agent carries the state. A second call excluding the first answer's files *is*
+    /// the refinement, with nothing to persist and nothing to invalidate.
+    pub exclude: Vec<String>,
 }
 
 impl Default for ContextOptions {
@@ -95,6 +173,8 @@ impl Default for ContextOptions {
         ContextOptions {
             budget: DEFAULT_BUDGET,
             max_next_reads: MAX_NEXT_READS,
+            weights: RankWeights::default(),
+            exclude: Vec::new(),
         }
     }
 }
@@ -222,7 +302,18 @@ struct Scored {
 
 /// Compile the minimum useful context for `task`.
 pub fn compile(store: &Store, task: &str, opts: &ContextOptions) -> Result<Context> {
-    let scored = rank(store, task)?;
+    let mut scored = rank(store, task, &opts.weights)?;
+    if !opts.exclude.is_empty() {
+        // Dropped before selection, not after: the budget freed by an excluded file
+        // must go to the next-best candidate, or iteration returns thinner answers
+        // instead of different ones.
+        scored.retain(|s| {
+            s.node
+                .path
+                .as_deref()
+                .is_none_or(|path| !opts.exclude.iter().any(|e| e == path))
+        });
+    }
     let context_budget = (opts.budget as f32 * CONTEXT_SHARE) as u32;
     let selected = select(&scored, context_budget);
     let context_cost: u32 = selected.iter().map(|s| s.node.tokens).sum();
@@ -293,7 +384,7 @@ pub fn compile(store: &Store, task: &str, opts: &ContextOptions) -> Result<Conte
 }
 
 /// Seed from lexical and exact-name matches, then spread across the graph.
-fn rank(store: &Store, task: &str) -> Result<Vec<Scored>> {
+fn rank(store: &Store, task: &str, weights: &RankWeights) -> Result<Vec<Scored>> {
     let mut scores: HashMap<i64, (f32, String)> = HashMap::new();
     let mut nodes: HashMap<i64, Node> = HashMap::new();
 
@@ -321,8 +412,8 @@ fn rank(store: &Store, task: &str) -> Result<Vec<Scored>> {
         let score = relevance
             * seed_weight(node.kind)
             * node.confidence
-            * (0.35 + 0.65 * coverage)
-            * (1.0 + PATH_AFFINITY_WEIGHT * affinity);
+            * (weights.coverage_floor + (1.0 - weights.coverage_floor) * coverage)
+            * (1.0 + weights.path_affinity * affinity);
         bump(
             &mut scores,
             &mut nodes,
@@ -337,6 +428,121 @@ fn rank(store: &Store, task: &str) -> Result<Vec<Scored>> {
     for word in meaningful_words(task) {
         for node in store.symbols_named(&word)? {
             bump(&mut scores, &mut nodes, node, 0.9, "named in the task");
+        }
+    }
+
+    // --- expansion through concepts ------------------------------------------
+    // The concept layer exists because the analyst's word and the code's word differ.
+    // Applying it only *after* seeding leaves the lexical search blind to every other
+    // surface form, so the strongest seeded concepts contribute one extra search each:
+    // a task that says "approval" also searches "phê duyệt", "approval_status" and
+    // whatever else the concept knows itself as.
+    let mut top_concepts: Vec<(i64, f32)> = if weights.concept_expansion <= 0.0 {
+        Vec::new()
+    } else {
+        scores
+            .iter()
+            .filter(|(id, _)| nodes.get(id).is_some_and(|n| n.kind == NodeKind::Concept))
+            .map(|(id, (score, _))| (*id, *score))
+            .collect()
+    };
+    top_concepts.sort_by(|a, b| b.1.total_cmp(&a.1).then(a.0.cmp(&b.0)));
+    top_concepts.truncate(CONCEPT_EXPANSIONS);
+    for (concept_id, concept_score) in top_concepts {
+        let Some(concept) = nodes.get(&concept_id).cloned() else {
+            continue;
+        };
+        let mut surface = String::new();
+        if let Some(labels) = concept.data.get("labels").and_then(|v| v.as_object()) {
+            for label in labels.values().filter_map(|v| v.as_str()) {
+                surface.push_str(label);
+                surface.push(' ');
+            }
+        }
+        if let Some(code) = concept.data.get("code").and_then(|v| v.as_array()) {
+            for identifier in code.iter().filter_map(|v| v.as_str()) {
+                surface.push_str(identifier);
+                surface.push(' ');
+            }
+        }
+        // Only the forms the task did not already say; searching the task's own words
+        // again would just re-rank the same seeds.
+        let novel: Vec<String> = meaningful_words(&surface)
+            .into_iter()
+            .filter(|w| !asked.contains(w))
+            .collect();
+        if novel.is_empty() {
+            continue;
+        }
+        let query = novel.into_iter().collect::<Vec<_>>().join(" ");
+        for (node, raw) in store.search(&query, LEXICAL_SEEDS / 4)? {
+            let relevance = (raw / best).clamp(0.0, 1.0);
+            let score = concept_score * weights.concept_expansion * relevance;
+            if score < MIN_SCORE {
+                continue;
+            }
+            let reason = format!("other name for {}", concept.name);
+            bump(&mut scores, &mut nodes, node, score, &reason);
+        }
+    }
+
+    // --- the repository's own history as a prior -----------------------------
+    // Every merged commit is a labelled example: its message is a ticket description
+    // and its files are the correct answer. This is the signal no static analysis has,
+    // and it is fully citable — N commits said these words and touched this file.
+    let asked_vec: Vec<String> = asked
+        .iter()
+        .map(|w| crate::concepts::stem(w).to_string())
+        .collect::<BTreeSet<_>>()
+        .into_iter()
+        .collect();
+    let prior = store.history_prior(&asked_vec, HISTORY_PRIOR_FILES)?;
+    if let Some((_, strongest)) = prior.first().map(|(p, s)| (p.clone(), *s)) {
+        for (path, raw) in &prior {
+            let strength = weights.history_prior * (raw / strongest.max(1e-6));
+            let reason = format!("past commits about this touched {path}");
+            for symbol in store
+                .symbols_in_file(path)?
+                .into_iter()
+                .take(weights.history_symbols_per_file)
+            {
+                boost(&mut scores, &mut nodes, symbol, strength * 0.5, &reason);
+            }
+            if let Some(file) = store.node_by_uid(&crate::model::uid::file(path))? {
+                boost(&mut scores, &mut nodes, file, strength, &reason);
+            }
+        }
+    }
+
+    // --- files lift their contents -------------------------------------------
+    // A file whose *path* matches the task is often the answer — `cloud-auth-login.tsx`
+    // for "remove the cloud auth button" — but a file node has no outgoing edges to
+    // its symbols and is not itself rendered, so without this step a perfectly
+    // matching file contributes nothing at all to the answer.
+    let mut top_files: Vec<(i64, f32)> = scores
+        .iter()
+        .filter(|(id, _)| nodes.get(id).is_some_and(|n| n.kind == NodeKind::File))
+        .map(|(id, (score, _))| (*id, *score))
+        .collect();
+    top_files.sort_by(|a, b| b.1.total_cmp(&a.1).then(a.0.cmp(&b.0)));
+    top_files.truncate(FILE_FANOUT);
+    for (file_id, file_score) in top_files {
+        let Some(path) = nodes.get(&file_id).and_then(|n| n.path.clone()) else {
+            continue;
+        };
+        let reason = format!("in {path}, which matches the task");
+        for symbol in store
+            .symbols_in_file(&path)?
+            .into_iter()
+            .take(FILE_FANOUT_SYMBOLS)
+        {
+            boost(
+                &mut scores,
+                &mut nodes,
+                symbol,
+                file_score * FILE_TO_SYMBOL,
+                &reason,
+            );
         }
     }
 
@@ -459,6 +665,34 @@ const SPREAD_EDGES: &[EdgeKind] = &[
     EdgeKind::TestedBy,
     EdgeKind::Contradicts,
 ];
+
+/// Add independent evidence to a node's score.
+///
+/// Distinct from [`bump`] on purpose: `bump` keeps the *strongest* single claim, which
+/// is right when two paths derive the same fact. A prior is a different fact about the
+/// same node, so it accumulates instead — and the reason string keeps whichever
+/// contribution was larger, so the citation matches the dominant evidence.
+fn boost(
+    scores: &mut HashMap<i64, (f32, String)>,
+    nodes: &mut HashMap<i64, Node>,
+    node: Node,
+    amount: f32,
+    reason: &str,
+) {
+    let id = node.id;
+    nodes.entry(id).or_insert(node);
+    match scores.get_mut(&id) {
+        Some((score, why)) => {
+            if amount > *score {
+                *why = reason.to_string();
+            }
+            *score += amount;
+        }
+        None => {
+            scores.insert(id, (amount, reason.to_string()));
+        }
+    }
+}
 
 /// Record a score, keeping the strongest claim. Returns whether it was an improvement.
 fn bump(
@@ -1134,6 +1368,64 @@ class DiscountPolicy:
             );
             assert!(read.est_tokens > 0);
         }
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn excluding_a_file_frees_its_budget_for_the_next_candidate() {
+        // The iteration primitive: a second call excluding the first answer's files
+        // must return *different* files, not a thinner version of the same answer.
+        let (store, root) = indexed();
+        let first = compile(
+            &store,
+            "strategic account discount",
+            &ContextOptions::default(),
+        )
+        .unwrap();
+        let offered: Vec<String> = first.next_reads.iter().map(|r| r.path.clone()).collect();
+        assert!(!offered.is_empty());
+
+        let second = compile(
+            &store,
+            "strategic account discount",
+            &ContextOptions {
+                exclude: offered.clone(),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        for read in &second.next_reads {
+            assert!(
+                !offered.contains(&read.path),
+                "{} was excluded and came back",
+                read.path
+            );
+        }
+        for item in &second.code {
+            assert!(!offered.contains(&item.path), "{} in code list", item.path);
+        }
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn an_english_task_reaches_a_vietnamese_document_through_the_concept() {
+        // Concept expansion: the task and the document share no token in any
+        // language; only the concept knows both names.
+        let root = fixture();
+        fs::write(
+            root.join("docs/chinh-sach.md"),
+            "# Chính sách chiết khấu\n\n## Khách hàng chiến lược\n\nKhách hàng chiến lược được hưởng chiết khấu mười lăm phần trăm.\n",
+        )
+        .unwrap();
+        let mut store = crate::store::Store::in_memory().unwrap();
+        index(&mut store, &IndexOptions::new(&root)).unwrap();
+
+        let ctx = compile(&store, "strategic account", &ContextOptions::default()).unwrap();
+        let rendered = serde_json::to_string(&ctx).unwrap();
+        assert!(
+            rendered.contains("chinh-sach") || rendered.contains("chiến lược"),
+            "the Vietnamese document must be reachable from the English task"
+        );
         let _ = fs::remove_dir_all(&root);
     }
 

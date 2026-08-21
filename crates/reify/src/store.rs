@@ -15,7 +15,7 @@ use crate::tokens;
 
 /// Bumped whenever the schema changes shape. A store whose version differs from the
 /// binary's is rebuilt rather than migrated in place; rebuilds are cheap by design.
-pub const SCHEMA_VERSION: i64 = 5;
+pub const SCHEMA_VERSION: i64 = 6;
 
 /// Edge kinds derived from a single file's content, invalidated when its hash changes.
 pub const CONTENT_EDGE_KINDS: &[EdgeKind] = &[
@@ -124,6 +124,20 @@ CREATE VIRTUAL TABLE IF NOT EXISTS search_ngram USING fts5(
     body,
     tokenize = "trigram"
 );
+
+-- The history prior: which files this repository's own commits touch when their
+-- messages talk about a given term.
+--
+-- Every merged commit is a labelled example nobody had to label - the message is a
+-- ticket description, the changed files are the correct answer. This table is that
+-- signal, PMI-scored so a file changed in every commit earns nothing. Owned by the
+-- history stage: rebuilt when HEAD moves, cleared by forget_history.
+CREATE TABLE IF NOT EXISTS history_terms (
+    term  TEXT NOT NULL,
+    path  TEXT NOT NULL,
+    score REAL NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_history_terms ON history_terms(term);
 
 CREATE TABLE IF NOT EXISTS facts (
     id      INTEGER PRIMARY KEY,
@@ -509,6 +523,7 @@ impl Store {
 
     /// Drop everything the history stage owns, before it rebuilds from a new `HEAD`.
     pub fn forget_history(&self) -> Result<()> {
+        self.conn.execute("DELETE FROM history_terms", [])?;
         for kind in HISTORY_EDGE_KINDS {
             self.conn
                 .execute("DELETE FROM edges WHERE kind = ?1", params![kind.as_str()])?;
@@ -600,6 +615,47 @@ impl Store {
                 r.get::<_, String>(2)?,
                 EdgeKind::parse(&r.get::<_, String>(3)?).unwrap_or(EdgeKind::Calls),
             ))
+        })?;
+        rows.map(|r| r.map_err(Into::into)).collect()
+    }
+
+    /// Persist the history prior, replacing whatever was there.
+    pub fn put_history_terms(&mut self, rows: &[(String, String, f32)]) -> Result<()> {
+        let tx = self.conn.transaction()?;
+        {
+            tx.execute("DELETE FROM history_terms", [])?;
+            let mut stmt =
+                tx.prepare("INSERT INTO history_terms(term, path, score) VALUES (?1, ?2, ?3)")?;
+            for (term, path, score) in rows {
+                stmt.execute(params![term, path, score])?;
+            }
+        }
+        tx.commit()?;
+        Ok(())
+    }
+
+    /// Files this repository's commits touch when their messages use these terms,
+    /// strongest first. The citation for each is real: N commits said the word and
+    /// changed the file.
+    pub fn history_prior(&self, terms: &[String], limit: usize) -> Result<Vec<(String, f32)>> {
+        if terms.is_empty() {
+            return Ok(Vec::new());
+        }
+        let placeholders = vec!["?"; terms.len()].join(",");
+        let sql = format!(
+            "SELECT path, SUM(score) AS total FROM history_terms
+             WHERE term IN ({placeholders})
+             GROUP BY path ORDER BY total DESC, path LIMIT ?"
+        );
+        let mut stmt = self.conn.prepare(&sql)?;
+        let mut params_vec: Vec<&dyn rusqlite::types::ToSql> = Vec::new();
+        for term in terms {
+            params_vec.push(term);
+        }
+        let limit = limit as i64;
+        params_vec.push(&limit);
+        let rows = stmt.query_map(params_vec.as_slice(), |r| {
+            Ok((r.get::<_, String>(0)?, r.get::<_, f64>(1)? as f32))
         })?;
         rows.map(|r| r.map_err(Into::into)).collect()
     }

@@ -1,0 +1,391 @@
+{
+  "best": {
+    "coverage_floor": 0.3499999940395355,
+    "history_prior": 5.5,
+    "history_symbols_per_file": 6,
+    "path_affinity": 1.0,
+    "score": 1.0226805210113525
+  },
+  "budget_tokens": 4000,
+  "grid": [
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.699999988079071,
+          "label": "erpnext",
+          "mrr": 0.4539831280708313
+        },
+        {
+          "hit_rate": 0.36000001430511475,
+          "label": "openmrs",
+          "mrr": 0.22166667878627777
+        }
+      ],
+      "score": 0.867824912071228,
+      "weights": {
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 1.5,
+        "history_symbols_per_file": 4,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.6499999761581421,
+          "label": "erpnext",
+          "mrr": 0.4405505657196045
+        },
+        {
+          "hit_rate": 0.3199999928474426,
+          "label": "openmrs",
+          "mrr": 0.21666668355464935
+        }
+      ],
+      "score": 0.8136086463928223,
+      "weights": {
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 1.5,
+        "history_symbols_per_file": 6,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.675000011920929,
+          "label": "erpnext",
+          "mrr": 0.46791666746139526
+        },
+        {
+          "hit_rate": 0.3199999928474426,
+          "label": "openmrs",
+          "mrr": 0.1966666728258133
+        }
+      ],
+      "score": 0.8297916650772095,
+      "weights": {
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 1.5,
+        "history_symbols_per_file": 10,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.699999988079071,
+          "label": "erpnext",
+          "mrr": 0.4980059564113617
+        },
+        {
+          "hit_rate": 0.4000000059604645,
+          "label": "openmrs",
+          "mrr": 0.3390476107597351
+        }
+      ],
+      "score": 0.9685267806053162,
+      "weights": {
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 2.200000047683716,
+        "history_symbols_per_file": 4,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.699999988079071,
+          "label": "erpnext",
+          "mrr": 0.5017261505126953
+        },
+        {
+          "hit_rate": 0.4399999976158142,
+          "label": "openmrs",
+          "mrr": 0.3444444239139557
+        }
+      ],
+      "score": 0.9930853247642517,
+      "weights": {
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 2.200000047683716,
+        "history_symbols_per_file": 6,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.675000011920929,
+          "label": "erpnext",
+          "mrr": 0.5327380895614624
+        },
+        {
+          "hit_rate": 0.4000000059604645,
+          "label": "openmrs",
+          "mrr": 0.3400000035762787
+        }
+      ],
+      "score": 0.9738690853118896,
+      "weights": {
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 2.200000047683716,
+        "history_symbols_per_file": 10,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.7250000238418579,
+          "label": "erpnext",
+          "mrr": 0.5234325528144836
+        },
+        {
+          "hit_rate": 0.4000000059604645,
+          "label": "openmrs",
+          "mrr": 0.3373333215713501
+        }
+      ],
+      "score": 0.9928829669952393,
+      "weights": {
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 3.0,
+        "history_symbols_per_file": 4,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.699999988079071,
+          "label": "erpnext",
+          "mrr": 0.5265277624130249
+        },
+        {
+          "hit_rate": 0.4399999976158142,
+          "label": "openmrs",
+          "mrr": 0.34933334589004517
+        }
+      ],
+      "score": 1.0079305171966553,
+      "weights": {
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 3.0,
+        "history_symbols_per_file": 6,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.675000011920929,
+          "label": "erpnext",
+          "mrr": 0.5527777671813965
+        },
+        {
+          "hit_rate": 0.36000001430511475,
+          "label": "openmrs",
+          "mrr": 0.3333333730697632
+        }
+      ],
+      "score": 0.9605555534362793,
+      "weights": {
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 3.0,
+        "history_symbols_per_file": 10,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.7250000238418579,
+          "label": "erpnext",
+          "mrr": 0.543055534362793
+        },
+        {
+          "hit_rate": 0.4399999976158142,
+          "label": "openmrs",
+          "mrr": 0.3040476143360138
+        }
+      ],
+      "score": 1.0060515403747559,
+      "weights": {
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 4.0,
+        "history_symbols_per_file": 4,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.7250000238418579,
+          "label": "erpnext",
+          "mrr": 0.5480555295944214
+        },
+        {
+          "hit_rate": 0.4399999976158142,
+          "label": "openmrs",
+          "mrr": 0.30799999833106995
+        }
+      ],
+      "score": 1.0105278491973877,
+      "weights": {
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 4.0,
+        "history_symbols_per_file": 6,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.675000011920929,
+          "label": "erpnext",
+          "mrr": 0.548611044883728
+        },
+        {
+          "hit_rate": 0.36000001430511475,
+          "label": "openmrs",
+          "mrr": 0.2693333327770233
+        }
+      ],
+      "score": 0.9264722466468811,
+      "weights": {
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 4.0,
+        "history_symbols_per_file": 10,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.7250000238418579,
+          "label": "erpnext",
+          "mrr": 0.569444477558136
+        },
+        {
+          "hit_rate": 0.4399999976158142,
+          "label": "openmrs",
+          "mrr": 0.30577778816223145
+        }
+      ],
+      "score": 1.0201112031936646,
+      "weights": {
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 5.5,
+        "history_symbols_per_file": 4,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.7250000238418579,
+          "label": "erpnext",
+          "mrr": 0.5723611116409302
+        },
+        {
+          "hit_rate": 0.4399999976158142,
+          "label": "openmrs",
+          "mrr": 0.30799999833106995
+        }
+      ],
+      "score": 1.0226805210113525,
+      "weights": {
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 5.5,
+        "history_symbols_per_file": 6,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.675000011920929,
+          "label": "erpnext",
+          "mrr": 0.5549999475479126
+        },
+        {
+          "hit_rate": 0.36000001430511475,
+          "label": "openmrs",
+          "mrr": 0.2693333327770233
+        }
+      ],
+      "score": 0.9296666979789734,
+      "weights": {
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 5.5,
+        "history_symbols_per_file": 10,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.699999988079071,
+          "label": "erpnext",
+          "mrr": 0.5423611402511597
+        },
+        {
+          "hit_rate": 0.4399999976158142,
+          "label": "openmrs",
+          "mrr": 0.3077777922153473
+        }
+      ],
+      "score": 0.9950694441795349,
+      "weights": {
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 7.0,
+        "history_symbols_per_file": 4,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.699999988079071,
+          "label": "erpnext",
+          "mrr": 0.5452777743339539
+        },
+        {
+          "hit_rate": 0.4399999976158142,
+          "label": "openmrs",
+          "mrr": 0.30799999833106995
+        }
+      ],
+      "score": 0.9966388940811157,
+      "weights": {
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 7.0,
+        "history_symbols_per_file": 6,
+        "path_affinity": 1.0
+      }
+    },
+    {
+      "per_set": [
+        {
+          "hit_rate": 0.675000011920929,
+          "label": "erpnext",
+          "mrr": 0.5348213911056519
+        },
+        {
+          "hit_rate": 0.36000001430511475,
+          "label": "openmrs",
+          "mrr": 0.2693333327770233
+        }
+      ],
+      "score": 0.919577419757843,
+      "weights": {
+        "coverage_floor": 0.3499999940395355,
+        "history_prior": 7.0,
+        "history_symbols_per_file": 10,
+        "path_affinity": 1.0
+      }
+    }
+  ],
+  "purpose": "fitted ranking weights; training data is commits earlier than every benchmark task"
+}

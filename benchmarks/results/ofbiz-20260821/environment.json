@@ -1,0 +1,12 @@
+{
+  "budget_tokens": 4000,
+  "code_files_in_corpus": 1256,
+  "conditions": [
+    "B-content-grep",
+    "C-path-grep",
+    "R-reify"
+  ],
+  "head": "fac1ba4911c16d84cf25424318af126e5e78b8d2",
+  "reify_version": "0.1.0",
+  "repository": "/Users/lambiengcode/Documents/reify/projects/reify/.bench/ofbiz"
+}
