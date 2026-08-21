@@ -10,17 +10,35 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/license-Apache--2.0-111111?style=flat-square" alt="Apache-2.0">
-  <img src="https://img.shields.io/badge/languages-11-111111?style=flat-square" alt="11 ngôn ngữ">
-  <img src="https://img.shields.io/badge/doc%20formats-10-111111?style=flat-square" alt="10 định dạng tài liệu">
-  <img src="https://img.shields.io/badge/network%20calls-0-111111?style=flat-square" alt="Không gọi mạng">
-  <img src="https://img.shields.io/badge/tests-361-111111?style=flat-square" alt="361 test">
-  <img src="https://img.shields.io/badge/built%20with-Rust-111111?style=flat-square" alt="Rust">
+  <sub>Đã cài rồi? Chạy <code>reify upgrade</code></sub>
 </p>
 
 <p align="center">
-  <strong>Với cùng một chi phí token, mô hình tìm đúng file cần sửa 75% số lần — grep chỉ được 50% &middot; đo trên bốn repository &middot; không bao giờ mở socket</strong><br>
-  <sub>Một mô hình thật, 142 task lấy từ commit đã merge thật ở ERPNext, OFBiz, OpenMRS và Medusa; mỗi index được dựng tại một commit <em>trước khi</em> những thay đổi đó tồn tại. Ba trong bốn repository chênh 25–50 điểm ở cùng mức chi phí; repository thứ tư không hơn gì cả, và mục <a href="#numbers">Số liệu</a> nói điều đó với đúng mức độ nổi bật như vậy. <a href="benchmarks/REPORT.md">Bản viết đầy đủ</a> &middot; <a href="#reproducing-the-benchmark">tự chạy lại</a>.</sub>
+  <strong>đồ thị tri thức xác định &middot; mọi khẳng định đều có trích dẫn &middot; từ tài liệu BA đến code &middot; một binary, không daemon &middot; không bao giờ mở socket</strong>
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-111111?style=flat-square" alt="Apache-2.0"></a>
+  <a href="#what-it-reads"><img src="https://img.shields.io/badge/languages-11-111111?style=flat-square" alt="11 ngôn ngữ"></a>
+  <a href="#what-it-reads"><img src="https://img.shields.io/badge/doc%20formats-10-111111?style=flat-square" alt="10 định dạng tài liệu"></a>
+  <a href="#privacy"><img src="https://img.shields.io/badge/network%20calls-0-111111?style=flat-square" alt="Không gọi mạng"></a>
+  <a href="#development"><img src="https://img.shields.io/badge/tests-369-111111?style=flat-square" alt="369 test"></a>
+  <a href="#architecture"><img src="https://img.shields.io/badge/built%20with-Rust-111111?style=flat-square" alt="Rust"></a>
+</p>
+
+<p align="center">
+  <a href="#claude-code"><img src="https://img.shields.io/badge/Claude_Code-supported-2da44e?style=flat-square" alt="Claude Code"></a>
+  <a href="#other-agents"><img src="https://img.shields.io/badge/Cursor-supported-2da44e?style=flat-square" alt="Cursor"></a>
+  <a href="#other-agents"><img src="https://img.shields.io/badge/Codex-supported-2da44e?style=flat-square" alt="Codex"></a>
+  <a href="#other-agents"><img src="https://img.shields.io/badge/OpenCode-supported-2da44e?style=flat-square" alt="OpenCode"></a>
+  <a href="#other-agents"><img src="https://img.shields.io/badge/Aider-supported-2da44e?style=flat-square" alt="Aider"></a>
+  <a href="#mcp"><img src="https://img.shields.io/badge/MCP-3_tools-2da44e?style=flat-square" alt="MCP"></a>
+  <a href="#install"><img src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux-prebuilt-111111?style=flat-square" alt="macOS / Linux"></a>
+</p>
+
+<p align="center">
+  <strong>Trên SWE-bench Verified, Reify đặt đúng file cần sửa trước mặt mô hình 84,6% số lần — grep chỉ được 6,6% &middot; 500 issue thật, benchmark của người khác &middot; không bao giờ mở socket</strong><br>
+  <sub>Một mô hình thật, 142 task lấy từ commit đã merge thật ở ERPNext, OFBiz, OpenMRS và Medusa; mỗi index được dựng tại một commit <em>trước khi</em> những thay đổi đó tồn tại. Đó là <em>truy xuất</em>: đúng file, đặt trước mặt mô hình. Còn về tính đúng đắn của bản vá đầu-cuối, hiện một baseline BM25 giải quyết được <em>nhiều</em> issue hơn Reify, và <a href="#swebench">mục nói điều đó</a> cũng nổi bật đúng như mục này. <a href="benchmarks/REPORT.md">Bản viết đầy đủ</a> &middot; <a href="#reproducing-the-benchmark">tự chạy lại</a>.</sub>
 </p>
 
 <p align="center">
@@ -28,8 +46,23 @@
 </p>
 
 <p align="center">
-  <sub>Mọi lệnh trong đoạn demo đều là thật, chạy trên một index ERPNext thật. Kịch bản ghi hình đã được <a href="assets/demo.tape">commit</a>; nếu ảnh động có bao giờ mâu thuẫn với công cụ, hãy dựng lại ảnh động.</sub>
+  <sub>Mọi lệnh trong đoạn demo đều là thật, chạy trên một index ERPNext thật. Kịch bản ghi hình đã được <a href="assets/demo-script.sh">commit</a> (ghi bằng terminalizer); nếu ảnh động có bao giờ mâu thuẫn với công cụ, hãy ghi lại ảnh động.</sub>
 </p>
+
+## <a id="two-minutes"></a>Hai phút đến câu trả lời đầu tiên
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/lambiengcode/reify/main/install.sh | sh
+cd your-repository
+reify init --write-agent-instructions   # nối agent của bạn qua AGENTS.md / CLAUDE.md
+reify index                             # 4,6 giây cho 5.000 file; 0,7 giây sau một lần sửa
+reify context "thay đổi bạn sắp thực hiện" --toon
+```
+
+<sub>Một binary tĩnh duy nhất — không daemon, không config, không API key, và mỗi bản
+phát hành kèm checksum SHA-256 mà <code>reify upgrade</code> kiểm tra trước khi cài.
+Đổi ý? <code>reify uninstall</code> xoá binary, <code>reify uninit</code> dọn một
+repository, cả hai đều in kế hoạch trước. Nối từng agent, hook và MCP: <a href="#install">Cài đặt</a>.</sub>
 
 <p align="center">
   <a href="README.md">English</a> &middot; <strong>Tiếng Việt</strong> &middot; <a href="README.zh.md">简体中文</a>
@@ -40,9 +73,11 @@
 <details>
 <summary><strong>Mục lục</strong></summary>
 
+- [Hai phút đến câu trả lời đầu tiên](#two-minutes)
 - [Vấn đề phụ thuộc một người](#the-one-person-problem)
 - [Reify thực sự cho bạn cái gì](#what-it-actually-gives-you)
 - [Trước / sau](#before--after)
+- [SWE-bench Verified](#swebench) — 84,6% so với 6,6% của grep
 - [Số liệu](#numbers) — [chỉ riêng truy xuất](#retrieval-alone) · [bảng điểm](#the-scorecard) · [chỗ nó không chạy được](#where-it-doesnt-work)
 - [Cách nó hoạt động](#how-it-works) — [bốn cây cầu sang code](#four-bridges)
 - [Nó đọc được gì](#what-it-reads)
@@ -142,7 +177,79 @@ $ reify why erpnext/selling/doctype/sales_order/sales_order.py:812
 
 Ba trong bốn phần đó là những thứ grep về mặt cấu trúc không thể tạo ra.
 
-## <a id="numbers"></a>Số liệu
+## <a id="swebench"></a>Số liệu, trên một benchmark không phải của chúng tôi
+
+Benchmark bốn repository bên dưới là của chúng tôi, và đó chính là lý do phải chạy thêm
+benchmark của người khác. **[SWE-bench Verified](https://openai.com/index/introducing-swe-bench-verified/)**
+gồm 500 issue GitHub thật từ mười hai dự án Python nổi tiếng, mỗi issue được ghim vào
+đúng `base_commit` mà nó được báo cáo — cùng một giao thức "index trước khi thay đổi"
+mà benchmark của Reify dùng, nhưng do người khác viết ra. Đề bài là một báo cáo lỗi
+thông thường; đáp án đúng là tập file mà bản vá được chấp nhận thực sự đã sửa.
+
+| truy xuất trên SWE-bench Verified, n=500 | đề xuất được một file mà bản vá đã sửa | MRR | đề xuất được **mọi** file như vậy | token trung vị |
+|---|--:|--:|--:|--:|
+| grep, content | 6.6% <sub>[4.7–9.1]</sub> | 0.06 | 5.6% | 3,998 |
+| grep, paths | 9.0% <sub>[6.8–11.8]</sub> | 0.06 | 7.8% | 3,996 |
+| **reify**, một vòng | **66.0%** <sub>[61.7–70.0]</sub> | 0.43 | 59.0% | **3,466** |
+| **reify**, ba vòng | **84.6%** <sub>[81.2–87.5]</sub> | 0.45 | 77.0% | 9,174 |
+
+**Một vòng Reify duy nhất thắng grep trên 310 instance và thua 13 — trong khi tiêu ít
+token hơn** (3.466 so với 3.998). Ba vòng thắng 395–5 (McNemar chính xác
+p ≈ 7 × 10⁻¹¹⁰). Đây không phải phép đo sát nút, và nó là con số sạch nhất trong tài
+liệu này chính bởi vì đề bài, repository lẫn đáp án đều đến từ nơi khác.
+
+Theo từng repository, ba vòng so với grep nội dung:
+
+| | grep | reify ×3 | | | grep | reify ×3 |
+|---|--:|--:|---|---|--:|--:|
+| django (n=231) | 6% | **88%** | | astropy (n=22) | 0% | **77%** |
+| sympy (n=75) | 7% | **77%** | | xarray (n=22) | 9% | **91%** |
+| sphinx (n=44) | 7% | **75%** | | pytest (n=19) | 26% | **84%** |
+| matplotlib (n=34) | 0% | **91%** | | pylint (n=10) | 10% | **60%** |
+| scikit-learn (n=32) | 9% | **88%** | | requests (n=8) | 0% | **100%** |
+
+**Điều này chứng minh gì và không chứng minh gì.** Nó đo *truy xuất* — liệu những file
+cần sửa có được đặt trước mặt mô hình hay không — chứ không đo việc mô hình sau đó có
+viết đúng bản vá hay không. Verified chỉ có Python, nên nó không nói gì về điểm yếu
+TypeScript hiện đại [bên dưới](#where-it-doesnt-work). Và các repository này nổi tiếng
+đến mức mô hình đã thuộc lòng một phần; điều đó ảnh hưởng tới *câu trả lời* của mô
+hình, không ảnh hưởng tới việc một bộ truy xuất đề xuất file nào, và mọi nhánh ở đây
+đều chạy trên cùng một index tại cùng một commit. Tái lập bằng driver trong
+[`benchmarks/swe/`](benchmarks/swe/).
+
+
+### Kết quả đầu-cuối, và nó không nghiêng về phía chúng tôi
+
+Truy xuất không phải tuyên bố cuối cùng của dự án này — giải quyết được issue mới là.
+Vì vậy cùng benchmark đó được chạy qua chính giao thức "truy xuất rồi sinh bản vá" của
+bài báo SWE-bench: một mô hình, một ngân sách ngữ cảnh, bộ truy xuất là khác biệt duy
+nhất giữa các nhánh, và mọi bản vá đều do **bộ chấm chính thức của SWE-bench** trong
+Docker phán quyết. 101 instance phân tầng; 72 trong số đó được chấm ở cả hai nhánh.
+
+| giải quyết được issue | | KTC 95% |
+|---|--:|---|
+| BM25 | **18,1%** (13/72) | [10,9–28,5] |
+| Reify | 11,1% (8/72) | [5,7–20,4] |
+
+BM25 giải được 8 instance mà Reify không giải được; Reify giải được 3 cái BM25 không
+(McNemar chính xác p = 0,23). Với cỡ mẫu này đó không phải khác biệt có ý nghĩa thống kê
+— nhưng ước lượng điểm nghiêng về BM25, và nó được báo cáo đúng theo chiều đó, vì đó là
+chiều mà kết quả đã đi ra.
+
+**Phần chẩn đoán còn giá trị hơn con số.** Trong 5 trên 8 instance mà BM25 giải được còn
+Reify thì không, **Reify đã từng đề xuất một file mà bản vá có sửa.** Vậy đây không phải
+thất bại về truy xuất. Đặt đúng file trước mặt mô hình và đưa cho mô hình thứ nó cần để
+viết bản vá là hai bài toán khác nhau, và Reify được đo là giỏi hơn hẳn ở bài toán thứ
+nhất so với bài toán thứ hai.
+
+Một giới hạn, nêu ra như một giới hạn chứ không phải để bào chữa: giao thức này dùng
+Reify như một *bộ xếp hạng file*, nạp nguyên cả file, tức là vứt bỏ đúng thứ mà
+`reify context` thực sự tạo ra — các đoạn code, luật, trích dẫn nguồn, mâu thuẫn, và kế
+hoạch đọc theo ngân sách. Nạp thẳng ngữ cảnh đã biên dịch mới là thí nghiệm tiếp theo
+hiển nhiên. Nó chưa được chạy, nên nó chưa chứng minh điều gì.
+
+## <a id="numbers"></a>Số liệu, trên bốn repository chọn để làm khó
+
 
 Phép đo trung thực là một mô hình thật làm một task thật: ticket lấy từ các commit đã
 merge, trong đó prompt chính là mô tả thay đổi do dev tự viết, còn đáp án đúng là những
@@ -165,6 +272,11 @@ thẳng đúng ngân sách gấp ba đó.
 | OFBiz (Java + XML), n=40 | 28% | **78%** | +50 | không |
 | OpenMRS (Java), n=22 | 32% | **59%** | +27 | sát nút |
 | Medusa (TS hiện đại), n=40 | 24% | **26%** | +2 | **chồng hoàn toàn — không thắng** |
+
+> **Lưu ý về hàng thứ tư:** +2 của Medusa là hoà, không phải thắng, và nó đứng trong
+> bảng chính với đầy đủ vị trí thay vì bị giấu xuống chú thích. Điều gì phân tách các
+> repository mà Reify thắng đậm với nơi nó không thắng đã được đo, không phải đoán —
+> xem [Chỗ nó không chạy được](#where-it-doesnt-work).
 
 **Các nhóm đối chứng, trên mọi repository:** ngữ cảnh hoàn hảo đạt 100% ở khắp nơi, nên
 chất lượng truy xuất chính là toàn bộ cuộc chơi. Ngữ cảnh mồi nhử có hình dạng y hệt
@@ -325,6 +437,13 @@ reify init      # cho biết nó sẽ index cái gì, không index cái gì, và
 reify index     # 4,6 giây cho 5.000 file; 0,7 giây sau khi bạn sửa một file
 ```
 
+**Cập nhật gọn, gỡ bỏ sạch.** `reify upgrade` thay binary bằng bản phát hành mới nhất —
+qua `curl` và `tar` dưới dạng tiến trình con nhìn thấy được, không bao giờ qua HTTP
+client nhúng, và checksum được kiểm tra trước khi cài bất cứ thứ gì; `--check` chỉ hỏi,
+còn `REIFY_OFFLINE=1` từ chối thẳng lệnh này. `reify uninstall --yes` xoá binary và
+không gì khác; `reify uninit --yes` xoá kho `.reify/` của một repository cùng khối hướng
+dẫn mà `init` đã ghi. Cả hai đều in kế hoạch trước khi chạy nếu thiếu `--yes`.
+
 <details>
 <summary><strong>Tự động hoàn thành lệnh trong shell</strong></summary>
 
@@ -426,6 +545,8 @@ Reify ghi prompt vào stdin của lệnh đó, hoặc thay vào tham số `{prom
 | `reify report` | Bảng điểm hệ thống |
 | `reify status` | Độ mới, độ phủ, và những gì đã bị bỏ qua |
 | `reify llm status \| preview` | Đã cấu hình mô hình chưa, và chính xác cái gì sẽ được gửi đi |
+| `reify upgrade [--check]` | Thay binary này bằng bản phát hành mới nhất. Lệnh duy nhất dùng mạng; bị từ chối khi `REIFY_OFFLINE=1` |
+| `reify uninstall --yes` \| `uninit --yes` | Xoá binary \| kho và khối hướng dẫn của một repository |
 | `reify serve --mcp` | Model Context Protocol qua stdio |
 | `reify completions <shell>` | Script tự động hoàn thành lệnh |
 
@@ -452,7 +573,7 @@ biệt giữa một công cụ họ có thể đánh giá và một công cụ h
 |---|---|
 | Thư viện mạng trong `Cargo.lock` | khẳng định bằng không, kiểm tra trong CI |
 | Socket trong mã nguồn | khẳng định bằng không, kiểm tra trong CI |
-| Tiến trình con | `git`, và các trình chuyển đổi tài liệu đã rà soát — mỗi cái đều được nêu tên trong một test |
+| Tiến trình con | `git`, các trình chuyển đổi tài liệu đã rà soát, và — riêng cho `reify upgrade` — `curl` và `tar`; mỗi cái đều được nêu tên trong một test |
 | Code từ repo của bạn, bị thực thi | không bao giờ. tree-sitter phân tích cú pháp; nó không chạy code |
 | Kho lưu trữ | `.reify/`, được `reify init` đưa vào gitignore |
 

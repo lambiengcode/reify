@@ -7,6 +7,7 @@
 
 mod mcp;
 mod render;
+mod selfmanage;
 
 use anyhow::{bail, Context, Result};
 use clap::{CommandFactory, Parser, Subcommand};
@@ -154,6 +155,34 @@ enum Command {
         #[arg(long)]
         mcp: bool,
     },
+
+    /// Replace this binary with a newer release.
+    ///
+    /// The one command in Reify that reaches the network — through `curl` and `tar`
+    /// as visible subprocesses, never an embedded client — with the checksum
+    /// verified before anything is installed. `REIFY_OFFLINE=1` refuses it.
+    Upgrade {
+        /// Only report whether a newer release exists.
+        #[arg(long)]
+        check: bool,
+        /// Install this exact version instead of the latest (e.g. `v0.1.0`).
+        version: Option<String>,
+    },
+
+    /// Remove the reify binary. Repository stores are never touched.
+    Uninstall {
+        /// Actually remove it; without this flag, only the plan is shown.
+        #[arg(long)]
+        yes: bool,
+    },
+
+    /// Remove this repository's `.reify/` store and the instruction block
+    /// `reify init --write-agent-instructions` appended.
+    Uninit {
+        /// Actually remove them; without this flag, only the plan is shown.
+        #[arg(long)]
+        yes: bool,
+    },
 }
 
 #[derive(Subcommand, Debug)]
@@ -298,6 +327,9 @@ fn run() -> Result<()> {
             anyhow::ensure!(*mcp, "only `--mcp` is supported; pass `reify serve --mcp`");
             mcp::serve(&root)
         }
+        Command::Upgrade { check, version } => selfmanage::upgrade(*check, version.as_deref()),
+        Command::Uninstall { yes } => selfmanage::uninstall(*yes),
+        Command::Uninit { yes } => selfmanage::uninit(&root, *yes),
     }
 }
 

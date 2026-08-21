@@ -566,7 +566,11 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
         let history = gitlog::history(&opts.root, opts.max_commits)?;
         report.history_truncated = history.truncated;
         store.commit(stage_history(&history, &present))?;
-        store.put_history_terms(&history_term_associations(&history, &present))?;
+        // Bodies join the prior behind a structural leakage wall: this stage only
+        // ever reads commits reachable from the indexed HEAD, so a benchmark task
+        // derived from a *later* commit can never find its own description here.
+        let bodies = gitlog::bodies(&opts.root, opts.max_commits).unwrap_or_default();
+        store.put_history_terms(&history_term_associations(&history, &bodies, &present))?;
         if let Some(sha) = &head {
             store.set_meta("head_sha", sha)?;
         }
@@ -807,6 +811,11 @@ const PRIOR_MIN_SUPPORT: u32 = 2;
 const PRIOR_MAX_FILES_PER_TERM: usize = 40;
 /// Terms taken from one commit subject. Subjects are one line; more is noise.
 const PRIOR_MAX_TERMS_PER_COMMIT: usize = 12;
+/// Term cap when a commit carries a body: squashed-PR merges put the real ticket
+/// text there, and twelve slots split across subject and body starves both.
+const PRIOR_MAX_TERMS_WITH_BODY: usize = 24;
+/// How much of a body contributes terms; beyond this it is boilerplate and sign-offs.
+const PRIOR_BODY_WORDS: usize = 80;
 /// A commit touching more files than this is a sweep and teaches nothing.
 const PRIOR_MAX_FILES_PER_COMMIT: usize = 20;
 
@@ -819,6 +828,7 @@ const PRIOR_MAX_FILES_PER_COMMIT: usize = 20;
 /// outranks one seen twice at equal PMI.
 fn history_term_associations(
     history: &gitlog::History,
+    bodies: &HashMap<String, String>,
     present: &HashSet<&str>,
 ) -> Vec<(String, String, f32)> {
     let mut pair_counts: HashMap<(String, String), u32> = HashMap::new();
@@ -831,13 +841,30 @@ fn history_term_associations(
             continue;
         }
         // Stored stemmed, and queried stemmed, so "discounts" in a subject still
-        // answers a task that says "discount".
+        // answers a task that says "discount". The subject is read first and the
+        // body second, so when the cap bites it is body boilerplate that is dropped.
+        let body_words: Vec<String> = bodies
+            .get(&commit.sha)
+            .map(|body| {
+                body.split_whitespace()
+                    .take(PRIOR_BODY_WORDS)
+                    .collect::<Vec<_>>()
+                    .join(" ")
+            })
+            .map(|prefix| concepts::meaningful_words(&prefix).into_iter().collect())
+            .unwrap_or_default();
+        let cap = if body_words.is_empty() {
+            PRIOR_MAX_TERMS_PER_COMMIT
+        } else {
+            PRIOR_MAX_TERMS_WITH_BODY
+        };
+        let mut seen = std::collections::BTreeSet::new();
         let terms: Vec<String> = concepts::meaningful_words(&commit.subject)
             .into_iter()
+            .chain(body_words)
             .map(|w| concepts::stem(&w).to_string())
-            .collect::<std::collections::BTreeSet<_>>()
-            .into_iter()
-            .take(PRIOR_MAX_TERMS_PER_COMMIT)
+            .filter(|w| seen.insert(w.clone()))
+            .take(cap)
             .collect();
         let files: Vec<&String> = commit
             .files
@@ -1497,7 +1524,7 @@ class SalesOrder:
         let present: HashSet<&str> = ["a/credit.py", "a/order.py", "a/invoice.py"]
             .into_iter()
             .collect();
-        let rows = history_term_associations(&history, &present);
+        let rows = history_term_associations(&history, &HashMap::new(), &present);
         assert!(
             rows.iter()
                 .any(|(t, f, _)| t == "credit" && f == "a/credit.py"),
@@ -1542,7 +1569,7 @@ class SalesOrder:
         let present: HashSet<&str> = ["a/credit.py", "a/invoice.py", "version.py"]
             .into_iter()
             .collect();
-        let rows = history_term_associations(&history, &present);
+        let rows = history_term_associations(&history, &HashMap::new(), &present);
         let version_score = rows
             .iter()
             .filter(|(t, f, _)| t == "credit" && f == "version.py")
@@ -1573,7 +1600,7 @@ class SalesOrder:
             ..Default::default()
         };
         let present: HashSet<&str> = wide_refs.iter().copied().collect();
-        assert!(history_term_associations(&history, &present).is_empty());
+        assert!(history_term_associations(&history, &HashMap::new(), &present).is_empty());
     }
 
     #[test]
@@ -1586,8 +1613,8 @@ class SalesOrder:
             ..Default::default()
         };
         let present: HashSet<&str> = ["a.py", "b.py"].into_iter().collect();
-        let first = history_term_associations(&history, &present);
-        let second = history_term_associations(&history, &present);
+        let first = history_term_associations(&history, &HashMap::new(), &present);
+        let second = history_term_associations(&history, &HashMap::new(), &present);
         assert_eq!(first, second);
     }
 

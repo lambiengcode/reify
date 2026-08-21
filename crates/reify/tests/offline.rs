@@ -113,6 +113,10 @@ fn the_only_subprocess_reify_runs_is_git() {
     //                point of the design: Reify opens no socket, and the one command
     //                that can reach a network is named by the user, logged on every
     //                call, and unreachable under REIFY_OFFLINE=1
+    //   curl, tar  — `reify upgrade` only: fetch and unpack a release as visible
+    //                subprocesses rather than an embedded HTTP client, checksum
+    //                verified in-process before install, refused under
+    //                REIFY_OFFLINE=1. Documented in the README's privacy section.
     // Neither can open a network connection on Reify's behalf, and both are given a
     // repository file as *input* rather than being loaded from the repository.
     let mut commands: BTreeSet<String> = BTreeSet::new();
@@ -130,6 +134,8 @@ fn the_only_subprocess_reify_runs_is_git() {
     let allowed: BTreeSet<String> = [
         "\"git\"",
         "\"sleep\"",
+        "\"curl\"",
+        "\"tar\"",
         // Spawned from a reviewed table, asserted by the next test.
         "c.program",
         "converter.program",

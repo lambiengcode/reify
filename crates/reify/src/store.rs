@@ -240,6 +240,52 @@ pub struct Store {
 }
 
 impl Store {
+    /// The repository root this store serves, derived from its on-disk location
+    /// (`<root>/.reify/store.db`). `None` when the store lives somewhere else, as
+    /// test stores do — callers treat that as "no repository to scan", never an error.
+    pub fn repo_root(&self) -> Option<std::path::PathBuf> {
+        let dir = self.path.parent()?;
+        if dir.file_name()? == crate::index::REIFY_DIR {
+            dir.parent().map(|p| p.to_path_buf())
+        } else {
+            None
+        }
+    }
+
+    /// Cross-file coverage per language: of the files that contain symbols, how many
+    /// have at least one *resolved cross-file dependent* — an edge arriving from a
+    /// node in a different file. The residual is the static-analysis frontier
+    /// (dynamic dispatch, reflection, convention wiring), measured rather than hidden.
+    pub fn coverage_by_language(&self) -> Result<Vec<(String, usize, usize)>> {
+        let mut out = Vec::new();
+        let mut stmt = self.conn.prepare(
+            "SELECT lang, COUNT(*), SUM(covered) FROM (
+                SELECT n.lang AS lang, n.path AS path,
+                       MAX(EXISTS (
+                           SELECT 1 FROM edges e
+                           JOIN nodes s ON s.id = e.src
+                           JOIN nodes d ON d.id = e.dst
+                           WHERE d.path = n.path AND s.path IS NOT NULL
+                             AND s.path <> n.path
+                       )) AS covered
+                FROM nodes n
+                WHERE n.kind = 'Symbol' AND n.path IS NOT NULL AND n.lang IS NOT NULL
+                GROUP BY n.lang, n.path
+            ) GROUP BY lang ORDER BY lang",
+        )?;
+        let rows = stmt.query_map([], |row| {
+            Ok((
+                row.get::<_, String>(0)?,
+                row.get::<_, i64>(1)? as usize,
+                row.get::<_, i64>(2)? as usize,
+            ))
+        })?;
+        for row in rows {
+            out.push(row?);
+        }
+        Ok(out)
+    }
+
     /// Open an existing store, or create one if `path` does not exist.
     pub fn open(path: impl AsRef<Path>) -> Result<Store> {
         let path = path.as_ref().to_path_buf();
@@ -1166,6 +1212,27 @@ mod tests {
             .at(path, 1, 10)
             .lang(Lang::Python)
             .search(name.to_string())
+    }
+
+    #[test]
+    fn coverage_counts_files_with_cross_file_dependents_only() {
+        let mut store = Store::in_memory().unwrap();
+        let mut batch = Batch::default();
+        batch.node(sym("a.py", "caller"));
+        batch.node(sym("b.py", "callee"));
+        batch.node(sym("c.py", "island"));
+        batch.edge(NewEdge::new(
+            uid::symbol("a.py", "caller"),
+            uid::symbol("b.py", "callee"),
+            EdgeKind::Calls,
+            Status::Confirmed,
+            1.0,
+        ));
+        store.commit(batch).unwrap();
+        let rows = store.coverage_by_language().unwrap();
+        // Three python files with symbols; only b.py has an inbound edge from a
+        // different file. a.py's own outgoing edge does not cover a.py.
+        assert_eq!(rows, vec![("python".to_string(), 3, 1)]);
     }
 
     #[test]

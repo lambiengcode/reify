@@ -10,17 +10,35 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/license-Apache--2.0-111111?style=flat-square" alt="Apache-2.0">
-  <img src="https://img.shields.io/badge/languages-11-111111?style=flat-square" alt="11 种语言">
-  <img src="https://img.shields.io/badge/doc%20formats-10-111111?style=flat-square" alt="10 种文档格式">
-  <img src="https://img.shields.io/badge/network%20calls-0-111111?style=flat-square" alt="零网络调用">
-  <img src="https://img.shields.io/badge/tests-361-111111?style=flat-square" alt="361 个测试">
-  <img src="https://img.shields.io/badge/built%20with-Rust-111111?style=flat-square" alt="Rust">
+  <sub>已经装好了？运行 <code>reify upgrade</code></sub>
 </p>
 
 <p align="center">
-  <strong>在相同的 token 成本下，模型有 75% 的概率找到那个必须改动的文件 —— grep 只有 50% &middot; 在四个代码库上实测 &middot; 从不打开任何 socket</strong><br>
-  <sub>真实模型，142 个任务，全部取自 ERPNext、OFBiz、OpenMRS 和 Medusa 中真实合并的提交；每个索引都构建在这些改动<em>尚不存在</em>的提交上。四个代码库里有三个在同等成本下领先 25–50 个百分点；第四个毫无优势，而<a href="#numbers">数据</a>一节以同样的篇幅说明了这一点。<a href="benchmarks/REPORT.md">完整报告</a> &middot; <a href="#reproducing-the-benchmark">自行复现</a>。</sub>
+  <strong>确定性知识图谱 &middot; 每条结论皆有引用 &middot; 从 BA 文档到代码 &middot; 单一二进制、无常驻进程 &middot; 从不打开 socket</strong>
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-111111?style=flat-square" alt="Apache-2.0"></a>
+  <a href="#what-it-reads"><img src="https://img.shields.io/badge/languages-11-111111?style=flat-square" alt="11 种语言"></a>
+  <a href="#what-it-reads"><img src="https://img.shields.io/badge/doc%20formats-10-111111?style=flat-square" alt="10 种文档格式"></a>
+  <a href="#privacy"><img src="https://img.shields.io/badge/network%20calls-0-111111?style=flat-square" alt="零网络调用"></a>
+  <a href="#development"><img src="https://img.shields.io/badge/tests-369-111111?style=flat-square" alt="369 个测试"></a>
+  <a href="#architecture"><img src="https://img.shields.io/badge/built%20with-Rust-111111?style=flat-square" alt="Rust"></a>
+</p>
+
+<p align="center">
+  <a href="#claude-code"><img src="https://img.shields.io/badge/Claude_Code-supported-2da44e?style=flat-square" alt="Claude Code"></a>
+  <a href="#other-agents"><img src="https://img.shields.io/badge/Cursor-supported-2da44e?style=flat-square" alt="Cursor"></a>
+  <a href="#other-agents"><img src="https://img.shields.io/badge/Codex-supported-2da44e?style=flat-square" alt="Codex"></a>
+  <a href="#other-agents"><img src="https://img.shields.io/badge/OpenCode-supported-2da44e?style=flat-square" alt="OpenCode"></a>
+  <a href="#other-agents"><img src="https://img.shields.io/badge/Aider-supported-2da44e?style=flat-square" alt="Aider"></a>
+  <a href="#mcp"><img src="https://img.shields.io/badge/MCP-3_tools-2da44e?style=flat-square" alt="MCP"></a>
+  <a href="#install"><img src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux-prebuilt-111111?style=flat-square" alt="macOS / Linux"></a>
+</p>
+
+<p align="center">
+  <strong>在 SWE-bench Verified 上，Reify 有 84.6% 的概率把必须改动的文件送到模型面前 —— grep 只有 6.6% &middot; 500 个真实 issue，别人的基准 &middot; 从不打开任何 socket</strong><br>
+  <sub>真实模型，142 个任务，全部取自 ERPNext、OFBiz、OpenMRS 和 Medusa 中真实合并的提交；每个索引都构建在这些改动<em>尚不存在</em>的提交上。那是<em>检索</em>：把正确的文件送到模型面前。而在端到端的补丁正确性上，目前一个 BM25 基线解决的 issue <em>比</em> Reify 更多，<a href="#swebench">说明这一点的那一节</a>与本节同样醒目。<a href="benchmarks/REPORT.md">完整报告</a> &middot; <a href="#reproducing-the-benchmark">自行复现</a>。</sub>
 </p>
 
 <p align="center">
@@ -28,8 +46,23 @@
 </p>
 
 <p align="center">
-  <sub>demo 中的每一条命令都是真实执行的，跑在真实的 ERPNext 索引上。录制脚本已<a href="assets/demo.tape">提交入库</a>；如果这段动图哪天与工具本身对不上，就重新录制动图。</sub>
+  <sub>demo 中的每一条命令都是真实执行的，跑在真实的 ERPNext 索引上。录制脚本已<a href="assets/demo-script.sh">提交入库</a>（由 terminalizer 录制）；如果这段动图哪天与工具本身对不上，就重新录制动图。</sub>
 </p>
+
+## <a id="two-minutes"></a>两分钟得到第一个答案
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/lambiengcode/reify/main/install.sh | sh
+cd your-repository
+reify init --write-agent-instructions   # 通过 AGENTS.md / CLAUDE.md 接入你的 agent
+reify index                             # 5000 个文件 4.6 秒；改动一个文件后 0.7 秒
+reify context "你即将进行的改动" --toon
+```
+
+<sub>一个静态二进制 —— 无常驻进程、无配置、无 API key，且每个发布版都附带 SHA-256
+校验和，<code>reify upgrade</code> 会在安装前先校验。改主意了？<code>reify uninstall</code>
+删除二进制，<code>reify uninit</code> 清理单个仓库，二者都会先打印计划。各 agent 的接入、
+钩子与 MCP：<a href="#install">安装</a>。</sub>
 
 <p align="center">
   <a href="README.md">English</a> &middot; <a href="README.vi.md">Tiếng Việt</a> &middot; <strong>简体中文</strong>
@@ -40,9 +73,11 @@
 <details>
 <summary><strong>目录</strong></summary>
 
+- [两分钟得到第一个答案](#two-minutes)
 - [只有一个人懂的问题](#the-one-person-problem)
 - [它到底给你什么](#what-it-actually-gives-you)
 - [改造前 / 改造后](#before--after)
+- [SWE-bench Verified](#swebench) — 84.6% 对 grep 的 6.6%
 - [数据](#numbers) — [纯检索表现](#retrieval-alone) · [记分卡](#the-scorecard) · [它失效的地方](#where-it-doesnt-work)
 - [工作原理](#how-it-works) — [通往代码的四座桥](#four-bridges)
 - [它能读什么](#what-it-reads)
@@ -137,7 +172,71 @@ $ reify why erpnext/selling/doctype/sales_order/sales_order.py:812
 
 其中四段里有三段，是 grep 在结构上根本产不出来的。
 
-## <a id="numbers"></a>数据
+## <a id="swebench"></a>数据：在一个不是我们设计的基准上
+
+下面那份四代码库基准是我们自己的 —— 这正是必须再跑一份别人的基准的理由。
+**[SWE-bench Verified](https://openai.com/index/introducing-swe-bench-verified/)**
+包含来自十二个知名 Python 项目的 500 个真实 GitHub issue，每个都钉在该 issue 被提出时
+的 `base_commit` 上 —— 与 Reify 自有基准相同的「先建索引、后有改动」协议，只不过是别人
+写的。任务是一份普通的问题报告；正确答案是被采纳的修复实际改动的那些文件。
+
+| SWE-bench Verified 上的检索，n=500 | 提供了修复所改动的某个文件 | MRR | 提供了**全部**此类文件 | token 中位数 |
+|---|--:|--:|--:|--:|
+| grep, content | 6.6% <sub>[4.7–9.1]</sub> | 0.06 | 5.6% | 3,998 |
+| grep, paths | 9.0% <sub>[6.8–11.8]</sub> | 0.06 | 7.8% | 3,996 |
+| **reify**, 单轮 | **66.0%** <sub>[61.7–70.0]</sub> | 0.43 | 59.0% | **3,466** |
+| **reify**, 三轮 | **84.6%** <sub>[81.2–87.5]</sub> | 0.45 | 77.0% | 9,174 |
+
+**单轮 Reify 在 310 个实例上胜过 grep，仅在 13 个上落败 —— 而且花的 token 更少**
+（3,466 对 3,998）。三轮则是 395 比 5（精确 McNemar 检验 p ≈ 7 × 10⁻¹¹⁰）。这不是一次
+势均力敌的测量，而且它是本文档中最干净的数字，正因为任务、代码库和标准答案全都来自
+别处。
+
+按代码库，三轮对内容 grep：
+
+| | grep | reify ×3 | | | grep | reify ×3 |
+|---|--:|--:|---|---|--:|--:|
+| django (n=231) | 6% | **88%** | | astropy (n=22) | 0% | **77%** |
+| sympy (n=75) | 7% | **77%** | | xarray (n=22) | 9% | **91%** |
+| sphinx (n=44) | 7% | **75%** | | pytest (n=19) | 26% | **84%** |
+| matplotlib (n=34) | 0% | **91%** | | pylint (n=10) | 10% | **60%** |
+| scikit-learn (n=32) | 9% | **88%** | | requests (n=8) | 0% | **100%** |
+
+**它证明了什么，没证明什么。** 它测的是*检索* —— 必须改动的文件是否被送到模型面前 ——
+而不是模型随后能否写出正确的补丁。Verified 只有 Python，因此它对[下文](#where-it-doesnt-work)
+的现代 TypeScript 弱项只字未提。而且这些仓库名气大到模型已部分背诵；这影响的是模型的
+*答案*，而非检索器提供哪些文件，并且这里每一组都跑在同一提交的同一份索引上。可用
+[`benchmarks/swe/`](benchmarks/swe/) 中的驱动脚本复现。
+
+
+### 端到端的结果，而且它对我们不利
+
+检索并不是这个项目最终的主张 —— 解决 issue 才是。因此同一份基准被放进 SWE-bench 论文
+自己的「检索增强生成补丁」协议：一个模型、一份上下文预算，各组之间唯一的差别是检索器，
+每个补丁都由 Docker 中的 **SWE-bench 官方评测器**判定。101 个分层抽样实例，其中 72 个
+在两组下都被判定过。
+
+| 解决了 issue | | 95% 置信区间 |
+|---|--:|---|
+| BM25 | **18.1%**（13/72） | [10.9–28.5] |
+| Reify | 11.1%（8/72） | [5.7–20.4] |
+
+BM25 解决了 8 个 Reify 没解决的实例；Reify 解决了 3 个 BM25 没解决的（精确 McNemar
+检验 p = 0.23）。在这个样本量下这不是显著差异 —— 但点估计偏向 BM25，而这里就按这个方向
+报告，因为结果本来就是这个方向。
+
+**诊断比数字更有价值。** 在 BM25 解决而 Reify 没解决的那 8 个实例中，有 5 个
+**Reify 其实已经提供了修复所改动的文件**。所以这些并不是检索失败。把正确的文件送到模型
+面前，和给模型足够写出补丁的材料，是两个不同的问题，而实测显示 Reify 在前者上远强于
+后者。
+
+一条限制，作为限制而非辩解陈述：该协议把 Reify 当作*文件排序器*使用，喂入的是整份文件，
+这恰恰丢掉了 `reify context` 真正产出的东西 —— 代码片段、规则、出处引用、冲突，以及按
+预算编排的阅读计划。改为喂入编译好的上下文，是显而易见的下一个实验。它还没有被跑过，
+所以它目前什么也没证明。
+
+## <a id="numbers"></a>数据：在四个刻意挑难的代码库上
+
 
 诚实的度量方式，是让真实模型去做真实任务：工单取自已合并的提交，提示词就是开发者本人
 对这次改动的描述，正确答案就是他们实际改动的文件。**每个索引都构建在这些改动尚不存在
@@ -157,6 +256,10 @@ $ reify why erpnext/selling/doctype/sales_order/sales_order.py:812
 | OFBiz（Java + XML），n=40 | 28% | **78%** | +50 | 不重叠 |
 | OpenMRS（Java），n=22 | 32% | **59%** | +27 | 勉强重叠 |
 | Medusa（现代 TS），n=40 | 24% | **26%** | +2 | **完全重叠 —— 没有优势** |
+
+> **关于第四行的说明：** Medusa 的 +2 是平局，不是胜利，而且它以完整篇幅留在主表中，
+> 而不是被藏进脚注。Reify 大胜的仓库与它赢不了的仓库之间的分界线是测出来的，不是猜的
+> —— 见[它失效的地方](#where-it-doesnt-work)。
 
 **每个代码库上的对照组：** 完美上下文处处拿到 100%，说明检索质量就是全部胜负手。形状
 完全相同的诱饵上下文只有 0–12%，说明起作用的是内容而非格式。完全不给代码库访问权时，
@@ -321,6 +424,12 @@ reify init      # 告诉你它会索引什么、不会索引什么，以及为�
 reify index     # 5000 个文件 4.6 秒；改动一个文件后 0.7 秒
 ```
 
+**升级干净，卸载彻底。** `reify upgrade` 用最新发布版替换当前二进制 —— 通过看得见的
+`curl` 与 `tar` 子进程完成，从不内嵌 HTTP 客户端，并且在安装任何东西之前先校验
+checksum；`--check` 只查询不安装，`REIFY_OFFLINE=1` 则直接拒绝整个命令。
+`reify uninstall --yes` 只删除二进制本身；`reify uninit --yes` 删除单个仓库的
+`.reify/` 存储和 `init` 写入的指令块。不带 `--yes` 时，两者都只打印计划。
+
 <details>
 <summary><strong>Shell 补全</strong></summary>
 
@@ -428,6 +537,8 @@ HTTP 客户端，见[隐私](#privacy)。
 | `reify report` | 系统记分卡 |
 | `reify status` | 新鲜度、覆盖率，以及哪些内容被跳过了 |
 | `reify llm status \| preview` | 是否配置了模型，以及究竟会发送什么内容 |
+| `reify upgrade [--check]` | 用最新发布版替换当前二进制。唯一联网的命令；`REIFY_OFFLINE=1` 时被拒绝 |
+| `reify uninstall --yes` \| `uninit --yes` | 删除二进制 \| 单个仓库的存储与指令块 |
 | `reify serve --mcp` | 基于 stdio 的 Model Context Protocol |
 | `reify completions <shell>` | 补全脚本 |
 
@@ -452,7 +563,7 @@ MCP 的 `reify_context` 已经用 TOON 应答。
 |---|---|
 | `Cargo.lock` 中的网络库 | 断言为零，在 CI 中执行 |
 | 源码中的 socket | 断言为零，在 CI 中执行 |
-| 子进程 | `git`，以及经过审查的文档转换器 —— 每一个都在测试中被点名 |
+| 子进程 | `git`、经过审查的文档转换器，以及 —— 仅限 `reify upgrade` —— `curl` 与 `tar`；每一个都在测试中被点名 |
 | 执行你仓库里的代码 | 从不。tree-sitter 只做解析，不运行代码 |
 | 存储位置 | `.reify/`，由 `reify init` 加入 gitignore |
 

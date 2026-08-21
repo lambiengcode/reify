@@ -11,7 +11,7 @@
 //! Four stages: seed, spread, select, render.
 
 use anyhow::Result;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::collections::{BTreeSet, HashMap};
 
 use crate::concepts::meaningful_words;
@@ -85,6 +85,15 @@ const FILE_FANOUT: usize = 6;
 const FILE_FANOUT_SYMBOLS: usize = 8;
 /// A symbol inherits this share of its file's seed score.
 const FILE_TO_SYMBOL: f32 = 0.8;
+
+/// Weight of the bounded content scan's file seeds; zero disables the scan.
+const LEXICAL_FILES_WEIGHT: f32 = 0.6;
+/// Files the content scan may seed per query.
+const LEXICAL_FILE_SEEDS: usize = 12;
+/// How much of one file the content scan reads. Signal for this purpose lives in
+/// string literals, labels and comments near the top; a megabyte of generated code
+/// past this point is cost without evidence.
+const CONTENT_SCAN_MAX_BYTES: u64 = 64_000;
 
 /// Default share of the top offered file's score below which files are not offered.
 ///
@@ -161,7 +170,8 @@ fn budget_share(kind: NodeKind) -> f32 {
 /// The defaults are the fitted values — provenance in `benchmarks/weights/` — and the
 /// fit must only ever run against commits *earlier* than any benchmark task, because
 /// fitting on the evaluation set is the easiest way to fake a benchmark.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
 pub struct RankWeights {
     /// Weight of the repository's-own-history prior.
     pub history_prior: f32,
@@ -180,6 +190,14 @@ pub struct RankWeights {
     /// tail of weak candidates, and offering seven wrong files is worse than offering
     /// two plausible ones plus an honest "unknown". Zero disables the cutoff.
     pub offer_cutoff: f32,
+    /// Weight of the bounded content scan's file seeds; zero disables the scan.
+    pub lexical_files: f32,
+    /// Seeded files whose symbols get lifted, per fan-out pass.
+    pub file_fanout: usize,
+    /// Symbols each fanned file may lift.
+    pub fanout_symbols: usize,
+    /// Share of a file's score its symbols inherit through fan-out.
+    pub file_to_symbol: f32,
 }
 
 impl Default for RankWeights {
@@ -191,6 +209,10 @@ impl Default for RankWeights {
             path_affinity: PATH_AFFINITY_WEIGHT,
             concept_expansion: CONCEPT_EXPANSION_DECAY,
             offer_cutoff: OFFER_CUTOFF,
+            lexical_files: LEXICAL_FILES_WEIGHT,
+            file_fanout: FILE_FANOUT,
+            fanout_symbols: FILE_FANOUT_SYMBOLS,
+            file_to_symbol: FILE_TO_SYMBOL,
         }
     }
 }
@@ -500,6 +522,29 @@ fn rank(store: &Store, task: &str, weights: &RankWeights) -> Result<Vec<Scored>>
         }
     }
 
+    // --- the repository's own text as a seed source ---------------------------
+    // FTS covers what extraction chose to index: names, signatures, summaries. A
+    // task's words often live only in a file's *body* — a JSX label, a string
+    // literal, a comment — which is exactly the signal a plain grep retrieves and
+    // the four-repo union analysis showed reify losing tasks to. So reify runs its
+    // own bounded content scan as one more seed source and lets selection arbitrate.
+    if weights.lexical_files > 0.0 {
+        if let Some(root) = store.repo_root() {
+            for (path, strength) in content_seed_files(&root, &asked, LEXICAL_FILE_SEEDS) {
+                if let Some(file) = store.node_by_uid(&crate::model::uid::file(&path))? {
+                    let reason = format!("{path} mentions the task's words");
+                    bump(
+                        &mut scores,
+                        &mut nodes,
+                        file,
+                        weights.lexical_files * strength,
+                        &reason,
+                    );
+                }
+            }
+        }
+    }
+
     // --- expansion through concepts ------------------------------------------
     // The concept layer exists because the analyst's word and the code's word differ.
     // Applying it only *after* seeding leaves the lexical search blind to every other
@@ -588,32 +633,8 @@ fn rank(store: &Store, task: &str, weights: &RankWeights) -> Result<Vec<Scored>>
     // for "remove the cloud auth button" — but a file node has no outgoing edges to
     // its symbols and is not itself rendered, so without this step a perfectly
     // matching file contributes nothing at all to the answer.
-    let mut top_files: Vec<(i64, f32)> = scores
-        .iter()
-        .filter(|(id, _)| nodes.get(id).is_some_and(|n| n.kind == NodeKind::File))
-        .map(|(id, (score, _))| (*id, *score))
-        .collect();
-    top_files.sort_by(|a, b| b.1.total_cmp(&a.1).then(a.0.cmp(&b.0)));
-    top_files.truncate(FILE_FANOUT);
-    for (file_id, file_score) in top_files {
-        let Some(path) = nodes.get(&file_id).and_then(|n| n.path.clone()) else {
-            continue;
-        };
-        let reason = format!("in {path}, which matches the task");
-        for symbol in store
-            .symbols_in_file(&path)?
-            .into_iter()
-            .take(FILE_FANOUT_SYMBOLS)
-        {
-            boost(
-                &mut scores,
-                &mut nodes,
-                symbol,
-                file_score * FILE_TO_SYMBOL,
-                &reason,
-            );
-        }
-    }
+    let mut fanned: BTreeSet<i64> = BTreeSet::new();
+    fan_out_files(store, &mut scores, &mut nodes, &mut fanned, weights)?;
 
     // --- spread --------------------------------------------------------------
     let mut frontier: Vec<i64> = scores.keys().copied().collect();
@@ -644,6 +665,13 @@ fn rank(store: &Store, task: &str, weights: &RankWeights) -> Result<Vec<Scored>>
         next.dedup();
         frontier = next;
     }
+
+    // --- files reached indirectly lift their contents too ---------------------
+    // The first fan-out pass ran on seeds; by now the history prior, co-change
+    // edges and the spread have scored *more* files — and a file node still renders
+    // nothing itself. Without this second pass, "these two files always change
+    // together" scores the neighbour file and then throws that evidence away.
+    fan_out_files(store, &mut scores, &mut nodes, &mut fanned, weights)?;
 
     let mut out: Vec<Scored> = scores
         .into_iter()
@@ -808,6 +836,146 @@ fn explain(kind: EdgeKind, direction: Direction, parent: &str) -> String {
 }
 
 /// How much a seed of each kind is worth before spreading.
+/// Lift the symbols of the highest-scoring file nodes that have not fanned yet.
+///
+/// Callable twice per query — once on the seeds, once after the spread — with
+/// `fanned` preventing a file from spending the symbol quota twice.
+fn fan_out_files(
+    store: &Store,
+    scores: &mut HashMap<i64, (f32, String)>,
+    nodes: &mut HashMap<i64, Node>,
+    fanned: &mut BTreeSet<i64>,
+    weights: &RankWeights,
+) -> Result<()> {
+    let mut top_files: Vec<(i64, f32)> = scores
+        .iter()
+        .filter(|(id, _)| {
+            !fanned.contains(*id) && nodes.get(id).is_some_and(|n| n.kind == NodeKind::File)
+        })
+        .map(|(id, (score, _))| (*id, *score))
+        .collect();
+    top_files.sort_by(|a, b| b.1.total_cmp(&a.1).then(a.0.cmp(&b.0)));
+    top_files.truncate(weights.file_fanout);
+    for (file_id, file_score) in top_files {
+        fanned.insert(file_id);
+        let Some(path) = nodes.get(&file_id).and_then(|n| n.path.clone()) else {
+            continue;
+        };
+        let reason = format!("in {path}, which matches the task");
+        for symbol in store
+            .symbols_in_file(&path)?
+            .into_iter()
+            .take(weights.fanout_symbols)
+        {
+            boost(
+                scores,
+                nodes,
+                symbol,
+                file_score * weights.file_to_symbol,
+                &reason,
+            );
+        }
+    }
+    Ok(())
+}
+
+/// Files whose *contents* mention the task's words, scored by distinct-word count.
+///
+/// Bounded and parallel: code files only, the first 64KB of each. On a 5,000-file
+/// repository the scan costs tens of milliseconds, and it buys the one signal FTS
+/// structurally lacks — string literals, UI labels and comments that never became a
+/// symbol name. Scores are normalised to 0..=1 against the best file.
+fn content_seed_files(
+    root: &std::path::Path,
+    asked: &BTreeSet<String>,
+    cap: usize,
+) -> Vec<(String, f32)> {
+    use rayon::prelude::*;
+    if asked.is_empty() {
+        return Vec::new();
+    }
+    let words: Vec<String> = asked.iter().map(|w| w.to_lowercase()).collect();
+    let corpus = scan_corpus(root);
+    let mut scored: Vec<(String, f32)> = corpus
+        .par_iter()
+        .filter_map(|(rel, text)| {
+            let mut distinct = 0usize;
+            let mut total = 0usize;
+            for word in &words {
+                let n = text.matches(word.as_str()).count();
+                if n > 0 {
+                    distinct += 1;
+                    total += n.min(50);
+                }
+            }
+            if distinct == 0 {
+                return None;
+            }
+            Some((rel.clone(), distinct as f32 + total as f32 / 200.0))
+        })
+        .collect();
+    scored.sort_by(|a, b| b.1.total_cmp(&a.1).then(a.0.cmp(&b.0)));
+    scored.truncate(cap);
+    let best = scored.first().map(|(_, s)| *s).unwrap_or(1.0).max(1e-6);
+    scored.into_iter().map(|(p, s)| (p, s / best)).collect()
+}
+
+/// The lowercased scan corpus for one repository root, walked once per process.
+///
+/// The walk dominates the scan's cost; a resident process (the MCP server, the
+/// benchmark harness) asks about the same repository hundreds of times, and paying
+/// the walk each time would turn a tens-of-milliseconds match into seconds. Memory is
+/// bounded by [`CONTENT_SCAN_MAX_BYTES`] per file — the same order the benchmark's
+/// own grep corpus already holds. A one-shot CLI process pays one walk, as before.
+fn scan_corpus(root: &std::path::Path) -> std::sync::Arc<Vec<(String, String)>> {
+    // (return type spelled out once here; the local alias below keeps clippy content)
+    use std::collections::HashMap as Map;
+    use std::sync::{Arc, Mutex, OnceLock};
+    type Corpus = Arc<Vec<(String, String)>>;
+    static CACHE: OnceLock<Mutex<Map<std::path::PathBuf, Corpus>>> = OnceLock::new();
+    let cache = CACHE.get_or_init(|| Mutex::new(Map::new()));
+    if let Some(hit) = cache.lock().ok().and_then(|c| c.get(root).cloned()) {
+        return hit;
+    }
+    use rayon::prelude::*;
+    let files: Vec<std::path::PathBuf> = ignore::WalkBuilder::new(root)
+        .build()
+        .filter_map(|entry| entry.ok())
+        .filter(|entry| entry.file_type().is_some_and(|t| t.is_file()))
+        .map(ignore::DirEntry::into_path)
+        .filter(|path| crate::discover::classify(&path.to_string_lossy()).is_code())
+        .collect();
+    let corpus: Corpus = Arc::new(
+        files
+            .par_iter()
+            .filter_map(|path| {
+                let text = bounded_read(path)?.to_lowercase();
+                let rel = path
+                    .strip_prefix(root)
+                    .ok()?
+                    .to_string_lossy()
+                    .replace('\\', "/");
+                Some((rel, text))
+            })
+            .collect(),
+    );
+    if let Ok(mut c) = cache.lock() {
+        c.insert(root.to_path_buf(), corpus.clone());
+    }
+    corpus
+}
+
+/// Read at most [`CONTENT_SCAN_MAX_BYTES`] of a file, lossily.
+fn bounded_read(path: &std::path::Path) -> Option<String> {
+    use std::io::Read;
+    let file = std::fs::File::open(path).ok()?;
+    let mut buf = Vec::with_capacity(8 * 1024);
+    file.take(CONTENT_SCAN_MAX_BYTES)
+        .read_to_end(&mut buf)
+        .ok()?;
+    Some(String::from_utf8_lossy(&buf).into_owned())
+}
+
 fn seed_weight(kind: NodeKind) -> f32 {
     match kind {
         NodeKind::Concept => 1.0,
@@ -1134,6 +1302,33 @@ fn history_out(node: &Node, reason: &str) -> HistoryOut {
 mod tests {
     use super::*;
     use crate::index::{index, IndexOptions};
+
+    #[test]
+    fn rank_weights_deserialise_partially_with_defaults() {
+        // An ablation file names only what it changes; everything else stays default.
+        let weights: RankWeights = serde_json::from_str(r#"{"lexical_files": 0.0}"#).unwrap();
+        assert_eq!(weights.lexical_files, 0.0);
+        assert_eq!(weights.file_fanout, RankWeights::default().file_fanout);
+        assert_eq!(weights.offer_cutoff, RankWeights::default().offer_cutoff);
+    }
+
+    #[test]
+    fn content_scan_finds_words_that_live_only_in_file_bodies() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .join("fixtures/minierp");
+        let asked: BTreeSet<String> = meaningful_words("corporate approval bypass");
+        let seeds = content_seed_files(&root, &asked, 12);
+        assert!(!seeds.is_empty(), "the fixture mentions these words");
+        // Scores are normalised: the best file is exactly 1.0 and nothing exceeds it.
+        assert!((seeds[0].1 - 1.0).abs() < 1e-6);
+        assert!(seeds.iter().all(|(_, s)| *s <= 1.0 + 1e-6));
+        // Paths come back repo-relative, so they can meet the store's file uids.
+        assert!(seeds.iter().all(|(p, _)| !p.starts_with('/')));
+    }
     use std::fs;
     use std::path::PathBuf;
 

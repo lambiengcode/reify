@@ -54,6 +54,14 @@ enum Command {
         /// index at the base, and the changes being asked for are genuinely absent.
         #[arg(long)]
         after: Option<String>,
+        /// Only take tasks from commits strictly *older* than this revision. This is
+        /// how a training corpus stays disjoint from every evaluation window.
+        #[arg(long)]
+        until: Option<String>,
+        /// Existing task files whose commits must not be re-used, so a new frozen
+        /// set is disjoint from the sets that came before it.
+        #[arg(long, num_args = 0..)]
+        exclude: Vec<PathBuf>,
     },
     /// Run every condition over a task set.
     Run {
@@ -65,6 +73,18 @@ enum Command {
         out: PathBuf,
         #[arg(long, default_value_t = DEFAULT_BUDGET)]
         budget: u32,
+        /// Ranking-weight overrides for the reify arms, as a JSON file. Absent
+        /// fields keep their defaults, so an ablation names only what it changes.
+        #[arg(long)]
+        weights: Option<PathBuf>,
+    },
+    /// Cross-file coverage: of the files that contain symbols, how many have at
+    /// least one resolved dependent in a *different* file, per language. A truth
+    /// file with no inbound cross-file edge cannot be reached through the graph,
+    /// which puts this number upstream of every ranking improvement.
+    Coverage {
+        #[arg(long)]
+        repo: PathBuf,
     },
     /// Run the model-in-the-loop experiments, including the falsification controls.
     Agent {
@@ -79,6 +99,10 @@ enum Command {
         /// Tasks to run. The full matrix is expensive, so a subset is the default.
         #[arg(long, default_value_t = 20)]
         limit: usize,
+        /// Conditions to run (default: all seven). Every provider call costs money,
+        /// so a re-baseline that only needs one arm should only pay for one arm.
+        #[arg(long, num_args = 0..)]
+        arms: Vec<String>,
     },
     /// Attribute ranking losses on training tasks: recall gap vs selection vs ordering.
     Audit {
@@ -141,8 +165,22 @@ fn run() -> Result<()> {
             count,
             scan,
             after,
+            until,
+            exclude,
         } => {
-            let set = tasks::generate(&repo, count, scan, after.as_deref())?;
+            let mut excluded = std::collections::BTreeSet::new();
+            for file in &exclude {
+                let prior: tasks::TaskSet = read_json(file)?;
+                excluded.extend(prior.tasks.into_iter().map(|t| t.commit));
+            }
+            let set = tasks::generate(
+                &repo,
+                count,
+                scan,
+                after.as_deref(),
+                until.as_deref(),
+                &excluded,
+            )?;
             eprintln!(
                 "{} tasks from {} commits at {}",
                 set.tasks.len(),
@@ -167,14 +205,17 @@ fn run() -> Result<()> {
             tasks: task_file,
             out,
             budget,
-        } => execute(&repo, &task_file, &out, budget),
+            weights,
+        } => execute(&repo, &task_file, &out, budget, weights.as_deref()),
+        Command::Coverage { repo } => coverage(&repo),
         Command::Agent {
             repo,
             tasks: task_file,
             out,
             budget,
             limit,
-        } => agent_experiments(&repo, &task_file, &out, budget, limit),
+            arms,
+        } => agent_experiments(&repo, &task_file, &out, budget, limit, &arms),
         Command::Audit {
             repo,
             tasks,
@@ -194,12 +235,46 @@ fn audit(repo: &Path, task_file: &Path, budget: u32) -> Result<()> {
             .join(reify::index::STORE_FILE),
     )?;
     let (mut unscored, mut cut, mut late, mut top3, mut first) = (0, 0, 0, 0, 0);
+    let (mut connected_unseeded, mut not_connected) = (0, 0);
     let mut offered_sizes = Vec::new();
     for task in &set.tasks {
         let a = conditions::rank_audit(&store, &task.prompt, &task.ground_truth, budget)?;
         offered_sizes.push(a.offered);
         match (a.scored_rank, a.offered_rank) {
-            (None, _) => unscored += 1,
+            (None, _) => {
+                unscored += 1;
+                // The taxonomy the plan pre-registered: an unscored miss is either
+                // *not-connected* — no lexical, path, or history feature links the
+                // prompt to any truth file under the current extractors — or
+                // *indexed-but-unseeded*, a connection existed and seeding never
+                // surfaced it. Nothing is "unreachable" in an index whose oracle
+                // scores 100%; the word would only flatter the extractors.
+                let stems: Vec<String> = reify::concepts::meaningful_words(&task.prompt)
+                    .into_iter()
+                    .map(|w| reify::concepts::stem(&w).to_string())
+                    .collect();
+                let via_history = store
+                    .history_prior(&stems, 50)
+                    .unwrap_or_default()
+                    .iter()
+                    .any(|(p, _)| task.ground_truth.iter().any(|t| t == p));
+                let words = reify::concepts::meaningful_words(&task.prompt);
+                let via_path = task.ground_truth.iter().any(|t| {
+                    let flat = t.to_lowercase().replace(['/', '_', '-', '.'], " ");
+                    words.iter().any(|w| flat.contains(w.as_str()))
+                });
+                if via_history || via_path {
+                    connected_unseeded += 1;
+                    eprintln!(
+                        "  UNSEEDED ({}{}) {}",
+                        if via_path { "path" } else { "" },
+                        if via_history { "+history" } else { "" },
+                        task.prompt.chars().take(60).collect::<String>()
+                    );
+                } else {
+                    not_connected += 1;
+                }
+            }
             (Some(s), None) => {
                 cut += 1;
                 eprintln!(
@@ -222,7 +297,7 @@ fn audit(repo: &Path, task_file: &Path, budget: u32) -> Result<()> {
     offered_sizes.sort_unstable();
     eprintln!(
         "
-{n} tasks: first={first} top3={top3} late={late} cut={cut} unscored={unscored}  (median offered: {})",
+{n} tasks: first={first} top3={top3} late={late} cut={cut} unscored={unscored} (of which connected-but-unseeded={connected_unseeded}, not-connected={not_connected})  (median offered: {})",
         offered_sizes.get(n / 2).copied().unwrap_or(0)
     );
     Ok(())
@@ -241,6 +316,34 @@ struct TrainingSet {
 /// enumeration cannot get stuck in a local optimum, and the full surface is written
 /// out so a later reader can see how flat or sharp the optimum was — a fit that
 /// barely beats its neighbours is noise wearing a crown.
+fn coverage(repo: &Path) -> Result<()> {
+    let store_path = repo
+        .join(reify::index::REIFY_DIR)
+        .join(reify::index::STORE_FILE);
+    anyhow::ensure!(store_path.exists(), "no index at {}", store_path.display());
+    let store = Store::open(&store_path)?;
+    let rows = store.coverage_by_language()?;
+    let (mut total, mut covered) = (0usize, 0usize);
+    println!(
+        "{:<14} {:>7} {:>9} {:>9}",
+        "language", "files", "covered", "share"
+    );
+    for (lang, files, with_dependents) in &rows {
+        println!(
+            "{lang:<14} {files:>7} {with_dependents:>9} {:>8.1}%",
+            *with_dependents as f32 * 100.0 / (*files).max(1) as f32
+        );
+        total += files;
+        covered += with_dependents;
+    }
+    println!(
+        "{:<14} {total:>7} {covered:>9} {:>8.1}%",
+        "TOTAL",
+        covered as f32 * 100.0 / total.max(1) as f32
+    );
+    Ok(())
+}
+
 fn fit(train: &[String], out: &Path, budget: u32) -> Result<()> {
     use reify::context::RankWeights;
 
@@ -268,46 +371,57 @@ fn fit(train: &[String], out: &Path, budget: u32) -> Result<()> {
         });
     }
 
-    // Grids from earlier phases established the surface's shape: the prior dominates
-    // (and its fitted peak failed held-out validation, so it is pinned at the pre-fit
-    // default), symbols mildly favours few, floor and affinity are flat to noise.
-    // The open dimension now is the offer cutoff — the precision knob.
-    let history_prior = [0.9f32];
-    let symbols_per_file = [6usize];
-    let coverage_floor = [0.35f32];
-    let path_affinity = [1.0f32];
-    let concept_expansion = [0.5f32];
-    let offer_cutoff = [0.0f32, 0.1, 0.2, 0.3, 0.45];
+    // Coordinate descent rather than a grid: the weight vector now has nine
+    // dimensions, and a cross-product at any useful resolution is millions of
+    // evaluations. Two sweeps over per-dimension candidate lists converge on this
+    // surface (verified against the earlier grids on the dimensions they shared),
+    // and every evaluation is logged so the surface stays auditable.
+    //
+    // The prior's own history applies: its fitted peak failed held-out validation
+    // once, so its candidates stay near the pre-fit default rather than re-opening
+    // the range that failed.
+    // coverage_floor, path_affinity and concept_expansion are omitted: three grid
+    // campaigns found them flat to noise, and every candidate here costs a full pass
+    // over every training corpus.
+    let candidates: Vec<(&str, Vec<f32>)> = vec![
+        ("lexical_files", vec![0.0, 0.3, 0.6, 1.0]),
+        ("file_fanout", vec![6.0, 10.0, 14.0]),
+        ("fanout_symbols", vec![8.0, 12.0]),
+        ("file_to_symbol", vec![0.6, 0.8, 1.0]),
+        ("history_prior", vec![0.6, 0.9, 1.2]),
+        ("offer_cutoff", vec![0.0, 0.1, 0.2, 0.3]),
+    ];
 
-    // A flat cross-product rather than nested loops: six levels of nesting is where
-    // a formatter and a patch stop agreeing about what the code looks like.
-    let mut combos: Vec<RankWeights> = Vec::new();
-    for &hp in &history_prior {
-        for &spf in &symbols_per_file {
-            for &cf in &coverage_floor {
-                for &pa in &path_affinity {
-                    for &ce in &concept_expansion {
-                        for &oc in &offer_cutoff {
-                            combos.push(RankWeights {
-                                history_prior: hp,
-                                history_symbols_per_file: spf,
-                                coverage_floor: cf,
-                                path_affinity: pa,
-                                concept_expansion: ce,
-                                offer_cutoff: oc,
-                            });
-                        }
-                    }
-                }
-            }
+    fn get(weights: &RankWeights, dim: &str) -> f32 {
+        match dim {
+            "lexical_files" => weights.lexical_files,
+            "file_fanout" => weights.file_fanout as f32,
+            "fanout_symbols" => weights.fanout_symbols as f32,
+            "file_to_symbol" => weights.file_to_symbol,
+            "history_prior" => weights.history_prior,
+            "offer_cutoff" => weights.offer_cutoff,
+            "coverage_floor" => weights.coverage_floor,
+            "path_affinity" => weights.path_affinity,
+            "concept_expansion" => weights.concept_expansion,
+            _ => unreachable!("unknown fit dimension {dim}"),
+        }
+    }
+    fn set(weights: &mut RankWeights, dim: &str, value: f32) {
+        match dim {
+            "lexical_files" => weights.lexical_files = value,
+            "file_fanout" => weights.file_fanout = value as usize,
+            "fanout_symbols" => weights.fanout_symbols = value as usize,
+            "file_to_symbol" => weights.file_to_symbol = value,
+            "history_prior" => weights.history_prior = value,
+            "offer_cutoff" => weights.offer_cutoff = value,
+            "coverage_floor" => weights.coverage_floor = value,
+            "path_affinity" => weights.path_affinity = value,
+            "concept_expansion" => weights.concept_expansion = value,
+            _ => unreachable!("unknown fit dimension {dim}"),
         }
     }
 
-    let total = combos.len();
-    let mut grid: Vec<serde_json::Value> = Vec::with_capacity(total);
-    let mut best: Option<(f32, RankWeights)> = None;
-
-    for (done, weights) in combos.into_iter().enumerate() {
+    let evaluate = |weights: &RankWeights| -> Result<(f32, Vec<serde_json::Value>)> {
         // The score is the mean over corpora of (hit rate + MRR), so a gain on one
         // repository cannot pay for a loss on another.
         let mut per_set = Vec::new();
@@ -316,7 +430,7 @@ fn fit(train: &[String], out: &Path, budget: u32) -> Result<()> {
             let mut outcomes = Vec::new();
             for task in &set.tasks {
                 let answer =
-                    conditions::reify_context_weighted(&set.store, &task.prompt, budget, &weights)?;
+                    conditions::reify_context_weighted(&set.store, &task.prompt, budget, weights)?;
                 outcomes.push(metrics::score(&task.id, "fit", &answer, &task.ground_truth));
             }
             let summary = metrics::summarise("fit", &outcomes);
@@ -329,29 +443,40 @@ fn fit(train: &[String], out: &Path, budget: u32) -> Result<()> {
                 "median_offered": summary.median_files_inspected,
             }));
         }
-        let score = score_sum / sets.len() as f32;
-        grid.push(serde_json::json!({
-            "weights": {
-                "history_prior": weights.history_prior,
-                "history_symbols_per_file": weights.history_symbols_per_file,
-                "coverage_floor": weights.coverage_floor,
-                "path_affinity": weights.path_affinity,
-                "concept_expansion": weights.concept_expansion,
-                "offer_cutoff": weights.offer_cutoff,
-            },
-            "score": score,
-            "per_set": per_set,
-        }));
-        // Strictly-greater keeps the first of equals, so ties resolve by grid order
-        // and the result is reproducible.
-        if best.as_ref().is_none_or(|(b, _)| score > *b) {
-            best = Some((score, weights));
-        }
-        eprint!("\r  {}/{total} combos", done + 1);
-    }
-    eprintln!();
+        Ok((score_sum / sets.len() as f32, per_set))
+    };
 
-    let (score, weights) = best.expect("the grid is never empty");
+    let mut grid: Vec<serde_json::Value> = Vec::new();
+    let mut weights = RankWeights::default();
+    let (mut best_score, _) = evaluate(&weights)?;
+    eprintln!("  defaults score {best_score:.4}");
+    for sweep in 0..2 {
+        for (dim, values) in &candidates {
+            for &value in values {
+                if (get(&weights, dim) - value).abs() < 1e-6 {
+                    continue;
+                }
+                let mut trial = weights.clone();
+                set(&mut trial, dim, value);
+                let (score, per_set) = evaluate(&trial)?;
+                grid.push(serde_json::json!({
+                    "sweep": sweep,
+                    "dim": dim,
+                    "value": value,
+                    "score": score,
+                    "per_set": per_set,
+                }));
+                // Strictly greater keeps the incumbent on ties, so the defaults win
+                // unless a candidate actually earns its keep.
+                if score > best_score {
+                    best_score = score;
+                    weights = trial;
+                    eprintln!("  sweep {sweep}: {dim}={value} -> {score:.4}");
+                }
+            }
+        }
+    }
+    let (score, weights) = (best_score, weights);
     eprintln!(
         "best score {score:.3}: prior={} symbols={} cutoff={}",
         weights.history_prior, weights.history_symbols_per_file, weights.offer_cutoff
@@ -426,7 +551,9 @@ fn agent_experiments(
     out: &Path,
     budget: u32,
     limit: usize,
+    arms: &[String],
 ) -> Result<()> {
+    let wanted = |name: &str| arms.is_empty() || arms.iter().any(|a| a == name);
     let set: tasks::TaskSet = read_json(task_file)?;
     let provider = agent::provider_or_explain(repo)?;
     eprintln!("provider: {}", provider.label);
@@ -445,34 +572,40 @@ fn agent_experiments(
         eprint!("\r  task {}/{}   ", i + 1, chosen.len());
 
         // E6: memorisation control. No context at all.
-        outcomes.push(agent::run(&provider, repo, task, "N-no-context", ""));
+        if wanted("N-no-context") {
+            outcomes.push(agent::run(&provider, repo, task, "N-no-context", ""));
+        }
 
         // E1: the budget-matched lexical baseline.
-        let grep = conditions::content_search(&corpus, &task.prompt, budget);
-        outcomes.push(agent::run(
-            &provider,
-            repo,
-            task,
-            "B-content-grep",
-            &agent::files_block(&grep),
-        ));
+        if wanted("B-content-grep") {
+            let grep = conditions::content_search(&corpus, &task.prompt, budget);
+            outcomes.push(agent::run(
+                &provider,
+                repo,
+                task,
+                "B-content-grep",
+                &agent::files_block(&grep),
+            ));
+        }
 
         // The condition under test.
-        let compiled = conditions::reify_context(&store, &task.prompt, budget)?;
-        outcomes.push(agent::run(
-            &provider,
-            repo,
-            task,
-            "R-reify",
-            &agent::files_block(&compiled),
-        ));
+        if wanted("R-reify") {
+            let compiled = conditions::reify_context(&store, &task.prompt, budget)?;
+            outcomes.push(agent::run(
+                &provider,
+                repo,
+                task,
+                "R-reify",
+                &agent::files_block(&compiled),
+            ));
+        }
 
         // E3: negative control. Reify's context for a *different* task. If this scores
         // like the real thing, the model is not reading the content.
         //
         // Skipped for a single-task run, where "a different task" would be this one
         // and the control would silently measure nothing.
-        if chosen.len() >= 2 {
+        if wanted("R-shuffled") && chosen.len() >= 2 {
             let other = chosen[(i + chosen.len() / 2) % chosen.len()];
             debug_assert_ne!(other.id, task.id, "the control must use a different task");
             let shuffled = conditions::reify_context(&store, &other.prompt, budget)?;
@@ -486,37 +619,43 @@ fn agent_experiments(
         }
 
         // E2: the ceiling. The answer, handed over.
-        outcomes.push(agent::run(
-            &provider,
-            repo,
-            task,
-            "O-oracle",
-            &agent::oracle_block(task),
-        ));
+        if wanted("O-oracle") {
+            outcomes.push(agent::run(
+                &provider,
+                repo,
+                task,
+                "O-oracle",
+                &agent::oracle_block(task),
+            ));
+        }
 
         // The iterated pair. Reify's three rounds cost roughly three budgets, so the
         // honest control is grep given three budgets outright — otherwise iteration
         // buys its gain with tokens the baseline was never offered.
-        let iterated = conditions::reify_context_iterative(&store, &task.prompt, budget, 3)?;
-        outcomes.push(agent::run(
-            &provider,
-            repo,
-            task,
-            "R-reify-iter3",
-            &agent::files_block(&iterated),
-        ));
-        let grep_wide = conditions::content_search(&corpus, &task.prompt, budget * 3);
-        outcomes.push(agent::run(
-            &provider,
-            repo,
-            task,
-            "B-content-grep-x3",
-            &agent::files_block(&grep_wide),
-        ));
+        if wanted("R-reify-iter3") {
+            let iterated = conditions::reify_context_iterative(&store, &task.prompt, budget, 3)?;
+            outcomes.push(agent::run(
+                &provider,
+                repo,
+                task,
+                "R-reify-iter3",
+                &agent::files_block(&iterated),
+            ));
+        }
+        if wanted("B-content-grep-x3") {
+            let grep_wide = conditions::content_search(&corpus, &task.prompt, budget * 3);
+            outcomes.push(agent::run(
+                &provider,
+                repo,
+                task,
+                "B-content-grep-x3",
+                &agent::files_block(&grep_wide),
+            ));
+        }
     }
     eprintln!();
 
-    let names = [
+    let names: Vec<&str> = [
         "N-no-context",
         "B-content-grep",
         "R-reify",
@@ -524,7 +663,10 @@ fn agent_experiments(
         "O-oracle",
         "R-reify-iter3",
         "B-content-grep-x3",
-    ];
+    ]
+    .into_iter()
+    .filter(|n| wanted(n))
+    .collect();
     let summaries: Vec<agent::AgentSummary> = names
         .iter()
         .map(|n| agent::summarise(n, &outcomes))
@@ -567,7 +709,17 @@ fn agent_experiments(
     Ok(())
 }
 
-fn execute(repo: &Path, task_file: &Path, out: &Path, budget: u32) -> Result<()> {
+fn execute(
+    repo: &Path,
+    task_file: &Path,
+    out: &Path,
+    budget: u32,
+    weight_file: Option<&Path>,
+) -> Result<()> {
+    let weights: reify::context::RankWeights = match weight_file {
+        Some(path) => serde_json::from_str(&std::fs::read_to_string(path)?)?,
+        None => Default::default(),
+    };
     let set: tasks::TaskSet = read_json(task_file)?;
     let store_path = repo
         .join(reify::index::REIFY_DIR)
@@ -602,7 +754,7 @@ fn execute(repo: &Path, task_file: &Path, out: &Path, budget: u32) -> Result<()>
             &task.ground_truth,
         ));
 
-        let compiled = conditions::reify_context(&store, &task.prompt, budget)?;
+        let compiled = conditions::reify_context_weighted(&store, &task.prompt, budget, &weights)?;
         outcomes.push(metrics::score(
             &task.id,
             "R-reify",
@@ -610,7 +762,13 @@ fn execute(repo: &Path, task_file: &Path, out: &Path, budget: u32) -> Result<()>
             &task.ground_truth,
         ));
 
-        let iterated = conditions::reify_context_iterative(&store, &task.prompt, budget, 3)?;
+        let iterated = conditions::reify_context_iterative_weighted(
+            &store,
+            &task.prompt,
+            budget,
+            3,
+            &weights,
+        )?;
         outcomes.push(metrics::score(
             &task.id,
             "R-reify-iter3",

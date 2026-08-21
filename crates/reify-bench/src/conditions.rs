@@ -219,6 +219,23 @@ pub fn reify_context_iterative(
     budget: u32,
     rounds: usize,
 ) -> Result<Answer> {
+    reify_context_iterative_weighted(
+        store,
+        prompt,
+        budget,
+        rounds,
+        &context::RankWeights::default(),
+    )
+}
+
+/// The iterated condition with explicit ranking weights, for ablations and fitting.
+pub fn reify_context_iterative_weighted(
+    store: &Store,
+    prompt: &str,
+    budget: u32,
+    rounds: usize,
+    weights: &context::RankWeights,
+) -> Result<Answer> {
     let started = std::time::Instant::now();
     let mut merged = Answer {
         files: Vec::new(),
@@ -236,7 +253,7 @@ pub fn reify_context_iterative(
                 budget,
                 max_next_reads: 12,
                 exclude: exclude.clone(),
-                ..Default::default()
+                weights: weights.clone(),
             },
         )?;
         let round = answer_from_context(&compiled);

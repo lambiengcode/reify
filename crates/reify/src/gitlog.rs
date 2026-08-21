@@ -162,6 +162,52 @@ pub fn head_sha(root: &Path) -> Option<String> {
         .then(|| String::from_utf8_lossy(&out.stdout).trim().to_string())
 }
 
+/// Commit bodies keyed by full sha, for the newest `max_commits` commits.
+///
+/// A separate bounded walk rather than a field on [`Commit`]: the history parser's
+/// record format is load-bearing (NUL-separated headers interleaved with
+/// `--name-only` output), and a body is multi-line free text that would have to be
+/// escaped through it. Git forbids NUL in messages, so a two-byte sentinel pair is
+/// enough to frame records here without touching that parser.
+pub fn bodies(root: &Path, max_commits: usize) -> Result<HashMap<String, String>> {
+    let output = Command::new("git")
+        .args([
+            "log",
+            "--no-merges",
+            "--format=%x02%H%x01%b",
+            &format!("-n{max_commits}"),
+        ])
+        .current_dir(root)
+        .output()
+        .context("running git log for commit bodies")?;
+    anyhow::ensure!(
+        output.status.success(),
+        "git log for bodies failed: {}",
+        String::from_utf8_lossy(&output.stderr).trim()
+    );
+    let text = String::from_utf8_lossy(&output.stdout);
+    let mut out = HashMap::new();
+    for record in text.split('\u{2}').skip(1) {
+        let Some((sha, body)) = record.split_once('\u{1}') else {
+            continue;
+        };
+        let body = body.trim();
+        if body.is_empty() {
+            continue;
+        }
+        // Bounded: a squashed-PR body carries its signal in the first paragraphs,
+        // and an unbounded one would let a single giant message dominate the counts.
+        out.insert(
+            sha.trim().to_string(),
+            body.chars().take(BODY_MAX_CHARS).collect(),
+        );
+    }
+    Ok(out)
+}
+
+/// How much of a commit body is worth reading as retrieval signal.
+const BODY_MAX_CHARS: usize = 600;
+
 /// Walk history, newest first, up to `max_commits`.
 pub fn history(root: &Path, max_commits: usize) -> Result<History> {
     let output = Command::new("git")
@@ -407,6 +453,54 @@ mod tests {
             class: ChangeClass::Other,
             files: files.iter().map(|s| s.to_string()).collect(),
         }
+    }
+
+    #[test]
+    fn bodies_are_read_bounded_and_keyed_by_sha() {
+        let dir = std::env::temp_dir().join(format!("reify-bodies-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        let git = |args: &[&str]| {
+            let ok = Command::new("git")
+                .args(args)
+                .current_dir(&dir)
+                .env("GIT_AUTHOR_NAME", "t")
+                .env("GIT_AUTHOR_EMAIL", "t@t")
+                .env("GIT_COMMITTER_NAME", "t")
+                .env("GIT_COMMITTER_EMAIL", "t@t")
+                .stdout(Stdio::null())
+                .stderr(Stdio::null())
+                .status()
+                .unwrap()
+                .success();
+            assert!(ok, "git {args:?}");
+        };
+        git(&["init", "-q"]);
+        std::fs::write(dir.join("a.py"), "x = 1\n").unwrap();
+        git(&["add", "."]);
+        git(&[
+            "commit",
+            "-q",
+            "-m",
+            "fix: subject line",
+            "-m",
+            "The body names cloud_auth_login and the strategic discount tier.",
+        ]);
+        std::fs::write(dir.join("b.py"), "y = 2\n").unwrap();
+        git(&["add", "."]);
+        git(&["commit", "-q", "-m", "feat: no body here"]);
+
+        let history = history(&dir, 10).unwrap();
+        let bodies = bodies(&dir, 10).unwrap();
+        // Only the commit that has a body appears, keyed by its full sha.
+        assert_eq!(bodies.len(), 1);
+        let with_body = history
+            .commits
+            .iter()
+            .find(|c| c.subject.contains("subject line"))
+            .unwrap();
+        assert!(bodies[&with_body.sha].contains("cloud_auth_login"));
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]

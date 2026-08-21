@@ -77,12 +77,21 @@ const MECHANICAL: &[&str] = &[
 /// `wanted` tasks are selected from the newest `scan` commits, taking every commit
 /// that passes the filters in order. Selection is deterministic and happens before any
 /// condition is run, so there is no opportunity to choose tasks that flatter a result.
-pub fn generate(root: &Path, wanted: usize, scan: usize, after: Option<&str>) -> Result<TaskSet> {
+pub fn generate(
+    root: &Path,
+    wanted: usize,
+    scan: usize,
+    after: Option<&str>,
+    until: Option<&str>,
+    exclude: &BTreeSet<String>,
+) -> Result<TaskSet> {
     let head = gitlog::head_sha(root).context("reading HEAD")?;
     let history = gitlog::history(root, scan)?;
 
     // When a base is given, the walk stops there: every task must describe a change
-    // made *after* the state the index will be built at.
+    // made *after* the state the index will be built at. When `until` is given, the
+    // walk *starts below it*: only strictly older commits qualify, which is how a
+    // training corpus is kept disjoint from every evaluation window.
     let base = after.map(|rev| resolve(root, rev)).transpose()?;
     let cutoff = base.as_ref().and_then(|sha| {
         history
@@ -90,14 +99,46 @@ pub fn generate(root: &Path, wanted: usize, scan: usize, after: Option<&str>) ->
             .iter()
             .position(|c| c.sha.starts_with(sha) || sha.starts_with(&c.sha))
     });
+    let start = match until.map(|rev| resolve(root, rev)).transpose()? {
+        None => 0,
+        // The scanned list is merge-free, so a merge commit named as the boundary is
+        // legitimately absent from it. When the boundary is HEAD itself, "strictly
+        // older than HEAD" excludes nothing the list contains.
+        Some(sha) if sha == head => 0,
+        Some(sha) => {
+            match history
+                .commits
+                .iter()
+                .position(|c| c.sha.starts_with(&sha) || sha.starts_with(&c.sha))
+            {
+                Some(position) => position + 1,
+                // A merge commit is legitimately absent from the merge-free list, so
+                // the boundary falls back to its timestamp: strictly-older-than holds
+                // for every commit authored before it.
+                None => {
+                    let at = commit_time(root, &sha)?;
+                    history
+                        .commits
+                        .iter()
+                        .position(|c| c.timestamp < at)
+                        .with_context(|| {
+                            format!("--until {sha}: nothing older within the scanned history")
+                        })?
+                }
+            }
+        }
+    };
 
     let mut tasks = Vec::new();
-    for (i, commit) in history.commits.iter().enumerate() {
+    for (i, commit) in history.commits.iter().enumerate().skip(start) {
         if tasks.len() >= wanted {
             break;
         }
         if cutoff.is_some_and(|stop| i >= stop) {
             break;
+        }
+        if exclude.contains(&commit.sha) {
+            continue;
         }
         let Some(mut task) = candidate(root, commit) else {
             continue;
@@ -121,6 +162,21 @@ pub fn generate(root: &Path, wanted: usize, scan: usize, after: Option<&str>) ->
         base,
         tasks,
     })
+}
+
+/// Author timestamp of a commit, for boundary fallback when the commit itself is a
+/// merge and therefore missing from the merge-free scan.
+fn commit_time(root: &Path, sha: &str) -> Result<i64> {
+    let output = Command::new("git")
+        .args(["show", "-s", "--format=%at", sha])
+        .current_dir(root)
+        .output()
+        .context("running git show for a boundary timestamp")?;
+    anyhow::ensure!(output.status.success(), "cannot read commit time of {sha}");
+    String::from_utf8_lossy(&output.stdout)
+        .trim()
+        .parse()
+        .context("parsing a commit timestamp")
 }
 
 /// Resolve a revision to a full sha.

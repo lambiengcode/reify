@@ -6,6 +6,27 @@ versions may break the store schema, and `reify index --force` rebuilds it.
 
 ## [Unreleased]
 
+### Added
+- **SWE-bench Verified evaluation** ([`benchmarks/swe/`](benchmarks/swe/)). Retrieval over
+  all 500 instances: reify offers a file the fix touched 84.6% of the time against grep's
+  6.6%, and a single round wins on 310 instances while spending fewer tokens. End-to-end
+  patch resolution over 101 instances went the other way — a BM25 baseline resolved 18.1%
+  against reify's 11.1% — and both results are in the README with equal prominence.
+- Retrieval: a bounded content scan as a seed source, commit *bodies* in the history
+  prior behind a temporal leakage wall, and a second file fan-out pass after graph
+  spread, so files reached through history and co-change lift their symbols.
+- `reify-bench`: `coverage` (cross-file dependent coverage per language), `--weights`
+  ablations, `--arms` selection, task windows (`--until`, `--exclude`), a miss taxonomy
+  in `audit`, and a coordinate-descent `fit`.
+- `reify upgrade [--check] [version]` — replace the binary with a release, fetched by
+  `curl` and unpacked by `tar` as visible subprocesses (never an embedded HTTP
+  client), checksum verified in-process before install; refused under
+  `REIFY_OFFLINE=1`.
+- `reify uninstall --yes` — remove the binary and nothing else.
+- `reify uninit --yes` — remove one repository's `.reify/` store and the instruction
+  block `init --write-agent-instructions` appended. Both new removal commands print
+  their plan and change nothing without `--yes`.
+
 ## [0.1.0] - 2026-08-21
 
 First vertical slice: a repository can be compiled, queried and benchmarked end to end.

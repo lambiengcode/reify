@@ -10,17 +10,35 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/license-Apache--2.0-111111?style=flat-square" alt="Apache-2.0">
-  <img src="https://img.shields.io/badge/languages-11-111111?style=flat-square" alt="11 languages">
-  <img src="https://img.shields.io/badge/doc%20formats-10-111111?style=flat-square" alt="10 document formats">
-  <img src="https://img.shields.io/badge/network%20calls-0-111111?style=flat-square" alt="Zero network calls">
-  <img src="https://img.shields.io/badge/tests-361-111111?style=flat-square" alt="361 tests">
-  <img src="https://img.shields.io/badge/built%20with-Rust-111111?style=flat-square" alt="Rust">
+  <sub>Already installed? Run <code>reify upgrade</code></sub>
 </p>
 
 <p align="center">
-  <strong>At the same token cost, the model finds the file that had to change 75% of the time — grep manages 50% &middot; measured on four repositories &middot; never opens a socket</strong><br>
-  <sub>A real model on 142 tasks from real merged commits across ERPNext, OFBiz, OpenMRS and Medusa, each index built at a commit <em>before</em> those changes existed. Three of the four repositories show wins of 25–50 points at matched cost; the fourth shows none, and <a href="#numbers">Numbers</a> says so with the same prominence. <a href="benchmarks/REPORT.md">Full writeup</a> &middot; <a href="#reproducing-the-benchmark">reproduce it</a>.</sub>
+  <strong>deterministic knowledge graph &middot; every claim cited &middot; BA documents to code &middot; one binary, no daemon &middot; never opens a socket</strong>
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-111111?style=flat-square" alt="Apache-2.0"></a>
+  <a href="#what-it-reads"><img src="https://img.shields.io/badge/languages-11-111111?style=flat-square" alt="11 languages"></a>
+  <a href="#what-it-reads"><img src="https://img.shields.io/badge/doc%20formats-10-111111?style=flat-square" alt="10 document formats"></a>
+  <a href="#privacy"><img src="https://img.shields.io/badge/network%20calls-0-111111?style=flat-square" alt="Zero network calls"></a>
+  <a href="#development"><img src="https://img.shields.io/badge/tests-369-111111?style=flat-square" alt="369 tests"></a>
+  <a href="#architecture"><img src="https://img.shields.io/badge/built%20with-Rust-111111?style=flat-square" alt="Rust"></a>
+</p>
+
+<p align="center">
+  <a href="#claude-code"><img src="https://img.shields.io/badge/Claude_Code-supported-2da44e?style=flat-square" alt="Claude Code supported"></a>
+  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img src="https://img.shields.io/badge/Cursor-supported-2da44e?style=flat-square" alt="Cursor supported"></a>
+  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img src="https://img.shields.io/badge/Codex-supported-2da44e?style=flat-square" alt="Codex supported"></a>
+  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img src="https://img.shields.io/badge/OpenCode-supported-2da44e?style=flat-square" alt="OpenCode supported"></a>
+  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img src="https://img.shields.io/badge/Aider-supported-2da44e?style=flat-square" alt="Aider supported"></a>
+  <a href="#mcp"><img src="https://img.shields.io/badge/MCP-3_tools-2da44e?style=flat-square" alt="MCP supported"></a>
+  <a href="#install"><img src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux-prebuilt-111111?style=flat-square" alt="macOS and Linux prebuilt"></a>
+</p>
+
+<p align="center">
+  <strong>On SWE-bench Verified, Reify puts the file that had to change in front of the model 84.6% of the time — grep manages 6.6% &middot; 500 real issues, someone else's benchmark &middot; never opens a socket</strong><br>
+  <sub>A real model on 142 tasks from real merged commits across ERPNext, OFBiz, OpenMRS and Medusa, each index built at a commit <em>before</em> those changes existed. That is <em>retrieval</em>: the right file, in front of the model. On end-to-end patch correctness a BM25 baseline currently resolves <em>more</em> issues than Reify does, and <a href="#the-end-to-end-result-which-does-not-go-our-way">the section saying so</a> is as prominent as this one. <a href="benchmarks/REPORT.md">Full writeup</a> &middot; <a href="#reproducing-the-benchmark">reproduce it</a>.</sub>
 </p>
 
 <p align="center">
@@ -28,8 +46,23 @@
 </p>
 
 <p align="center">
-  <sub>Every command in the demo is real, against a real ERPNext index. The recording script is <a href="assets/demo.tape">committed</a>; if the GIF ever disagrees with the tool, re-render the GIF.</sub>
+  <sub>Every command in the demo is real, against a real ERPNext index. The recording script is <a href="assets/demo-script.sh">committed</a> (recorded with terminalizer); if the GIF ever disagrees with the tool, re-record the GIF.</sub>
 </p>
+
+## Two minutes to first answer
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/lambiengcode/reify/main/install.sh | sh
+cd your-repository
+reify init --write-agent-instructions   # wires your agent through AGENTS.md / CLAUDE.md
+reify index                             # 4.6 s for 5,000 files; 0.7 s after one edit
+reify context "the change you are about to make" --toon
+```
+
+<sub>One static binary — no daemon, no config, no API key, and every release ships a
+SHA-256 checksum that `reify upgrade` verifies before installing. Changed your mind?
+`reify uninstall` removes the binary and `reify uninit` cleans one repository, both
+showing their plan first. Per-agent wiring, hooks and MCP: <a href="#install">Install</a>.</sub>
 
 <p align="center">
   <strong>English</strong> &middot; <a href="README.vi.md">Tiếng Việt</a> &middot; <a href="README.zh.md">简体中文</a>
@@ -40,10 +73,12 @@
 <details>
 <summary><strong>Contents</strong></summary>
 
+- [Two minutes to first answer](#two-minutes-to-first-answer)
 - [The one-person problem](#the-one-person-problem)
 - [What it actually gives you](#what-it-actually-gives-you)
 - [Before / after](#before--after)
-- [Numbers](#numbers) — [retrieval alone](#retrieval-on-its-own-no-model-involved) · [the scorecard](#the-scorecard-against-targets-set-before-the-work) · [where it doesn't work](#where-it-doesnt-work)
+- [SWE-bench Verified](#numbers-on-a-benchmark-we-did-not-design) — 84.6% vs grep's 6.6%
+- [Numbers](#numbers-on-four-repositories-chosen-to-hurt) — [retrieval alone](#retrieval-on-its-own-no-model-involved) · [the scorecard](#the-scorecard-against-targets-set-before-the-work) · [where it doesn't work](#where-it-doesnt-work)
 - [How it works](#how-it-works) — [four bridges to code](#four-bridges-from-business-vocabulary-to-code)
 - [What it reads](#what-it-reads)
 - [Multilingual](#multilingual)
@@ -142,7 +177,99 @@ $ reify why erpnext/selling/doctype/sales_order/sales_order.py:812
 
 Three of those four sections are things grep structurally cannot produce.
 
-## Numbers
+## Numbers, on a benchmark we did not design
+
+The four-repository benchmark below is ours, which is exactly the reason to also run
+somebody else's. **[SWE-bench Verified](https://openai.com/index/introducing-swe-bench-verified/)**
+is 500 real GitHub issues from twelve well-known Python projects, each pinned to the
+`base_commit` the issue was filed against — the same index-before-the-change protocol
+Reify's own benchmark uses, written by other people. The task is a plain issue report;
+the right answer is the set of files the accepted fix actually touched.
+
+| retrieval on SWE-bench Verified, n=500 | offered a file the fix touched | MRR | offered **every** such file | median tokens |
+|---|--:|--:|--:|--:|
+| grep, content | 6.6% <sub>[4.7–9.1]</sub> | 0.06 | 5.6% | 3,998 |
+| grep, paths | 9.0% <sub>[6.8–11.8]</sub> | 0.06 | 7.8% | 3,996 |
+| **reify**, one round | **66.0%** <sub>[61.7–70.0]</sub> | 0.43 | 59.0% | **3,466** |
+| **reify**, three rounds | **84.6%** <sub>[81.2–87.5]</sub> | 0.45 | 77.0% | 9,174 |
+
+**A single round of Reify beats grep on 310 instances and loses on 13 — while spending
+fewer tokens** (3,466 against 3,998). Three rounds win 395 to 5 (exact McNemar
+p ≈ 7 × 10⁻¹¹⁰). This is not a close measurement, and it is the cleanest number in this
+README precisely because the tasks, the repositories and the ground truth all came from
+somewhere else.
+
+Per repository, three rounds against content-grep:
+
+| | grep | reify ×3 | | | grep | reify ×3 |
+|---|--:|--:|---|---|--:|--:|
+| django (n=231) | 6% | **88%** | | astropy (n=22) | 0% | **77%** |
+| sympy (n=75) | 7% | **77%** | | xarray (n=22) | 9% | **91%** |
+| sphinx (n=44) | 7% | **75%** | | pytest (n=19) | 26% | **84%** |
+| matplotlib (n=34) | 0% | **91%** | | pylint (n=10) | 10% | **60%** |
+| scikit-learn (n=32) | 9% | **88%** | | requests (n=8) | 0% | **100%** |
+
+**What this does and does not show.** It measures retrieval — whether the files that
+had to change are put in front of the model — not whether the model then writes a
+correct patch. Verified is Python-only, so it says nothing about the modern-TypeScript
+weakness [below](#where-it-doesnt-work). And these repositories are famous enough that
+models have partly memorised them; that affects a model's *answers*, not which files a
+retriever offers, and every arm here ran against the same index at the same commit.
+Reproduce it with the driver in [`benchmarks/swe/`](benchmarks/swe/).
+
+
+### The end-to-end result, which does not go our way
+
+Retrieval is not this project's final claim — resolving the issue is. So the same
+benchmark was run through the SWE-bench paper's own retrieval-augmented protocol: one
+model, one context budget, the retriever as the only difference between arms, and every
+patch judged by the **official SWE-bench harness** in Docker. 101 stratified instances;
+72 of them graded under both arms.
+
+| resolved the issue | | 95% CI |
+|---|--:|---|
+| BM25 | **18.1%** (13/72) | [10.9–28.5] |
+| Reify | 11.1% (8/72) | [5.7–20.4] |
+
+BM25 solved 8 instances Reify did not; Reify solved 3 BM25 did not (exact McNemar
+p = 0.23). At this sample size that is not a significant difference — but the point
+estimate favours BM25, and it is reported in that direction because that is the
+direction it came out in.
+
+**The diagnostic is worth more than the number.** In 5 of the 8 instances BM25 resolved
+and Reify did not, **Reify had already offered a file the fix touched.** So these are not
+retrieval failures. Putting the right file in front of a model and giving that model what
+it needs to write the patch are different problems, and Reify is measurably much better
+at the first than at the second.
+
+One limitation, stated as a limitation and not as a defence: this protocol used Reify as
+a *file ranker*, feeding whole files, which throws away what `reify context` actually
+produces — spans, rules, citations, conflicts, the budgeted reading plan. Feeding the
+compiled context instead is the obvious next experiment. It has not been run, so it
+proves nothing yet.
+
+<details>
+<summary><strong>Getting SWE-bench to run at all on Apple Silicon</strong></summary>
+
+Two things had to be fixed before either arm could be measured honestly, and both are in
+[`benchmarks/swe/`](benchmarks/swe/):
+
+- **40 instances had no runnable environment.** Their conda specs pin packages such as
+  `setuptools==38.2.4` that were never built for `aarch64`, which is why SWE-bench
+  publishes no arm64 image for them and why building locally fails too. The fix is to
+  force the harness's own `USE_X86` escape hatch on for every instance and pre-pull each
+  image with `--platform linux/amd64`, since the harness otherwise pulls with the
+  daemon's native platform and 404s. After that: zero environment errors.
+- **Roughly 45% of patches would not apply,** because a model asked for exact SEARCH text
+  reproduces these famous repositories from memory rather than from the listing. Numbering
+  every line of the context and asking for line-range replacements dropped that to ~1%.
+
+Images are pulled, graded and deleted in batches, so peak disk stays near 18 GB instead
+of the ~200 GB a naive pre-pull needs.
+
+</details>
+
+## Numbers, on four repositories chosen to hurt
 
 The honest measurement is a real model doing a real task: tickets taken from merged
 commits, where the prompt is the developer's own description of the change and the
@@ -165,6 +292,11 @@ control is grep handed the same tripled budget outright.
 | OFBiz (Java + XML), n=40 | 28% | **78%** | +50 | no |
 | OpenMRS (Java), n=22 | 32% | **59%** | +27 | barely |
 | Medusa (modern TS), n=40 | 24% | **26%** | +2 | **fully — no win** |
+
+> **A note on the fourth row:** Medusa's +2 is a tie, not a win, and it stays in the
+> headline table at full prominence rather than in a footnote. What separates the
+> repositories where Reify wins big from the one where it doesn't is measured, not
+> guessed — see [Where it doesn't work](#where-it-doesnt-work).
 
 **The controls, on every repository:** perfect context scores 100% everywhere, so
 retrieval quality is the entire game. A decoy context of identical shape scores 0–12%,
@@ -324,6 +456,14 @@ reify init      # tells you what it will and won't index, and why
 reify index     # 4.6s for 5,000 files; 0.7s after you edit one
 ```
 
+**Stay current, leave cleanly.** `reify upgrade` replaces the binary with the latest
+release — through `curl` and `tar` as visible subprocesses, never an embedded HTTP
+client, with the checksum verified before anything is installed; `--check` only asks,
+and `REIFY_OFFLINE=1` refuses the command outright. `reify uninstall --yes` removes the
+binary and nothing else; `reify uninit --yes` removes one repository's `.reify/` store
+and the instruction block `init` wrote. Both show their plan first when run without
+`--yes`.
+
 <details>
 <summary><strong>Shell completions</strong></summary>
 
@@ -425,6 +565,8 @@ Reify writes the prompt to that command's stdin, or substitutes a `{prompt}` arg
 | `reify report` | System scorecard |
 | `reify status` | Freshness, coverage, and what was skipped |
 | `reify llm status \| preview` | Is a model configured, and exactly what would be sent |
+| `reify upgrade [--check]` | Replace this binary with the latest release. The only networked command; refused under `REIFY_OFFLINE=1` |
+| `reify uninstall --yes` \| `uninit --yes` | Remove the binary \| one repository's store and instruction block |
 | `reify serve --mcp` | Model Context Protocol over stdio |
 | `reify completions <shell>` | Completion script |
 
@@ -451,7 +593,7 @@ difference between a tool they can evaluate and one they cannot.
 |---|---|
 | Networking crates in `Cargo.lock` | asserted zero, in CI |
 | Sockets in the source | asserted zero, in CI |
-| Subprocesses | `git`, and reviewed document converters — each named in a test |
+| Subprocesses | `git`, reviewed document converters, and — for `reify upgrade` only — `curl` and `tar`; each named in a test |
 | Code from your repo, executed | never. tree-sitter parses; it does not run |
 | The store | `.reify/`, gitignored by `reify init` |
 
@@ -543,7 +685,7 @@ history.
 **Our one expert has no time to help set this up.**
 They don't need to. `reify init && reify index` needs nothing from them. If you can
 borrow an afternoon, `reify concepts --suggest` turns what Reify mined into a draft
-glossary they correct rather than author — and [Numbers](#numbers) shows that declared
+glossary they correct rather than author — and [Numbers](#numbers-on-four-repositories-chosen-to-hurt) shows that declared
 vocabulary is exactly where the gains come from.
 
 **Will this actually let us hire?**

@@ -23,3 +23,6 @@ owo-colors = "4.3.0"
 reify = { path = "../reify" }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
+# Pure-Rust SHA-256, used only to verify a downloaded release before `reify
+# upgrade` installs it. Not a networking crate; the offline tests still hold.
+sha2 = "0.10.9"
