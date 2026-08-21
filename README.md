@@ -14,7 +14,7 @@
   <img src="https://img.shields.io/badge/languages-11-111111?style=flat-square" alt="11 languages">
   <img src="https://img.shields.io/badge/doc%20formats-10-111111?style=flat-square" alt="10 document formats">
   <img src="https://img.shields.io/badge/network%20calls-0-111111?style=flat-square" alt="Zero network calls">
-  <img src="https://img.shields.io/badge/tests-345-111111?style=flat-square" alt="345 tests">
+  <img src="https://img.shields.io/badge/tests-361-111111?style=flat-square" alt="361 tests">
   <img src="https://img.shields.io/badge/built%20with-Rust-111111?style=flat-square" alt="Rust">
 </p>
 
@@ -23,7 +23,32 @@
   <sub>A real model on 142 tasks from real merged commits across ERPNext, OFBiz, OpenMRS and Medusa, each index built at a commit <em>before</em> those changes existed. Three of the four repositories show wins of 25–50 points at matched cost; the fourth shows none, and <a href="#numbers">Numbers</a> says so with the same prominence. <a href="benchmarks/REPORT.md">Full writeup</a> &middot; <a href="#reproducing-the-benchmark">reproduce it</a>.</sub>
 </p>
 
+<p align="center">
+  <strong>English</strong> &middot; <a href="README.vi.md">Tiếng Việt</a> &middot; <a href="README.zh.md">简体中文</a>
+</p>
+
 ---
+
+<details>
+<summary><strong>Contents</strong></summary>
+
+- [The one-person problem](#the-one-person-problem)
+- [What it actually gives you](#what-it-actually-gives-you)
+- [Before / after](#before--after)
+- [Numbers](#numbers) — [retrieval alone](#retrieval-on-its-own-no-model-involved) · [the scorecard](#the-scorecard-against-targets-set-before-the-work) · [where it doesn't work](#where-it-doesnt-work)
+- [How it works](#how-it-works) — [four bridges to code](#four-bridges-from-business-vocabulary-to-code)
+- [What it reads](#what-it-reads)
+- [Multilingual](#multilingual)
+- [Install](#install) — [Claude Code](#claude-code) · [other agents](#codex-cursor-opencode-aider-pi-windsurf-cline) · [MCP](#mcp) · [a model](#optional-a-model)
+- [Commands](#commands)
+- [Privacy](#privacy)
+- [Architecture](#architecture) — [measured performance](#measured-performance)
+- [Reproducing the benchmark](#reproducing-the-benchmark)
+- [Development](#development)
+- [FAQ](#faq)
+- [Roadmap](#roadmap) · [Status](#status) · [License](#license)
+
+</details>
 
 ## The one-person problem
 
