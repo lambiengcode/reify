@@ -273,7 +273,71 @@ Ranked by expected value per unit of effort, not by interest.
 | 5 | 6 | SCIP, only if typed-language weakness survives phases 1–4 |
 | 6 | §4 | End-to-end completion, the measurement that settles it |
 
-## 7. Kill criteria for this roadmap
+## Outcomes so far — updated 2026-08-21, after phases 1–4
+
+Retrieval numbers are final (frozen tasks, leakage-free, one binary). Model-in-the-loop
+numbers follow the same protocol and are reported in the README.
+
+### What was built
+
+| Bet | Status | Outcome |
+|---|---|---|
+| 1 — history prior | **shipped** | The single largest ranking gain. MRR roughly doubled on every repository where commits carry real messages |
+| 2 — TESTED_BY | **shipped** | Emitted for every call from a test file into production code, across all eleven languages' test conventions |
+| 3 — fitted weights | **shipped, then partly reverted** | See below — the fit's falsification clause fired |
+| 4 — iteration | **shipped** | +9 to +17 points of hit rate for ~2.8× tokens, passing its pre-registered bar on three of four repositories |
+| 5 — concept expansion | **shipped, honest verdict: no measurable effect** | Identical training scores with it on and off. Its mechanism is multilingual and is covered by tests; on English task sets it does nothing, and saying otherwise would be decoration |
+| 7 — two more repositories | **shipped** | OFBiz (Java + XML config) and Medusa (modern TS monorepo) |
+| 6 — SCIP | not started | The OFBiz result (below) removed its premise |
+| §4 — end-to-end | not started | Requires runnable test environments per repository; still the measurement that settles the real claim |
+
+### Retrieval, frozen tasks, all four repositories
+
+| | grep | reify | reify ×3 rounds |
+|---|--:|--:|--:|
+| ERPNext (Python/JS) | 10% | 55% | **72%** |
+| OFBiz (Java + XML) | 12% | 45% | **62%** |
+| OpenMRS (Java) | 32% | 41% | **50%** |
+| Medusa (modern TS) | 18% | 18% | **28%** |
+
+Three findings that were not in the plan:
+
+1. **The Java weakness was OpenMRS-specific, not Java-specific.** OFBiz — Java, with
+   its business logic largely in XML — shows one of the largest margins of any
+   repository. K-R2's premise ("typed languages are where Reify is weak") was wrong;
+   what OpenMRS lacks is *history that speaks the tasks' vocabulary*, not types.
+2. **Modern, well-factored TS is the hard case**, inverting the expectation. Medusa's
+   tasks describe UI behaviour ("remove duplicate cloud auth button") whose vocabulary
+   barely intersects the code's. Iteration lifts it from 18% to 28%; nothing else
+   moved it. This is now the open problem.
+3. **A file whose *path* matches the task used to contribute nothing** — file nodes had
+   no edges to their contents and were not rendered. Fixing that fan-out was worth
+   more than any weight: on training data it added 3–12 points of hit rate and up to
+   0.19 MRR on top of everything else.
+
+### The fit's falsification clause fired, as designed
+
+Bet 3 pre-registered: *"Falsified if the fitted weights beat the hand-picked ones on
+the training range but not on the held-out tasks. That result gets published too."*
+
+That is what happened. Training preferred a history-prior weight of 2.2–5.5; every
+value in that range scored worse than the pre-fit default (0.9) on the frozen tasks —
+the commit-vocabulary association is real but nonstationary, and a weight tuned on one
+window overshoots the next. The default reverted to 0.9, the value chosen before any
+evaluation was seen, and the full training surface is committed in
+`benchmarks/weights/`. K-R3 is *not* triggered — the prior works (it carries much of
+the MRR gain at 0.9) — but its strength cannot be chosen by fitting to history alone.
+
+### Multiplicity, stated plainly
+
+During this phase the frozen tasks were evaluated more than once while diagnosing the
+fit failure and the Medusa collapse. The final numbers above come from the last run,
+after all decisions were locked, but a skeptical reader should treat the *margins* as
+softer than a single-look protocol would justify. The decisions themselves — reverting
+the prior, adding the file fan-out — were made on training data or from structural
+diagnosis, not by choosing whatever maximised the frozen scores.
+
+## 8. Kill criteria for this roadmap
 
 Distinct from the product kill criteria in [`PLAN.md`](PLAN.md) §Y. These govern the
 roadmap only.

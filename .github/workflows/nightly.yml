@@ -32,8 +32,10 @@ jobs:
           # Baselines measured on 2026-08-20 at the pinned commit. A drift beyond 10%
           # means extraction changed, which is either a bug or a deliberate change that
           # should update these numbers in the same pull request.
-          BASELINE = {"symbols": 18900, "doc_sections": 535, "database_objects": 731,
-                      "concepts": 579, "rules": 412}
+          # Re-baselined 2026-08-21 after arrow-function extraction and the
+          # capped heading/code-vocabulary bridges changed what is mined.
+          BASELINE = {"symbols": 19222, "doc_sections": 535, "database_objects": 734,
+                      "concepts": 960, "rules": 419}
           got = json.load(open("report.json"))
           bad = []
           for key, expected in BASELINE.items():

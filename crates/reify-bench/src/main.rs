@@ -442,6 +442,26 @@ fn agent_experiments(
             "O-oracle",
             &agent::oracle_block(task),
         ));
+
+        // The iterated pair. Reify's three rounds cost roughly three budgets, so the
+        // honest control is grep given three budgets outright — otherwise iteration
+        // buys its gain with tokens the baseline was never offered.
+        let iterated = conditions::reify_context_iterative(&store, &task.prompt, budget, 3)?;
+        outcomes.push(agent::run(
+            &provider,
+            repo,
+            task,
+            "R-reify-iter3",
+            &agent::files_block(&iterated),
+        ));
+        let grep_wide = conditions::content_search(&corpus, &task.prompt, budget * 3);
+        outcomes.push(agent::run(
+            &provider,
+            repo,
+            task,
+            "B-content-grep-x3",
+            &agent::files_block(&grep_wide),
+        ));
     }
     eprintln!();
 
@@ -451,6 +471,8 @@ fn agent_experiments(
         "R-reify",
         "R-shuffled",
         "O-oracle",
+        "R-reify-iter3",
+        "B-content-grep-x3",
     ];
     let summaries: Vec<agent::AgentSummary> = names
         .iter()
@@ -770,6 +792,8 @@ fn agent_section(input: &Path) -> String {
         "R-reify" => "condition under test",
         "R-shuffled" => "E3 negative control",
         "O-oracle" => "E2 ceiling",
+        "R-reify-iter3" => "three rounds, cumulative cost",
+        "B-content-grep-x3" => "grep at the same tripled budget",
         _ => "",
     };
     for s in &summaries {
