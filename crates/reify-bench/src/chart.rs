@@ -37,7 +37,8 @@ pub struct Series {
 /// Colour a condition by what it *is*, so the same role reads the same across charts.
 fn colour_for(condition: &str) -> &'static str {
     match condition {
-        c if c.starts_with("R-reify") => REIFY,
+        "R-reify-iter3" => REIFY,
+        c if c.starts_with("R-reify") && !c.contains("shuffled") => REIFY,
         c if c.starts_with("O-") => CEILING,
         c if c.starts_with("N-") => BASELINE,
         c if c.starts_with("R-shuffled") => DECOY,
@@ -49,12 +50,14 @@ fn colour_for(condition: &str) -> &'static str {
 /// Shorten a condition id into something readable under a bar.
 fn label_for(condition: &str) -> &'static str {
     match condition {
-        "N-no-context" => "no context",
+        "N-no-context" => "none",
         "B-content-grep" => "grep",
         "R-reify" => "reify",
         "R-shuffled" => "decoy",
         "O-oracle" => "perfect",
         "C-path-grep" => "path grep",
+        "R-reify-iter3" => "reify ×3",
+        "B-content-grep-x3" => "grep ×3",
         _ => "other",
     }
 }
@@ -86,13 +89,12 @@ pub fn agent_chart(series: &[Series]) -> String {
     // the width of a proportional font is how legend entries end up on top of each
     // other, and there is no layout engine here to catch it.
     let legend = [
-        (BASELINE, "no context (control)"),
-        (RIVAL, "budget-matched grep"),
-        (REIFY, "reify"),
-        (DECOY, "decoy context (control)"),
+        (BASELINE, "no context (memorisation control)"),
+        (RIVAL, "grep, tripled budget"),
+        (REIFY, "reify, three rounds (same cost)"),
         (CEILING, "perfect context (ceiling)"),
     ];
-    let columns = 3usize;
+    let columns = 2usize;
     let column_width = (WIDTH - 132.0) / columns as f32;
     for (index, (colour, text)) in legend.iter().enumerate() {
         let x = 66.0 + (index % columns) as f32 * column_width;
@@ -191,7 +193,7 @@ pub fn agent_chart(series: &[Series]) -> String {
 
     let _ = writeln!(
         svg,
-        r#"  <text x="{mid}" y="{y:.0}" font-size="11" fill="{INK}" text-anchor="middle">Overlapping whiskers mean the difference is not established. On OpenMRS, reify and grep overlap.</text>
+        r#"  <text x="{mid}" y="{y:.0}" font-size="11" fill="{INK}" text-anchor="middle">Overlapping whiskers mean the difference is not established. On Medusa, reify and grep overlap.</text>
 </svg>"#,
         mid = WIDTH / 2.0,
         y = height - 12.0
@@ -272,11 +274,13 @@ pub fn retrieval_chart(series: &[Series]) -> String {
 
 /// Build a chart series from a repository's agent summaries.
 pub fn agent_series(repository: &str, summaries: &[AgentSummary]) -> Series {
+    // The headline is the budget-matched comparison: reify iterated three rounds
+    // against grep handed the same tripled budget outright. Single-shot numbers live
+    // in the tables; seven bars per group is a legend, not a chart.
     let order = [
         "N-no-context",
-        "B-content-grep",
-        "R-reify",
-        "R-shuffled",
+        "B-content-grep-x3",
+        "R-reify-iter3",
         "O-oracle",
     ];
     let mut bars = Vec::new();
@@ -302,7 +306,7 @@ pub fn agent_series(repository: &str, summaries: &[AgentSummary]) -> Series {
 
 /// Build a chart series from a repository's retrieval summaries.
 pub fn retrieval_series(repository: &str, summaries: &[Summary]) -> Series {
-    let order = ["B-content-grep", "C-path-grep", "R-reify"];
+    let order = ["B-content-grep", "C-path-grep", "R-reify", "R-reify-iter3"];
     let mut bars = Vec::new();
     let mut tasks = 0usize;
     for name in order {
@@ -397,7 +401,7 @@ mod tests {
 
     #[test]
     fn conditions_get_readable_labels() {
-        assert_eq!(label_for("N-no-context"), "no context");
+        assert_eq!(label_for("N-no-context"), "none");
         assert_eq!(label_for("R-shuffled"), "decoy");
         assert_eq!(label_for("unknown-condition"), "other");
     }

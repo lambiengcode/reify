@@ -1,0 +1,4176 @@
+[
+  {
+    "task": "t-574313ab",
+    "condition": "N-no-context",
+    "named": [
+      "cypress/integration/erpnext/accounts/payment_entry.js",
+      "cypress/integration/erpnext/accounts/purchase_invoice.js",
+      "cypress/integration/erpnext/accounts/sales_invoice.js",
+      "cypress/integration/erpnext/stock/stock_entry.js",
+      "cypress/integration/erpnext/selling/opportunity.js",
+      "cypress/integration/erpnext/selling/quotation.js",
+      "cypress/integration/erpnext/buying/supplier_quotation.js",
+      "cypress/integration/erpnext/hr/employee.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 98,
+    "elapsed_ms": 2552,
+    "error": null
+  },
+  {
+    "task": "t-574313ab",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/JavaMailContainer.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 124,
+    "elapsed_ms": 1263,
+    "error": null
+  },
+  {
+    "task": "t-574313ab",
+    "condition": "R-reify",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/GenericService.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelService.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceDispatcher.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityQuery.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericDelegator.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlFilter.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/cms/CmsEvents.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 183,
+    "elapsed_ms": 1677,
+    "error": null
+  },
+  {
+    "task": "t-574313ab",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/container/ComponentContainer.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/component/ComponentConfig.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/webdav/WebDavServlet.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/view/ApacheFopWorker.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 187,
+    "elapsed_ms": 1612,
+    "error": null
+  },
+  {
+    "task": "t-574313ab",
+    "condition": "O-oracle",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/HttpClient.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 131,
+    "elapsed_ms": 1237,
+    "error": null
+  },
+  {
+    "task": "t-574313ab",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityQuery.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericDelegator.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlFilter.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/OfbizUrlBuilder.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 922,
+    "elapsed_ms": 1731,
+    "error": null
+  },
+  {
+    "task": "t-574313ab",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/thirdparty/authorizedotnet/AIMPaymentServices.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 132,
+    "elapsed_ms": 1388,
+    "error": null
+  },
+  {
+    "task": "t-3e204182",
+    "condition": "N-no-context",
+    "named": [
+      "api/image_management_services.py",
+      "api/image_management_services/__init__.py",
+      "api/image_management_services/image_management.py",
+      "api/image_management_services/utils.py",
+      "api/image_management_services/permissions.py",
+      "api/image_management_services/path_validation.py",
+      "api/image_management_services/security.py",
+      "api/image_management_services/validators.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 93,
+    "elapsed_ms": 1728,
+    "error": null
+  },
+  {
+    "task": "t-3e204182",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/common/src/main/java/org/apache/ofbiz/common/qrcode/QRCodeServices.java",
+      "themes/common-theme/webapp/common-theme/js/plugins/date/timezones/strip_olson_comments_ofbiz.rb"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 143,
+    "elapsed_ms": 1311,
+    "error": null
+  },
+  {
+    "task": "t-3e204182",
+    "condition": "R-reify",
+    "named": [
+      "applications/product/src/main/java/org/apache/ofbiz/product/imagemanagement/ImageManagementServices.java",
+      "applications/product/src/main/java/org/apache/ofbiz/product/imagemanagement/CropImage.java",
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelPermission.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 324,
+    "elapsed_ms": 1506,
+    "error": null
+  },
+  {
+    "task": "t-3e204182",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/common/src/main/java/org/apache/ofbiz/common/FtpServices.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilHttp.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilMisc.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityOperator.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilGenerics.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/collections/GenericMap.java",
+      "framework/minilang/src/main/java/org/apache/ofbiz/minilang/SimpleMethod.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/cache/Cache.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 292,
+    "elapsed_ms": 1695,
+    "error": null
+  },
+  {
+    "task": "t-3e204182",
+    "condition": "O-oracle",
+    "named": [
+      "applications/product/src/main/java/org/apache/ofbiz/product/imagemanagement/ImageManagementServices.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 134,
+    "elapsed_ms": 1337,
+    "error": null
+  },
+  {
+    "task": "t-3e204182",
+    "condition": "R-reify-iter3",
+    "named": [
+      "applications/product/src/main/java/org/apache/ofbiz/product/imagemanagement/ImageManagementServices.java",
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelPermission.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/FileUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilHttp.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ConfigXMLReader.java",
+      "framework/common/src/main/java/org/apache/ofbiz/common/image/ImageTransform.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 891,
+    "elapsed_ms": 2023,
+    "error": null
+  },
+  {
+    "task": "t-3e204182",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "applications/product/src/main/java/org/apache/ofbiz/product/imagemanagement/FrameImage.java",
+      "applications/product/src/main/java/org/apache/ofbiz/product/imagemanagement/ImageUrlServlet.java",
+      "framework/common/src/main/java/org/apache/ofbiz/common/qrcode/QRCodeServices.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/config/model/SqlLoadPath.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 188,
+    "elapsed_ms": 1516,
+    "error": null
+  },
+  {
+    "task": "t-9525ae7d",
+    "condition": "N-no-context",
+    "named": [
+      "frappe/public/js/desk/point_of_sale/pos.js",
+      "frappe/public/js/desk/point_of_sale/pos_controller.js",
+      "frappe/public/js/frappe/ui/tools/file_uploader.js",
+      "frappe/public/js/frappe/form/controls/image.js",
+      "frappe/public/js/frappe/utils/file_utils.js",
+      "frappe/public/js/frappe/views/image_viewer/image_viewer.js",
+      "frappe/server/utils.py",
+      "frappe/core/doctype/file/file.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 93,
+    "elapsed_ms": 1858,
+    "error": null
+  },
+  {
+    "task": "t-9525ae7d",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/common/src/main/java/org/apache/ofbiz/common/imagemanipulation/ImageServices.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 141,
+    "elapsed_ms": 1249,
+    "error": null
+  },
+  {
+    "task": "t-9525ae7d",
+    "condition": "R-reify",
+    "named": [
+      "applications/content/src/main/java/org/apache/ofbiz/content/data/DataResourceWorker.java",
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecurityUtil.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelPermission.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 277,
+    "elapsed_ms": 1375,
+    "error": null
+  },
+  {
+    "task": "t-9525ae7d",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/ScriptHelper.java",
+      "framework/common/src/main/java/org/apache/ofbiz/common/scripting/ScriptHelperImpl.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java",
+      "framework/common/src/main/java/org/apache/ofbiz/common/scripting/ContextHelper.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 239,
+    "elapsed_ms": 1524,
+    "error": null
+  },
+  {
+    "task": "t-9525ae7d",
+    "condition": "O-oracle",
+    "named": [
+      "applications/product/src/main/java/org/apache/ofbiz/product/imagemanagement/CropImage.java",
+      "applications/product/src/main/java/org/apache/ofbiz/product/imagemanagement/RotateImage.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 154,
+    "elapsed_ms": 1310,
+    "error": null
+  },
+  {
+    "task": "t-9525ae7d",
+    "condition": "R-reify-iter3",
+    "named": [
+      "applications/content/src/main/java/org/apache/ofbiz/content/data/DataResourceWorker.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/content/ContentPermissionServices.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelPermission.java",
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecurityUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilHttp.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/event/CoreEvents.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/StringUtil.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 669,
+    "elapsed_ms": 2243,
+    "error": null
+  },
+  {
+    "task": "t-9525ae7d",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "applications/product/src/main/java/org/apache/ofbiz/product/spreadsheetimport/ImportProductServices.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/data/DataServices.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 146,
+    "elapsed_ms": 1346,
+    "error": null
+  },
+  {
+    "task": "t-4d02372e",
+    "condition": "N-no-context",
+    "named": [],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 91,
+    "elapsed_ms": 1313,
+    "error": null
+  },
+  {
+    "task": "t-4d02372e",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/common/src/main/java/org/apache/ofbiz/common/JsLanguageFileMappingCreator.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/survey/SurveyEvents.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 140,
+    "elapsed_ms": 1367,
+    "error": null
+  },
+  {
+    "task": "t-4d02372e",
+    "condition": "R-reify",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelPermission.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/test/ServicePermissionTests.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelServiceReader.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 305,
+    "elapsed_ms": 1431,
+    "error": null
+  },
+  {
+    "task": "t-4d02372e",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecurityUtil.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/ShoppingCartServices.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/ShoppingCart.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 264,
+    "elapsed_ms": 1661,
+    "error": null
+  },
+  {
+    "task": "t-4d02372e",
+    "condition": "O-oracle",
+    "named": [
+      "applications/product/src/main/java/org/apache/ofbiz/product/imagemanagement/ImageManagementServices.java",
+      "applications/product/src/main/java/org/apache/ofbiz/product/imagemanagement/ReplaceImage.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 156,
+    "elapsed_ms": 1360,
+    "error": null
+  },
+  {
+    "task": "t-4d02372e",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelPermission.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelService.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 879,
+    "elapsed_ms": 1317,
+    "error": null
+  },
+  {
+    "task": "t-4d02372e",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "applications/product/src/main/java/org/apache/ofbiz/product/imagemanagement/ReplaceImage.java"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 167,
+    "elapsed_ms": 1488,
+    "error": null
+  },
+  {
+    "task": "t-b9dfe95a",
+    "condition": "N-no-context",
+    "named": [
+      "frappe/desk/page/setup_wizard/setup_wizard.py",
+      "frappe/desk/page/setup_wizard/setup_wizard.js",
+      "frappe/public/js/frappe/ui/toolbar/toolbar.js",
+      "frappe/public/js/frappe/ui/tools/page_builder.js",
+      "frappe/public/js/frappe/ui/tools/form.js",
+      "frappe/public/js/frappe/ui/tools/form_editor.js",
+      "frappe/public/js/frappe/ui/tools/page.js",
+      "frappe/public/js/frappe/ui/tools/page_editor.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 95,
+    "elapsed_ms": 2054,
+    "error": null
+  },
+  {
+    "task": "t-b9dfe95a",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceXaWrapper.java",
+      "themes/common-theme/webapp/common-theme/js/i18n/datepicker/datepicker-eu.js",
+      "themes/common-theme/webapp/common-theme/js/util/util.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 154,
+    "elapsed_ms": 1492,
+    "error": null
+  },
+  {
+    "task": "t-b9dfe95a",
+    "condition": "R-reify",
+    "named": [
+      "framework/testtools/src/main/java/org/apache/ofbiz/testtools/ServiceTest.java",
+      "framework/testtools/src/main/java/org/apache/ofbiz/testtools/EntityXmlAssertTest.java",
+      "framework/testtools/src/main/java/org/apache/ofbiz/testtools/SimpleMethodTest.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/job/AbstractJob.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/job/JobPoller.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/concurrent/ExecutionPool.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/jms/JmsServiceEngine.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/transaction/GenericXaResource.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 499,
+    "elapsed_ms": 1614,
+    "error": null
+  },
+  {
+    "task": "t-b9dfe95a",
+    "condition": "R-shuffled",
+    "named": [
+      "applications/content/src/main/java/org/apache/ofbiz/content/ftp/FtpClientInterface.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/ftp/SecureFtpClient.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/ftp/SimpleFtpClient.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/ftp/SshFtpClient.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilIO.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/FieldInfo.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/ModelFormField.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 244,
+    "elapsed_ms": 1865,
+    "error": null
+  },
+  {
+    "task": "t-b9dfe95a",
+    "condition": "O-oracle",
+    "named": [
+      "framework/testtools/src/main/java/org/apache/ofbiz/testtools/ModelTestSuite.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/event/JavaEventHandler.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 151,
+    "elapsed_ms": 1448,
+    "error": null
+  },
+  {
+    "task": "t-b9dfe95a",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/job/JobPoller.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/job/AbstractJob.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/job/JobManager.java",
+      "framework/testtools/src/main/java/org/apache/ofbiz/testtools/TestRunContainer.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/transaction/TransactionUtil.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/Debug.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/concurrent/ExecutionPool.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 944,
+    "elapsed_ms": 1933,
+    "error": null
+  },
+  {
+    "task": "t-b9dfe95a",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/webtools/src/main/java/org/apache/ofbiz/webtools/artifactinfo/RunTestEvents.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelEntityChecker.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceXaWrapper.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 165,
+    "elapsed_ms": 1419,
+    "error": null
+  },
+  {
+    "task": "t-a7c6cc25",
+    "condition": "N-no-context",
+    "named": [],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 97,
+    "elapsed_ms": 1365,
+    "error": null
+  },
+  {
+    "task": "t-a7c6cc25",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlFilter.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 142,
+    "elapsed_ms": 1220,
+    "error": null
+  },
+  {
+    "task": "t-a7c6cc25",
+    "condition": "R-reify",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlFilter.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/template/FreeMarkerWorker.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 251,
+    "elapsed_ms": 1269,
+    "error": null
+  },
+  {
+    "task": "t-a7c6cc25",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilDateTime.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/collections/GenericMapCollection.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityQuery.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/group/GroupModel.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/job/AbstractJob.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/job/JobPoller.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/cache/CacheLine.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 348,
+    "elapsed_ms": 1874,
+    "error": null
+  },
+  {
+    "task": "t-a7c6cc25",
+    "condition": "O-oracle",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/LoginWorker.java",
+      "framework/webapp/src/test/java/org/apache/ofbiz/webapp/control/ControlFilterTests.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 154,
+    "elapsed_ms": 1422,
+    "error": null
+  },
+  {
+    "task": "t-a7c6cc25",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlFilter.java",
+      "framework/webapp/src/test/java/org/apache/ofbiz/webapp/control/ControlFilterTests.java"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 818,
+    "elapsed_ms": 1894,
+    "error": null
+  },
+  {
+    "task": "t-a7c6cc25",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlFilter.java",
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredFreemarker.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlServlet.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 184,
+    "elapsed_ms": 1630,
+    "error": null
+  },
+  {
+    "task": "t-ee52aa8a",
+    "condition": "N-no-context",
+    "named": [
+      "frappe/website/router.py",
+      "frappe/website/page_renderers/base_template_renderer.py",
+      "frappe/website/page_renderers/not_found.py",
+      "frappe/website/serve.py",
+      "frappe/app.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 89,
+    "elapsed_ms": 1674,
+    "error": null
+  },
+  {
+    "task": "t-ee52aa8a",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/webtools/src/main/java/org/apache/ofbiz/webtools/artifactinfo/ControllerRequestArtifactInfo.java",
+      "framework/webtools/src/main/java/org/apache/ofbiz/webtools/artifactinfo/ControllerViewArtifactInfo.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 147,
+    "elapsed_ms": 1235,
+    "error": null
+  },
+  {
+    "task": "t-ee52aa8a",
+    "condition": "R-reify",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ConfigXMLReader.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/RequestHandler.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlServlet.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilHttp.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/StringUtil.java"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 254,
+    "elapsed_ms": 1666,
+    "error": null
+  },
+  {
+    "task": "t-ee52aa8a",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilDateTime.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/collections/GenericMapCollection.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityQuery.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityUtil.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java",
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpServices.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 238,
+    "elapsed_ms": 1819,
+    "error": null
+  },
+  {
+    "task": "t-ee52aa8a",
+    "condition": "O-oracle",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/RequestHandler.java",
+      "framework/webapp/src/test/java/org/apache/ofbiz/webapp/control/RequestHandlerTests.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 147,
+    "elapsed_ms": 958,
+    "error": null
+  },
+  {
+    "task": "t-ee52aa8a",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ConfigXMLReader.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/RequestHandler.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlServlet.java",
+      "framework/webapp/src/test/java/org/apache/ofbiz/webapp/control/RequestHandlerTests.java",
+      "framework/webtools/src/main/java/org/apache/ofbiz/webtools/artifactinfo/ControllerRequestArtifactInfo.java",
+      "framework/webtools/src/main/java/org/apache/ofbiz/webtools/artifactinfo/ControllerViewArtifactInfo.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/artifact/ArtifactInfoGatherer.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilHttp.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 731,
+    "elapsed_ms": 2229,
+    "error": null
+  },
+  {
+    "task": "t-ee52aa8a",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/webtools/src/main/java/org/apache/ofbiz/webtools/artifactinfo/ControllerRequestArtifactInfo.java",
+      "framework/webtools/src/main/java/org/apache/ofbiz/webtools/artifactinfo/ControllerViewArtifactInfo.java",
+      "framework/webapp/src/test/java/org/apache/ofbiz/webapp/control/RequestHandlerTests.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/RequestHandler.java",
+      "framework/security/src/main/java/org/apache/ofbiz/security/CsrfUtil.java",
+      "applications/commonext/webapp/ordermgr-js/order.js",
+      "themes/common-theme/webapp/common-theme/js/util/selectMultipleRelatedValues.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 222,
+    "elapsed_ms": 1875,
+    "error": null
+  },
+  {
+    "task": "t-d50791ab",
+    "condition": "N-no-context",
+    "named": [],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 86,
+    "elapsed_ms": 1593,
+    "error": null
+  },
+  {
+    "task": "t-d50791ab",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/datasource/GenericHelperDAO.java",
+      "applications/party/src/main/java/org/apache/ofbiz/party/party/PartyRelationshipHelper.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 136,
+    "elapsed_ms": 1563,
+    "error": null
+  },
+  {
+    "task": "t-d50791ab",
+    "condition": "R-reify",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityQuery.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericDelegator.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/Delegator.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilObject.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilGenerics.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlServlet.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 246,
+    "elapsed_ms": 1665,
+    "error": null
+  },
+  {
+    "task": "t-d50791ab",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/StringUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilGenerics.java",
+      "framework/webtools/src/main/java/org/apache/ofbiz/webtools/WebToolsServices.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 246,
+    "elapsed_ms": 1516,
+    "error": null
+  },
+  {
+    "task": "t-d50791ab",
+    "condition": "O-oracle",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilHttp.java",
+      "framework/base/src/test/java/org/apache/ofbiz/base/util/UtilHttpTest.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 137,
+    "elapsed_ms": 1319,
+    "error": null
+  },
+  {
+    "task": "t-d50791ab",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericDelegator.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityQuery.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/Delegator.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilGenerics.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilObject.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlServlet.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java",
+      "framework/common/src/main/java/org/apache/ofbiz/common/FindServices.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 905,
+    "elapsed_ms": 2290,
+    "error": null
+  },
+  {
+    "task": "t-d50791ab",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/Delegator.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityConditionSubSelect.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 132,
+    "elapsed_ms": 1298,
+    "error": null
+  },
+  {
+    "task": "t-c762bc84",
+    "condition": "N-no-context",
+    "named": [
+      "services/entity_xml_service.py",
+      "tests/EntityXmlAssertTest.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 94,
+    "elapsed_ms": 1074,
+    "error": null
+  },
+  {
+    "task": "t-c762bc84",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/testtools/src/main/java/org/apache/ofbiz/testtools/EntityXmlAssertTest.java",
+      "framework/testtools/src/main/java/org/apache/ofbiz/testtools/ModelTestSuite.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/test/FinAccountTest.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 162,
+    "elapsed_ms": 1440,
+    "error": null
+  },
+  {
+    "task": "t-c762bc84",
+    "condition": "R-reify",
+    "named": [
+      "framework/testtools/src/main/java/org/apache/ofbiz/testtools/EntityXmlAssertTest.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/test/EntityTestSuite.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/component/ComponentConfig.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/container/ComponentContainerTest.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 340,
+    "elapsed_ms": 1552,
+    "error": null
+  },
+  {
+    "task": "t-c762bc84",
+    "condition": "R-shuffled",
+    "named": [
+      "applications/product/src/main/java/org/apache/ofbiz/shipment/packing/PackingSession.java",
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/thirdparty/taxware/TaxwareUTL.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/StringUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/string/UelFunctions.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/Debug.java",
+      "framework/datafile/src/main/java/org/apache/ofbiz/datafile/DataFile.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 240,
+    "elapsed_ms": 1715,
+    "error": null
+  },
+  {
+    "task": "t-c762bc84",
+    "condition": "O-oracle",
+    "named": [
+      "framework/testtools/src/main/java/org/apache/ofbiz/testtools/EntityXmlAssertTest.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 131,
+    "elapsed_ms": 1158,
+    "error": null
+  },
+  {
+    "task": "t-c762bc84",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/testtools/src/main/java/org/apache/ofbiz/testtools/EntityXmlAssertTest.java",
+      "framework/testtools/src/main/java/org/apache/ofbiz/testtools/ServiceTest.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/test/EntityTestSuite.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 915,
+    "elapsed_ms": 1353,
+    "error": null
+  },
+  {
+    "task": "t-c762bc84",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/Delegator.java",
+      "framework/testtools/src/main/java/org/apache/ofbiz/testtools/EntityXmlAssertTest.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/test/FinAccountTests.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 162,
+    "elapsed_ms": 1423,
+    "error": null
+  },
+  {
+    "task": "t-90c5ae72",
+    "condition": "N-no-context",
+    "named": [
+      "frappe/email/doctype/email_account/email_account.json",
+      "frappe/email/doctype/email_account/email_account.py",
+      "frappe/email/doctype/email_account/email_account.js",
+      "frappe/email/outgoing.py",
+      "frappe/email/doctype/notification/notification.py",
+      "frappe/email/doctype/email_queue/email_queue.py",
+      "frappe/email/doctype/email_queue/email_queue.json",
+      "frappe/email/doctype/email_queue/email_queue.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 83,
+    "elapsed_ms": 2245,
+    "error": null
+  },
+  {
+    "task": "t-90c5ae72",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/JavaMailContainer.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 110,
+    "elapsed_ms": 1814,
+    "error": null
+  },
+  {
+    "task": "t-90c5ae72",
+    "condition": "R-reify",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/common/email/EmailServices.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/JavaMailContainer.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/MimeMessageWrapper.java",
+      "framework/common/src/main/java/org/apache/ofbiz/common/email/EmailServices.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 196,
+    "elapsed_ms": 1612,
+    "error": null
+  },
+  {
+    "task": "t-90c5ae72",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/StringUtil.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/calendar/RecurrenceUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/string/UelFunctions.java",
+      "framework/base/src/test/java/org/apache/ofbiz/base/util/StringUtilTests.java",
+      "framework/base/src/test/java/org/apache/ofbiz/base/util/ObjectTypeTests.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/ObjectType.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 207,
+    "elapsed_ms": 1469,
+    "error": null
+  },
+  {
+    "task": "t-90c5ae72",
+    "condition": "O-oracle",
+    "named": [
+      "framework/common/src/main/java/org/apache/ofbiz/common/email/EmailServices.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 118,
+    "elapsed_ms": 1230,
+    "error": null
+  },
+  {
+    "task": "t-90c5ae72",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/common/src/main/java/org/apache/ofbiz/common/email/EmailServices.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/MimeMessageWrapper.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/JavaMailContainer.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 823,
+    "elapsed_ms": 1481,
+    "error": null
+  },
+  {
+    "task": "t-90c5ae72",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/common/src/main/java/org/apache/ofbiz/common/email/EmailServices.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 190,
+    "elapsed_ms": 1577,
+    "error": null
+  },
+  {
+    "task": "t-7b8bc02d",
+    "condition": "N-no-context",
+    "named": [],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 90,
+    "elapsed_ms": 1427,
+    "error": null
+  },
+  {
+    "task": "t-7b8bc02d",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/fo/ScreenFopViewHandler.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/engine/SoapSerializer.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 139,
+    "elapsed_ms": 1382,
+    "error": null
+  },
+  {
+    "task": "t-7b8bc02d",
+    "condition": "R-reify",
+    "named": [
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java",
+      "framework/security/src/test/java/org/apache/ofbiz/security/SecurityUtilTest.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntitySaxReader.java",
+      "framework/entity/src/test/java/org/apache/ofbiz/entity/util/EntitySaxReaderTests.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 256,
+    "elapsed_ms": 1663,
+    "error": null
+  },
+  {
+    "task": "t-7b8bc02d",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/ObjectType.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/ScriptUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilCodec.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/cache/UtilCache.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/collections/GenericMap.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/collections/MapContext.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericEntity.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilMisc.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 287,
+    "elapsed_ms": 1915,
+    "error": null
+  },
+  {
+    "task": "t-7b8bc02d",
+    "condition": "O-oracle",
+    "named": [
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 124,
+    "elapsed_ms": 1783,
+    "error": null
+  },
+  {
+    "task": "t-7b8bc02d",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java",
+      "framework/security/src/test/java/org/apache/ofbiz/security/SecurityUtilTest.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/RequestWrapper.java",
+      "framework/base/src/test/java/org/apache/ofbiz/base/util/UtilObjectTests.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/OrderByItem.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntitySaxReader.java",
+      "framework/entity/src/test/java/org/apache/ofbiz/entity/util/EntitySaxReaderTests.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/StringUtil.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 724,
+    "elapsed_ms": 2291,
+    "error": null
+  },
+  {
+    "task": "t-7b8bc02d",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/fo/ScreenFopViewHandler.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/jdbc/SQLProcessor.java",
+      "framework/entity/src/test/java/org/apache/ofbiz/entity/util/EntitySaxReaderTests.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 160,
+    "elapsed_ms": 1698,
+    "error": null
+  },
+  {
+    "task": "t-70b9901e",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/public/js/utils.js",
+      "erpnext/public/js/erpnext.js",
+      "erpnext/public/js/controllers/form.js",
+      "erpnext/public/js/controllers/transaction.js",
+      "erpnext/public/js/controllers/timeline.js",
+      "erpnext/public/js/print/print_format.js",
+      "erpnext/public/js/templates.js",
+      "erpnext/erpnext_integrations/connectors/ftl_connector.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 91,
+    "elapsed_ms": 1904,
+    "error": null
+  },
+  {
+    "task": "t-70b9901e",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/widget/src/test/java/org/apache/ofbiz/widget/renderer/macro/RenderableFtlFormElementsBuilderDatetimeTest.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/ftl/FreeMarkerViewHandler.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 148,
+    "elapsed_ms": 1108,
+    "error": null
+  },
+  {
+    "task": "t-70b9901e",
+    "condition": "R-reify",
+    "named": [
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/macro/FtlWriter.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/macro/RenderableFtlFormElementsBuilder.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/html/HtmlWidgetRenderer.java",
+      "framework/widget/src/test/java/org/apache/ofbiz/widget/renderer/macro/MacroFormRendererTest.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 232,
+    "elapsed_ms": 1718,
+    "error": null
+  },
+  {
+    "task": "t-70b9901e",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/start/src/main/java/org/apache/ofbiz/base/start/StartupCommandUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/container/ContainerConfig.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityQuery.java",
+      "framework/start/src/main/java/org/apache/ofbiz/base/start/StartupCommand.java",
+      "framework/start/src/main/java/org/apache/ofbiz/base/start/Start.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/website/WebSiteProperties.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityBatchIterator.java",
+      "framework/start/src/main/java/org/apache/ofbiz/base/start/Config.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 257,
+    "elapsed_ms": 1769,
+    "error": null
+  },
+  {
+    "task": "t-70b9901e",
+    "condition": "O-oracle",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/template/FreeMarkerWorker.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/HtmlWidget.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 147,
+    "elapsed_ms": 1609,
+    "error": null
+  },
+  {
+    "task": "t-70b9901e",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/macro/FtlWriter.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/macro/RenderableFtlFormElementsBuilder.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/macro/MacroScreenRenderer.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/html/HtmlWidgetRenderer.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/HtmlWidget.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/template/FreeMarkerWorker.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/ftl/OfbizScreenTransform.java",
+      "framework/widget/src/test/java/org/apache/ofbiz/widget/renderer/macro/MacroFormRendererTest.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 696,
+    "elapsed_ms": 1932,
+    "error": null
+  },
+  {
+    "task": "t-70b9901e",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/widget/src/test/java/org/apache/ofbiz/widget/renderer/macro/MacroFormRendererTest.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/ftl/FreeMarkerViewHandler.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 142,
+    "elapsed_ms": 1165,
+    "error": null
+  },
+  {
+    "task": "t-d5d01f8e",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/controllers/status_updater.py",
+      "erpnext/selling/doctype/sales_order/sales_order.py",
+      "erpnext/buying/doctype/purchase_order/purchase_order.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 88,
+    "elapsed_ms": 1889,
+    "error": null
+  },
+  {
+    "task": "t-d5d01f8e",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/metrics/MetricsFactory.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/group/GroupServiceModel.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 135,
+    "elapsed_ms": 1375,
+    "error": null
+  },
+  {
+    "task": "t-d5d01f8e",
+    "condition": "R-reify",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/webdav/WebDavServlet.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/webdav/RequestHandler.java",
+      "applications/marketing/src/main/java/org/apache/ofbiz/sfa/vcard/VCard.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelService.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlFilter.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 318,
+    "elapsed_ms": 1611,
+    "error": null
+  },
+  {
+    "task": "t-d5d01f8e",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/FormStringRenderer.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/fo/FoFormRenderer.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/macro/MacroFormRenderer.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilFormatOut.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/ModelScreenWidget.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 202,
+    "elapsed_ms": 1317,
+    "error": null
+  },
+  {
+    "task": "t-d5d01f8e",
+    "condition": "O-oracle",
+    "named": [
+      "applications/marketing/src/main/java/org/apache/ofbiz/sfa/vcard/VCard.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 122,
+    "elapsed_ms": 1077,
+    "error": null
+  },
+  {
+    "task": "t-d5d01f8e",
+    "condition": "R-reify-iter3",
+    "named": [
+      "applications/marketing/src/main/java/org/apache/ofbiz/sfa/vcard/VCard.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 814,
+    "elapsed_ms": 1050,
+    "error": null
+  },
+  {
+    "task": "t-d5d01f8e",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/group/GroupServiceModel.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/group/GroupServiceGroup.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/group/GroupServiceGroupRegistry.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/group/GroupServiceGroupConfigurator.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/group/GroupServiceGroupLoader.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/group/GroupServiceGroupContext.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/group/GroupServiceGroupProvider.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/group/GroupServiceGroupUtil.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 156,
+    "elapsed_ms": 1588,
+    "error": null
+  },
+  {
+    "task": "t-37345ed4",
+    "condition": "N-no-context",
+    "named": [
+      "frappe/utils/file_lock.py",
+      "frappe/utils/backups.py",
+      "frappe/utils/file_manager.py",
+      "frappe/core/doctype/file/file.py",
+      "frappe/core/doctype/file/utils.py",
+      "frappe/integrations/offsite_backup_utils.py",
+      "frappe/utils/safe_exec.py",
+      "frappe/utils/install.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 95,
+    "elapsed_ms": 1523,
+    "error": null
+  },
+  {
+    "task": "t-37345ed4",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityConditionSubSelect.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/webapp/ftl/RenderSubContentTransform.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/finder/ByAndFinder.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 170,
+    "elapsed_ms": 1059,
+    "error": null
+  },
+  {
+    "task": "t-37345ed4",
+    "condition": "R-reify",
+    "named": [
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java",
+      "framework/catalina/src/main/java/org/apache/ofbiz/catalina/container/FilterJars.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/LoginCheck.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/serialize/XmlSerializer.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/StringUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/string/UelFunctions.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilGenerics.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 242,
+    "elapsed_ms": 1320,
+    "error": null
+  },
+  {
+    "task": "t-37345ed4",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/RequestHandler.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/HtmlWidget.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/data/DataEvents.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 201,
+    "elapsed_ms": 1050,
+    "error": null
+  },
+  {
+    "task": "t-37345ed4",
+    "condition": "O-oracle",
+    "named": [
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 130,
+    "elapsed_ms": 947,
+    "error": null
+  },
+  {
+    "task": "t-37345ed4",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 824,
+    "elapsed_ms": 782,
+    "error": null
+  },
+  {
+    "task": "t-37345ed4",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelEntityChecker.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityConditionSubSelect.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/webapp/ftl/RenderSubContentTransform.java",
+      "framework/minilang/src/main/java/org/apache/ofbiz/minilang/method/conditional/ElseIf.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 195,
+    "elapsed_ms": 1037,
+    "error": null
+  },
+  {
+    "task": "t-4901ab0c",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/utils/file_manager.py",
+      "erpnext/utilities/tika_integration.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 91,
+    "elapsed_ms": 1202,
+    "error": null
+  },
+  {
+    "task": "t-4901ab0c",
+    "condition": "B-content-grep",
+    "named": [
+      "applications/content/src/main/java/org/apache/ofbiz/content/webapp/ftl/LoopSubContentTransform.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/content/ContentWorkerInterface.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 144,
+    "elapsed_ms": 991,
+    "error": null
+  },
+  {
+    "task": "t-4901ab0c",
+    "condition": "R-reify",
+    "named": [
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 236,
+    "elapsed_ms": 796,
+    "error": null
+  },
+  {
+    "task": "t-4901ab0c",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/HttpClient.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilMisc.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/invoice/InvoiceServices.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/invoice/InvoiceWorker.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityQuery.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java",
+      "framework/webtools/src/main/java/org/apache/ofbiz/webtools/WebToolsServices.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilDateTime.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 282,
+    "elapsed_ms": 1784,
+    "error": null
+  },
+  {
+    "task": "t-4901ab0c",
+    "condition": "O-oracle",
+    "named": [
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 125,
+    "elapsed_ms": 732,
+    "error": null
+  },
+  {
+    "task": "t-4901ab0c",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/data/DataEvents.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/data/DataServices.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/FileUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilHttp.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/SeoConfigUtil.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/engine/SoapSerializer.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/jms/JmsSerializer.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 846,
+    "elapsed_ms": 1405,
+    "error": null
+  },
+  {
+    "task": "t-4901ab0c",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/jdbc/SQLProcessor.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/webapp/ftl/LoopSubContentTransform.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/content/ContentWorkerInterface.java",
+      "themes/common-theme/webapp/common-theme/js/i18n/datepicker/datepicker-rm.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 183,
+    "elapsed_ms": 1065,
+    "error": null
+  },
+  {
+    "task": "t-110ae1e9",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/erpnext/setup/doctype/email_account/email_account.py",
+      "erpnext/erpnext/setup/doctype/email_account/email_account.json",
+      "erpnext/erpnext/setup/doctype/email_account/email_account.js",
+      "erpnext/erpnext/utils/oauth.py",
+      "erpnext/erpnext/email/doctype/email_queue/email_queue.py",
+      "erpnext/erpnext/email/doctype/email_queue/email_queue.json",
+      "erpnext/erpnext/email/smtp.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 86,
+    "elapsed_ms": 1810,
+    "error": null
+  },
+  {
+    "task": "t-110ae1e9",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/common/src/main/java/org/apache/ofbiz/common/authentication/AuthHelper.java",
+      "framework/common/src/main/java/org/apache/ofbiz/common/authentication/api/Authenticator.java",
+      "framework/common/src/main/java/org/apache/ofbiz/common/authentication/example/TestFailAuthenticator.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/config/model/Authorization.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 186,
+    "elapsed_ms": 1384,
+    "error": null
+  },
+  {
+    "task": "t-110ae1e9",
+    "condition": "R-reify",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/MimeMessageWrapper.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/MailSessionFactory.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/MailService.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/MailProperties.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/SmtpAuthenticator.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/mail/EmailAddressWorker.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/MailInvoker.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/MailConfigurator.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 260,
+    "elapsed_ms": 2325,
+    "error": null
+  },
+  {
+    "task": "t-110ae1e9",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/container/ComponentContainer.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/cache/UtilCache.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericValue.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/cache/AbstractCache.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/cache/Cache.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 267,
+    "elapsed_ms": 1588,
+    "error": null
+  },
+  {
+    "task": "t-110ae1e9",
+    "condition": "O-oracle",
+    "named": [
+      "framework/common/src/main/java/org/apache/ofbiz/common/email/EmailServices.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 121,
+    "elapsed_ms": 1429,
+    "error": null
+  },
+  {
+    "task": "t-110ae1e9",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/MimeMessageWrapper.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/WebAppUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilProperties.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/Debug.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceDispatcher.java",
+      "framework/common/src/main/java/org/apache/ofbiz/common/login/LdapAuthenticationServices.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilHttp.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 836,
+    "elapsed_ms": 2526,
+    "error": null
+  },
+  {
+    "task": "t-110ae1e9",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/common/src/main/java/org/apache/ofbiz/common/authentication/AuthHelper.java",
+      "framework/common/src/main/java/org/apache/ofbiz/common/authentication/api/Authenticator.java",
+      "framework/common/src/main/java/org/apache/ofbiz/common/authentication/example/TestFailAuthenticator.java",
+      "framework/common/src/main/java/org/apache/ofbiz/common/authentication/example/TestPassAuthenticator.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/thirdparty/sagepay/SagePayPaymentServices.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/thirdparty/authorizedotnet/AIMRespPositions.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 248,
+    "elapsed_ms": 2190,
+    "error": null
+  },
+  {
+    "task": "t-460b0317",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/setup/install.py",
+      "erpnext/setup/utils.py",
+      "erpnext/patches/v13_0/setup_trust_manager.py",
+      "erpnext/patches/v14_0/update_trust_manager.py",
+      "erpnext/public/js/setup_wizard.js",
+      "erpnext/www/setup_wizard.py",
+      "erpnext/erpnext_integrations/connectors/trust_manager.py",
+      "erpnext/erpnext_integrations/doctype/trust_manager/trust_manager.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 96,
+    "elapsed_ms": 2190,
+    "error": null
+  },
+  {
+    "task": "t-460b0317",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/SSLUtil.java",
+      "framework/base/src/test/java/org/apache/ofbiz/base/collections/MultivaluedMapContextAdapterTests.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 144,
+    "elapsed_ms": 1552,
+    "error": null
+  },
+  {
+    "task": "t-460b0317",
+    "condition": "R-reify",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilHttp.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/template/FreeMarkerWorker.java",
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntitySaxReader.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/data/DataResourceWorker.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/Debug.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/HtmlWidget.java",
+      "framework/webtools/src/main/java/org/apache/ofbiz/webtools/labelmanager/LabelManagerFactory.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 266,
+    "elapsed_ms": 2044,
+    "error": null
+  },
+  {
+    "task": "t-460b0317",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/log4j/OFBizDynamicThresholdFilter.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityDateFilterCondition.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityWhereString.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericEntity.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityQuery.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityExpr.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 249,
+    "elapsed_ms": 1803,
+    "error": null
+  },
+  {
+    "task": "t-460b0317",
+    "condition": "O-oracle",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/MultiTrustManager.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 130,
+    "elapsed_ms": 1340,
+    "error": null
+  },
+  {
+    "task": "t-460b0317",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilHttp.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilXml.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/Debug.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/FileUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/StringUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilMisc.java",
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/template/FreeMarkerWorker.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 746,
+    "elapsed_ms": 1640,
+    "error": null
+  },
+  {
+    "task": "t-460b0317",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/MultiTrustManager.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/SSLUtil.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/JWTManager.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/AliasKeyManager.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 198,
+    "elapsed_ms": 1548,
+    "error": null
+  },
+  {
+    "task": "t-4b6b36b8",
+    "condition": "N-no-context",
+    "named": [
+      "frappe/email/doctype/notification/notification.py",
+      "frappe/email/smtp.py",
+      "frappe/core/doctype/communication/communication.py",
+      "frappe/integrations/office365/utils.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 94,
+    "elapsed_ms": 1516,
+    "error": null
+  },
+  {
+    "task": "t-4b6b36b8",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/common/src/main/java/org/apache/ofbiz/common/email/NotificationServices.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/config/model/Notification.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 143,
+    "elapsed_ms": 1330,
+    "error": null
+  },
+  {
+    "task": "t-4b6b36b8",
+    "condition": "R-reify",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/JavaMailContainer.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 375,
+    "elapsed_ms": 1302,
+    "error": null
+  },
+  {
+    "task": "t-4b6b36b8",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelViewEntity.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelEntity.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/config/model/Datasource.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityFieldValue.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/DynamicViewEntity.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 205,
+    "elapsed_ms": 1592,
+    "error": null
+  },
+  {
+    "task": "t-4b6b36b8",
+    "condition": "O-oracle",
+    "named": [
+      "framework/common/src/main/java/org/apache/ofbiz/common/email/EmailServices.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 129,
+    "elapsed_ms": 1286,
+    "error": null
+  },
+  {
+    "task": "t-4b6b36b8",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/common/src/main/java/org/apache/ofbiz/common/email/EmailServices.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/JavaMailContainer.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 916,
+    "elapsed_ms": 1621,
+    "error": null
+  },
+  {
+    "task": "t-4b6b36b8",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/common/src/main/java/org/apache/ofbiz/common/email/EmailServices.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 159,
+    "elapsed_ms": 1240,
+    "error": null
+  },
+  {
+    "task": "t-192510b3",
+    "condition": "N-no-context",
+    "named": [
+      "frappe/integrations/oauth2.py",
+      "frappe/integrations/oauth2_logins.py",
+      "frappe/integration_broker/doctype/oauth_client/oauth_client.py",
+      "frappe/utils/oauth.py",
+      "frappe/integration_broker/doctype/oauth_provider_settings/oauth_provider_settings.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 98,
+    "elapsed_ms": 2097,
+    "error": null
+  },
+  {
+    "task": "t-192510b3",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/URLConnector.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 210,
+    "elapsed_ms": 1281,
+    "error": null
+  },
+  {
+    "task": "t-192510b3",
+    "condition": "R-reify",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/string/UelFunctions.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlFilter.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/HtmlWidget.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/html/HtmlWidgetRenderer.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/fo/FoFormRenderer.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 210,
+    "elapsed_ms": 1731,
+    "error": null
+  },
+  {
+    "task": "t-192510b3",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilGenerics.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityQuery.java",
+      "framework/start/src/main/java/org/apache/ofbiz/base/start/Start.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 247,
+    "elapsed_ms": 1353,
+    "error": null
+  },
+  {
+    "task": "t-192510b3",
+    "condition": "O-oracle",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/URLConnector.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 131,
+    "elapsed_ms": 1262,
+    "error": null
+  },
+  {
+    "task": "t-192510b3",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/SSLUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilHttp.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/SeoConfigUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/template/FreeMarkerWorker.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlFilter.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 631,
+    "elapsed_ms": 1669,
+    "error": null
+  },
+  {
+    "task": "t-192510b3",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/URLConnector.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/HttpClient.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/GroovyUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/config/UrlLoader.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/config/FileLoader.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/thirdparty/eway/GatewayConnector.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 222,
+    "elapsed_ms": 1748,
+    "error": null
+  },
+  {
+    "task": "t-55a38798",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.js",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.js",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.json",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.json",
+      "erpnext/accounts/doctype/pos_invoice/pos_invoice.py",
+      "erpnext/accounts/doctype/pos_invoice/pos_invoice.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 92,
+    "elapsed_ms": 2079,
+    "error": null
+  },
+  {
+    "task": "t-55a38798",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlFilter.java",
+      "themes/common-theme/webapp/common-theme/js/util/combobox.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 133,
+    "elapsed_ms": 1729,
+    "error": null
+  },
+  {
+    "task": "t-55a38798",
+    "condition": "R-reify",
+    "named": [
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/StringUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/string/UelFunctions.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/data/DataEvents.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/engine/EntityAutoEngine.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 198,
+    "elapsed_ms": 1658,
+    "error": null
+  },
+  {
+    "task": "t-55a38798",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelPermission.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/test/ServicePermissionTests.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/ScriptHelper.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelServiceReader.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilXml.java",
+      "framework/common/src/main/java/org/apache/ofbiz/common/scripting/ScriptHelperImpl.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 257,
+    "elapsed_ms": 1830,
+    "error": null
+  },
+  {
+    "task": "t-55a38798",
+    "condition": "O-oracle",
+    "named": [
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 126,
+    "elapsed_ms": 1318,
+    "error": null
+  },
+  {
+    "task": "t-55a38798",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/HttpRequestFileUpload.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/data/DataServices.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/data/DataEvents.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/cms/CmsEvents.java",
+      "framework/common/src/main/java/org/apache/ofbiz/common/CommonServices.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/FileUtil.java",
+      "framework/security/src/test/java/org/apache/ofbiz/security/SecurityUtilTest.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 806,
+    "elapsed_ms": 2130,
+    "error": null
+  },
+  {
+    "task": "t-55a38798",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/common/src/main/java/org/apache/ofbiz/common/email/EmailServices.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 162,
+    "elapsed_ms": 1151,
+    "error": null
+  },
+  {
+    "task": "t-c8170e9f",
+    "condition": "N-no-context",
+    "named": [],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 87,
+    "elapsed_ms": 2030,
+    "error": null
+  },
+  {
+    "task": "t-c8170e9f",
+    "condition": "B-content-grep",
+    "named": [
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/ProposedOrder.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/config/model/Authorization.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 138,
+    "elapsed_ms": 1468,
+    "error": null
+  },
+  {
+    "task": "t-c8170e9f",
+    "condition": "R-reify",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/container/ComponentContainer.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/component/ComponentConfig.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/webdav/WebDavServlet.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/view/ApacheFopWorker.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 176,
+    "elapsed_ms": 1662,
+    "error": null
+  },
+  {
+    "task": "t-c8170e9f",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityQuery.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericDelegator.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlFilter.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/cms/CmsEvents.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 172,
+    "elapsed_ms": 1466,
+    "error": null
+  },
+  {
+    "task": "t-c8170e9f",
+    "condition": "O-oracle",
+    "named": [
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/bom/BOMServices.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 125,
+    "elapsed_ms": 1324,
+    "error": null
+  },
+  {
+    "task": "t-c8170e9f",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/component/ComponentConfig.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceDispatcher.java",
+      "framework/webtools/src/main/java/org/apache/ofbiz/webtools/artifactinfo/ArtifactInfoFactory.java",
+      "applications/workeffort/src/main/java/org/apache/ofbiz/workeffort/workeffort/ICalHandlerFactory.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilMisc.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/LoginWorker.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/component/ComponentLoaderConfig.java",
+      "framework/entityext/src/main/java/org/apache/ofbiz/entityext/data/EntityDataLoadContainer.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 803,
+    "elapsed_ms": 2154,
+    "error": null
+  },
+  {
+    "task": "t-c8170e9f",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/ProposedOrder.java",
+      "applications/product/src/main/java/org/apache/ofbiz/product/imagemanagement/FrameImage.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/engine/StandardJavaEngine.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/config/ServiceConfigListener.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 185,
+    "elapsed_ms": 1616,
+    "error": null
+  },
+  {
+    "task": "t-b1a86de9",
+    "condition": "N-no-context",
+    "named": [],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 87,
+    "elapsed_ms": 1297,
+    "error": null
+  },
+  {
+    "task": "t-b1a86de9",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecurityFactory.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/DistributedCacheClear.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 135,
+    "elapsed_ms": 1465,
+    "error": null
+  },
+  {
+    "task": "t-b1a86de9",
+    "condition": "R-reify",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/cache/Cache.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityOperator.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilMisc.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilHttp.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/collections/GenericMap.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilGenerics.java",
+      "framework/common/src/main/java/org/apache/ofbiz/common/FtpServices.java",
+      "framework/minilang/src/main/java/org/apache/ofbiz/minilang/SimpleMethod.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 286,
+    "elapsed_ms": 1903,
+    "error": null
+  },
+  {
+    "task": "t-b1a86de9",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilGenerics.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityQuery.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/string/UelFunctions.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 318,
+    "elapsed_ms": 1628,
+    "error": null
+  },
+  {
+    "task": "t-b1a86de9",
+    "condition": "O-oracle",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityUtil.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 121,
+    "elapsed_ms": 1270,
+    "error": null
+  },
+  {
+    "task": "t-b1a86de9",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericDelegator.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityQuery.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilGenerics.java",
+      "framework/common/src/main/java/org/apache/ofbiz/common/FindServices.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityOperator.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilMisc.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/cache/Cache.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 899,
+    "elapsed_ms": 2200,
+    "error": null
+  },
+  {
+    "task": "t-b1a86de9",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/security/src/main/java/org/apache/ofbiz/security/CsrfUtil.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/config/model/EntityConfig.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/test/EntityCryptoTestSuite.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 155,
+    "elapsed_ms": 1294,
+    "error": null
+  },
+  {
+    "task": "t-0bb30afe",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/accounts/doctype/party/party.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 87,
+    "elapsed_ms": 1446,
+    "error": null
+  },
+  {
+    "task": "t-0bb30afe",
+    "condition": "B-content-grep",
+    "named": [
+      "applications/party/src/main/java/org/apache/ofbiz/party/party/PartyTypeHelper.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 153,
+    "elapsed_ms": 1285,
+    "error": null
+  },
+  {
+    "task": "t-0bb30afe",
+    "condition": "R-reify",
+    "named": [
+      "applications/party/src/main/java/org/apache/ofbiz/party/party/PartyServices.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 233,
+    "elapsed_ms": 1278,
+    "error": null
+  },
+  {
+    "task": "t-0bb30afe",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/StringUtil.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 271,
+    "elapsed_ms": 1236,
+    "error": null
+  },
+  {
+    "task": "t-0bb30afe",
+    "condition": "O-oracle",
+    "named": [
+      "applications/party/src/main/java/org/apache/ofbiz/party/party/PartyServices.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 122,
+    "elapsed_ms": 1374,
+    "error": null
+  },
+  {
+    "task": "t-0bb30afe",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/datafile/src/main/java/org/apache/ofbiz/datafile/Record.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/StringUtil.java",
+      "applications/party/src/main/java/org/apache/ofbiz/party/party/PartyServices.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 892,
+    "elapsed_ms": 1366,
+    "error": null
+  },
+  {
+    "task": "t-0bb30afe",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java",
+      "applications/party/src/main/java/org/apache/ofbiz/party/party/PartyTypeHelper.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 152,
+    "elapsed_ms": 1295,
+    "error": null
+  },
+  {
+    "task": "t-03aeb0db",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/stock/doctype/shipment/shipment.py",
+      "erpnext/stock/doctype/shipment/shipment.json",
+      "erpnext/stock/doctype/shipment/shipment_dashboard.py",
+      "erpnext/stock/doctype/shipment/shipment_list.js",
+      "erpnext/stock/doctype/shipment/shipment.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 89,
+    "elapsed_ms": 1694,
+    "error": null
+  },
+  {
+    "task": "t-03aeb0db",
+    "condition": "B-content-grep",
+    "named": [
+      "applications/product/src/main/java/org/apache/ofbiz/shipment/packing/PackingEvent.java",
+      "applications/product/src/main/java/org/apache/ofbiz/shipment/verify/VerifyPickSessionRow.java",
+      "applications/product/src/main/java/org/apache/ofbiz/shipment/test/IssuanceTest.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 162,
+    "elapsed_ms": 1416,
+    "error": null
+  },
+  {
+    "task": "t-03aeb0db",
+    "condition": "R-reify",
+    "named": [
+      "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/ShoppingCart.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/ShoppingCartServices.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/order/OrderReadHelper.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 262,
+    "elapsed_ms": 1619,
+    "error": null
+  },
+  {
+    "task": "t-03aeb0db",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelPermission.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/test/ServicePermissionTests.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/LoginCheck.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelServiceReader.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/jobshopmgt/ProductionRun.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/string/UelFunctions.java",
+      "framework/catalina/src/main/java/org/apache/ofbiz/catalina/container/FilterJars.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 303,
+    "elapsed_ms": 2041,
+    "error": null
+  },
+  {
+    "task": "t-03aeb0db",
+    "condition": "O-oracle",
+    "named": [
+      "applications/product/src/main/java/org/apache/ofbiz/shipment/packing/PackingSession.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 126,
+    "elapsed_ms": 1536,
+    "error": null
+  },
+  {
+    "task": "t-03aeb0db",
+    "condition": "R-reify-iter3",
+    "named": [
+      "applications/product/src/main/java/org/apache/ofbiz/shipment/shipment/ShipmentServices.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/ShoppingCart.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/order/OrderReadHelper.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/order/OrderServices.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 881,
+    "elapsed_ms": 2108,
+    "error": null
+  },
+  {
+    "task": "t-03aeb0db",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/tax/TaxAuthorityServices.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/config/model/ServiceGroups.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 141,
+    "elapsed_ms": 1404,
+    "error": null
+  },
+  {
+    "task": "t-187d5512",
+    "condition": "N-no-context",
+    "named": [
+      "gift_card/gift_card.py",
+      "gift_card/gift_card_ledger.py",
+      "gift_card/api.py",
+      "gift_card/doctype/gift_card/gift_card.py",
+      "gift_card/doctype/gift_card_purchase/gift_card_purchase.py",
+      "gift_card/doctype/gift_card_settings/gift_card_settings.py",
+      "gift_card/doctype/gift_card_ledger/gift_card_ledger.py",
+      "gift_card/workspace/gift_card/gift_card.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 84,
+    "elapsed_ms": 1770,
+    "error": null
+  },
+  {
+    "task": "t-187d5512",
+    "condition": "B-content-grep",
+    "named": [
+      "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/WebShoppingCart.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/finaccount/FinAccountProductServices.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/lang/IsEmpty.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 156,
+    "elapsed_ms": 1584,
+    "error": null
+  },
+  {
+    "task": "t-187d5512",
+    "condition": "R-reify",
+    "named": [
+      "applications/content/src/main/java/org/apache/ofbiz/content/ftp/FtpClientInterface.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/ftp/SecureFtpClient.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/ftp/SimpleFtpClient.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/ftp/SshFtpClient.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilIO.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/FieldInfo.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/ModelFormField.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 233,
+    "elapsed_ms": 2020,
+    "error": null
+  },
+  {
+    "task": "t-187d5512",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/concurrent/ExecutionPool.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/container/AdminServerContainer.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/ReferenceCleaner.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/URLConnector.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/cache/CacheLine.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/transaction/GenericXaResource.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceXaWrapper.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/group/GroupModel.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 487,
+    "elapsed_ms": 1879,
+    "error": null
+  },
+  {
+    "task": "t-187d5512",
+    "condition": "O-oracle",
+    "named": [
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/payment/GiftCertificateServices.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 124,
+    "elapsed_ms": 1388,
+    "error": null
+  },
+  {
+    "task": "t-187d5512",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityQuery.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/ShoppingCart.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/CheckOutHelper.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/payment/GiftCertificateServices.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/finaccount/FinAccountHelper.java",
+      "applications/product/src/main/java/org/apache/ofbiz/product/store/ProductStoreWorker.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/payment/PaymentMethodServices.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/order/OrderReadHelper.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 675,
+    "elapsed_ms": 2045,
+    "error": null
+  },
+  {
+    "task": "t-187d5512",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "applications/order/src/main/java/org/apache/ofbiz/order/thirdparty/zipsales/ZipSalesServices.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/finaccount/FinAccountProductServices.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/thirdparty/clearcommerce/CCServicesTest.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/lang/IsEmpty.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 187,
+    "elapsed_ms": 1577,
+    "error": null
+  },
+  {
+    "task": "t-cff2b47b",
+    "condition": "N-no-context",
+    "named": [
+      "apps/erpnext_compat/apis/mrp_runner.py",
+      "apps/erpnext_compat/services/mrp_run_storage.py",
+      "apps/erpnext_compat/services/mrp_provenance.py",
+      "apps/erpnext_compat/services/mrp_history.py",
+      "apps/erpnext_compat/doctype/mrp_run_history/mrp_run_history.py",
+      "apps/erpnext_compat/doctype/mrp_run_history/mrp_run_history.json",
+      "apps/erpnext_compat/doctype/mrp_provenance_entry/mrp_provenance_entry.py",
+      "apps/erpnext_compat/doctype/mrp_provenance_entry/mrp_provenance_entry.json"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 87,
+    "elapsed_ms": 2123,
+    "error": null
+  },
+  {
+    "task": "t-cff2b47b",
+    "condition": "B-content-grep",
+    "named": [
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/ProposedOrder.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/config/model/RunFromPool.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 138,
+    "elapsed_ms": 1582,
+    "error": null
+  },
+  {
+    "task": "t-cff2b47b",
+    "condition": "R-reify",
+    "named": [
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpServices.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityQuery.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/group/GroupModel.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/job/AbstractJob.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/job/JobPoller.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/jms/JmsServiceEngine.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilDateTime.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 338,
+    "elapsed_ms": 2135,
+    "error": null
+  },
+  {
+    "task": "t-cff2b47b",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlFilter.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/template/FreeMarkerWorker.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/log4j/OFBizDynamicThresholdFilter.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/LoginCheck.java",
+      "framework/catalina/src/main/java/org/apache/ofbiz/catalina/container/FilterJars.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/StringUtil.java",
+      "framework/minilang/src/main/java/org/apache/ofbiz/minilang/method/envops/SetCalendar.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 242,
+    "elapsed_ms": 1864,
+    "error": null
+  },
+  {
+    "task": "t-cff2b47b",
+    "condition": "O-oracle",
+    "named": [
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpServices.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpRun.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpRunDetail.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpRunData.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpRunPart.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpRunSupply.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpRunDemand.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpRunService.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 125,
+    "elapsed_ms": 2155,
+    "error": null
+  },
+  {
+    "task": "t-cff2b47b",
+    "condition": "R-reify-iter3",
+    "named": [
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpServices.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/InventoryEventPlannedServices.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/jobshopmgt/ProductionRunServices.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/Delegator.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericDelegator.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelService.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilDateTime.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 918,
+    "elapsed_ms": 1932,
+    "error": null
+  },
+  {
+    "task": "t-cff2b47b",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/InventoryEventPlannedServices.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpServices.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpRun.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpRunItem.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpRunBom.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpRunSupply.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpRunDemand.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpRunLog.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 170,
+    "elapsed_ms": 2221,
+    "error": null
+  },
+  {
+    "task": "t-dd2d941b",
+    "condition": "N-no-context",
+    "named": [
+      "applications/mrp/src/main/java/org/apache/ofbiz/mrp/engine/MrpEngine.java",
+      "applications/mrp/src/main/java/org/apache/ofbiz/mrp/engine/MrpProduct.java",
+      "applications/mrp/src/main/java/org/apache/ofbiz/mrp/engine/Supply.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 94,
+    "elapsed_ms": 1710,
+    "error": null
+  },
+  {
+    "task": "t-dd2d941b",
+    "condition": "B-content-grep",
+    "named": [
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/ProposedOrder.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 146,
+    "elapsed_ms": 1352,
+    "error": null
+  },
+  {
+    "task": "t-dd2d941b",
+    "condition": "R-reify",
+    "named": [
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpServices.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilDateTime.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 243,
+    "elapsed_ms": 1421,
+    "error": null
+  },
+  {
+    "task": "t-dd2d941b",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ConfigXMLReader.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/RequestHandler.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlServlet.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/LoginWorker.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 259,
+    "elapsed_ms": 1773,
+    "error": null
+  },
+  {
+    "task": "t-dd2d941b",
+    "condition": "O-oracle",
+    "named": [
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpServices.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 132,
+    "elapsed_ms": 1055,
+    "error": null
+  },
+  {
+    "task": "t-dd2d941b",
+    "condition": "R-reify-iter3",
+    "named": [
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/MrpServices.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/ProposedOrder.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 768,
+    "elapsed_ms": 1343,
+    "error": null
+  },
+  {
+    "task": "t-dd2d941b",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntitySaxReader.java",
+      "applications/manufacturing/src/main/java/org/apache/ofbiz/manufacturing/mrp/ProposedOrder.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/job/JobUtil.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 162,
+    "elapsed_ms": 1476,
+    "error": null
+  },
+  {
+    "task": "t-c7853869",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/stock/doctype/stock_entry/stock_entry.py",
+      "erpnext/stock/doctype/stock_entry_detail/stock_entry_detail.py",
+      "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation.py",
+      "erpnext/stock/doctype/stock_reconciliation_item/stock_reconciliation_item.py",
+      "erpnext/stock/doctype/landed_cost_voucher/landed_cost_voucher.py",
+      "erpnext/stock/doctype/landed_cost_taxes_and_charges/landed_cost_taxes_and_charges.py",
+      "erpnext/controllers/stock_controller.py",
+      "erpnext/stock/utils.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 90,
+    "elapsed_ms": 1894,
+    "error": null
+  },
+  {
+    "task": "t-c7853869",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/test/ServiceEntityAutoTests.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 117,
+    "elapsed_ms": 1337,
+    "error": null
+  },
+  {
+    "task": "t-c7853869",
+    "condition": "R-reify",
+    "named": [
+      "framework/webtools/src/main/java/org/apache/ofbiz/webtools/WebToolsServices.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilGenerics.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilURL.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/StringUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilDateTime.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/string/UelFunctions.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlFilter.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 250,
+    "elapsed_ms": 1792,
+    "error": null
+  },
+  {
+    "task": "t-c7853869",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericDelegator.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/Delegator.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityQuery.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelEntity.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/SequenceValueItem.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/EntityImportExportUtil.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericEntity.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/EntityUtil.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 251,
+    "elapsed_ms": 2051,
+    "error": null
+  },
+  {
+    "task": "t-c7853869",
+    "condition": "O-oracle",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntitySaxReader.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 125,
+    "elapsed_ms": 1256,
+    "error": null
+  },
+  {
+    "task": "t-c7853869",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericEntity.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericDelegator.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/datasource/GenericDAO.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityDataAssert.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntitySaxReader.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 843,
+    "elapsed_ms": 1572,
+    "error": null
+  },
+  {
+    "task": "t-c7853869",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelEntityChecker.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/connection/ConnectionFactory.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/importexport/EntityImportExportUtil.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/importexport/EntityImportExportImport.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/importexport/EntityImportExportService.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/sequencevalue/SequenceValueItem.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/sequencevalue/SequenceValueItem.java.bak",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/sequencevalue/SequenceValueSvc.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 162,
+    "elapsed_ms": 2170,
+    "error": null
+  },
+  {
+    "task": "t-6ff5306e",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/stock/doctype/item/item.py",
+      "erpnext/stock/doctype/item/item_dashboard.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/sales_order/sales_order.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry.py",
+      "erpnext/stock/doctype/stock_reservation_entry/stock_reservation_entry.py",
+      "erpnext/stock/doctype/stock_reservation_entry/stock_reservation_entry.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 92,
+    "elapsed_ms": 1850,
+    "error": null
+  },
+  {
+    "task": "t-6ff5306e",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/JavaMailContainer.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 118,
+    "elapsed_ms": 853,
+    "error": null
+  },
+  {
+    "task": "t-6ff5306e",
+    "condition": "R-reify",
+    "named": [
+      "applications/product/src/main/java/org/apache/ofbiz/shipment/packing/PackingSession.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 238,
+    "elapsed_ms": 804,
+    "error": null
+  },
+  {
+    "task": "t-6ff5306e",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/component/ComponentConfig.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilHttp.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/StringUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilMisc.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ServiceUtil.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/test/EntityTestSuite.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/RequestHandler.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/view/ApacheFopWorker.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 338,
+    "elapsed_ms": 1641,
+    "error": null
+  },
+  {
+    "task": "t-6ff5306e",
+    "condition": "O-oracle",
+    "named": [
+      "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/ShoppingCart.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 129,
+    "elapsed_ms": 1017,
+    "error": null
+  },
+  {
+    "task": "t-6ff5306e",
+    "condition": "R-reify-iter3",
+    "named": [
+      "applications/product/src/main/java/org/apache/ofbiz/shipment/packing/PackingSession.java",
+      "applications/product/src/main/java/org/apache/ofbiz/shipment/packing/PackingServices.java",
+      "applications/product/src/main/java/org/apache/ofbiz/shipment/packing/PackingSessionLine.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 881,
+    "elapsed_ms": 1136,
+    "error": null
+  },
+  {
+    "task": "t-6ff5306e",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "applications/order/src/main/java/org/apache/ofbiz/order/requirement/RequirementServices.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/order/OrderChangeHelper.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/macro/FtlWriter.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 164,
+    "elapsed_ms": 1080,
+    "error": null
+  },
+  {
+    "task": "t-d9fe8931",
+    "condition": "N-no-context",
+    "named": [
+      "frappe/utils/__init__.py",
+      "frappe/model/utils/__init__.py",
+      "frappe/utils/dateutils.py",
+      "frappe/desk/reportview.py",
+      "frappe/core/doctype/event/event.py",
+      "frappe/core/page/query_report/query_report.js",
+      "frappe/public/js/frappe/form/controls/datetime.js",
+      "frappe/public/js/frappe/utils/date.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 86,
+    "elapsed_ms": 1629,
+    "error": null
+  },
+  {
+    "task": "t-d9fe8931",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilRandom.java",
+      "applications/party/src/main/java/org/apache/ofbiz/party/content/PartyContentWrapper.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 132,
+    "elapsed_ms": 1171,
+    "error": null
+  },
+  {
+    "task": "t-d9fe8931",
+    "condition": "R-reify",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/StringUtil.java",
+      "framework/base/src/test/java/org/apache/ofbiz/base/util/StringUtilTests.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 210,
+    "elapsed_ms": 977,
+    "error": null
+  },
+  {
+    "task": "t-d9fe8931",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/ServiceMcaCondition.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/ServiceMcaAction.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/MimeMessageWrapper.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/JavaMailContainer.java",
+      "framework/common/src/main/java/org/apache/ofbiz/common/email/EmailServices.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 198,
+    "elapsed_ms": 1427,
+    "error": null
+  },
+  {
+    "task": "t-d9fe8931",
+    "condition": "O-oracle",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/conversion/DateTimeConverters.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 122,
+    "elapsed_ms": 776,
+    "error": null
+  },
+  {
+    "task": "t-d9fe8931",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/StringUtil.java",
+      "framework/base/src/test/java/org/apache/ofbiz/base/util/StringUtilTests.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/ObjectType.java",
+      "framework/base/src/test/java/org/apache/ofbiz/base/util/ObjectTypeTests.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelInfo.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilMisc.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/Debug.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/calendar/RecurrenceUtil.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 869,
+    "elapsed_ms": 1557,
+    "error": null
+  },
+  {
+    "task": "t-d9fe8931",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/common/src/main/java/org/apache/ofbiz/common/FindServices.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/period/PeriodServices.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 133,
+    "elapsed_ms": 1198,
+    "error": null
+  },
+  {
+    "task": "t-3eaef2fd",
+    "condition": "N-no-context",
+    "named": [
+      "frappe/model/fields.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 150,
+    "elapsed_ms": 962,
+    "error": null
+  },
+  {
+    "task": "t-3eaef2fd",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/finder/ListFinder.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 197,
+    "elapsed_ms": 985,
+    "error": null
+  },
+  {
+    "task": "t-3eaef2fd",
+    "condition": "R-reify",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericEntity.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/ObjectType.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/ScriptUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilMisc.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelField.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityCondition.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/EntityUtilProperties.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericDelegator.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 347,
+    "elapsed_ms": 1561,
+    "error": null
+  },
+  {
+    "task": "t-3eaef2fd",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/OrderByItem.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 316,
+    "elapsed_ms": 1163,
+    "error": null
+  },
+  {
+    "task": "t-3eaef2fd",
+    "condition": "O-oracle",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelViewEntity.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 185,
+    "elapsed_ms": 933,
+    "error": null
+  },
+  {
+    "task": "t-3eaef2fd",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelViewEntity.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 799,
+    "elapsed_ms": 907,
+    "error": null
+  },
+  {
+    "task": "t-3eaef2fd",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelEntityChecker.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/finder/ListFinder.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 215,
+    "elapsed_ms": 1023,
+    "error": null
+  },
+  {
+    "task": "t-be630727",
+    "condition": "N-no-context",
+    "named": [
+      "frappe/website/website.py",
+      "frappe/website/utils.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 91,
+    "elapsed_ms": 855,
+    "error": null
+  },
+  {
+    "task": "t-be630727",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/website/WebSiteProperties.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/AfterLoginEvents.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 137,
+    "elapsed_ms": 1035,
+    "error": null
+  },
+  {
+    "task": "t-be630727",
+    "condition": "R-reify",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/website/WebSiteProperties.java",
+      "framework/start/src/main/java/org/apache/ofbiz/base/start/StartupCommand.java",
+      "framework/start/src/main/java/org/apache/ofbiz/base/start/Config.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 257,
+    "elapsed_ms": 1231,
+    "error": null
+  },
+  {
+    "task": "t-be630727",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/macro/RenderableFtlFormElementsBuilder.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/macro/FtlWriter.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/html/HtmlWidgetRenderer.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 232,
+    "elapsed_ms": 1135,
+    "error": null
+  },
+  {
+    "task": "t-be630727",
+    "condition": "O-oracle",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/website/WebSiteProperties.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 127,
+    "elapsed_ms": 1039,
+    "error": null
+  },
+  {
+    "task": "t-be630727",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/website/WebSiteProperties.java",
+      "framework/start/src/main/java/org/apache/ofbiz/base/start/StartupCommand.java",
+      "framework/start/src/main/java/org/apache/ofbiz/base/start/Config.java",
+      "framework/start/src/main/java/org/apache/ofbiz/base/start/StartupCommandUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/container/ContainerConfig.java",
+      "framework/catalina/src/main/java/org/apache/ofbiz/catalina/container/CatalinaContainer.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/OfbizUrlBuilder.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/rmi/RmiServiceContainer.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 899,
+    "elapsed_ms": 2038,
+    "error": null
+  },
+  {
+    "task": "t-be630727",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/website/WebSiteProperties.java",
+      "framework/catalina/src/main/java/org/apache/ofbiz/catalina/container/CatalinaContainer.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 161,
+    "elapsed_ms": 1130,
+    "error": null
+  },
+  {
+    "task": "t-0b9cbae4",
+    "condition": "N-no-context",
+    "named": [],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 82,
+    "elapsed_ms": 946,
+    "error": null
+  },
+  {
+    "task": "t-0b9cbae4",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/ScreenStringRenderer.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/ModelWidgetVisitor.java",
+      "themes/helveticus/webapp/helveticus/js/helveticus.js",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/taglib/ContentUrlTag.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 166,
+    "elapsed_ms": 1056,
+    "error": null
+  },
+  {
+    "task": "t-0b9cbae4",
+    "condition": "R-reify",
+    "named": [
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/FormStringRenderer.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/fo/FoFormRenderer.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/macro/MacroFormRenderer.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilFormatOut.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/ModelScreenWidget.java"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 196,
+    "elapsed_ms": 1033,
+    "error": null
+  },
+  {
+    "task": "t-0b9cbae4",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlFilter.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/webdav/RequestHandler.java",
+      "applications/product/src/main/java/org/apache/ofbiz/product/category/SeoControlServlet.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelService.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityQuery.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilValidate.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 313,
+    "elapsed_ms": 1344,
+    "error": null
+  },
+  {
+    "task": "t-0b9cbae4",
+    "condition": "O-oracle",
+    "named": [
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/ModelScreenWidget.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/macro/MacroScreenRenderer.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 142,
+    "elapsed_ms": 997,
+    "error": null
+  },
+  {
+    "task": "t-0b9cbae4",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/FormStringRenderer.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/macro/MacroFormRenderer.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/HtmlWidgetRenderer.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/macro/MacroScreenRenderer.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/ScreenStringRenderer.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/ModelScreenWidget.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/VisualTheme.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 653,
+    "elapsed_ms": 1427,
+    "error": null
+  },
+  {
+    "task": "t-0b9cbae4",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/XmlWidgetVisitor.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/ScreenStringRenderer.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/ModelWidgetVisitor.java",
+      "themes/helveticus/webapp/helveticus/js/helveticus.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 187,
+    "elapsed_ms": 1076,
+    "error": null
+  },
+  {
+    "task": "t-6868d3ab",
+    "condition": "N-no-context",
+    "named": [
+      "soap/soap_handler.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 87,
+    "elapsed_ms": 1028,
+    "error": null
+  },
+  {
+    "task": "t-6868d3ab",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/event/SOAPEventHandler.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 113,
+    "elapsed_ms": 733,
+    "error": null
+  },
+  {
+    "task": "t-6868d3ab",
+    "condition": "R-reify",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/RequestHandler.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilCodec.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlFilter.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/HtmlWidget.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/data/DataEvents.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 192,
+    "elapsed_ms": 1428,
+    "error": null
+  },
+  {
+    "task": "t-6868d3ab",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/StringUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/string/UelFunctions.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/LoginCheck.java",
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java",
+      "framework/catalina/src/main/java/org/apache/ofbiz/catalina/container/FilterJars.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/serialize/XmlSerializer.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 233,
+    "elapsed_ms": 1187,
+    "error": null
+  },
+  {
+    "task": "t-6868d3ab",
+    "condition": "O-oracle",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/event/SOAPEventHandler.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 122,
+    "elapsed_ms": 838,
+    "error": null
+  },
+  {
+    "task": "t-6868d3ab",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/event/SOAPEventHandler.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 581,
+    "elapsed_ms": 760,
+    "error": null
+  },
+  {
+    "task": "t-6868d3ab",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilCodec.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/event/SOAPEventHandler.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 155,
+    "elapsed_ms": 858,
+    "error": null
+  },
+  {
+    "task": "t-a8563259",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice_list.js",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice_list.js",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/accounts/doctype/journal_entry/journal_entry.py",
+      "erpnext/accounts/doctype/payment_entry/payment_entry.py",
+      "erpnext/accounts/doctype/pos_invoice/pos_invoice_list.js",
+      "erpnext/accounts/doctype/pos_invoice/pos_invoice.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 87,
+    "elapsed_ms": 1401,
+    "error": null
+  },
+  {
+    "task": "t-a8563259",
+    "condition": "B-content-grep",
+    "named": [
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/payment/BillingAccountWorker.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/ftp/SimpleFtpClient.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 139,
+    "elapsed_ms": 1164,
+    "error": null
+  },
+  {
+    "task": "t-a8563259",
+    "condition": "R-reify",
+    "named": [
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/invoice/InvoiceServices.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/invoice/InvoiceWorker.java",
+      "framework/webtools/src/main/java/org/apache/ofbiz/webtools/WebToolsServices.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 278,
+    "elapsed_ms": 958,
+    "error": null
+  },
+  {
+    "task": "t-a8563259",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/serialize/XmlSerializer.java",
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java",
+      "framework/ofbiz-gui/src/main/java/org/apache/ofbiz/widget/model/ModelForm.java",
+      "framework/ofbiz-gui/src/main/java/org/apache/ofbiz/widget/model/ModelMenu.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/invoice/InvoiceServices.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/invoice/InvoiceWorker.java",
+      "applications/accounting/widget/AccountingScreens.xml",
+      "applications/accounting/webapp/AccountingWebAppUiLabels.xml"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 232,
+    "elapsed_ms": 1597,
+    "error": null
+  },
+  {
+    "task": "t-a8563259",
+    "condition": "O-oracle",
+    "named": [
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/invoice/InvoiceServices.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/invoice/InvoiceUiLabels.xml",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/invoice/InvoiceScreens.xml",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/invoice/InvoiceForms.xml",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/invoice/InvoiceMenus.xml",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/invoice/InvoiceEvents.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/invoice/InvoiceWorker.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/invoice/InvoiceReport.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 125,
+    "elapsed_ms": 1848,
+    "error": null
+  },
+  {
+    "task": "t-a8563259",
+    "condition": "R-reify-iter3",
+    "named": [
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/invoice/InvoiceServices.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/invoice/InvoiceWorker.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 813,
+    "elapsed_ms": 1213,
+    "error": null
+  },
+  {
+    "task": "t-a8563259",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/invoice/InvoiceWorker.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/ftp/SimpleFtpClient.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 137,
+    "elapsed_ms": 1062,
+    "error": null
+  },
+  {
+    "task": "t-50c0216b",
+    "condition": "N-no-context",
+    "named": [],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 84,
+    "elapsed_ms": 739,
+    "error": null
+  },
+  {
+    "task": "t-50c0216b",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/collections/MapContext.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/ScriptLinkHelper.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 131,
+    "elapsed_ms": 1027,
+    "error": null
+  },
+  {
+    "task": "t-50c0216b",
+    "condition": "R-reify",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/cache/AbstractCache.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/cache/UtilCache.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/HtmlWidget.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/container/ComponentContainer.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/cache/CacheLine.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericEntity.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericValue.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/cache/Cache.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 265,
+    "elapsed_ms": 1292,
+    "error": null
+  },
+  {
+    "task": "t-50c0216b",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ExternalLoginKeysManager.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/LoginEventListener.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/mail/MimeMessageWrapper.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ContextFilter.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/JWTManager.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/RequestHandler.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/WebAppUtil.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/LoginWorker.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 258,
+    "elapsed_ms": 1457,
+    "error": null
+  },
+  {
+    "task": "t-50c0216b",
+    "condition": "O-oracle",
+    "named": [
+      "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/ShoppingCart.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 120,
+    "elapsed_ms": 713,
+    "error": null
+  },
+  {
+    "task": "t-50c0216b",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/cache/AbstractCache.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/cache/UtilCache.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/HtmlWidget.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/container/ComponentContainer.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericEntity.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericValue.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/cache/Cache.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 916,
+    "elapsed_ms": 1514,
+    "error": null
+  },
+  {
+    "task": "t-50c0216b",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/Delegator.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/view/HttpViewHandler.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericRemoveException.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/collections/GenericMapKeySet.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 171,
+    "elapsed_ms": 1033,
+    "error": null
+  },
+  {
+    "task": "t-cdf18bb2",
+    "condition": "N-no-context",
+    "named": [
+      "frappe/desk/reportview.py",
+      "frappe/public/js/frappe/views/reports/query_report.js",
+      "frappe/core/doctype/entity_filter/entity_filter.py",
+      "frappe/core/doctype/entity_filter/entity_filter.json",
+      "frappe/core/doctype/entity_filter/test_entity_filter.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 92,
+    "elapsed_ms": 1519,
+    "error": null
+  },
+  {
+    "task": "t-cdf18bb2",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityDateFilterCondition.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityCondition.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/cache/EntityCache.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityOperator.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityConditionFactory.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityExpr.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityConditionList.java"
+    ],
+    "hit": true,
+    "recall": 0.6666667,
+    "prompt_tokens": 168,
+    "elapsed_ms": 1649,
+    "error": null
+  },
+  {
+    "task": "t-cdf18bb2",
+    "condition": "R-reify",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityDateFilterCondition.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityWhereString.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericEntity.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityExpr.java"
+    ],
+    "hit": true,
+    "recall": 0.33333334,
+    "prompt_tokens": 246,
+    "elapsed_ms": 1301,
+    "error": null
+  },
+  {
+    "task": "t-cdf18bb2",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntitySaxReader.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/cache/EntityCache.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityCondition.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityDateFilterCondition.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityConditionList.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityExpr.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericEntity.java"
+    ],
+    "hit": true,
+    "recall": 0.6666667,
+    "prompt_tokens": 262,
+    "elapsed_ms": 1704,
+    "error": null
+  },
+  {
+    "task": "t-cdf18bb2",
+    "condition": "O-oracle",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityDateFilterCondition.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityCondition.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityUtil.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 172,
+    "elapsed_ms": 1301,
+    "error": null
+  },
+  {
+    "task": "t-cdf18bb2",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityDateFilterCondition.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/cache/AbstractCache.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityCondition.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityExpr.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityConditionList.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityQuery.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericEntity.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelEntity.java"
+    ],
+    "hit": true,
+    "recall": 0.6666667,
+    "prompt_tokens": 772,
+    "elapsed_ms": 1809,
+    "error": null
+  },
+  {
+    "task": "t-cdf18bb2",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityUtil.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityDateFilterCondition.java",
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecurityUtil.java"
+    ],
+    "hit": true,
+    "recall": 0.6666667,
+    "prompt_tokens": 160,
+    "elapsed_ms": 1158,
+    "error": null
+  },
+  {
+    "task": "t-45fc6d15",
+    "condition": "N-no-context",
+    "named": [
+      "frappe/desk/form/utils.py",
+      "frappe/public/js/frappe/form/form.js",
+      "frappe/public/js/frappe/form/script_manager.js",
+      "frappe/public/js/frappe/form/entity.js",
+      "frappe/public/js/frappe/model/view_entity.js",
+      "frappe/desk/page/setup_wizard/setup_wizard.js",
+      "frappe/core/doctype/view_entity/view_entity.js",
+      "frappe/core/doctype/view_entity/view_entity.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 96,
+    "elapsed_ms": 1885,
+    "error": null
+  },
+  {
+    "task": "t-45fc6d15",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityFieldValue.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityConditionVisitor.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 146,
+    "elapsed_ms": 864,
+    "error": null
+  },
+  {
+    "task": "t-45fc6d15",
+    "condition": "R-reify",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelViewEntity.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelEntity.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/DynamicViewEntity.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityFieldValue.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 207,
+    "elapsed_ms": 1032,
+    "error": null
+  },
+  {
+    "task": "t-45fc6d15",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntitySaxReader.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelEntity.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelViewEntity.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelField.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/EntityUtil.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericEntity.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericDelegator.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityCondition.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 377,
+    "elapsed_ms": 1878,
+    "error": null
+  },
+  {
+    "task": "t-45fc6d15",
+    "condition": "O-oracle",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelViewEntity.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 131,
+    "elapsed_ms": 925,
+    "error": null
+  },
+  {
+    "task": "t-45fc6d15",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelViewEntity.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/DynamicViewEntity.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelEntity.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/model/ModelReader.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/datasource/GenericDAO.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/condition/EntityFieldValue.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/GenericDelegator.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/jdbc/SqlJdbcUtil.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 761,
+    "elapsed_ms": 1626,
+    "error": null
+  },
+  {
+    "task": "t-45fc6d15",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/jdbc/SqlJdbcUtil.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/jdbc/ConnectionFactoryLoader.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 143,
+    "elapsed_ms": 1090,
+    "error": null
+  },
+  {
+    "task": "t-bcbb8be9",
+    "condition": "N-no-context",
+    "named": [],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 85,
+    "elapsed_ms": 1107,
+    "error": null
+  },
+  {
+    "task": "t-bcbb8be9",
+    "condition": "B-content-grep",
+    "named": [
+      "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/CartEventListener.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/test/SalesOrderTest.java",
+      "applications/commonext/webapp/ordermgr-js/order.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 147,
+    "elapsed_ms": 950,
+    "error": null
+  },
+  {
+    "task": "t-bcbb8be9",
+    "condition": "R-reify",
+    "named": [
+      "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/ShoppingCart.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/ShoppingCartItem.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/ShoppingCartEvents.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 235,
+    "elapsed_ms": 1168,
+    "error": null
+  },
+  {
+    "task": "t-bcbb8be9",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/html/HtmlWidgetRenderer.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/ControlFilter.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/model/HtmlWidget.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/string/UelFunctions.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/fo/FoFormRenderer.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 197,
+    "elapsed_ms": 1571,
+    "error": null
+  },
+  {
+    "task": "t-bcbb8be9",
+    "condition": "O-oracle",
+    "named": [
+      "applications/order/src/main/java/org/apache/ofbiz/order/order/OrderReadHelper.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 121,
+    "elapsed_ms": 629,
+    "error": null
+  },
+  {
+    "task": "t-bcbb8be9",
+    "condition": "R-reify-iter3",
+    "named": [
+      "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/ShoppingCart.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/ShoppingCartItem.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/order/OrderServices.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/order/OrderReadHelper.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/CheckOutEvents.java",
+      "applications/order/src/main/java/org/apache/ofbiz/order/shoppingcart/ShoppingCartEvents.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityQuery.java",
+      "applications/accounting/src/main/java/org/apache/ofbiz/accounting/invoice/InvoiceServices.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 798,
+    "elapsed_ms": 1704,
+    "error": null
+  },
+  {
+    "task": "t-bcbb8be9",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "applications/order/src/main/java/org/apache/ofbiz/order/thirdparty/zipsales/ZipSalesServices.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/control/JWTManager.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 135,
+    "elapsed_ms": 1263,
+    "error": null
+  },
+  {
+    "task": "t-a794822d",
+    "condition": "N-no-context",
+    "named": [],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 86,
+    "elapsed_ms": 822,
+    "error": null
+  },
+  {
+    "task": "t-a794822d",
+    "condition": "B-content-grep",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/jms/AbstractJmsListener.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/template/RestrictedStaticModels.java",
+      "framework/webapp/src/main/java/org/apache/ofbiz/webapp/ftl/LoopWriter.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 156,
+    "elapsed_ms": 936,
+    "error": null
+  },
+  {
+    "task": "t-a794822d",
+    "condition": "R-reify",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelPermission.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelServiceReader.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/test/ServicePermissionTests.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilXml.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/ScriptHelper.java",
+      "framework/common/src/main/java/org/apache/ofbiz/common/scripting/ScriptHelperImpl.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntitySaxReader.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/Debug.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 251,
+    "elapsed_ms": 1406,
+    "error": null
+  },
+  {
+    "task": "t-a794822d",
+    "condition": "R-shuffled",
+    "named": [
+      "framework/security/src/main/java/org/apache/ofbiz/security/SecuredUpload.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/StringUtil.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/string/UelFunctions.java",
+      "applications/content/src/main/java/org/apache/ofbiz/content/data/DataEvents.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/engine/EntityAutoEngine.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 193,
+    "elapsed_ms": 1463,
+    "error": null
+  },
+  {
+    "task": "t-a794822d",
+    "condition": "O-oracle",
+    "named": [
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/SafeObjectInputStream.java"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 122,
+    "elapsed_ms": 1032,
+    "error": null
+  },
+  {
+    "task": "t-a794822d",
+    "condition": "R-reify-iter3",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelPermission.java",
+      "framework/service/src/main/java/org/apache/ofbiz/service/ModelServiceReader.java",
+      "framework/base/src/main/java/org/apache/ofbiz/base/util/UtilXml.java",
+      "framework/service/src/test/java/org/apache/ofbiz/service/test/ServicePermissionTests.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 721,
+    "elapsed_ms": 1227,
+    "error": null
+  },
+  {
+    "task": "t-a794822d",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "framework/service/src/main/java/org/apache/ofbiz/service/jms/AbstractJmsListener.java",
+      "framework/widget/src/main/java/org/apache/ofbiz/widget/renderer/fo/FoFormRenderer.java",
+      "framework/datafile/src/main/java/org/apache/ofbiz/datafile/RecordIterator.java",
+      "framework/entity/src/main/java/org/apache/ofbiz/entity/util/EntityDataAssert.java"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 176,
+    "elapsed_ms": 1345,
+    "error": null
+  }
+]

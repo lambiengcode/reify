@@ -1,0 +1,4332 @@
+[
+  {
+    "task": "t-2328e6da",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/stock/doctype/product_bundle/product_bundle.py",
+      "erpnext/stock/doctype/product_bundle/product_bundle.js",
+      "erpnext/stock/doctype/packed_item/packed_item.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/stock/doctype/sales_order/sales_order.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry.py"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 90,
+    "elapsed_ms": 1909,
+    "error": null
+  },
+  {
+    "task": "t-2328e6da",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/stock/doctype/packed_item/packed_item.py",
+      "erpnext/stock/doctype/packed_item/packed_item.js",
+      "erpnext/stock/doctype/packed_item/test_packed_item.py",
+      "erpnext/stock/doctype/product_bundle/product_bundle.py",
+      "erpnext/stock/doctype/product_bundle/product_bundle.js",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 154,
+    "elapsed_ms": 1815,
+    "error": null
+  },
+  {
+    "task": "t-2328e6da",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/stock/doctype/packed_item/packed_item.py",
+      "erpnext/stock/doctype/packed_item/test_packed_item.py",
+      "erpnext/selling/doctype/sales_order/mapper.py",
+      "erpnext/stock/doctype/delivery_note/mapper.py",
+      "erpnext/selling/doctype/product_bundle/product_bundle.py",
+      "erpnext/public/js/controllers/buying.js",
+      "erpnext/public/js/utils/sales_common.js",
+      "erpnext/stock/doctype/stock_entry/stock_entry.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 228,
+    "elapsed_ms": 1400,
+    "error": null
+  },
+  {
+    "task": "t-2328e6da",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/buying/doctype/purchase_order/purchase_order.py",
+      "erpnext/accounts/doctype/pos_invoice/pos_invoice.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 165,
+    "elapsed_ms": 1220,
+    "error": null
+  },
+  {
+    "task": "t-2328e6da",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/public/js/utils/sales_common.js",
+      "erpnext/stock/doctype/packed_item/packed_item.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 128,
+    "elapsed_ms": 625,
+    "error": null
+  },
+  {
+    "task": "t-2328e6da",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/selling/doctype/product_bundle/product_bundle.py",
+      "erpnext/stock/doctype/packed_item/packed_item.py",
+      "erpnext/stock/get_item_details.py",
+      "erpnext/controllers/selling_controller.py",
+      "erpnext/selling/doctype/sales_order/sales_order.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry.js"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 617,
+    "elapsed_ms": 1887,
+    "error": null
+  },
+  {
+    "task": "t-2328e6da",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/stock/doctype/pick_list/pick_list.py",
+      "erpnext/stock/doctype/packing_slip/test_packing_slip.py",
+      "erpnext/manufacturing/doctype/production_plan_item/production_plan_item.py",
+      "erpnext/patches/v16_0/set_company_wise_warehouses.py",
+      "erpnext/manufacturing/doctype/production_plan_material_request_warehouse/production_plan_material_request_warehouse.js",
+      "erpnext/manufacturing/doctype/production_plan_material_request_warehouse/test_production_plan_material_request_warehouse.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 216,
+    "elapsed_ms": 1439,
+    "error": null
+  },
+  {
+    "task": "t-941baffd",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/accounts/report/projects_and_tasks/projects_and_tasks.py",
+      "erpnext/projects/report/timesheet_billing_summary/timesheet_billing_summary.py",
+      "erpnext/projects/report/timesheet_billing_summary/timesheet_billing_summary.js",
+      "erpnext/projects/doctype/timesheet/timesheet.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 90,
+    "elapsed_ms": 1133,
+    "error": null
+  },
+  {
+    "task": "t-941baffd",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/projects/report/timesheet_billing_summary/timesheet_billing_summary.js",
+      "erpnext/projects/doctype/task/task.py",
+      "erpnext/startup/filters.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 132,
+    "elapsed_ms": 830,
+    "error": null
+  },
+  {
+    "task": "t-941baffd",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/projects/doctype/timesheet/timesheet.js",
+      "erpnext/projects/doctype/timesheet/timesheet.py",
+      "erpnext/projects/doctype/project/project_timesheet.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 188,
+    "elapsed_ms": 824,
+    "error": null
+  },
+  {
+    "task": "t-941baffd",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/manufacturing/doctype/work_order/work_order.py",
+      "erpnext/manufacturing/doctype/work_order/work_order.js",
+      "erpnext/manufacturing/doctype/work_order/test_work_order.py",
+      "erpnext/setup/doctype/item_group/item_group.py",
+      "erpnext/stock/doctype/warehouse/warehouse.py",
+      "erpnext/public/js/queries.js",
+      "erpnext/stock/utils.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 177,
+    "elapsed_ms": 1022,
+    "error": null
+  },
+  {
+    "task": "t-941baffd",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/projects/report/timesheet_billing_summary/timesheet_billing_summary.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 125,
+    "elapsed_ms": 858,
+    "error": null
+  },
+  {
+    "task": "t-941baffd",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/projects/doctype/timesheet/timesheet.py",
+      "erpnext/projects/doctype/timesheet/timesheet.js",
+      "erpnext/projects/doctype/timesheet/test_timesheet.py",
+      "erpnext/accounts/doctype/sales_invoice/services/timesheet_billing.py",
+      "erpnext/accounts/doctype/sales_invoice_timesheet/sales_invoice_timesheet.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 561,
+    "elapsed_ms": 1259,
+    "error": null
+  },
+  {
+    "task": "t-941baffd",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/projects/report/timesheet_billing_summary/timesheet_billing_summary.js",
+      "erpnext/projects/report/timesheet_billing_summary/timesheet_billing_summary.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 161,
+    "elapsed_ms": 1151,
+    "error": null
+  },
+  {
+    "task": "t-7faadb82",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/hr/doctype/timesheet/timesheet.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 86,
+    "elapsed_ms": 758,
+    "error": null
+  },
+  {
+    "task": "t-7faadb82",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/projects/report/timesheet_billing_summary/timesheet_billing_summary.js",
+      "erpnext/accounts/doctype/sales_invoice/services/timesheet_billing.py",
+      "erpnext/projects/doctype/timesheet_detail/timesheet_detail.py",
+      "erpnext/accounts/doctype/sales_invoice_timesheet/sales_invoice_timesheet.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 205,
+    "elapsed_ms": 936,
+    "error": null
+  },
+  {
+    "task": "t-7faadb82",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/projects/doctype/timesheet/timesheet.py",
+      "erpnext/projects/doctype/timesheet/test_timesheet.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 186,
+    "elapsed_ms": 1024,
+    "error": null
+  },
+  {
+    "task": "t-7faadb82",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/templates/pages/projects.py",
+      "erpnext/setup/doctype/employee/employee.py",
+      "erpnext/support/doctype/issue/issue.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 121,
+    "elapsed_ms": 842,
+    "error": null
+  },
+  {
+    "task": "t-7faadb82",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/projects/report/timesheet_billing_summary/timesheet_billing_summary.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 120,
+    "elapsed_ms": 931,
+    "error": null
+  },
+  {
+    "task": "t-7faadb82",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/projects/doctype/timesheet/timesheet.py",
+      "erpnext/accounts/doctype/sales_invoice/services/timesheet_billing.py",
+      "erpnext/accounts/doctype/sales_invoice_timesheet/sales_invoice_timesheet.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/projects/doctype/timesheet_detail/timesheet_detail.py",
+      "erpnext/projects/doctype/timesheet/timesheet.js",
+      "erpnext/projects/doctype/project/project_timesheet.js",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 442,
+    "elapsed_ms": 1303,
+    "error": null
+  },
+  {
+    "task": "t-7faadb82",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/projects/report/timesheet_billing_summary/timesheet_billing_summary.js",
+      "erpnext/projects/report/timesheet_billing_summary/timesheet_billing_summary.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 125,
+    "elapsed_ms": 897,
+    "error": null
+  },
+  {
+    "task": "t-8320c776",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/manufacturing/doctype/job_card/job_card.py",
+      "erpnext/manufacturing/doctype/job_card/job_card_item.py",
+      "erpnext/manufacturing/doctype/job_card/job_card_item.json",
+      "erpnext/manufacturing/doctype/job_card/job_card.js",
+      "erpnext/manufacturing/doctype/job_card/job_card_list.js",
+      "erpnext/manufacturing/doctype/job_card/job_card_dashboard.py",
+      "erpnext/manufacturing/doctype/job_card/job_card_calendar.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 82,
+    "elapsed_ms": 1377,
+    "error": null
+  },
+  {
+    "task": "t-8320c776",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/manufacturing/doctype/job_card/job_card.py",
+      "erpnext/manufacturing/doctype/job_card_item/job_card_item.py",
+      "erpnext/manufacturing/doctype/job_card/job_card.json",
+      "erpnext/manufacturing/doctype/job_card/job_card_list.js",
+      "erpnext/manufacturing/doctype/job_card/job_card_dashboard.py",
+      "erpnext/manufacturing/doctype/job_card/job_card.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 168,
+    "elapsed_ms": 1636,
+    "error": null
+  },
+  {
+    "task": "t-8320c776",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/manufacturing/doctype/job_card/job_card.py",
+      "erpnext/manufacturing/doctype/job_card/job_card.js",
+      "erpnext/utilities/bulk_transaction.py",
+      "erpnext/manufacturing/doctype/job_card/test_job_card.py",
+      "erpnext/public/js/queries.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 152,
+    "elapsed_ms": 931,
+    "error": null
+  },
+  {
+    "task": "t-8320c776",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/controllers/status_updater.py",
+      "erpnext/public/js/queries.js",
+      "erpnext/accounts/doctype/bank_statement_import/bank_statement_import.py",
+      "erpnext/accounts/doctype/bank_statement_import/bank_statement_import.js",
+      "erpnext/support/doctype/issue/issue.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 168,
+    "elapsed_ms": 1098,
+    "error": null
+  },
+  {
+    "task": "t-8320c776",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/stock/doctype/stock_entry/services/manufacturing.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry.py",
+      "erpnext/manufacturing/doctype/job_card/job_card.py",
+      "erpnext/manufacturing/doctype/job_card/job_card.json",
+      "erpnext/manufacturing/doctype/job_card/__init__.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry.json",
+      "erpnext/manufacturing/doctype/job_card/job_card.js",
+      "erpnext/manufacturing/doctype/job_card/job_card_list.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 112,
+    "elapsed_ms": 1557,
+    "error": null
+  },
+  {
+    "task": "t-8320c776",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/manufacturing/doctype/job_card/job_card.py",
+      "erpnext/manufacturing/doctype/job_card/job_card.js",
+      "erpnext/manufacturing/doctype/job_card_secondary_item/job_card_secondary_item.py",
+      "erpnext/manufacturing/doctype/job_card/test_job_card.py",
+      "erpnext/manufacturing/doctype/job_card/mapper.py",
+      "erpnext/manufacturing/doctype/work_order/test_work_order.py",
+      "erpnext/stock/doctype/stock_entry/services/manufacturing.py",
+      "erpnext/manufacturing/report/job_card_summary/job_card_summary.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 440,
+    "elapsed_ms": 1340,
+    "error": null
+  },
+  {
+    "task": "t-8320c776",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/manufacturing/doctype/job_card/job_card_dashboard.py",
+      "erpnext/manufacturing/doctype/job_card/test_job_card.py",
+      "erpnext/patches/v16_0/co_by_product_patch.py",
+      "erpnext/patches/v16_0/rename_secondary_item_type_field.py",
+      "erpnext/subcontracting/doctype/subcontracting_receipt_item/subcontracting_receipt_item.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 197,
+    "elapsed_ms": 1030,
+    "error": null
+  },
+  {
+    "task": "t-696f0df8",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/stock/doctype/pick_list/pick_list.py",
+      "erpnext/stock/doctype/pick_list/pick_list_dashboard.py",
+      "erpnext/stock/doctype/pick_list/pick_list_list.js",
+      "erpnext/stock/doctype/pick_list/pick_list.js",
+      "erpnext/stock/doctype/pick_list/pick_list.json",
+      "erpnext/stock/doctype/pick_list/pick_list_dashboard.html"
+    ],
+    "hit": true,
+    "recall": 0.33333334,
+    "prompt_tokens": 84,
+    "elapsed_ms": 1438,
+    "error": null
+  },
+  {
+    "task": "t-696f0df8",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/stock/doctype/packed_item/packed_item.py",
+      "erpnext/patches/v16_0/set_mr_picked_qty.py",
+      "erpnext/patches/v12_0/set_quotation_status.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 125,
+    "elapsed_ms": 962,
+    "error": null
+  },
+  {
+    "task": "t-696f0df8",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/stock/doctype/pick_list/pick_list.py",
+      "erpnext/stock/doctype/pick_list/pick_list.js",
+      "erpnext/stock/doctype/packed_item/packed_item.py",
+      "erpnext/selling/doctype/sales_order/sales_order.py",
+      "erpnext/stock/doctype/pick_list/test_pick_list.py"
+    ],
+    "hit": true,
+    "recall": 0.33333334,
+    "prompt_tokens": 200,
+    "elapsed_ms": 1004,
+    "error": null
+  },
+  {
+    "task": "t-696f0df8",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/stock/doctype/item/item.py",
+      "erpnext/stock/serial_batch_bundle.py",
+      "erpnext/crm/frappe_crm_api.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 151,
+    "elapsed_ms": 931,
+    "error": null
+  },
+  {
+    "task": "t-696f0df8",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/stock/doctype/pick_list/mapper.py",
+      "erpnext/stock/doctype/pick_list/pick_list.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 135,
+    "elapsed_ms": 1085,
+    "error": null
+  },
+  {
+    "task": "t-696f0df8",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/stock/doctype/pick_list/pick_list.py",
+      "erpnext/stock/doctype/pick_list/pick_list.js",
+      "erpnext/stock/doctype/packed_item/packed_item.py",
+      "erpnext/stock/doctype/pick_list/test_pick_list.py",
+      "erpnext/selling/doctype/sales_order/sales_order.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/packed_item/test_packed_item.py"
+    ],
+    "hit": true,
+    "recall": 0.6666667,
+    "prompt_tokens": 507,
+    "elapsed_ms": 1126,
+    "error": null
+  },
+  {
+    "task": "t-696f0df8",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/stock/doctype/pick_list/pick_list.py",
+      "erpnext/selling/doctype/sales_order/services/status.py",
+      "erpnext/patches/v15_0/update_pick_list_fields.py",
+      "erpnext/patches/v14_0/set_pick_list_status.py"
+    ],
+    "hit": true,
+    "recall": 0.33333334,
+    "prompt_tokens": 155,
+    "elapsed_ms": 942,
+    "error": null
+  },
+  {
+    "task": "t-478a2f4f",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/stock/doctype/batch/batch.py",
+      "erpnext/stock/doctype/batch/batch_reservation.py",
+      "erpnext/stock/doctype/batch/batch_reservation_item.py",
+      "erpnext/stock/doctype/stock_reservation_entry/stock_reservation_entry.py",
+      "erpnext/stock/doctype/stock_reservation_entry/stock_reservation_entry_item.py",
+      "erpnext/stock/stock_ledger.py",
+      "erpnext/stock/report/batch_wise_balance_history/batch_wise_balance_history.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 85,
+    "elapsed_ms": 1732,
+    "error": null
+  },
+  {
+    "task": "t-478a2f4f",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/stock/doctype/batch/batch.py",
+      "erpnext/stock/report/reserved_stock/test_reserved_stock.py",
+      "erpnext/manufacturing/doctype/work_order/work_order_dashboard.py",
+      "erpnext/patches/v12_0/set_total_batch_quantity.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 161,
+    "elapsed_ms": 1042,
+    "error": null
+  },
+  {
+    "task": "t-478a2f4f",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/stock/doctype/stock_reservation_entry/stock_reservation_entry.py",
+      "erpnext/stock/doctype/serial_and_batch_bundle/serial_and_batch_bundle.py",
+      "erpnext/stock/stock_ledger.py",
+      "erpnext/stock/utils.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 147,
+    "elapsed_ms": 1018,
+    "error": null
+  },
+  {
+    "task": "t-478a2f4f",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/stock/get_item_details.py",
+      "erpnext/controllers/queries.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 154,
+    "elapsed_ms": 1076,
+    "error": null
+  },
+  {
+    "task": "t-478a2f4f",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/stock/doctype/stock_reservation_entry/stock_reservation_entry.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 118,
+    "elapsed_ms": 1204,
+    "error": null
+  },
+  {
+    "task": "t-478a2f4f",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/stock/doctype/stock_reservation_entry/stock_reservation_entry.py",
+      "erpnext/stock/doctype/serial_and_batch_bundle/serial_and_batch_bundle.py",
+      "erpnext/stock/stock_ledger.py",
+      "erpnext/stock/utils.py",
+      "erpnext/controllers/stock_controller.py",
+      "erpnext/stock/doctype/stock_reservation_entry/test_stock_reservation_entry.py",
+      "erpnext/stock/services/serial_batch_bundle_service.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 431,
+    "elapsed_ms": 1617,
+    "error": null
+  },
+  {
+    "task": "t-478a2f4f",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/stock/doctype/purchase_receipt/services/reservation.py",
+      "erpnext/stock/report/stock_qty_vs_batch_qty/stock_qty_vs_batch_qty.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 151,
+    "elapsed_ms": 975,
+    "error": null
+  },
+  {
+    "task": "t-f4ef7fdb",
+    "condition": "N-no-context",
+    "named": [
+      "apps/stocking/doctype/purchase_receipt/purchase_receipt.py",
+      "apps/stocking/doctype/purchase_invoice/purchase_invoice.py",
+      "apps/stocking/doctype/landed_cost_voucher/landed_cost_voucher.py",
+      "apps/stocking/doctype/stock_entry/stock_entry.py",
+      "apps/stocking/doctype/stock_ledger_entry/stock_ledger_entry.py",
+      "apps/stocking/doctype/material_request/material_request.py",
+      "apps/stocking/doctype/item/item.py",
+      "apps/stocking/stock_ledger.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 82,
+    "elapsed_ms": 1403,
+    "error": null
+  },
+  {
+    "task": "t-f4ef7fdb",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/patches/v15_0/update_uae_zero_rated_fetch.py",
+      "banking/src/lib/checks.ts",
+      "erpnext/stock/doctype/packed_item/packed_item.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 120,
+    "elapsed_ms": 1172,
+    "error": null
+  },
+  {
+    "task": "t-f4ef7fdb",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/controllers/sales_and_purchase_return.py",
+      "erpnext/controllers/selling_controller.py",
+      "erpnext/stock/stock_ledger.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 161,
+    "elapsed_ms": 842,
+    "error": null
+  },
+  {
+    "task": "t-f4ef7fdb",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/accounts/services/taxes.py",
+      "erpnext/stock/get_item_details.py",
+      "erpnext/accounts/doctype/item_tax_template/item_tax_template.py",
+      "erpnext/accounts/doctype/tax_rule/tax_rule.py",
+      "erpnext/setup/doctype/item_group/item_group.py",
+      "erpnext/accounts/doctype/accounts_settings/accounts_settings.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 263,
+    "elapsed_ms": 1492,
+    "error": null
+  },
+  {
+    "task": "t-f4ef7fdb",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/controllers/sales_and_purchase_return.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 109,
+    "elapsed_ms": 1123,
+    "error": null
+  },
+  {
+    "task": "t-f4ef7fdb",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/stock/stock_ledger.py",
+      "erpnext/stock/utils.py",
+      "erpnext/stock/serial_batch_bundle.py",
+      "erpnext/controllers/stock_controller.py",
+      "erpnext/controllers/sales_and_purchase_return.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/purchase_receipt/test_purchase_receipt.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 429,
+    "elapsed_ms": 1660,
+    "error": null
+  },
+  {
+    "task": "t-f4ef7fdb",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/stock/report/stock_ageing/stock_ageing.py",
+      "erpnext/regional/report/uae_vat_201/uae_vat_201.py",
+      "erpnext/patches/v15_0/update_uae_zero_rated_fetch.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 127,
+    "elapsed_ms": 1198,
+    "error": null
+  },
+  {
+    "task": "t-e5cd30c5",
+    "condition": "N-no-context",
+    "named": [
+      "frappe/public/js/frappe/form/form.js",
+      "frappe/public/js/frappe/form/controls/file.js",
+      "frappe/public/js/frappe/form/controls/table.js",
+      "frappe/public/js/frappe/form/controls/table_multi_select.js",
+      "frappe/public/js/frappe/form/controls/attach.js",
+      "frappe/public/js/frappe/form/controls/read_only.js",
+      "frappe/public/js/frappe/utils/file.js",
+      "frappe/public/js/frappe/views/workspace/workspace.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 86,
+    "elapsed_ms": 1786,
+    "error": null
+  },
+  {
+    "task": "t-e5cd30c5",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/setup/doctype/transaction_deletion_record/transaction_deletion_record.py",
+      "erpnext/setup/doctype/transaction_deletion_record/transaction_deletion_record.js",
+      "erpnext/setup/doctype/transaction_deletion_record/test_transaction_deletion_record.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 145,
+    "elapsed_ms": 1126,
+    "error": null
+  },
+  {
+    "task": "t-e5cd30c5",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/setup/doctype/transaction_deletion_record/transaction_deletion_record.py",
+      "erpnext/setup/doctype/transaction_deletion_record_item/transaction_deletion_record_item.py",
+      "erpnext/setup/doctype/transaction_deletion_record_to_delete/transaction_deletion_record_to_delete.py",
+      "erpnext/setup/doctype/transaction_deletion_record/test_transaction_deletion_record.py",
+      "erpnext/tests/utils.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 257,
+    "elapsed_ms": 1518,
+    "error": null
+  },
+  {
+    "task": "t-e5cd30c5",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/setup/doctype/employee/employee.py",
+      "erpnext/stock/report/stock_ledger_invariant_check/stock_ledger_invariant_check.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 123,
+    "elapsed_ms": 1048,
+    "error": null
+  },
+  {
+    "task": "t-e5cd30c5",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/setup/doctype/transaction_deletion_record/transaction_deletion_record.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 121,
+    "elapsed_ms": 995,
+    "error": null
+  },
+  {
+    "task": "t-e5cd30c5",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/setup/doctype/transaction_deletion_record/transaction_deletion_record.py",
+      "erpnext/setup/doctype/transaction_deletion_record_item/transaction_deletion_record_item.py",
+      "erpnext/setup/doctype/transaction_deletion_record_to_delete/transaction_deletion_record_to_delete.py",
+      "erpnext/setup/doctype/transaction_deletion_record/test_transaction_deletion_record.py",
+      "erpnext/accounts/doctype/transaction_deletion_record_details/transaction_deletion_record_details.py",
+      "erpnext/setup/demo.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 578,
+    "elapsed_ms": 1352,
+    "error": null
+  },
+  {
+    "task": "t-e5cd30c5",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/setup/doctype/transaction_deletion_record/transaction_deletion_record.py",
+      "erpnext/setup/doctype/transaction_deletion_record/transaction_deletion_record.js",
+      "erpnext/setup/doctype/transaction_deletion_record/transaction_deletion_record_list.js",
+      "erpnext/setup/doctype/transaction_deletion_record_item/transaction_deletion_record_item.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 192,
+    "elapsed_ms": 964,
+    "error": null
+  },
+  {
+    "task": "t-8eeb0196",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/stock/doctype/stock_entry/stock_entry.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry.js",
+      "erpnext/stock/doctype/stock_entry/stock_entry_list.js",
+      "erpnext/stock/doctype/stock_entry/stock_entry_list.json",
+      "erpnext/stock/doctype/batch/batch.js",
+      "erpnext/stock/doctype/batch/batch.py",
+      "erpnext/stock/doctype/batch/batch.json",
+      "erpnext/stock/report/item_batch_map/item_batch_map.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 83,
+    "elapsed_ms": 1423,
+    "error": null
+  },
+  {
+    "task": "t-8eeb0196",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/stock/doctype/batch/batch.js",
+      "erpnext/stock/report/available_batch_report/available_batch_report.py",
+      "erpnext/controllers/ledger_preview.py",
+      "erpnext/patches/v13_0/stock_entry_enhancements.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 138,
+    "elapsed_ms": 993,
+    "error": null
+  },
+  {
+    "task": "t-8eeb0196",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/stock/doctype/stock_entry/stock_entry.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry.js",
+      "erpnext/stock/stock_ledger.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 176,
+    "elapsed_ms": 1041,
+    "error": null
+  },
+  {
+    "task": "t-8eeb0196",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/stock/doctype/stock_entry/stock_entry.js",
+      "erpnext/stock/doctype/stock_entry/stock_entry.py",
+      "erpnext/stock/serial_batch_bundle.py",
+      "erpnext/stock/doctype/batch/batch.py",
+      "erpnext/stock/doctype/batch/batch.js",
+      "erpnext/stock/doctype/stock_entry/stock_entry_list.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 242,
+    "elapsed_ms": 991,
+    "error": null
+  },
+  {
+    "task": "t-8eeb0196",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/stock/doctype/stock_entry/stock_entry.js",
+      "erpnext/stock/doctype/stock_entry/stock_entry.py",
+      "erpnext/stock/doctype/batch/batch.js",
+      "erpnext/stock/doctype/batch/batch.py",
+      "erpnext/stock/doctype/batch/batch.json",
+      "erpnext/stock/doctype/stock_entry_detail/stock_entry_detail.py",
+      "erpnext/stock/doctype/stock_entry_detail/stock_entry_detail.json",
+      "erpnext/stock/doctype/batch/batch_list.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 110,
+    "elapsed_ms": 1328,
+    "error": null
+  },
+  {
+    "task": "t-8eeb0196",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/stock/doctype/stock_entry/stock_entry.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry.js",
+      "erpnext/stock/doctype/stock_entry/services/serial_batch.py",
+      "erpnext/stock/services/serial_batch_bundle_service.py",
+      "erpnext/stock/serial_batch_bundle.py",
+      "erpnext/stock/stock_ledger.py",
+      "erpnext/controllers/stock_controller.py",
+      "erpnext/stock/utils.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 448,
+    "elapsed_ms": 1100,
+    "error": null
+  },
+  {
+    "task": "t-8eeb0196",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/stock/doctype/stock_entry/stock_entry.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry_list.js",
+      "erpnext/stock/doctype/stock_entry/stock_entry.js",
+      "erpnext/stock/doctype/stock_entry/stock_entry.json",
+      "erpnext/stock/doctype/stock_entry/stock_entry_dashboard.py",
+      "erpnext/stock/report/batch_wise_balance_history/batch_wise_balance_history.py",
+      "erpnext/stock/doctype/batch/batch.js",
+      "erpnext/stock/doctype/batch/batch.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 138,
+    "elapsed_ms": 1332,
+    "error": null
+  },
+  {
+    "task": "t-2524af47",
+    "condition": "N-no-context",
+    "named": [
+      "www/frappe/public/js/frappe/views/kanban/kanban_board.js",
+      "www/frappe/public/js/frappe/views/list/list_view.js",
+      "www/frappe/public/js/frappe/views/report/script_report.js",
+      "www/frappe/public/js/frappe/views/workspace/workspace.js",
+      "www/frappe/public/js/frappe/model/doctype.js",
+      "www/frappe/public/js/frappe/model/imports.js",
+      "www/frappe/public/js/frappe/form/form.js",
+      "www/frappe/public/js/frappe/views/editor/editor.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 83,
+    "elapsed_ms": 1779,
+    "error": null
+  },
+  {
+    "task": "t-2524af47",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/stock/doctype/packed_item/packed_item.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 122,
+    "elapsed_ms": 700,
+    "error": null
+  },
+  {
+    "task": "t-2524af47",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/controllers/selling_controller.py",
+      "erpnext/controllers/buying_controller.py",
+      "erpnext/selling/doctype/quotation/quotation.py",
+      "erpnext/stock/stock_ledger.py",
+      "erpnext/stock/utils.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 145,
+    "elapsed_ms": 963,
+    "error": null
+  },
+  {
+    "task": "t-2524af47",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/accounts/doctype/exchange_rate_revaluation/exchange_rate_revaluation.py",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py",
+      "erpnext/accounts/deferred_revenue.py",
+      "erpnext/accounts/services/billing_validation.py",
+      "erpnext/accounts/doctype/dunning/dunning.py",
+      "erpnext/accounts/doctype/gl_entry/gl_entry.py",
+      "erpnext/stock/doctype/material_request/material_request.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 239,
+    "elapsed_ms": 1116,
+    "error": null
+  },
+  {
+    "task": "t-2524af47",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/controllers/selling_controller.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 108,
+    "elapsed_ms": 660,
+    "error": null
+  },
+  {
+    "task": "t-2524af47",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/controllers/stock_controller.py",
+      "erpnext/controllers/buying_controller.py",
+      "erpnext/controllers/selling_controller.py",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py",
+      "erpnext/buying/doctype/purchase_order/purchase_order.py",
+      "erpnext/selling/doctype/sales_order/sales_order.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 477,
+    "elapsed_ms": 1370,
+    "error": null
+  },
+  {
+    "task": "t-2524af47",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/stock/report/stock_ageing/stock_ageing.py",
+      "erpnext/controllers/ledger_preview.py",
+      "erpnext/selling/doctype/product_bundle/product_bundle_list.js",
+      "erpnext/buying/doctype/request_for_quotation/request_for_quotation_dashboard.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 195,
+    "elapsed_ms": 1156,
+    "error": null
+  },
+  {
+    "task": "t-3a6e17a0",
+    "condition": "N-no-context",
+    "named": [],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 85,
+    "elapsed_ms": 991,
+    "error": null
+  },
+  {
+    "task": "t-3a6e17a0",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation.py",
+      "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation.js",
+      "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation.json"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 169,
+    "elapsed_ms": 851,
+    "error": null
+  },
+  {
+    "task": "t-3a6e17a0",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation.py",
+      "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation.js",
+      "erpnext/stock/doctype/stock_reconciliation_item/stock_reconciliation_item.py",
+      "erpnext/stock/doctype/item/item.py",
+      "erpnext/stock/stock_ledger.py",
+      "erpnext/controllers/stock_controller.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 273,
+    "elapsed_ms": 963,
+    "error": null
+  },
+  {
+    "task": "t-3a6e17a0",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/controllers/subcontracting_inward_controller.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry.py",
+      "erpnext/subcontracting/doctype/subcontracting_inward_order/subcontracting_inward_order.py",
+      "erpnext/buying/doctype/purchase_order/mapper.py",
+      "erpnext/stock/stock_balance.py",
+      "erpnext/manufacturing/doctype/production_plan/production_plan.js",
+      "erpnext/public/js/controllers/buying.js",
+      "erpnext/public/js/utils/sales_common.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 198,
+    "elapsed_ms": 1313,
+    "error": null
+  },
+  {
+    "task": "t-3a6e17a0",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 116,
+    "elapsed_ms": 733,
+    "error": null
+  },
+  {
+    "task": "t-3a6e17a0",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation.js",
+      "erpnext/stock/doctype/stock_reconciliation_item/stock_reconciliation_item.py",
+      "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation.py",
+      "erpnext/stock/get_item_details.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 580,
+    "elapsed_ms": 2009,
+    "error": null
+  },
+  {
+    "task": "t-3a6e17a0",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation.py",
+      "erpnext/stock/doctype/stock_reconciliation_item/stock_reconciliation_item.py",
+      "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation.json",
+      "erpnext/stock/doctype/stock_reconciliation_item/stock_reconciliation_item.json",
+      "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation_list.js",
+      "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation.js",
+      "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation_dashboard.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 152,
+    "elapsed_ms": 1412,
+    "error": null
+  },
+  {
+    "task": "t-8d4c1087",
+    "condition": "N-no-context",
+    "named": [
+      "projects_tools/portals/scripts/project.py",
+      "projects_tools/portals/scripts/__init__.py",
+      "erpnext/projects/doctype/project/project.py",
+      "erpnext/projects/doctype/project/project.js",
+      "erpnext/projects/doctype/project/project.json"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 87,
+    "elapsed_ms": 1301,
+    "error": null
+  },
+  {
+    "task": "t-8d4c1087",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/support/doctype/issue/issue.py",
+      "erpnext/projects/web_form/tasks/tasks.py",
+      "erpnext/patches/v13_0/update_project_template_tasks.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 127,
+    "elapsed_ms": 1073,
+    "error": null
+  },
+  {
+    "task": "t-8d4c1087",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/projects/doctype/project/project.py",
+      "erpnext/templates/pages/projects.py",
+      "erpnext/projects/doctype/project/project.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 169,
+    "elapsed_ms": 985,
+    "error": null
+  },
+  {
+    "task": "t-8d4c1087",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/projects/doctype/project/project.js",
+      "erpnext/projects/doctype/project/project.py",
+      "erpnext/projects/doctype/project/project_list.js",
+      "erpnext/projects/doctype/project/project_tree.js",
+      "erpnext/projects/doctype/project/project_calendar.js",
+      "erpnext/projects/doctype/project/project_dashboard.py",
+      "erpnext/projects/doctype/project/project_kanban.js",
+      "erpnext/projects/doctype/project/project.json"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 184,
+    "elapsed_ms": 1618,
+    "error": null
+  },
+  {
+    "task": "t-8d4c1087",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/templates/pages/projects.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 111,
+    "elapsed_ms": 901,
+    "error": null
+  },
+  {
+    "task": "t-8d4c1087",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/templates/pages/projects.py",
+      "erpnext/projects/doctype/project/project.py",
+      "erpnext/projects/doctype/project/project.js",
+      "erpnext/portal/utils.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 593,
+    "elapsed_ms": 1054,
+    "error": null
+  },
+  {
+    "task": "t-8d4c1087",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/templates/pages/projects.py",
+      "erpnext/projects/doctype/project/project.py",
+      "erpnext/projects/doctype/timesheet/timesheet.py",
+      "erpnext/projects/web_form/tasks/tasks.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 136,
+    "elapsed_ms": 1062,
+    "error": null
+  },
+  {
+    "task": "t-25dfcb17",
+    "condition": "N-no-context",
+    "named": [
+      "benchmark/benchmark/benchmark.py",
+      "erpnext/public/js/website.js",
+      "erpnext/public/js/website.js.map",
+      "erpnext/public/scss/website.scss",
+      "erpnext/erpnext/domains/Manufacturing.py",
+      "erpnext/erpnext/domains/Manufacturing/__init__.py",
+      "erpnext/erpnext/domains/Manufacturing/doctype/Workstation/Workstation.py",
+      "erpnext/erpnext/domains/Manufacturing/doctype/Workstation/Workstation.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 89,
+    "elapsed_ms": 1710,
+    "error": null
+  },
+  {
+    "task": "t-25dfcb17",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/public/js/plant_floor_visual/visual_plant.js",
+      "erpnext/manufacturing/doctype/workstation/workstation_list.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 187,
+    "elapsed_ms": 1017,
+    "error": null
+  },
+  {
+    "task": "t-25dfcb17",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/manufacturing/doctype/production_plan/production_plan.py",
+      "erpnext/manufacturing/doctype/production_plan/production_plan.js",
+      "erpnext/manufacturing/doctype/job_card/job_card.py",
+      "erpnext/public/js/queries.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 194,
+    "elapsed_ms": 1137,
+    "error": null
+  },
+  {
+    "task": "t-25dfcb17",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/projects/doctype/task/task.py",
+      "erpnext/projects/doctype/project/project.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 174,
+    "elapsed_ms": 918,
+    "error": null
+  },
+  {
+    "task": "t-25dfcb17",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/manufacturing/doctype/workstation/workstation.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 118,
+    "elapsed_ms": 953,
+    "error": null
+  },
+  {
+    "task": "t-25dfcb17",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/manufacturing/doctype/workstation/workstation.py",
+      "erpnext/manufacturing/doctype/workstation/workstation.js",
+      "erpnext/manufacturing/doctype/production_plan/production_plan.py",
+      "erpnext/manufacturing/doctype/production_plan/production_plan.js",
+      "erpnext/manufacturing/doctype/job_card/job_card.py",
+      "erpnext/manufacturing/doctype/job_card/job_card.js",
+      "erpnext/manufacturing/doctype/work_order/services/status.py",
+      "erpnext/manufacturing/doctype/work_order/work_order.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 551,
+    "elapsed_ms": 1586,
+    "error": null
+  },
+  {
+    "task": "t-25dfcb17",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/manufacturing/doctype/workstation/workstation.py",
+      "erpnext/public/js/plant_floor_visual/visual_plant.js",
+      "erpnext/manufacturing/doctype/workstation/workstation_list.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 216,
+    "elapsed_ms": 1178,
+    "error": null
+  },
+  {
+    "task": "t-a3032f2f",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/buying/doctype/request_for_quotation/request_for_quotation.py",
+      "erpnext/buying/doctype/request_for_quotation/templates/rfq.html",
+      "erpnext/buying/doctype/request_for_quotation/templates/includes/rfq.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 88,
+    "elapsed_ms": 1247,
+    "error": null
+  },
+  {
+    "task": "t-a3032f2f",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/buying/doctype/request_for_quotation/mapper.py",
+      "erpnext/subcontracting/doctype/subcontracting_receipt/mapper.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 157,
+    "elapsed_ms": 911,
+    "error": null
+  },
+  {
+    "task": "t-a3032f2f",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/templates/includes/rfq.js",
+      "erpnext/buying/doctype/request_for_quotation/request_for_quotation.py",
+      "erpnext/buying/doctype/request_for_quotation/test_request_for_quotation.py",
+      "erpnext/tests/utils.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 191,
+    "elapsed_ms": 1198,
+    "error": null
+  },
+  {
+    "task": "t-a3032f2f",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/selling/doctype/sales_order/sales_order.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 165,
+    "elapsed_ms": 857,
+    "error": null
+  },
+  {
+    "task": "t-a3032f2f",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/templates/includes/rfq.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 111,
+    "elapsed_ms": 897,
+    "error": null
+  },
+  {
+    "task": "t-a3032f2f",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/templates/includes/rfq.js",
+      "erpnext/buying/doctype/request_for_quotation/request_for_quotation.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 500,
+    "elapsed_ms": 1038,
+    "error": null
+  },
+  {
+    "task": "t-a3032f2f",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/buying/doctype/request_for_quotation/mapper.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 138,
+    "elapsed_ms": 688,
+    "error": null
+  },
+  {
+    "task": "t-5c4fb99f",
+    "condition": "N-no-context",
+    "named": [
+      "www/desk.py",
+      "www/projects.py",
+      "erpnext/projects/doctype/project/project.js",
+      "erpnext/projects/doctype/project/project.py",
+      "erpnext/templates/pages/projects.py",
+      "erpnext/templates/pages/project.py",
+      "erpnext/templates/includes/projects/project_row.html",
+      "erpnext/templates/includes/projects/project_comments.html"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 88,
+    "elapsed_ms": 1353,
+    "error": null
+  },
+  {
+    "task": "t-5c4fb99f",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/projects/doctype/project/project.py",
+      "erpnext/projects/doctype/project/project_dashboard.py",
+      "erpnext/projects/doctype/project/project_list.js",
+      "erpnext/projects/doctype/project/project.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 139,
+    "elapsed_ms": 997,
+    "error": null
+  },
+  {
+    "task": "t-5c4fb99f",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/templates/pages/projects.py",
+      "erpnext/accounts/doctype/psoa_project/psoa_project.py",
+      "erpnext/accounts/report/non_billed_report.py",
+      "erpnext/controllers/queries.py",
+      "erpnext/setup/doctype/item_group/item_group.py",
+      "erpnext/public/js/controllers/buying.js",
+      "erpnext/public/js/utils/sales_common.js",
+      "erpnext/projects/doctype/project/project.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 191,
+    "elapsed_ms": 1418,
+    "error": null
+  },
+  {
+    "task": "t-5c4fb99f",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/project/doctype/project/project.py",
+      "erpnext/project/doctype/project/project.js",
+      "erpnext/project/doctype/project/project_list.js",
+      "erpnext/templates/pages/project.py",
+      "erpnext/templates/pages/project.html",
+      "erpnext/templates/includes/projects/project_row.html",
+      "erpnext/templates/includes/projects/project_tasks.html",
+      "erpnext/project/doctype/project/project_dashboard.html"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 208,
+    "elapsed_ms": 1628,
+    "error": null
+  },
+  {
+    "task": "t-5c4fb99f",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/templates/pages/projects.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 111,
+    "elapsed_ms": 1308,
+    "error": null
+  },
+  {
+    "task": "t-5c4fb99f",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/templates/pages/projects.py",
+      "erpnext/templates/pages/project.py",
+      "erpnext/templates/includes/projects/project_row.html",
+      "erpnext/templates/generators/project.html"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 604,
+    "elapsed_ms": 1084,
+    "error": null
+  },
+  {
+    "task": "t-5c4fb99f",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/projects/doctype/project/project.py",
+      "erpnext/projects/doctype/timesheet/timesheet.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 150,
+    "elapsed_ms": 715,
+    "error": null
+  },
+  {
+    "task": "t-d91fce90",
+    "condition": "N-no-context",
+    "named": [],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 80,
+    "elapsed_ms": 715,
+    "error": null
+  },
+  {
+    "task": "t-d91fce90",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/setup/install.py",
+      "erpnext/tests/test_webform.py",
+      "erpnext/regional/south_africa/setup.py",
+      "erpnext/accounts/doctype/cashier_closing/cashier_closing.js",
+      "erpnext/setup/doctype/territory/territory_tree.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 138,
+    "elapsed_ms": 1130,
+    "error": null
+  },
+  {
+    "task": "t-d91fce90",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/setup/doctype/employee/employee.py",
+      "erpnext/setup/doctype/email_digest/email_digest.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 109,
+    "elapsed_ms": 947,
+    "error": null
+  },
+  {
+    "task": "t-d91fce90",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/stock/doctype/serial_and_batch_bundle/serial_and_batch_bundle.py",
+      "erpnext/stock/serial_batch_bundle.py",
+      "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation.py",
+      "erpnext/controllers/stock_controller.py",
+      "erpnext/tests/utils.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 147,
+    "elapsed_ms": 970,
+    "error": null
+  },
+  {
+    "task": "t-d91fce90",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/hooks.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 99,
+    "elapsed_ms": 688,
+    "error": null
+  },
+  {
+    "task": "t-d91fce90",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/setup/doctype/employee/employee.py",
+      "erpnext/setup/doctype/employee/employee.js",
+      "erpnext/public/js/controllers/transaction.js",
+      "erpnext/controllers/stock_controller.py",
+      "erpnext/controllers/queries.py",
+      "erpnext/startup/boot.py",
+      "erpnext/setup/demo.py",
+      "erpnext/stock/utils.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 458,
+    "elapsed_ms": 1557,
+    "error": null
+  },
+  {
+    "task": "t-d91fce90",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/setup/doctype/employee/employee.py",
+      "erpnext/setup/install.py",
+      "erpnext/patches/v12_0/set_employee_preferred_emails.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 159,
+    "elapsed_ms": 1007,
+    "error": null
+  },
+  {
+    "task": "t-27b06fcb",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/accounts/doctype/sales_invoice_item/sales_invoice_item.py",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/accounts/doctype/purchase_invoice_item/purchase_invoice_item.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/delivery_note_item/delivery_note_item.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py",
+      "erpnext/stock/doctype/purchase_receipt_item/purchase_receipt_item.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 83,
+    "elapsed_ms": 1333,
+    "error": null
+  },
+  {
+    "task": "t-27b06fcb",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice_dashboard.py",
+      "erpnext/accounts/report/sales_payment_summary/sales_payment_summary.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 164,
+    "elapsed_ms": 1381,
+    "error": null
+  },
+  {
+    "task": "t-27b06fcb",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/controllers/sales_and_purchase_return.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/controllers/accounts_controller.py",
+      "erpnext/accounts/doctype/pos_invoice/pos_invoice.py",
+      "erpnext/accounts/doctype/bank_transaction/auto_match_party.py",
+      "erpnext/accounts/report/financial_statements.py",
+      "erpnext/public/js/bank_reconciliation_tool/dialog_manager.js",
+      "erpnext/selling/page/point_of_sale/point_of_sale.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 219,
+    "elapsed_ms": 1971,
+    "error": null
+  },
+  {
+    "task": "t-27b06fcb",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/crm/frappe_crm_api.py",
+      "erpnext/crm/utils.py",
+      "erpnext/accounts/doctype/financial_report_template/financial_report_engine.py",
+      "erpnext/stock/serial_batch_bundle.py",
+      "erpnext/stock/utils.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 197,
+    "elapsed_ms": 1312,
+    "error": null
+  },
+  {
+    "task": "t-27b06fcb",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/accounts/report/gross_profit/gross_profit.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 111,
+    "elapsed_ms": 1070,
+    "error": null
+  },
+  {
+    "task": "t-27b06fcb",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/controllers/sales_and_purchase_return.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.js",
+      "erpnext/controllers/accounts_controller.py",
+      "erpnext/controllers/selling_controller.py",
+      "erpnext/stock/utils.py",
+      "erpnext/stock/get_item_details.py",
+      "erpnext/public/js/utils.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 604,
+    "elapsed_ms": 1809,
+    "error": null
+  },
+  {
+    "task": "t-27b06fcb",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/selling/doctype/sales_order/mapper.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice_dashboard.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 153,
+    "elapsed_ms": 896,
+    "error": null
+  },
+  {
+    "task": "t-b68324ce",
+    "condition": "N-no-context",
+    "named": [
+      "frappe/public/js/frappe/form/footer.js",
+      "erpnext/manufacturing/doctype/job_card/job_card.js",
+      "erpnext/manufacturing/doctype/job_card/job_card.py",
+      "erpnext/manufacturing/doctype/work_order/work_order.js",
+      "erpnext/manufacturing/doctype/work_order/work_order.py",
+      "erpnext/manufacturing/doctype/work_order/work_order_list.js",
+      "erpnext/public/js/utils.js",
+      "erpnext/public/js/queries.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 89,
+    "elapsed_ms": 1259,
+    "error": null
+  },
+  {
+    "task": "t-b68324ce",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/manufacturing/doctype/work_order/work_order.js",
+      "erpnext/manufacturing/doctype/work_order/work_order.py",
+      "erpnext/manufacturing/doctype/work_order/work_order.json",
+      "erpnext/manufacturing/doctype/job_card/job_card.js",
+      "erpnext/manufacturing/doctype/job_card/job_card.py",
+      "erpnext/manufacturing/doctype/job_card/job_card.json",
+      "erpnext/manufacturing/doctype/workstation/workstation.js",
+      "erpnext/manufacturing/doctype/operation/operation_dashboard.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 124,
+    "elapsed_ms": 1118,
+    "error": null
+  },
+  {
+    "task": "t-b68324ce",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/manufacturing/doctype/work_order/work_order.py",
+      "erpnext/manufacturing/doctype/job_card/job_card.py",
+      "erpnext/manufacturing/doctype/job_card/job_card.js",
+      "erpnext/public/js/controllers/transaction.js"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 190,
+    "elapsed_ms": 1043,
+    "error": null
+  },
+  {
+    "task": "t-b68324ce",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/controllers/sales_and_purchase_return.py",
+      "erpnext/buying/doctype/purchase_order/purchase_order.py",
+      "erpnext/buying/report/purchase_order_analysis/purchase_order_analysis.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py",
+      "erpnext/accounts/report/financial_statements.py",
+      "erpnext/controllers/accounts_controller.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 178,
+    "elapsed_ms": 1400,
+    "error": null
+  },
+  {
+    "task": "t-b68324ce",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/manufacturing/doctype/job_card/job_card.py",
+      "erpnext/manufacturing/doctype/work_order/work_order.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 130,
+    "elapsed_ms": 1061,
+    "error": null
+  },
+  {
+    "task": "t-b68324ce",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/manufacturing/doctype/work_order/work_order.py",
+      "erpnext/manufacturing/doctype/job_card/job_card.py",
+      "erpnext/manufacturing/doctype/job_card/job_card.js",
+      "erpnext/manufacturing/doctype/work_order/test_work_order.py",
+      "erpnext/manufacturing/doctype/job_card/test_job_card.py",
+      "erpnext/manufacturing/doctype/job_card/mapper.py"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 568,
+    "elapsed_ms": 1482,
+    "error": null
+  },
+  {
+    "task": "t-b68324ce",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/manufacturing/doctype/work_order/work_order.js",
+      "erpnext/manufacturing/doctype/work_order/services/operations.py",
+      "erpnext/manufacturing/doctype/work_order_operation/work_order_operation.py"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 143,
+    "elapsed_ms": 778,
+    "error": null
+  },
+  {
+    "task": "t-1fa057b9",
+    "condition": "N-no-context",
+    "named": [
+      "apps/erpnext/controllers/stock_controller.py",
+      "apps/erpnext/erpnext/manufacturing/report/bom_operations_time/bom_operations_time.py",
+      "apps/erpnext/erpnext/manufacturing/report/bom_operations_time/bom_operations_time.js",
+      "apps/erpnext/erpnext/manufacturing/report/bom_stock_report/bom_stock_report.py",
+      "apps/erpnext/erpnext/manufacturing/report/bom_stock_report/bom_stock_report.js",
+      "apps/erpnext/erpnext/manufacturing/report/mrp_bom_operations_time/mrp_bom_operations_time.py",
+      "apps/erpnext/erpnext/manufacturing/report/mrp_bom_operations_time/mrp_bom_operations_time.js",
+      "apps/erpnext/erpnext/manufacturing/report/mrp_stock_report/mrp_stock_report.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 86,
+    "elapsed_ms": 1888,
+    "error": null
+  },
+  {
+    "task": "t-1fa057b9",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/stock/report/stock_balance/stock_balance.py",
+      "erpnext/stock/report/stock_balance/stock_balance.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 141,
+    "elapsed_ms": 999,
+    "error": null
+  },
+  {
+    "task": "t-1fa057b9",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/public/js/financial_statements.js",
+      "erpnext/accounts/report/accounts_receivable/accounts_receivable.py",
+      "erpnext/accounts/report/gross_profit/gross_profit.py",
+      "erpnext/accounts/report/cash_flow/cash_flow.py",
+      "erpnext/accounts/report/payment_ledger/payment_ledger.js",
+      "erpnext/stock/report/stock_ledger/stock_ledger.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 184,
+    "elapsed_ms": 1479,
+    "error": null
+  },
+  {
+    "task": "t-1fa057b9",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/stock/doctype/delivery_note/delivery_note_list.js",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/delivery_note/test_delivery_note.py",
+      "erpnext/stock/serial_batch_bundle.py",
+      "erpnext/stock/stock_ledger.py",
+      "erpnext/controllers/selling_controller.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 190,
+    "elapsed_ms": 1562,
+    "error": null
+  },
+  {
+    "task": "t-1fa057b9",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/manufacturing/report/material_requirements_planning_report/material_requirements_planning_report.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 128,
+    "elapsed_ms": 1434,
+    "error": null
+  },
+  {
+    "task": "t-1fa057b9",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/manufacturing/report/material_requirements_planning_report/material_requirements_planning_report.js",
+      "erpnext/manufacturing/report/material_requirements_planning_report/material_requirements_planning_report.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 703,
+    "elapsed_ms": 1289,
+    "error": null
+  },
+  {
+    "task": "t-1fa057b9",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/manufacturing/report/material_requirements_planning_report/material_requirements_planning_report.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 171,
+    "elapsed_ms": 1329,
+    "error": null
+  },
+  {
+    "task": "t-1f839061",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/manufacturing/doctype/work_order/work_order.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 93,
+    "elapsed_ms": 1586,
+    "error": null
+  },
+  {
+    "task": "t-1f839061",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/manufacturing/doctype/production_plan/production_plan.py",
+      "erpnext/manufacturing/doctype/work_order/work_order.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 126,
+    "elapsed_ms": 1376,
+    "error": null
+  },
+  {
+    "task": "t-1f839061",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/manufacturing/doctype/work_order/work_order.py",
+      "erpnext/manufacturing/doctype/work_order/test_work_order.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 189,
+    "elapsed_ms": 1390,
+    "error": null
+  },
+  {
+    "task": "t-1f839061",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/manufacturing/doctype/work_order/work_order.js",
+      "erpnext/manufacturing/doctype/work_order/work_order.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 239,
+    "elapsed_ms": 1476,
+    "error": null
+  },
+  {
+    "task": "t-1f839061",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/manufacturing/doctype/work_order/services/status.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 122,
+    "elapsed_ms": 1406,
+    "error": null
+  },
+  {
+    "task": "t-1f839061",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/manufacturing/doctype/work_order/work_order.py",
+      "erpnext/manufacturing/doctype/work_order/services/status.py",
+      "erpnext/manufacturing/doctype/work_order/work_order.js",
+      "erpnext/manufacturing/doctype/work_order/test_work_order.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 450,
+    "elapsed_ms": 1290,
+    "error": null
+  },
+  {
+    "task": "t-1f839061",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/manufacturing/doctype/work_order/work_order.py",
+      "erpnext/manufacturing/doctype/work_order/work_order.js",
+      "erpnext/manufacturing/doctype/work_order/work_order_list.js",
+      "erpnext/manufacturing/doctype/work_order/work_order_calendar.js",
+      "erpnext/manufacturing/doctype/work_order/work_order_dashboard.py",
+      "erpnext/manufacturing/doctype/work_order/work_order_dashboard.html",
+      "erpnext/manufacturing/doctype/work_order/work_order_dashboard.css",
+      "erpnext/manufacturing/doctype/work_order/work_order_dashboard.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 166,
+    "elapsed_ms": 1805,
+    "error": null
+  },
+  {
+    "task": "t-d40679cf",
+    "condition": "N-no-context",
+    "named": [
+      "procurement/doctype/purchase_invoice/purchase_invoice.py",
+      "procurement/doctype/purchase_invoice/purchase_invoice_item.py",
+      "stock/doctype/drop_ship/drop_ship.py",
+      "stock/doctype/drop_ship/drop_ship_item.py",
+      "accounts/doctype/sales_invoice/sales_invoice.py",
+      "accounts/doctype/sales_invoice/sales_invoice_item.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 84,
+    "elapsed_ms": 1554,
+    "error": null
+  },
+  {
+    "task": "t-d40679cf",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/assets/doctype/asset_repair/asset_repair.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 102,
+    "elapsed_ms": 1296,
+    "error": null
+  },
+  {
+    "task": "t-d40679cf",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/buying/doctype/purchase_order/purchase_order.py",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/accounts/doctype/pos_invoice/pos_invoice.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 159,
+    "elapsed_ms": 1440,
+    "error": null
+  },
+  {
+    "task": "t-d40679cf",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/stock/doctype/packed_item/packed_item.py",
+      "erpnext/stock/doctype/packed_item/test_packed_item.py",
+      "erpnext/selling/doctype/sales_order/mapper.py",
+      "erpnext/stock/doctype/delivery_note/mapper.py",
+      "erpnext/public/js/controllers/buying.js",
+      "erpnext/public/js/utils/sales_common.js",
+      "erpnext/stock/doctype/stock_entry/stock_entry.js",
+      "erpnext/stock/serial_batch_bundle.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 222,
+    "elapsed_ms": 1643,
+    "error": null
+  },
+  {
+    "task": "t-d40679cf",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/accounts/report/gross_profit/gross_profit.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 112,
+    "elapsed_ms": 1194,
+    "error": null
+  },
+  {
+    "task": "t-d40679cf",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/buying/doctype/purchase_order/services/drop_ship.py",
+      "erpnext/controllers/buying_controller.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/controllers/accounts_controller.py",
+      "erpnext/utilities/transaction_base.py",
+      "erpnext/controllers/stock_controller.py",
+      "erpnext/accounts/services/billing_validation.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 555,
+    "elapsed_ms": 1284,
+    "error": null
+  },
+  {
+    "task": "t-d40679cf",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/patches/v13_0/bill_for_rejected_quantity_in_purchase_invoice.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 149,
+    "elapsed_ms": 1194,
+    "error": null
+  },
+  {
+    "task": "t-4dc0b2ea",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/manufacturing/doctype/work_order/work_order.py",
+      "erpnext/manufacturing/doctype/work_order/work_order.js",
+      "erpnext/manufacturing/doctype/work_order/work_order.json",
+      "erpnext/manufacturing/doctype/operation/operation.py"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 88,
+    "elapsed_ms": 1442,
+    "error": null
+  },
+  {
+    "task": "t-4dc0b2ea",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/manufacturing/doctype/production_plan/production_plan.py",
+      "erpnext/manufacturing/doctype/work_order/work_order.py",
+      "erpnext/manufacturing/doctype/work_order/work_order_item/work_order_item.py",
+      "erpnext/manufacturing/doctype/operation/operation_dashboard.py",
+      "erpnext/patches/v14_0/update_stock_uom_in_work_order_item.py",
+      "erpnext/manufacturing/doctype/production_plan_item/production_plan_item.py",
+      "erpnext/manufacturing/doctype/bom/bom.py",
+      "erpnext/manufacturing/doctype/work_order/work_order_list.js"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 141,
+    "elapsed_ms": 2092,
+    "error": null
+  },
+  {
+    "task": "t-4dc0b2ea",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/manufacturing/doctype/work_order/work_order.py",
+      "erpnext/manufacturing/doctype/work_order/work_order.js",
+      "erpnext/setup/doctype/item_group/item_group.py",
+      "erpnext/stock/utils.py"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 175,
+    "elapsed_ms": 1376,
+    "error": null
+  },
+  {
+    "task": "t-4dc0b2ea",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/manufacturing/doctype/work_order/work_order.py",
+      "erpnext/manufacturing/doctype/work_order/work_order.js",
+      "erpnext/stock/doctype/item/item.py",
+      "erpnext/stock/doctype/item_group/item_group.py",
+      "erpnext/stock/doctype/item/item_dashboard.py",
+      "erpnext/stock/doctype/item/item_list.js"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 186,
+    "elapsed_ms": 1770,
+    "error": null
+  },
+  {
+    "task": "t-4dc0b2ea",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/manufacturing/doctype/work_order/services/required_items.py",
+      "erpnext/manufacturing/doctype/work_order/work_order.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 134,
+    "elapsed_ms": 1219,
+    "error": null
+  },
+  {
+    "task": "t-4dc0b2ea",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/manufacturing/doctype/work_order/work_order.py",
+      "erpnext/manufacturing/doctype/work_order/work_order.js",
+      "erpnext/manufacturing/doctype/work_order/test_work_order.py",
+      "erpnext/setup/doctype/item_group/item_group.py",
+      "erpnext/stock/get_item_details.py",
+      "erpnext/manufacturing/doctype/work_order_item/work_order_item.py",
+      "erpnext/stock/doctype/warehouse/warehouse.py",
+      "erpnext/utilities/product.py"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 485,
+    "elapsed_ms": 1752,
+    "error": null
+  },
+  {
+    "task": "t-4dc0b2ea",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/manufacturing/doctype/work_order/work_order.py",
+      "erpnext/setup/doctype/item_group/item_group.py",
+      "erpnext/stock/doctype/stock_entry/services/stock_entry_base.py",
+      "erpnext/manufacturing/doctype/operation/operation_dashboard.py"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 149,
+    "elapsed_ms": 1521,
+    "error": null
+  },
+  {
+    "task": "t-2f82e0dd",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/stock/doctype/material_request/material_request.py",
+      "erpnext/selling/doctype/sales_order/sales_order.py",
+      "erpnext/buying/doctype/purchase_order/purchase_order.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 90,
+    "elapsed_ms": 1802,
+    "error": null
+  },
+  {
+    "task": "t-2f82e0dd",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/accounts/doctype/pos_profile/pos_profile.py",
+      "erpnext/utilities/query.py",
+      "erpnext/regional/south_africa/setup.py",
+      "erpnext/templates/pages/task_info.py",
+      "erpnext/patches/v14_0/delete_shopify_doctypes.py",
+      "erpnext/patches/v14_0/delete_amazon_mws_doctype.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 161,
+    "elapsed_ms": 1576,
+    "error": null
+  },
+  {
+    "task": "t-2f82e0dd",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/setup/doctype/employee/employee.py",
+      "erpnext/templates/pages/projects.py",
+      "erpnext/support/doctype/issue/issue.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 125,
+    "elapsed_ms": 1312,
+    "error": null
+  },
+  {
+    "task": "t-2f82e0dd",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/projects/doctype/timesheet/timesheet.py",
+      "erpnext/controllers/budget_controller.py",
+      "erpnext/projects/doctype/task/task.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 190,
+    "elapsed_ms": 1354,
+    "error": null
+  },
+  {
+    "task": "t-2f82e0dd",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/accounts/doctype/bank_statement_import/bank_statement_import.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 123,
+    "elapsed_ms": 1209,
+    "error": null
+  },
+  {
+    "task": "t-2f82e0dd",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/setup/doctype/employee/employee.py",
+      "erpnext/templates/pages/projects.py",
+      "erpnext/support/doctype/issue/issue.py",
+      "erpnext/accounts/doctype/financial_report_template/financial_report_engine.py",
+      "erpnext/support/doctype/service_level_agreement/service_level_agreement.py",
+      "erpnext/controllers/queries.py",
+      "erpnext/crm/doctype/lead/lead.py",
+      "erpnext/portal/utils.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 440,
+    "elapsed_ms": 1568,
+    "error": null
+  },
+  {
+    "task": "t-2f82e0dd",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/accounts/doctype/pos_profile/pos_profile.py",
+      "erpnext/utilities/query.py",
+      "erpnext/regional/south_africa/setup.py",
+      "erpnext/patches/v14_0/delete_shopify_doctypes.py",
+      "erpnext/patches/v14_0/delete_amazon_mws_doctype.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 167,
+    "elapsed_ms": 1517,
+    "error": null
+  },
+  {
+    "task": "t-9a71ab4d",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/selling/doctype/quotation/quotation.py",
+      "erpnext/buying/doctype/supplier_quotation/supplier_quotation.py",
+      "erpnext/selling/doctype/sales_order/sales_order.py",
+      "erpnext/buying/doctype/purchase_order/purchase_order.py",
+      "erpnext/selling/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/buying/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 88,
+    "elapsed_ms": 1853,
+    "error": null
+  },
+  {
+    "task": "t-9a71ab4d",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/assets/doctype/asset_repair/asset_repair.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 106,
+    "elapsed_ms": 1202,
+    "error": null
+  },
+  {
+    "task": "t-9a71ab4d",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/accounts/doctype/bank_statement_import/bank_statement_import.py",
+      "erpnext/accounts/doctype/bank_statement_import/bank_statement_import.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 173,
+    "elapsed_ms": 1404,
+    "error": null
+  },
+  {
+    "task": "t-9a71ab4d",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/utilities/bulk_transaction.py",
+      "erpnext/manufacturing/doctype/job_card/job_card.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 158,
+    "elapsed_ms": 1248,
+    "error": null
+  },
+  {
+    "task": "t-9a71ab4d",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/accounts/doctype/bank_statement_import/bank_statement_import.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 120,
+    "elapsed_ms": 1304,
+    "error": null
+  },
+  {
+    "task": "t-9a71ab4d",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/accounts/doctype/bank_statement_import/bank_statement_import.py",
+      "erpnext/accounts/doctype/bank_statement_import/bank_statement_import.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 508,
+    "elapsed_ms": 1288,
+    "error": null
+  },
+  {
+    "task": "t-9a71ab4d",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/accounts/doctype/bank_statement_import/bank_statement_import.py",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/quality_management/doctype/quality_review/quality_review.py",
+      "erpnext/regional/__init__.py",
+      "erpnext/patches/v15_0/set_asset_status_if_not_already_set.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 168,
+    "elapsed_ms": 1589,
+    "error": null
+  },
+  {
+    "task": "t-5a69bb90",
+    "condition": "N-no-context",
+    "named": [
+      "www/frappe/public/js/frappe/views/form/integrations/interactions.js",
+      "www/frappe/public/js/frappe/views/form/script_manager.js",
+      "www/frappe/public/js/frappe/views/form/footer.js",
+      "www/frappe/public/js/frappe/views/form/toolbar.js",
+      "www/frappe/public/js/frappe/views/form/main.js",
+      "www/frappe/www/frappe/views/form/integrations/methods.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 86,
+    "elapsed_ms": 2237,
+    "error": null
+  },
+  {
+    "task": "t-5a69bb90",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/selling/page/point_of_sale/pos_item_selector.js",
+      "erpnext/stock/doctype/stock_closing_balance/test_stock_closing_balance.py",
+      "erpnext/patches/v13_0/reset_corrupt_defaults.py",
+      "erpnext/patches/v11_0/remove_barcodes_field_from_copy_fields_to_variants.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 156,
+    "elapsed_ms": 1709,
+    "error": null
+  },
+  {
+    "task": "t-5a69bb90",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/crm/frappe_crm_api.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 153,
+    "elapsed_ms": 1332,
+    "error": null
+  },
+  {
+    "task": "t-5a69bb90",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/stock/doctype/pick_list/pick_list.py",
+      "erpnext/stock/doctype/pick_list/pick_list.js",
+      "erpnext/stock/doctype/pick_list/test_pick_list.py",
+      "erpnext/stock/serial_batch_bundle.py",
+      "erpnext/accounts/party.py",
+      "erpnext/accounts/utils.py",
+      "erpnext/crm/utils.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 202,
+    "elapsed_ms": 1559,
+    "error": null
+  },
+  {
+    "task": "t-5a69bb90",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/crm/doctype/utils.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 108,
+    "elapsed_ms": 1192,
+    "error": null
+  },
+  {
+    "task": "t-5a69bb90",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/utilities/doctype/video/video.py",
+      "erpnext/utilities/report/youtube_interactions/youtube_interactions.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 472,
+    "elapsed_ms": 1346,
+    "error": null
+  },
+  {
+    "task": "t-5a69bb90",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/crm/doctype/utils.py",
+      "erpnext/selling/page/point_of_sale/pos_item_selector.js",
+      "erpnext/stock/doctype/packed_item/test_packed_item.py",
+      "erpnext/stock/doctype/shipment/shipment.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 138,
+    "elapsed_ms": 1467,
+    "error": null
+  },
+  {
+    "task": "t-9ee41029",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/accounts/doctype/sales_taxes_and_charges_template/sales_taxes_and_charges_template_dashboard.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 90,
+    "elapsed_ms": 1531,
+    "error": null
+  },
+  {
+    "task": "t-9ee41029",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/accounts/doctype/sales_taxes_and_charges_template/sales_taxes_and_charges_template_dashboard.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 161,
+    "elapsed_ms": 1362,
+    "error": null
+  },
+  {
+    "task": "t-9ee41029",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice_dashboard.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 159,
+    "elapsed_ms": 1506,
+    "error": null
+  },
+  {
+    "task": "t-9ee41029",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/stock/doctype/stock_reservation_entry/stock_reservation_entry.py",
+      "erpnext/stock/doctype/serial_and_batch_bundle/serial_and_batch_bundle.py",
+      "erpnext/tests/utils.py",
+      "erpnext/stock/stock_ledger.py",
+      "erpnext/stock/utils.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 152,
+    "elapsed_ms": 1403,
+    "error": null
+  },
+  {
+    "task": "t-9ee41029",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/accounts/doctype/sales_taxes_and_charges_template/sales_taxes_and_charges_template_dashboard.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 131,
+    "elapsed_ms": 1348,
+    "error": null
+  },
+  {
+    "task": "t-9ee41029",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice_dashboard.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 568,
+    "elapsed_ms": 1217,
+    "error": null
+  },
+  {
+    "task": "t-9ee41029",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/selling/doctype/sales_order/sales_order.py",
+      "erpnext/buying/doctype/purchase_order/purchase_order.py",
+      "erpnext/patches/v12_0/update_item_tax_template_company.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 137,
+    "elapsed_ms": 1553,
+    "error": null
+  },
+  {
+    "task": "t-4a5943e2",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/controllers/stock_controller.py",
+      "erpnext/stock/doctype/item_tax_template/item_tax_template.js",
+      "erpnext/stock/doctype/item_tax_template/item_tax_template.py",
+      "erpnext/stock/doctype/item_tax_template/item_tax_template_dashboard.py",
+      "erpnext/stock/doctype/item/item.js",
+      "erpnext/stock/doctype/item/item.py",
+      "erpnext/stock/doctype/item_tax_template/item_tax_template.json"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 89,
+    "elapsed_ms": 1998,
+    "error": null
+  },
+  {
+    "task": "t-4a5943e2",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/accounts/doctype/tax_rule/tax_rule.py",
+      "erpnext/patches/v12_0/move_item_tax_to_item_tax_template.py",
+      "erpnext/accounts/doctype/purchase_taxes_and_charges_template/purchase_taxes_and_charges_template.py",
+      "erpnext/patches/v15_0/create_accounting_dimensions_in_advance_taxes_and_charges.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 168,
+    "elapsed_ms": 1695,
+    "error": null
+  },
+  {
+    "task": "t-4a5943e2",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/accounts/doctype/item_tax_template/item_tax_template.py",
+      "erpnext/accounts/doctype/item_tax_template/test_item_tax_template.py",
+      "erpnext/accounts/services/taxes.py",
+      "erpnext/controllers/queries.py",
+      "erpnext/stock/get_item_details.py",
+      "erpnext/setup/doctype/item_group/item_group.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 270,
+    "elapsed_ms": 1635,
+    "error": null
+  },
+  {
+    "task": "t-4a5943e2",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/controllers/selling_controller.py",
+      "erpnext/stock/stock_ledger.py",
+      "erpnext/accounts/report/financial_statements.py",
+      "erpnext/crm/doctype/lead/lead.py",
+      "erpnext/selling/doctype/quotation/quotation.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 168,
+    "elapsed_ms": 1446,
+    "error": null
+  },
+  {
+    "task": "t-4a5943e2",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/accounts/doctype/item_tax_template/item_tax_template_dashboard.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 122,
+    "elapsed_ms": 1249,
+    "error": null
+  },
+  {
+    "task": "t-4a5943e2",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/accounts/doctype/item_tax_template/item_tax_template.py",
+      "erpnext/accounts/doctype/item_tax_template/item_tax_template.js",
+      "erpnext/accounts/doctype/item_tax_template/item_tax_template.json",
+      "erpnext/accounts/doctype/item_tax_template_detail/item_tax_template_detail.py",
+      "erpnext/accounts/doctype/item_tax_template_detail/item_tax_template_detail.json",
+      "erpnext/accounts/doctype/item_tax_template/test_item_tax_template.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 622,
+    "elapsed_ms": 1784,
+    "error": null
+  },
+  {
+    "task": "t-4a5943e2",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/setup/doctype/item_group/item_group_tree.js",
+      "erpnext/accounts/doctype/tax_rule/tax_rule.py",
+      "erpnext/accounts/doctype/purchase_taxes_and_charges_template/purchase_taxes_and_charges_template.py",
+      "erpnext/stock/doctype/item/test_item.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 155,
+    "elapsed_ms": 1509,
+    "error": null
+  },
+  {
+    "task": "t-c6b17299",
+    "condition": "N-no-context",
+    "named": [],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 84,
+    "elapsed_ms": 1069,
+    "error": null
+  },
+  {
+    "task": "t-c6b17299",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/buying/doctype/request_for_quotation/request_for_quotation.py",
+      "erpnext/crm/doctype/contract_fulfilment_checklist/test_contract_fulfilment_checklist.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 129,
+    "elapsed_ms": 1118,
+    "error": null
+  },
+  {
+    "task": "t-c6b17299",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/setup/doctype/employee/employee.py",
+      "erpnext/stock/report/stock_ledger_invariant_check/stock_ledger_invariant_check.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 121,
+    "elapsed_ms": 943,
+    "error": null
+  },
+  {
+    "task": "t-c6b17299",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/accounts/doctype/transaction_deletion_record_details/transaction_deletion_record_details.py",
+      "erpnext/setup/doctype/transaction_deletion_record/transaction_deletion_record.py",
+      "erpnext/stock/doctype/stock_closing_entry/stock_closing_entry.py",
+      "erpnext/stock/serial_batch_bundle.py",
+      "erpnext/setup/doctype/company/company.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 255,
+    "elapsed_ms": 1523,
+    "error": null
+  },
+  {
+    "task": "t-c6b17299",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/setup/doctype/email_digest/email_digest.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 111,
+    "elapsed_ms": 1385,
+    "error": null
+  },
+  {
+    "task": "t-c6b17299",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/setup/doctype/email_digest/email_digest.py",
+      "erpnext/controllers/queries.py",
+      "erpnext/portal/utils.py",
+      "erpnext/templates/utils.py",
+      "erpnext/utilities/product.py",
+      "erpnext/stock/utils.py",
+      "erpnext/accounts/party.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 408,
+    "elapsed_ms": 1567,
+    "error": null
+  },
+  {
+    "task": "t-c6b17299",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/buying/doctype/request_for_quotation/request_for_quotation.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 122,
+    "elapsed_ms": 1253,
+    "error": null
+  },
+  {
+    "task": "t-7cc236d1",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/selling/report/supplier_quotation_comparison/supplier_quotation_comparison.py",
+      "erpnext/selling/report/supplier_quotation_comparison/supplier_quotation_comparison.js",
+      "erpnext/selling/report/supplier_quotation_comparison/supplier_quotation_comparison.json"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 88,
+    "elapsed_ms": 1355,
+    "error": null
+  },
+  {
+    "task": "t-7cc236d1",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/buying/report/supplier_quotation_comparison/supplier_quotation_comparison.js",
+      "erpnext/buying/report/supplier_quotation_comparison/supplier_quotation_comparison.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 162,
+    "elapsed_ms": 1488,
+    "error": null
+  },
+  {
+    "task": "t-7cc236d1",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/buying/report/supplier_quotation_comparison/supplier_quotation_comparison.py",
+      "erpnext/buying/report/supplier_quotation_comparison/supplier_quotation_comparison.js",
+      "erpnext/buying/report/supplier_quotation_comparison/supplier_quotation_comparison.json"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 247,
+    "elapsed_ms": 1242,
+    "error": null
+  },
+  {
+    "task": "t-7cc236d1",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/buying/report/supplier_quotation_comparison/supplier_quotation_comparison.js",
+      "erpnext/buying/report/supplier_quotation_comparison/supplier_quotation_comparison.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 181,
+    "elapsed_ms": 1278,
+    "error": null
+  },
+  {
+    "task": "t-7cc236d1",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/buying/report/supplier_quotation_comparison/supplier_quotation_comparison.js",
+      "erpnext/buying/report/supplier_quotation_comparison/supplier_quotation_comparison.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 146,
+    "elapsed_ms": 1174,
+    "error": null
+  },
+  {
+    "task": "t-7cc236d1",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/buying/report/supplier_quotation_comparison/supplier_quotation_comparison.py",
+      "erpnext/buying/report/supplier_quotation_comparison/supplier_quotation_comparison.js",
+      "erpnext/buying/report/supplier_quotation_comparison/supplier_quotation_comparison.json"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 525,
+    "elapsed_ms": 1306,
+    "error": null
+  },
+  {
+    "task": "t-7cc236d1",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/buying/report/supplier_quotation_comparison/supplier_quotation_comparison.py",
+      "erpnext/buying/report/supplier_quotation_comparison/supplier_quotation_comparison.js",
+      "erpnext/buying/doctype/request_for_quotation/request_for_quotation.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 221,
+    "elapsed_ms": 1192,
+    "error": null
+  },
+  {
+    "task": "t-70a8a2d0",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt_list.js",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.js",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice_dashboard.py",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice_list.js",
+      "erpnext/controllers/accounts_controller.py",
+      "erpnext/controllers/stock_controller.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 90,
+    "elapsed_ms": 1464,
+    "error": null
+  },
+  {
+    "task": "t-70a8a2d0",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/stock/doctype/purchase_receipt/services/gl_composer.py",
+      "erpnext/accounts/report/purchase_invoice_trends/purchase_invoice_trends.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 130,
+    "elapsed_ms": 922,
+    "error": null
+  },
+  {
+    "task": "t-70a8a2d0",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 246,
+    "elapsed_ms": 883,
+    "error": null
+  },
+  {
+    "task": "t-70a8a2d0",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/controllers/buying_controller.py",
+      "erpnext/stock/stock_ledger.py",
+      "erpnext/stock/utils.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 152,
+    "elapsed_ms": 1142,
+    "error": null
+  },
+  {
+    "task": "t-70a8a2d0",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/accounts/doctype/purchase_receipt/purchase_receipt.py",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice_list.js",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.js",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice_dashboard.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 120,
+    "elapsed_ms": 1167,
+    "error": null
+  },
+  {
+    "task": "t-70a8a2d0",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py",
+      "erpnext/controllers/buying_controller.py",
+      "erpnext/controllers/accounts_controller.py",
+      "erpnext/utilities/transaction_base.py",
+      "erpnext/accounts/doctype/gl_entry/gl_entry.py",
+      "erpnext/stock/doctype/purchase_receipt/test_purchase_receipt.py",
+      "erpnext/accounts/doctype/exchange_rate_revaluation/exchange_rate_revaluation.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 636,
+    "elapsed_ms": 1889,
+    "error": null
+  },
+  {
+    "task": "t-70a8a2d0",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/accounts/doctype/accounts_settings/accounts_settings.py",
+      "erpnext/buying/doctype/buying_settings/buying_settings.py",
+      "erpnext/patches/v15_0/rename_field_from_rate_difference_to_amount_difference.py",
+      "erpnext/patches/v15_0/rename_purchase_receipt_amount_to_purchase_amount.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 198,
+    "elapsed_ms": 1065,
+    "error": null
+  },
+  {
+    "task": "t-ef249746",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/subcontracting/doctype/subcontracting_order/subcontracting_order.py",
+      "erpnext/subcontracting/doctype/subcontracting_receipt/subcontracting_receipt.py",
+      "erpnext/subcontracting/doctype/subcontracting_receipt/subcontracting_receipt_item.py",
+      "erpnext/subcontracting/doctype/subcontracting_order_item/subcontracting_order_item.py",
+      "erpnext/subcontracting/doctype/subcontracting_order/subcontracting_order_item.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry.py",
+      "erpnext/stock/doctype/stock_entry_detail/stock_entry_detail.py",
+      "erpnext/stock/stock_ledger.py"
+    ],
+    "hit": true,
+    "recall": 0.33333334,
+    "prompt_tokens": 85,
+    "elapsed_ms": 1697,
+    "error": null
+  },
+  {
+    "task": "t-ef249746",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/subcontracting/doctype/subcontracting_inward_order/subcontracting_inward_order.js",
+      "erpnext/stock/services/quality_inspection_service.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 167,
+    "elapsed_ms": 802,
+    "error": null
+  },
+  {
+    "task": "t-ef249746",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/controllers/subcontracting_inward_controller.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry.py",
+      "erpnext/subcontracting/doctype/subcontracting_inward_order/subcontracting_inward_order.py",
+      "erpnext/buying/doctype/purchase_order/mapper.py",
+      "erpnext/public/js/controllers/buying.js"
+    ],
+    "hit": true,
+    "recall": 0.33333334,
+    "prompt_tokens": 198,
+    "elapsed_ms": 937,
+    "error": null
+  },
+  {
+    "task": "t-ef249746",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/stock/doctype/stock_entry/stock_entry.js",
+      "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation.js",
+      "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation.py",
+      "erpnext/stock/doctype/stock_reconciliation_item/stock_reconciliation_item.py",
+      "erpnext/stock/stock_ledger.py",
+      "erpnext/controllers/stock_controller.py",
+      "erpnext/stock/doctype/item/item.py"
+    ],
+    "hit": true,
+    "recall": 0.33333334,
+    "prompt_tokens": 273,
+    "elapsed_ms": 1243,
+    "error": null
+  },
+  {
+    "task": "t-ef249746",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/stock/doctype/stock_entry/services/material_receipt_issue.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry.js",
+      "erpnext/stock/doctype/stock_entry/stock_entry.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 143,
+    "elapsed_ms": 1159,
+    "error": null
+  },
+  {
+    "task": "t-ef249746",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/subcontracting/doctype/subcontracting_inward_order/subcontracting_inward_order.py",
+      "erpnext/controllers/subcontracting_inward_controller.py",
+      "erpnext/stock/doctype/stock_entry/services/subcontracting.py",
+      "erpnext/buying/doctype/purchase_order/services/subcontracting.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry.py",
+      "erpnext/subcontracting/doctype/subcontracting_inward_order/subcontracting_inward_order.js",
+      "erpnext/subcontracting/doctype/subcontracting_inward_order_item/subcontracting_inward_order_item.py",
+      "erpnext/stock/doctype/warehouse/warehouse.py"
+    ],
+    "hit": true,
+    "recall": 0.33333334,
+    "prompt_tokens": 689,
+    "elapsed_ms": 1766,
+    "error": null
+  },
+  {
+    "task": "t-ef249746",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/subcontracting/doctype/subcontracting_inward_order/subcontracting_inward_order_dashboard.py",
+      "erpnext/subcontracting/doctype/subcontracting_inward_order_item/subcontracting_inward_order_item.py",
+      "erpnext/manufacturing/doctype/work_order/services/reservation.py",
+      "erpnext/stock/services/quality_inspection_service.py",
+      "erpnext/stock/stock_balance.py",
+      "erpnext/patches/v16_0/co_by_product_patch.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 191,
+    "elapsed_ms": 1152,
+    "error": null
+  },
+  {
+    "task": "t-fb7c2caf",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/stock/dashboard/item_dashboard.html",
+      "erpnext/stock/doctype/pick_list/pick_list.py",
+      "erpnext/stock/doctype/pick_list/pick_list.js",
+      "erpnext/stock/doctype/pick_list/pick_list.json",
+      "erpnext/stock/doctype/batch/batch.js",
+      "erpnext/stock/doctype/batch/batch.py",
+      "erpnext/stock/stock_ledger.py",
+      "erpnext/stock/utils.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 88,
+    "elapsed_ms": 1546,
+    "error": null
+  },
+  {
+    "task": "t-fb7c2caf",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/stock/doctype/serial_and_batch_bundle/serial_and_batch_bundle.js",
+      "erpnext/stock/doctype/serial_and_batch_bundle/serial_and_batch_bundle.py",
+      "erpnext/stock/doctype/serial_and_batch_bundle/serial_and_batch_bundle.json",
+      "erpnext/stock/doctype/pick_list/pick_list.js",
+      "erpnext/stock/doctype/pick_list/pick_list.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.js",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 174,
+    "elapsed_ms": 1298,
+    "error": null
+  },
+  {
+    "task": "t-fb7c2caf",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/stock/doctype/pick_list/pick_list.js",
+      "erpnext/public/js/utils/serial_no_batch_selector.js",
+      "erpnext/stock/doctype/serial_and_batch_bundle/serial_and_batch_bundle.py",
+      "erpnext/controllers/selling_controller.py",
+      "erpnext/public/js/utils.js",
+      "erpnext/stock/serial_batch_bundle.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 184,
+    "elapsed_ms": 827,
+    "error": null
+  },
+  {
+    "task": "t-fb7c2caf",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/controllers/queries.py",
+      "erpnext/controllers/tests/test_queries.py",
+      "erpnext/projects/doctype/project/project.py",
+      "erpnext/projects/doctype/project/project.js",
+      "erpnext/accounts/doctype/psoa_project/psoa_project.py",
+      "erpnext/accounts/report/non_billed_report.py",
+      "erpnext/templates/pages/projects.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 170,
+    "elapsed_ms": 954,
+    "error": null
+  },
+  {
+    "task": "t-fb7c2caf",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/public/js/utils/serial_no_batch_selector.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 116,
+    "elapsed_ms": 984,
+    "error": null
+  },
+  {
+    "task": "t-fb7c2caf",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/public/js/utils/serial_no_batch_selector.js",
+      "erpnext/stock/doctype/pick_list/pick_list.js",
+      "erpnext/stock/doctype/serial_and_batch_bundle/serial_and_batch_bundle.py",
+      "erpnext/stock/serial_batch_bundle.py",
+      "erpnext/public/js/controllers/transaction.js",
+      "erpnext/controllers/stock_controller.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry.js",
+      "erpnext/stock/doctype/delivery_note/delivery_note.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 536,
+    "elapsed_ms": 1375,
+    "error": null
+  },
+  {
+    "task": "t-fb7c2caf",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/public/js/utils.js",
+      "erpnext/stock/doctype/stock_settings/stock_settings.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 146,
+    "elapsed_ms": 782,
+    "error": null
+  },
+  {
+    "task": "t-7c6da80f",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/projects/doctype/task/task.py",
+      "erpnext/projects/doctype/task/task.js",
+      "erpnext/projects/doctype/task/task_dashboard.py",
+      "erpnext/projects/doctype/task/task_dashboard.html",
+      "erpnext/projects/doctype/task/task_list.js",
+      "erpnext/projects/doctype/task/task_board.js",
+      "erpnext/projects/doctype/task/task_calendar.js",
+      "erpnext/projects/doctype/task/task_tree.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 82,
+    "elapsed_ms": 1515,
+    "error": null
+  },
+  {
+    "task": "t-7c6da80f",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/projects/doctype/task/task.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 122,
+    "elapsed_ms": 953,
+    "error": null
+  },
+  {
+    "task": "t-7c6da80f",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/projects/doctype/task/task.py",
+      "erpnext/projects/doctype/task/test_task.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 168,
+    "elapsed_ms": 978,
+    "error": null
+  },
+  {
+    "task": "t-7c6da80f",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/manufacturing/doctype/production_plan/production_plan.py",
+      "erpnext/manufacturing/doctype/production_plan/test_production_plan.py",
+      "erpnext/manufacturing/doctype/production_plan/production_plan.js",
+      "erpnext/manufacturing/doctype/job_card/job_card.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 187,
+    "elapsed_ms": 991,
+    "error": null
+  },
+  {
+    "task": "t-7c6da80f",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/projects/doctype/task/task.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 106,
+    "elapsed_ms": 682,
+    "error": null
+  },
+  {
+    "task": "t-7c6da80f",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/projects/doctype/task/task.py",
+      "erpnext/projects/doctype/task/test_task.py",
+      "erpnext/projects/doctype/project/project.py",
+      "erpnext/projects/doctype/project/test_project.py",
+      "erpnext/projects/doctype/dependent_task/dependent_task.py",
+      "erpnext/projects/doctype/project_template/project_template.py",
+      "erpnext/projects/doctype/project_template_task/project_template_task.py",
+      "erpnext/projects/report/delayed_tasks_summary/delayed_tasks_summary.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 505,
+    "elapsed_ms": 1532,
+    "error": null
+  },
+  {
+    "task": "t-7c6da80f",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/projects/doctype/task/task.py",
+      "erpnext/templates/pages/task_info.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 139,
+    "elapsed_ms": 899,
+    "error": null
+  },
+  {
+    "task": "t-10109674",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/controllers/status_updater.py",
+      "erpnext/selling/doctype/sales_order/sales_order.json",
+      "erpnext/selling/doctype/sales_order/sales_order.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.json",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.json",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/controllers/selling_controller.py"
+    ],
+    "hit": true,
+    "recall": 0.6,
+    "prompt_tokens": 92,
+    "elapsed_ms": 1555,
+    "error": null
+  },
+  {
+    "task": "t-10109674",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/selling/doctype/sales_order/sales_order.py",
+      "erpnext/selling/doctype/sales_order/sales_order.js",
+      "erpnext/selling/doctype/sales_order/sales_order.json",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.js",
+      "erpnext/stock/doctype/delivery_note/delivery_note.json",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.js"
+    ],
+    "hit": true,
+    "recall": 0.6,
+    "prompt_tokens": 128,
+    "elapsed_ms": 1203,
+    "error": null
+  },
+  {
+    "task": "t-10109674",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/selling/doctype/sales_order/sales_order.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/stock/doctype/delivery_note/test_delivery_note.py"
+    ],
+    "hit": true,
+    "recall": 0.6,
+    "prompt_tokens": 169,
+    "elapsed_ms": 1095,
+    "error": null
+  },
+  {
+    "task": "t-10109674",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/selling/doctype/sales_order/sales_order.py",
+      "erpnext/selling/doctype/sales_order/sales_order.js",
+      "erpnext/selling/doctype/sales_order/sales_order.json",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.js",
+      "erpnext/stock/doctype/delivery_note/delivery_note.json",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.js"
+    ],
+    "hit": true,
+    "recall": 0.6,
+    "prompt_tokens": 195,
+    "elapsed_ms": 1454,
+    "error": null
+  },
+  {
+    "task": "t-10109674",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/accounts/party.py",
+      "erpnext/public/js/utils/sales_common.js",
+      "erpnext/selling/doctype/sales_order/sales_order.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 166,
+    "elapsed_ms": 1138,
+    "error": null
+  },
+  {
+    "task": "t-10109674",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/selling/doctype/sales_order/sales_order.py",
+      "erpnext/selling/doctype/sales_order/sales_order.js",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.js",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.js",
+      "erpnext/controllers/selling_controller.py",
+      "erpnext/public/js/utils/sales_common.js"
+    ],
+    "hit": true,
+    "recall": 0.8,
+    "prompt_tokens": 565,
+    "elapsed_ms": 1117,
+    "error": null
+  },
+  {
+    "task": "t-10109674",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/selling/doctype/sales_order/sales_order.py",
+      "erpnext/selling/doctype/sales_order/sales_order.js",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.js",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.js",
+      "erpnext/selling/doctype/sales_order/sales_order.json",
+      "erpnext/stock/doctype/delivery_note/mapper.py"
+    ],
+    "hit": true,
+    "recall": 0.6,
+    "prompt_tokens": 161,
+    "elapsed_ms": 1230,
+    "error": null
+  },
+  {
+    "task": "t-3558ce3b",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/accounts/report/general_ledger/general_ledger.py",
+      "erpnext/accounts/report/general_ledger/general_ledger.js",
+      "erpnext/accounts/report/general_ledger/general_ledger.html",
+      "erpnext/accounts/report/utils.py",
+      "erpnext/accounts/doctype/account/account.py",
+      "erpnext/accounts/doctype/account/account.js",
+      "erpnext/accounts/doctype/account_dimension/account_dimension.py",
+      "erpnext/accounts/doctype/account_dimension/account_dimension.js"
+    ],
+    "hit": true,
+    "recall": 0.33333334,
+    "prompt_tokens": 91,
+    "elapsed_ms": 1466,
+    "error": null
+  },
+  {
+    "task": "t-3558ce3b",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/accounts/report/general_ledger/general_ledger.js",
+      "erpnext/accounts/report/general_ledger/general_ledger.py",
+      "erpnext/accounts/report/general_ledger/general_ledger.html",
+      "erpnext/accounts/report/utils.py",
+      "erpnext/accounts/report/general_ledger/__init__.py",
+      "erpnext/accounts/doctype/account/account.py",
+      "erpnext/accounts/doctype/accounting_dimension/accounting_dimension.py",
+      "erpnext/accounts/report/accounts_receivable_summary/accounts_receivable_summary.py"
+    ],
+    "hit": true,
+    "recall": 0.33333334,
+    "prompt_tokens": 142,
+    "elapsed_ms": 1273,
+    "error": null
+  },
+  {
+    "task": "t-3558ce3b",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/accounts/report/general_ledger/general_ledger.py",
+      "erpnext/accounts/report/general_ledger/general_ledger.js",
+      "erpnext/accounts/report/general_ledger/general_ledger.html",
+      "erpnext/accounts/report/utils.py",
+      "erpnext/accounts/doctype/accounting_dimension_filter/accounting_dimension_filter.py",
+      "erpnext/accounts/doctype/accounting_dimension/accounting_dimension.py",
+      "erpnext/accounts/doctype/accounting_dimension/test_accounting_dimension.py",
+      "erpnext/accounts/doctype/financial_report_template/financial_report_engine.py"
+    ],
+    "hit": true,
+    "recall": 0.33333334,
+    "prompt_tokens": 212,
+    "elapsed_ms": 1522,
+    "error": null
+  },
+  {
+    "task": "t-3558ce3b",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/accounts/report/general_ledger/general_ledger.py",
+      "erpnext/accounts/report/general_ledger/general_ledger.js",
+      "erpnext/accounts/report/general_ledger/general_ledger.html",
+      "erpnext/accounts/report/utils.py",
+      "erpnext/accounts/doctype/account/account.py",
+      "erpnext/accounts/doctype/accounting_dimension/accounting_dimension.py",
+      "erpnext/controllers/queries.py",
+      "erpnext/controllers/tests/test_queries.py"
+    ],
+    "hit": true,
+    "recall": 0.33333334,
+    "prompt_tokens": 195,
+    "elapsed_ms": 1240,
+    "error": null
+  },
+  {
+    "task": "t-3558ce3b",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/accounts/doctype/accounts_settings/accounts_settings.py",
+      "erpnext/accounts/doctype/accounts_settings/accounts_settings.json",
+      "erpnext/accounts/report/general_ledger/general_ledger.js",
+      "erpnext/accounts/report/general_ledger/general_ledger.py",
+      "erpnext/startup/boot.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 143,
+    "elapsed_ms": 1310,
+    "error": null
+  },
+  {
+    "task": "t-3558ce3b",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/accounts/report/general_ledger/general_ledger.py",
+      "erpnext/accounts/report/general_ledger/general_ledger.js",
+      "erpnext/accounts/report/general_ledger/general_ledger.html",
+      "erpnext/accounts/doctype/accounting_dimension_filter/accounting_dimension_filter.py",
+      "erpnext/accounts/doctype/accounting_dimension/accounting_dimension.py",
+      "erpnext/accounts/report/utils.py",
+      "erpnext/accounts/report/general_ledger/test_general_ledger.py",
+      "erpnext/accounts/doctype/accounts_settings/accounts_settings.py"
+    ],
+    "hit": true,
+    "recall": 0.6666667,
+    "prompt_tokens": 587,
+    "elapsed_ms": 1121,
+    "error": null
+  },
+  {
+    "task": "t-3558ce3b",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/accounts/report/general_ledger/general_ledger.js",
+      "erpnext/accounts/report/general_ledger/general_ledger.py",
+      "erpnext/accounts/report/general_ledger/general_ledger.json",
+      "erpnext/accounts/report/general_ledger/general_ledger.html",
+      "erpnext/accounts/test/test_reports.py"
+    ],
+    "hit": true,
+    "recall": 0.33333334,
+    "prompt_tokens": 182,
+    "elapsed_ms": 1331,
+    "error": null
+  },
+  {
+    "task": "t-9239d1c2",
+    "condition": "N-no-context",
+    "named": [
+      "apps/stock/stock_ledger.py",
+      "apps/stock/doctype/packing_slip/packing_slip.py",
+      "apps/stock/doctype/delivery_note/delivery_note.py",
+      "apps/stock/doctype/sales_invoice/sales_invoice.py",
+      "apps/stock/doctype/stock_entry/stock_entry.py",
+      "apps/stock/doctype/purchase_receipt/purchase_receipt.py",
+      "apps/stock/doctype/batch/batch.py",
+      "apps/stock/doctype/stock_ledger_entry/stock_ledger_entry.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 89,
+    "elapsed_ms": 1727,
+    "error": null
+  },
+  {
+    "task": "t-9239d1c2",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/stock/doctype/batch/batch.py",
+      "erpnext/stock/tests/test_get_item_details.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 128,
+    "elapsed_ms": 829,
+    "error": null
+  },
+  {
+    "task": "t-9239d1c2",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/stock/doctype/serial_and_batch_bundle/serial_and_batch_bundle.py",
+      "erpnext/stock/serial_batch_bundle.py",
+      "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation.py",
+      "erpnext/controllers/stock_controller.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 156,
+    "elapsed_ms": 1074,
+    "error": null
+  },
+  {
+    "task": "t-9239d1c2",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/stock/stock_ledger.py",
+      "erpnext/stock/utils.py",
+      "erpnext/stock/doctype/batch/batch.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py",
+      "erpnext/stock/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry_utils.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 118,
+    "elapsed_ms": 1617,
+    "error": null
+  },
+  {
+    "task": "t-9239d1c2",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/stock/doctype/serial_and_batch_bundle/serial_and_batch_bundle.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 122,
+    "elapsed_ms": 1072,
+    "error": null
+  },
+  {
+    "task": "t-9239d1c2",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/stock/serial_batch_bundle.py",
+      "erpnext/controllers/stock_controller.py",
+      "erpnext/stock/stock_ledger.py",
+      "erpnext/stock/doctype/serial_and_batch_bundle/serial_and_batch_bundle.py",
+      "erpnext/stock/services/serial_batch_bundle_service.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry.py",
+      "erpnext/stock/doctype/stock_reconciliation/stock_reconciliation.py",
+      "erpnext/stock/utils.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 473,
+    "elapsed_ms": 1392,
+    "error": null
+  },
+  {
+    "task": "t-9239d1c2",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/stock/doctype/batch/batch.py",
+      "erpnext/stock/stock_balance.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 148,
+    "elapsed_ms": 972,
+    "error": null
+  },
+  {
+    "task": "t-be2dea0b",
+    "condition": "N-no-context",
+    "named": [
+      "custom_app/hooks.py",
+      "custom_app/custom_fields.py",
+      "custom_app/patches.txt",
+      "custom_app/__init__.py",
+      "custom_app/install.py",
+      "custom_app/synchronization.py",
+      "custom_app/fixtures/custom_fields.json"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 89,
+    "elapsed_ms": 1699,
+    "error": null
+  },
+  {
+    "task": "t-be2dea0b",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/crm/doctype/crm_settings/crm_settings.py",
+      "erpnext/crm/doctype/crm_settings/crm_settings.js",
+      "erpnext/crm/doctype/lead/lead.js",
+      "erpnext/crm/doctype/prospect/prospect.js",
+      "erpnext/setup/doctype/territory/territory_tree.js",
+      "erpnext/crm/frappe_crm_api.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 147,
+    "elapsed_ms": 1302,
+    "error": null
+  },
+  {
+    "task": "t-be2dea0b",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/crm/doctype/crm_settings/crm_settings.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 203,
+    "elapsed_ms": 1224,
+    "error": null
+  },
+  {
+    "task": "t-be2dea0b",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/controllers/accounts_controller.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/accounts/doctype/sales_invoice/services/pos.py",
+      "erpnext/accounts/doctype/pos_invoice/pos_invoice.py",
+      "erpnext/selling/page/point_of_sale/point_of_sale.py",
+      "erpnext/public/js/bank_reconciliation_tool/dialog_manager.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 225,
+    "elapsed_ms": 1415,
+    "error": null
+  },
+  {
+    "task": "t-be2dea0b",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/crm/doctype/crm_settings/crm_settings.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 116,
+    "elapsed_ms": 1027,
+    "error": null
+  },
+  {
+    "task": "t-be2dea0b",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/crm/frappe_crm_api.py",
+      "erpnext/crm/doctype/crm_settings/crm_settings.py",
+      "erpnext/crm/doctype/crm_settings/crm_settings.js",
+      "erpnext/crm/doctype/lead/lead.py",
+      "erpnext/crm/doctype/lead/lead.js",
+      "erpnext/crm/doctype/opportunity/opportunity.py",
+      "erpnext/crm/doctype/prospect/prospect.py",
+      "erpnext/setup/install.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 496,
+    "elapsed_ms": 1678,
+    "error": null
+  },
+  {
+    "task": "t-be2dea0b",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/crm/doctype/crm_settings/crm_settings.py",
+      "erpnext/crm/doctype/crm_settings/crm_settings.json",
+      "erpnext/crm/frappe_crm_api.py",
+      "erpnext/hooks.py",
+      "erpnext/crm/doctype/lead/lead.js",
+      "erpnext/crm/doctype/lead/lead.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 140,
+    "elapsed_ms": 1164,
+    "error": null
+  },
+  {
+    "task": "t-fd728dac",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/buying/doctype/purchase_order/purchase_order.py",
+      "erpnext/buying/doctype/purchase_order/purchase_order.js",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py",
+      "erpnext/buying/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/controllers/stock_controller.py",
+      "erpnext/controllers/accounts_controller.py",
+      "erpnext/buying/doctype/purchase_order/purchase_order_dashboard.py",
+      "erpnext/buying/doctype/purchase_order/purchase_order_list.js"
+    ],
+    "hit": true,
+    "recall": 0.33333334,
+    "prompt_tokens": 87,
+    "elapsed_ms": 1840,
+    "error": null
+  },
+  {
+    "task": "t-fd728dac",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/buying/utils.py",
+      "erpnext/stock/stock_balance.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 145,
+    "elapsed_ms": 1077,
+    "error": null
+  },
+  {
+    "task": "t-fd728dac",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/controllers/sales_and_purchase_return.py",
+      "erpnext/buying/doctype/purchase_order/purchase_order.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py",
+      "erpnext/controllers/accounts_controller.py",
+      "erpnext/buying/report/purchase_order_analysis/purchase_order_analysis.py"
+    ],
+    "hit": true,
+    "recall": 0.33333334,
+    "prompt_tokens": 177,
+    "elapsed_ms": 1178,
+    "error": null
+  },
+  {
+    "task": "t-fd728dac",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/public/js/controllers/buying.js",
+      "erpnext/public/js/controllers/transaction.js",
+      "erpnext/stock/utils.py",
+      "erpnext/utilities/bulk_transaction.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 189,
+    "elapsed_ms": 1284,
+    "error": null
+  },
+  {
+    "task": "t-fd728dac",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/controllers/buying_controller.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 143,
+    "elapsed_ms": 969,
+    "error": null
+  },
+  {
+    "task": "t-fd728dac",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/controllers/sales_and_purchase_return.py",
+      "erpnext/buying/doctype/purchase_order/purchase_order.py",
+      "erpnext/controllers/buying_controller.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py",
+      "erpnext/buying/doctype/purchase_order/purchase_order.js",
+      "erpnext/controllers/accounts_controller.py",
+      "erpnext/stock/utils.py",
+      "erpnext/buying/utils.py"
+    ],
+    "hit": true,
+    "recall": 0.6666667,
+    "prompt_tokens": 575,
+    "elapsed_ms": 1311,
+    "error": null
+  },
+  {
+    "task": "t-fd728dac",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/controllers/status_updater.py",
+      "erpnext/buying/doctype/purchase_order/purchase_order.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt_dashboard.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 154,
+    "elapsed_ms": 840,
+    "error": null
+  },
+  {
+    "task": "t-1e583725",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.js",
+      "erpnext/controllers/sales_and_purchase_return.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note_item.py",
+      "erpnext/accounts/party.py",
+      "erpnext/controllers/accounts_controller.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note_list.js",
+      "erpnext/stock/doctype/delivery_note/delivery_note_dashboard.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 83,
+    "elapsed_ms": 1555,
+    "error": null
+  },
+  {
+    "task": "t-1e583725",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/controllers/trends.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 96,
+    "elapsed_ms": 748,
+    "error": null
+  },
+  {
+    "task": "t-1e583725",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/controllers/selling_controller.py",
+      "erpnext/stock/doctype/delivery_note/test_delivery_note.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note_list.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 187,
+    "elapsed_ms": 1302,
+    "error": null
+  },
+  {
+    "task": "t-1e583725",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/stock/report/stock_ledger/stock_ledger.js",
+      "erpnext/accounts/report/accounts_receivable/accounts_receivable.py",
+      "erpnext/accounts/report/gross_profit/gross_profit.py",
+      "erpnext/public/js/utils/barcode_scanner.js",
+      "erpnext/public/js/financial_statements.js",
+      "erpnext/accounts/report/cash_flow/cash_flow.py",
+      "erpnext/accounts/report/payment_ledger/payment_ledger.js",
+      "erpnext/stock/report/stock_ledger/stock_ledger.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 181,
+    "elapsed_ms": 1573,
+    "error": null
+  },
+  {
+    "task": "t-1e583725",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/controllers/status_updater.py",
+      "erpnext/controllers/stock_controller.py",
+      "erpnext/stock/doctype/delivery_note/services/billing_status.py"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 134,
+    "elapsed_ms": 957,
+    "error": null
+  },
+  {
+    "task": "t-1e583725",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/controllers/selling_controller.py",
+      "erpnext/accounts/doctype/sales_invoice/mapper.py",
+      "erpnext/selling/doctype/sales_order/mapper.py",
+      "erpnext/accounts/party.py",
+      "erpnext/accounts/utils.py",
+      "erpnext/stock/utils.py",
+      "erpnext/stock/doctype/delivery_note/test_delivery_note.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 481,
+    "elapsed_ms": 1141,
+    "error": null
+  },
+  {
+    "task": "t-1e583725",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/stock/doctype/delivery_note/services/billing_status.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note_item.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note_item.json",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice_item.py",
+      "erpnext/controllers/stock_controller.py"
+    ],
+    "hit": true,
+    "recall": 0.6666667,
+    "prompt_tokens": 160,
+    "elapsed_ms": 1477,
+    "error": null
+  },
+  {
+    "task": "t-a2976dd2",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/stock/doctype/batch/batch.js",
+      "erpnext/stock/doctype/batch/batch.py",
+      "erpnext/stock/doctype/batch/batch_list.js",
+      "erpnext/stock/doctype/batch/batch_list.py",
+      "erpnext/stock/doctype/batch/batch_selector.js",
+      "erpnext/stock/doctype/batch/batch_selector.py",
+      "erpnext/stock/doctype/batch/batch_selector.html",
+      "erpnext/stock/doctype/batch/batch_selector.json"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 88,
+    "elapsed_ms": 1340,
+    "error": null
+  },
+  {
+    "task": "t-a2976dd2",
+    "condition": "B-content-grep",
+    "named": [
+      "erpnext/subcontracting/doctype/subcontracting_receipt/subcontracting_receipt.js",
+      "erpnext/stock/doctype/batch/batch_list.js",
+      "erpnext/patches/v12_0/set_total_batch_quantity.py",
+      "erpnext/patches/v14_0/update_batch_valuation_flag.py",
+      "erpnext/patches/v15_0/enable_old_serial_batch_fields.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 165,
+    "elapsed_ms": 1219,
+    "error": null
+  },
+  {
+    "task": "t-a2976dd2",
+    "condition": "R-reify",
+    "named": [
+      "erpnext/public/js/utils/serial_no_batch_selector.js",
+      "erpnext/public/js/controllers/transaction.js",
+      "erpnext/public/js/controllers/buying.js",
+      "erpnext/public/js/utils/sales_common.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 234,
+    "elapsed_ms": 811,
+    "error": null
+  },
+  {
+    "task": "t-a2976dd2",
+    "condition": "R-shuffled",
+    "named": [
+      "erpnext/manufacturing/doctype/work_order/work_order.js",
+      "erpnext/manufacturing/doctype/work_order/work_order.py",
+      "erpnext/public/js/queries.js",
+      "erpnext/stock/utils.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 184,
+    "elapsed_ms": 1111,
+    "error": null
+  },
+  {
+    "task": "t-a2976dd2",
+    "condition": "O-oracle",
+    "named": [
+      "erpnext/public/js/utils/serial_no_batch_selector.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 115,
+    "elapsed_ms": 760,
+    "error": null
+  },
+  {
+    "task": "t-a2976dd2",
+    "condition": "R-reify-iter3",
+    "named": [
+      "erpnext/public/js/utils/serial_no_batch_selector.js",
+      "erpnext/public/js/controllers/transaction.js",
+      "erpnext/public/js/controllers/buying.js",
+      "erpnext/public/js/utils/sales_common.js",
+      "erpnext/selling/page/point_of_sale/pos_controller.js",
+      "erpnext/stock/doctype/stock_entry/stock_entry.js",
+      "erpnext/subcontracting/doctype/subcontracting_receipt/subcontracting_receipt.js",
+      "erpnext/subcontracting/doctype/subcontracting_order/subcontracting_order.js"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 530,
+    "elapsed_ms": 1604,
+    "error": null
+  },
+  {
+    "task": "t-a2976dd2",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "erpnext/selling/page/point_of_sale/pos_controller.js",
+      "erpnext/subcontracting/doctype/subcontracting_receipt/subcontracting_receipt.js",
+      "erpnext/stock/doctype/stock_settings/stock_settings.js",
+      "erpnext/patches/v15_0/enable_old_serial_batch_fields.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 168,
+    "elapsed_ms": 1025,
+    "error": null
+  }
+]

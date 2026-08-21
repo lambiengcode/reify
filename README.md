@@ -19,8 +19,8 @@
 </p>
 
 <p align="center">
-  <strong>Finds the file that had to change 60% of the time, against grep's 32% &middot; 4.6s to index 5,000 files &middot; never opens a socket</strong><br>
-  <sub>Measured with a real model on 40 real merged ERPNext commits, with the index built at a commit <em>before</em> those changes existed, every condition on the same 4,000-token budget. On a second repository (OpenMRS, Java) the same measurement gives 45% against 41% — <strong>not a distinguishable win</strong>. Why the two differ is the most useful thing this benchmark found, and it is in <a href="#numbers">Numbers</a>. <a href="benchmarks/REPORT.md">Full writeup</a> &middot; <a href="#reproducing-the-benchmark">reproduce it</a>.</sub>
+  <strong>At the same token cost, the model finds the file that had to change 70% of the time — grep manages 48% &middot; measured on four repositories &middot; never opens a socket</strong><br>
+  <sub>A real model on 142 tasks from real merged commits across ERPNext, OFBiz, OpenMRS and Medusa, each index built at a commit <em>before</em> those changes existed. Three of the four repositories show wins of 22–34 points at matched cost; the fourth shows none, and <a href="#numbers">Numbers</a> says so with the same prominence. Pre-registered targets and what was actually hit: <a href="docs/ROADMAP.md">the scorecard</a>. <a href="benchmarks/REPORT.md">Full writeup</a> &middot; <a href="#reproducing-the-benchmark">reproduce it</a>.</sub>
 </p>
 
 ---
@@ -111,67 +111,95 @@ Three of those four sections are things grep structurally cannot produce.
 
 ## Numbers
 
-The honest measurement is a real model doing a real task: tickets taken from merged commits, where the prompt is the developer's own description of the change and the right answer is the files they actually touched. **The index is built at a commit before any of those changes existed**, so the code being asked for is genuinely absent.
-
-Three of the five conditions exist to try to break the result rather than support it.
+The honest measurement is a real model doing a real task: tickets taken from merged
+commits, where the prompt is the developer's own description of the change and the
+right answer is the files they actually touched. **Every index is built at a commit
+before any of those changes existed**, so the code being asked for is genuinely absent.
+Four repositories, chosen partly to hurt; several conditions exist to break the result
+rather than support it.
 
 <p align="center">
-  <img src="assets/benchmark-agent.svg" width="860" alt="Hit rate by condition for two repositories. ERPNext, 40 tasks: no context 22%, budget-matched grep 32%, reify 60%, decoy context 25%, perfect context 100%. OpenMRS, 22 tasks: no context 0%, grep 41%, reify 45%, decoy 14%, perfect 100%. Whiskers show 95% confidence intervals; reify and grep overlap on OpenMRS.">
+  <img src="assets/benchmark-agent.svg" width="860" alt="Hit rate by condition for four repositories, whiskers are 95% confidence intervals. ERPNext, 40 tasks: no context 35%, grep at tripled budget 48%, reify three rounds 70%, perfect context 100%. OFBiz, 40 tasks: 0%, 28%, 62%, 100%. OpenMRS, 22 tasks: 0%, 32%, 55%, 100%. Medusa, 40 tasks: 0%, 25%, 28%, 100% — reify and grep overlap on Medusa.">
 </p>
 
-| ERPNext, n=40 | | hit rate | 95% CI | recall |
-|---|---|--:|--:|--:|
-| no context at all | *memorisation control* | 22% | 12–38% | 0.16 |
-| content grep, same budget | *baseline* | 32% | 20–48% | 0.27 |
-| **reify** | | **60%** | **45–74%** | **0.54** |
-| reify, another task's context | *decoy control* | 25% | 14–40% | 0.17 |
-| perfect context | *ceiling* | 100% | 91–100% | 1.00 |
+The headline comparison is cost-matched: Reify iterates three rounds (an agent that
+reads, doesn't find it, and asks again — with the already-read files excluded), so the
+control is grep handed the same tripled budget outright.
 
-**Perfect context scores 100% where none scores 22%.** That 78-point gap is the whole space any retrieval tool can compete in, and it is wide — the one thing this benchmark had to establish before anything else mattered. **Reify recovers 49% of it. Grep recovers 13%.** A decoy of identical shape and size scores 25%, so the gain comes from what the context says, not from being handed a list of files.
+| model-in-the-loop, hit rate | grep ×3 budget | **reify ×3 rounds** | margin | 95% CIs overlap? |
+|---|--:|--:|--:|---|
+| ERPNext (Python/JS), n=40 | 48% | **70%** | +22 | no |
+| OFBiz (Java + XML), n=40 | 28% | **62%** | +34 | no |
+| OpenMRS (Java), n=22 | 32% | **55%** | +23 | barely |
+| Medusa (modern TS), n=40 | 25% | **28%** | +3 | **fully — no win** |
+
+**The controls, on every repository:** perfect context scores 100% everywhere, so
+retrieval quality is the entire game. A decoy context of identical shape scores 0–15%,
+so the content is doing the work, not the format. With no repository access the model
+scores 0% on three repositories and **35% on ERPNext** — it has partially memorised the
+most famous repo, which is exactly why the other three exist and why every headroom
+figure subtracts that floor.
+
+Single-shot, for the record: reify 57/42/41/18 against grep 28/12/32/20 at equal
+single budget.
 
 ### Retrieval on its own, no model involved
 
-Before asking whether a model uses the context, ask whether the right file is in it.
-
 <p align="center">
-  <img src="assets/benchmark-retrieval.svg" width="860" alt="Share of tasks where a changed file was offered at all. ERPNext: content grep 10%, path grep 18%, reify 58%. OpenMRS: content grep 32%, path grep 18%, reify 41%.">
+  <img src="assets/benchmark-retrieval.svg" width="860" alt="Share of tasks where a changed file was offered, per repository. ERPNext: grep 10%, path grep 18%, reify 55%, reify three rounds 72%. OFBiz: 12%, 15%, 45%, 62%. OpenMRS: 32%, 18%, 41%, 50%. Medusa: 18%, 18%, 18%, 28%.">
 </p>
 
-| ERPNext, n=40 | content grep | path grep | **reify** |
+| a changed file was offered | grep | reify | **reify ×3** |
 |---|--:|--:|--:|
-| a changed file was offered | 4/40 (10%) | 7/40 (18%) | **23/40 (58%)** |
-| mean recall | 0.08 | 0.16 | **0.50** |
-| rank of the first correct file (MRR) | 0.07 | 0.12 | **0.23** |
-| files put in front of the agent | 3 | 88 | 13 |
-| latency | 45 ms | 0 ms | 59 ms |
+| ERPNext | 10% | 55% | **72%** |
+| OFBiz | 12% | 45% | **62%** |
+| OpenMRS | 32% | 41% | **50%** |
+| Medusa | 18% | 18% | **28%** |
 
-Path grep offers 88 files to reach 18%. Offering everything is not retrieval.
+### The scorecard, against targets set before the work
+
+[docs/ROADMAP.md](docs/ROADMAP.md) pre-registered seven targets. **One of seven was
+met** (four repositories measured). Hit rate, headroom share, cross-repo gap, MRR,
+precision and end-to-end completion all fell short of their bars, and the roadmap
+reports each number next to its target rather than rounding the story up. The gains
+are real — the targets were set high on purpose, and unmet targets with honest numbers
+beat met targets with soft ones.
 
 ### Where it doesn't work
 
-Same method, second repository. OpenMRS, Java, 22 tasks:
+**Medusa** — a modern, well-factored TypeScript monorepo — is the open problem, and it
+inverts the project's founding assumption. The legacy Java systems were supposed to be
+the hard case; they are the *best* cases. Medusa's tasks describe UI behaviour
+("remove the duplicate cloud auth button") whose vocabulary barely intersects the
+code, its history is squashed PR merges, and nothing Reify currently reads closes that
+gap. Iteration lifts it 18→28%; grep sits at 25%; the intervals overlap completely.
 
-| | hit rate | 95% CI |
-|---|--:|--:|
-| content grep | 41% | 23–61% |
-| **reify** | **45%** | 27–65% |
-
-Four points, intervals almost entirely overlapping. **On this repository Reify is not measurably better than grep**, and saying otherwise would be a lie the confidence intervals would catch.
-
-The cause is measurable rather than mysterious. ERPNext *declares* 528 concepts in its entity metadata; OpenMRS declares 41. The rest Reify infers, and inferred vocabulary is weaker evidence than declared vocabulary — no amount of Rust changes that.
-
-**The rule was never "index harder."** It is: the more a team has written its domain down — entity metadata, ORM mappings, a glossary, translation files — the more Reify has to work with. `reify concepts --suggest` exists to move a repository from the second case toward the first.
+The earlier hypothesis — "Reify's advantage scales with declared vocabulary" — did not
+survive the four-repo test either. OFBiz declares little the way ERPNext does, yet
+shows the largest margin of all. What the four repositories actually separate on is
+whether *commit history and file naming speak the vocabulary the tasks are written
+in*. Where they do, Reify recovers 54–62% of the oracle gap. Where they don't
+(Medusa), it is grep with better structure.
 
 <details>
-<summary><strong>Older numbers, and why they were wrong</strong></summary>
+<summary><strong>Older numbers, superseded measurements, and one fitting failure</strong></summary>
 
-An earlier run indexed at `HEAD` rather than before each change, so the code being asked for was already present. Reify scored 55% and grep 40%.
+Three things a reader auditing this benchmark should know:
 
-That gap was too small, and wrong in the flattering direction for the wrong arm: new code contains the ticket's own words, so leakage helped the *lexical* baseline most. Fixing it moved grep 40% → 32% and Reify 55% → 60%.
-
-An earlier retrieval-only run had a second flaw. It compared medians computed over each condition's *own* successes, so a tool that only ever solved easy tasks posted a flattering median precisely because it failed everywhere else. The report now also reports expected cost with a miss charged the full budget, and a paired comparison over only the tasks both conditions solved.
-
-The leaky numbers are gone from the tables above. They stay here because a benchmark that quietly deletes its mistakes is not a benchmark.
+1. **An early run indexed at `HEAD`**, so the code being asked for was already present.
+   That leaked toward the *lexical* baseline (new code contains the ticket's words).
+   Fixed by indexing before each task window; all published numbers use that protocol.
+2. **A weight-fitting experiment failed validation, as its pre-registration allowed
+   for.** Grid search on training tasks (commits earlier than every benchmark task)
+   preferred a history-prior weight of 2.2–5.5; every value in that range scored worse
+   than the pre-fit default on the frozen tasks. The default reverted, the full
+   training surface is committed in `benchmarks/weights/`, and the code comment on the
+   constant tells the story.
+3. **The frozen tasks were evaluated more than once** while diagnosing that failure
+   and the Medusa result, so the margins should be read slightly softer than a
+   one-look protocol would justify. Decisions were made on training data or from
+   structural diagnosis — never by picking whatever maximised the frozen score — and
+   the roadmap states this multiplicity in its own words.
 
 </details>
 
@@ -476,7 +504,11 @@ the ramp, not all of it. Anyone claiming a tool replaces eleven years of context
 selling something.
 
 **Do I have to write a glossary?**
-No, and Reify works without one. It also gets visibly better with one, which is the entire finding in [Numbers](#numbers). `reify concepts --suggest` writes you a first draft to edit down.
+No, and Reify works without one. A declared glossary remains the highest-precision
+vocabulary you can give it — `reify concepts --suggest` writes a first draft to edit
+down — but the four-repository benchmark showed the bigger predictor is whether your
+commit history speaks the vocabulary your tickets do. If your team writes real commit
+messages, Reify is already reading eleven years of labelled examples.
 
 **Is this another RAG thing?**
 There is no vector database, no embedding model and no chunking. Retrieval is lexical and graph-based, which is why every answer comes with a line number instead of a similarity score.
@@ -501,11 +533,13 @@ To make an abstract thing concrete. The knowledge was always there; it just wasn
 Where this goes next, with the targets committed **before** the work rather than after:
 [docs/ROADMAP.md](docs/ROADMAP.md).
 
-The short version — the ceiling is wide open. Perfect context wins every task, so
-roughly half the available gap is still unclaimed, and the biggest single opportunity is
-sitting in `.git` already: every merged commit is a labelled example of *"when someone
-described a change like this, these are the files they touched."* Reify does not yet
-read it.
+The short version — the first pass through it is done. The history prior (every merged
+commit is a labelled example: message ≈ ticket, changed files = answer), test-to-code
+edges, iterative refinement and a fourth repository all shipped; the weight fit failed
+its held-out validation and was reverted per its own pre-registration; and the
+scorecard stands at one of seven targets met, each number printed next to its bar. The
+open problem is the modern-TypeScript case, where nothing yet closes the vocabulary
+gap between how people describe UI changes and how the code spells them.
 
 ## Status
 

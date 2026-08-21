@@ -315,6 +315,36 @@ Three findings that were not in the plan:
    more than any weight: on training data it added 3–12 points of hit rate and up to
    0.19 MRR on top of everything else.
 
+### Model-in-the-loop, final (seven arms, zero provider failures)
+
+| hit rate | none | grep | grep ×3 | reify | **reify ×3** | decoy | oracle |
+|---|--:|--:|--:|--:|--:|--:|--:|
+| ERPNext, n=40 | 35% | 28% | 48% | 57% | **70%** | 15% | 100% |
+| OFBiz, n=40 | 0% | 12% | 28% | 42% | **62%** | 8% | 100% |
+| OpenMRS, n=22 | 0% | 32% | 32% | 41% | **55%** | 9% | 100% |
+| Medusa, n=40 | 0% | 20% | 25% | 18% | **28%** | 0% | 100% |
+
+ERPNext's 35% no-context floor is partial memorisation of the most famous repository —
+the reason the other three exist. Subtracting each floor, reify ×3 recovers 54% of the
+oracle gap on ERPNext, 62% on OFBiz, 55% on OpenMRS, 28% on Medusa.
+
+### The §2 scorecard: one of seven
+
+| Target | Bar | Landed | |
+|---|---|---|---|
+| Hit rate, ERPNext & OpenMRS | ≥ 80% each | 70% / 55% | ✗ |
+| Headroom recovered | ≥ 75% each | 54% / 55% | ✗ |
+| Cross-repo gap | ≤ 8 pts | 15 pts | ✗ |
+| MRR | ≥ 0.50 | 0.41 | ✗ |
+| Precision | ≥ 0.20 | 0.08 | ✗ |
+| Repositories | ≥ 4 | 4 | ✓ |
+| End-to-end completion | measured | not measured — needs per-repo runnable test environments | ✗ |
+
+Per §2's own rule: this is a real improvement reported as exactly that, not success.
+The margins over grep at matched cost (+22, +34, +23, +3) are the product's honest
+pitch; the unmet bars are the next phase's work, starting with ranking precision — the
+right file is *present* far more often than it is *first*.
+
 ### The fit's falsification clause fired, as designed
 
 Bet 3 pre-registered: *"Falsified if the fitted weights beat the hand-picked ones on

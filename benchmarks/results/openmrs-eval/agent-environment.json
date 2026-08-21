@@ -1,0 +1,16 @@
+{
+  "budget_tokens": 4000,
+  "conditions": [
+    "N-no-context",
+    "B-content-grep",
+    "R-reify",
+    "R-shuffled",
+    "O-oracle",
+    "R-reify-iter3",
+    "B-content-grep-x3"
+  ],
+  "head": "b5ec6fa66d017ac9df75d58ab20314eff84fbfc0",
+  "provider": "deepseek-axi ask {prompt}",
+  "tasks": 22,
+  "token_counts": "estimated by reify heuristic-v1; the provider interface is a command, so no usage counts are returned"
+}

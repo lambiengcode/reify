@@ -1,0 +1,4334 @@
+[
+  {
+    "task": "t-1a9fe477",
+    "condition": "N-no-context",
+    "named": [
+      "apps/medusa_cloud/medusa_cloud.py",
+      "apps/medusa_cloud/medusa_cloud/doctype/medusa_cloud_settings/medusa_cloud_settings.js",
+      "apps/medusa_cloud/medusa_cloud/doctype/medusa_cloud_settings/medusa_cloud_settings.py",
+      "apps/medusa_cloud/medusa_cloud/doctype/medusa_cloud_settings/medusa_cloud_settings.json",
+      "apps/medusa_cloud/medusa_cloud/doctype/medusa_cloud_settings/medusa_cloud_settings_list.js",
+      "apps/medusa_cloud/medusa_cloud/doctype/medusa_cloud_settings/medusa_cloud_settings_list.py",
+      "apps/medusa_cloud/medusa_cloud/doctype/medusa_cloud_settings/medusa_cloud_settings_list.html",
+      "apps/medusa_cloud/medusa_cloud/doctype/medusa_cloud_settings/medusa_cloud_settings_list.json"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 84,
+    "elapsed_ms": 1803,
+    "error": null
+  },
+  {
+    "task": "t-1a9fe477",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/admin/dashboard/src/routes/login/components/cloud-auth-login.tsx",
+      "packages/admin/dashboard/src/routes/orders/order-create-edit/components/order-edit-create-form/order-edit-item.tsx"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 160,
+    "elapsed_ms": 1365,
+    "error": null
+  },
+  {
+    "task": "t-1a9fe477",
+    "condition": "R-reify",
+    "named": [
+      "packages/modules/auth/src/providers/medusa-cloud-auth.ts",
+      "packages/admin/dashboard/src/routes/categories/common/utils.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 283,
+    "elapsed_ms": 1255,
+    "error": null
+  },
+  {
+    "task": "t-1a9fe477",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/js-sdk/src/auth/index.ts",
+      "packages/core/js-sdk/src/client.ts",
+      "packages/core/js-sdk/src/admin/views.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 183,
+    "elapsed_ms": 818,
+    "error": null
+  },
+  {
+    "task": "t-1a9fe477",
+    "condition": "O-oracle",
+    "named": [
+      "packages/admin/dashboard/src/routes/login/components/cloud-auth-login.tsx"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 117,
+    "elapsed_ms": 1090,
+    "error": null
+  },
+  {
+    "task": "t-1a9fe477",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/admin/dashboard/src/routes/login/components/cloud-auth-login.tsx",
+      "packages/admin/dashboard/src/hooks/api/cloud.tsx",
+      "packages/modules/auth/src/providers/medusa-cloud-auth.ts",
+      "packages/medusa/src/api/cloud/auth/route.ts",
+      "packages/medusa/src/api/cloud/auth/users/route.ts",
+      "packages/admin/dashboard/src/hooks/api/mfa.tsx",
+      "packages/modules/auth/src/types/index.ts",
+      "packages/core/types/src/auth/provider.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 699,
+    "elapsed_ms": 1737,
+    "error": null
+  },
+  {
+    "task": "t-1a9fe477",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/admin/dashboard/src/routes/login/components/cloud-auth-login.tsx",
+      "packages/admin/dashboard/src/routes/login/index.tsx"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 231,
+    "elapsed_ms": 1519,
+    "error": null
+  },
+  {
+    "task": "t-9dd56bf5",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/selling/doctype/sales_order/sales_order.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/selling/doctype/sales_order/sales_order.js",
+      "erpnext/stock/doctype/delivery_note/delivery_note.js",
+      "erpnext/controllers/sales_and_purchase_return.py",
+      "erpnext/controllers/stock_controller.py",
+      "erpnext/stock/utils.py",
+      "erpnext/stock/doctype/fulfillment_form/fulfillment_form.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 87,
+    "elapsed_ms": 1505,
+    "error": null
+  },
+  {
+    "task": "t-9dd56bf5",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/admin/dashboard/src/routes/orders/order-create-fulfillment/components/order-create-fulfillment-form/index.ts",
+      "packages/admin/dashboard/src/routes/orders/order-create-fulfillment/components/order-create-fulfillment-form/order-create-fulfillment-form.tsx",
+      "packages/admin/dashboard/src/routes/orders/order-create-fulfillment/components/order-create-fulfillment-form/fulfillment-select.tsx",
+      "packages/admin/dashboard/src/routes/orders/order-create-fulfillment/components/order-create-fulfillment-form/select-options.ts",
+      "packages/admin/dashboard/src/routes/orders/order-create-fulfillment/components/order-create-fulfillment-form/utils.ts"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 236,
+    "elapsed_ms": 1469,
+    "error": null
+  },
+  {
+    "task": "t-9dd56bf5",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/js-sdk/src/admin/customer.ts",
+      "packages/core/js-sdk/src/admin/product.ts",
+      "packages/core/js-sdk/src/admin/region.ts",
+      "packages/core/js-sdk/src/admin/tax-rate.ts",
+      "packages/core/js-sdk/src/admin/tax-region.ts",
+      "packages/core/js-sdk/src/admin/draft-order.ts",
+      "packages/core/js-sdk/src/admin/claim.ts",
+      "packages/core/js-sdk/src/admin/exchange.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 317,
+    "elapsed_ms": 1435,
+    "error": null
+  },
+  {
+    "task": "t-9dd56bf5",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/js-sdk/src/admin/product.ts",
+      "packages/core/js-sdk/src/admin/customer.ts",
+      "packages/core/js-sdk/src/admin/region.ts",
+      "packages/core/js-sdk/src/admin/price-list.ts",
+      "packages/core/js-sdk/src/admin/user.ts",
+      "packages/core/modules-sdk/src/link.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 295,
+    "elapsed_ms": 1194,
+    "error": null
+  },
+  {
+    "task": "t-9dd56bf5",
+    "condition": "O-oracle",
+    "named": [
+      "packages/admin/dashboard/src/hooks/api/shipping-options.tsx",
+      "packages/admin/dashboard/src/routes/orders/order-create-fulfillment/components/order-create-fulfillment-form/order-create-fulfillment-form.tsx"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 153,
+    "elapsed_ms": 1127,
+    "error": null
+  },
+  {
+    "task": "t-9dd56bf5",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/core/js-sdk/src/admin/fulfillment.ts",
+      "packages/core/js-sdk/src/admin/stock-location.ts",
+      "packages/core/js-sdk/src/admin/shipping-option.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 597,
+    "elapsed_ms": 796,
+    "error": null
+  },
+  {
+    "task": "t-9dd56bf5",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/admin/dashboard/src/routes/orders/order-create-fulfillment/components/order-create-fulfillment-form/index.ts",
+      "packages/admin/dashboard/src/routes/orders/order-create-fulfillment/components/order-create-fulfillment-form/order-create-fulfillment-form.tsx",
+      "packages/admin/dashboard/src/routes/orders/order-create-fulfillment/components/order-create-fulfillment-form/fulfillment-item-select.tsx",
+      "packages/admin/dashboard/src/components/common/form/index.ts",
+      "packages/admin/dashboard/src/routes/orders/order-create-fulfillment/components/order-create-fulfillment-form/fulfillment-details.tsx"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 262,
+    "elapsed_ms": 1375,
+    "error": null
+  },
+  {
+    "task": "t-7479b070",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/stock/doctype/stock_entry/stock_entry.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/stock/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/stock/doctype/stock_entry/stock_entry_list.js",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt_list.js",
+      "erpnext/stock/doctype/delivery_note/delivery_note_list.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 87,
+    "elapsed_ms": 1702,
+    "error": null
+  },
+  {
+    "task": "t-7479b070",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/core/core-flows/src/order/workflows/get-order-detail.ts",
+      "packages/admin/dashboard/src/routes/orders/order-list/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 155,
+    "elapsed_ms": 845,
+    "error": null
+  },
+  {
+    "task": "t-7479b070",
+    "condition": "R-reify",
+    "named": [
+      "packages/admin/dashboard/src/routes/orders/order-allocate-items/components/order-create-fulfillment-form/order-allocate-items-form.tsx",
+      "packages/plugins/draft-order/src/admin/components/inputs/switch-block.tsx",
+      "packages/design-system/ui/src/hooks/use-toggle-state/use-toggle-state.tsx",
+      "packages/admin/dashboard/src/routes/promotions/common/edit-rules/components/rules-form-field/rules-form-field.tsx",
+      "packages/admin/dashboard/src/routes/promotions/common/edit-rules/components/rule-value-form-field/rule-value-form-field.tsx",
+      "packages/design-system/ui/src/components/code-block/code-block.tsx",
+      "www/apps/ui/specs/examples/code-block-demo.tsx",
+      "www/apps/ui/specs/examples/code-block-no-copy.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 356,
+    "elapsed_ms": 1657,
+    "error": null
+  },
+  {
+    "task": "t-7479b070",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/js-sdk/src/admin/price-list.ts",
+      "packages/core/js-sdk/src/client.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 361,
+    "elapsed_ms": 931,
+    "error": null
+  },
+  {
+    "task": "t-7479b070",
+    "condition": "O-oracle",
+    "named": [
+      "integration-tests/http/__tests__/order/store/order.spec.ts",
+      "packages/medusa/src/api/store/orders/query-config.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 130,
+    "elapsed_ms": 1095,
+    "error": null
+  },
+  {
+    "task": "t-7479b070",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/admin/dashboard/src/routes/orders/order-allocate-items/components/order-create-fulfillment-form/order-allocate-items-form.tsx",
+      "packages/admin/dashboard/src/hooks/api/store.tsx",
+      "packages/admin/dashboard/src/components/data-grid/hooks/use-data-grid-form-handlers.tsx",
+      "packages/design-system/ui/src/hooks/use-toggle-state/use-toggle-state.tsx",
+      "packages/plugins/draft-order/src/admin/components/inputs/switch-block.tsx",
+      "packages/plugins/loyalty/src/admin/hooks/api/store.tsx",
+      "packages/plugins/loyalty/src/admin/components/data-grid/hooks/use-data-grid-form-handlers.tsx",
+      "packages/admin/dashboard/src/hooks/use-combobox-data.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 637,
+    "elapsed_ms": 1680,
+    "error": null
+  },
+  {
+    "task": "t-7479b070",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/core/js-sdk/src/admin/order.ts",
+      "packages/core/core-flows/src/order/workflows/get-order-detail.ts",
+      "packages/core/core-flows/src/store/steps/index.ts",
+      "packages/admin/dashboard/src/routes/orders/order-create-claim/components/claim-create-form/item-placeholder.tsx",
+      "packages/admin/dashboard/src/routes/promotions/common/edit-rules/components/rules-form-field/rules-form-field.tsx",
+      "www/apps/cloud/components/Pricing/FeatureSections/index.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 205,
+    "elapsed_ms": 1201,
+    "error": null
+  },
+  {
+    "task": "t-4e5a02bd",
+    "condition": "N-no-context",
+    "named": [
+      "benchmarks/benchmark_redis.py",
+      "benchmarks/benchmark_redis_cache.py",
+      "frappe/utils/redis_cache.py",
+      "frappe/utils/redis_wrapper.py",
+      "frappe/utils/background_jobs.py",
+      "frappe/core/doctype/cache_cleanup/cache_cleanup.py",
+      "frappe/core/doctype/deleted_document/deleted_document.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 83,
+    "elapsed_ms": 1403,
+    "error": null
+  },
+  {
+    "task": "t-4e5a02bd",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/modules/cache-redis/src/services/redis-cache.ts",
+      "packages/modules/cache-redis/src/loaders/index.ts",
+      "packages/modules/cache-redis/src/types/index.ts",
+      "packages/modules/cache-redis/src/services/index.ts",
+      "packages/modules/providers/caching-redis/src/loaders/connection.ts",
+      "packages/medusa/src/modules/cache-redis.ts",
+      "www/apps/resources/sidebars/infrastructure-modules.mjs"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 184,
+    "elapsed_ms": 1335,
+    "error": null
+  },
+  {
+    "task": "t-4e5a02bd",
+    "condition": "R-reify",
+    "named": [
+      "packages/modules/cache-redis/src/services/redis-cache.ts",
+      "packages/modules/cache-redis/src/types/index.ts",
+      "packages/core/types/src/cache/service.ts",
+      "packages/modules/providers/caching-redis/src/types/index.ts",
+      "packages/modules/providers/caching-redis/src/services/__tests__/redis-cache.spec.ts",
+      "packages/modules/cache-inmemory/src/services/inmemory-cache.ts"
+    ],
+    "hit": true,
+    "recall": 0.25,
+    "prompt_tokens": 204,
+    "elapsed_ms": 1031,
+    "error": null
+  },
+  {
+    "task": "t-4e5a02bd",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/core-flows/src/product/steps/get-variant-pricing-link.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 106,
+    "elapsed_ms": 680,
+    "error": null
+  },
+  {
+    "task": "t-4e5a02bd",
+    "condition": "O-oracle",
+    "named": [
+      "packages/modules/caching/src/loaders/hash.ts",
+      "packages/modules/providers/caching-redis/src/loaders/hash.ts",
+      "packages/modules/providers/caching-redis/src/services/redis-cache.ts",
+      "packages/modules/providers/caching-redis/src/services/__tests__/redis-cache.spec.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 164,
+    "elapsed_ms": 868,
+    "error": null
+  },
+  {
+    "task": "t-4e5a02bd",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/modules/cache-redis/src/services/redis-cache.ts",
+      "packages/modules/cache-redis/src/types/index.ts",
+      "packages/core/types/src/cache/service.ts",
+      "packages/modules/providers/caching-redis/src/services/redis-cache.ts",
+      "packages/modules/providers/caching-redis/src/types/index.ts",
+      "packages/modules/providers/caching-redis/src/services/__tests__/redis-cache.spec.ts",
+      "packages/modules/cache-inmemory/src/services/inmemory-cache.ts",
+      "packages/modules/providers/locking-redis/src/services/redis-lock.ts"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 552,
+    "elapsed_ms": 1563,
+    "error": null
+  },
+  {
+    "task": "t-4e5a02bd",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/modules/workflow-engine-redis/src/utils/workflow-orchestrator-storage.ts",
+      "packages/core/types/src/caching/index.ts",
+      "packages/modules/cache-redis/src/loaders/index.ts",
+      "packages/modules/cache-redis/src/services/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 146,
+    "elapsed_ms": 859,
+    "error": null
+  },
+  {
+    "task": "t-2101adb7",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/public/js/print/print_settings.js",
+      "erpnext/public/js/print/print_view.js",
+      "erpnext/public/scss/print.scss",
+      "erpnext/templates/print_format/print_format.html",
+      "erpnext/public/less/print.less",
+      "erpnext/public/js/doctype/print_settings/print_settings.js",
+      "erpnext/public/js/print/print_dialog.js",
+      "erpnext/templates/includes/print_format.html"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 85,
+    "elapsed_ms": 1695,
+    "error": null
+  },
+  {
+    "task": "t-2101adb7",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/admin/admin-bundler/src/commands/serve.ts",
+      "packages/core/utils/src/common/generate-entity-id.ts",
+      "www/packages/build-scripts/src/utils/custom-llms-generators.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 183,
+    "elapsed_ms": 880,
+    "error": null
+  },
+  {
+    "task": "t-2101adb7",
+    "condition": "R-reify",
+    "named": [
+      "packages/eslint-plugin/src/rules/admin-env-vars-import-meta/rule.ts",
+      "packages/eslint-plugin/src/rules/import-from-framework-not-internal/rule.ts",
+      "packages/eslint-plugin/src/rules/no-mikroorm-direct-import/rule.ts",
+      "packages/eslint-plugin/src/rules/no-trailing-slash-in-route-matcher/rule.ts",
+      "packages/eslint-plugin/src/rules/prefer-link-over-remote-link/rule.ts",
+      "packages/eslint-plugin/src/rules/step-id-kebab-case/rule.ts",
+      "packages/eslint-plugin/src/rules/zod-import-source/rule.ts",
+      "packages/eslint-plugin/src/util/strings.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 389,
+    "elapsed_ms": 1468,
+    "error": null
+  },
+  {
+    "task": "t-2101adb7",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/admin/dashboard/src/routes/categories/common/utils.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 377,
+    "elapsed_ms": 729,
+    "error": null
+  },
+  {
+    "task": "t-2101adb7",
+    "condition": "O-oracle",
+    "named": [
+      "packages/admin/admin-bundler/src/utils/write-static-files.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 115,
+    "elapsed_ms": 923,
+    "error": null
+  },
+  {
+    "task": "t-2101adb7",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/eslint-plugin/src/rules/admin-env-vars-import-meta/rule.ts",
+      "packages/eslint-plugin/src/rules/admin-component-must-be-arrow-function/rule.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 654,
+    "elapsed_ms": 1111,
+    "error": null
+  },
+  {
+    "task": "t-2101adb7",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/core/types/src/common/config-module.ts",
+      "www/packages/build-scripts/src/utils/custom-llms-generators.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 172,
+    "elapsed_ms": 1060,
+    "error": null
+  },
+  {
+    "task": "t-e528fc5b",
+    "condition": "N-no-context",
+    "named": [
+      "www/app.py",
+      "www/website/script.py",
+      "erpnext/public/js/utils.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 84,
+    "elapsed_ms": 1004,
+    "error": null
+  },
+  {
+    "task": "t-e528fc5b",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/admin/dashboard/src/index.html",
+      "www/apps/api-reference/components/Tags/Operation/__tests__/index.test.tsx",
+      "www/packages/docs-ui/src/components/SimilarPages/index.tsx",
+      "www/packages/docs-ui/src/components/ZoomImg/index.tsx",
+      "www/packages/docs-ui/src/components/Heading/H4/index.tsx",
+      "packages/admin/dashboard/src/routes/products/product-attributes/index.ts",
+      "packages/admin/dashboard/src/index.tsx",
+      "www/packages/docs-ui/src/index.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 170,
+    "elapsed_ms": 1232,
+    "error": null
+  },
+  {
+    "task": "t-e528fc5b",
+    "condition": "R-reify",
+    "named": [
+      "www/packages/docs-ui/src/hooks/use-scroll-utils/index.tsx",
+      "packages/admin/dashboard/src/hooks/api/promotions.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 268,
+    "elapsed_ms": 979,
+    "error": null
+  },
+  {
+    "task": "t-e528fc5b",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/eslint-plugin/src/rules/admin-env-vars-import-meta/rule.ts",
+      "packages/eslint-plugin/src/rules/import-from-framework-not-internal/rule.ts",
+      "packages/eslint-plugin/src/rules/link-create-keys-modules-enum/rule.ts",
+      "packages/eslint-plugin/src/rules/no-async-workflow-constructor/rule.ts",
+      "packages/eslint-plugin/src/rules/no-deprecated-remote-query-config/rule.ts",
+      "packages/eslint-plugin/src/rules/no-mikroorm-direct-import/rule.ts",
+      "packages/eslint-plugin/src/rules/no-trailing-slash-in-route-matcher/rule.ts",
+      "packages/eslint-plugin/src/rules/prefer-container-registration-keys/rule.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 388,
+    "elapsed_ms": 1817,
+    "error": null
+  },
+  {
+    "task": "t-e528fc5b",
+    "condition": "O-oracle",
+    "named": [
+      "packages/admin/dashboard/src/providers/i18n-provider/i18n-provider.tsx"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 117,
+    "elapsed_ms": 1014,
+    "error": null
+  },
+  {
+    "task": "t-e528fc5b",
+    "condition": "R-reify-iter3",
+    "named": [
+      "www/apps/api-reference/providers/sidebar.tsx",
+      "www/apps/bloom/providers/sidebar.tsx",
+      "www/apps/book/providers/sidebar.tsx",
+      "www/apps/cloud/providers/sidebar.tsx",
+      "www/apps/resources/providers/sidebar.tsx",
+      "www/apps/ui/providers/sidebar.tsx",
+      "www/apps/user-guide/providers/sidebar.tsx",
+      "packages/admin/dashboard/src/providers/search-provider/search-provider.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 668,
+    "elapsed_ms": 1401,
+    "error": null
+  },
+  {
+    "task": "t-e528fc5b",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "www/apps/api-reference/components/Tags/Section/Schema/__tests__/index.test.tsx",
+      "www/apps/api-reference/components/Tags/Operation/__tests__/index.test.tsx",
+      "packages/design-system/ui/src/components/table/table.tsx",
+      "www/packages/docs-ui/src/components/WorkflowDiagram/Common/Node/__tests__/index.test.tsx",
+      "www/packages/docs-ui/src/components/ZoomImg/index.tsx",
+      "www/packages/docs-ui/src/components/Heading/H4/index.tsx",
+      "packages/admin/dashboard/src/routes/products/product-attributes/components/product-attributes-form/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 222,
+    "elapsed_ms": 1281,
+    "error": null
+  },
+  {
+    "task": "t-5796a0c0",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/stock/doctype/stock_entry/stock_entry.py",
+      "erpnext/stock/doctype/stock_entry_detail/stock_entry_detail.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/delivery_note_item/delivery_note_item.py",
+      "erpnext/stock/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/stock/doctype/sales_invoice_item/sales_invoice_item.py",
+      "erpnext/stock/doctype/pick_list/pick_list.py",
+      "erpnext/stock/doctype/packed_item/packed_item.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 88,
+    "elapsed_ms": 1744,
+    "error": null
+  },
+  {
+    "task": "t-5796a0c0",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/admin/dashboard/src/routes/orders/order-detail/components/order-fulfillment-section/index.tsx",
+      "packages/admin/dashboard/src/routes/orders/order-create-fulfillment/index.tsx",
+      "packages/admin/dashboard/src/routes/locations/location-detail/location-detail.tsx",
+      "packages/core/types/src/modules-sdk/__fixtures__/remote-query.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 176,
+    "elapsed_ms": 1060,
+    "error": null
+  },
+  {
+    "task": "t-5796a0c0",
+    "condition": "R-reify",
+    "named": [
+      "packages/admin/dashboard/src/routes/locations/location-detail/components/location-fulfillment-providers-section/location-fulfillment-providers-section.tsx",
+      "packages/core/core-flows/src/stock-location/steps/delete-stock-locations.ts",
+      "packages/core/core-flows/src/stock-location/workflows/update-stock-locations.ts",
+      "packages/core/core-flows/src/stock-location/steps/associate-locations-with-fulfillment-sets.ts",
+      "packages/admin/dashboard/src/hooks/api/stock-locations.tsx",
+      "packages/admin/dashboard/src/hooks/api/fulfillment-providers.tsx",
+      "packages/medusa/src/api/admin/stock-locations/[id]/fulfillment-providers/route.ts",
+      "packages/medusa/src/api/admin/stock-locations/[id]/fulfillment-sets/route.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 352,
+    "elapsed_ms": 1756,
+    "error": null
+  },
+  {
+    "task": "t-5796a0c0",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/eslint-plugin/src/rules/admin-env-vars-import-meta/rule.ts",
+      "packages/eslint-plugin/src/rules/no-deprecated-remote-query-config/rule.ts",
+      "packages/eslint-plugin/src/rules/no-mikroorm-direct-import/rule.ts",
+      "packages/eslint-plugin/src/rules/step-id-kebab-case/rule.ts",
+      "packages/eslint-plugin/src/rules/step-must-return-step-response/rule.ts",
+      "packages/eslint-plugin/src/rules/use-query-context-utility/rule.ts",
+      "packages/eslint-plugin/src/rules/prefer-container-registration-keys/rule.ts",
+      "packages/eslint-plugin/src/rules/prefer-modules-enum/rule.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 392,
+    "elapsed_ms": 1631,
+    "error": null
+  },
+  {
+    "task": "t-5796a0c0",
+    "condition": "O-oracle",
+    "named": [
+      "packages/admin/dashboard/src/routes/orders/order-detail/components/order-fulfillment-section/order-fulfillment-section.tsx"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 134,
+    "elapsed_ms": 900,
+    "error": null
+  },
+  {
+    "task": "t-5796a0c0",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/admin/dashboard/src/routes/locations/location-detail/components/location-fulfillment-providers-section/location-fulfillment-providers-section.tsx",
+      "packages/admin/dashboard/src/hooks/api/stock-locations.tsx",
+      "packages/admin/dashboard/src/hooks/api/orders.tsx",
+      "packages/medusa/src/api/admin/stock-locations/helpers.ts",
+      "packages/medusa/src/api/admin/stock-locations/validators.ts",
+      "packages/core/core-flows/src/stock-location/workflows/update-stock-locations.ts",
+      "packages/medusa/src/api/admin/stock-locations/[id]/fulfillment-sets/route.ts",
+      "packages/medusa/src/api/admin/stock-locations/[id]/fulfillment-providers/route.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 730,
+    "elapsed_ms": 1799,
+    "error": null
+  },
+  {
+    "task": "t-5796a0c0",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/admin/dashboard/src/routes/orders/order-detail/components/order-fulfillment-section/order-fulfillment-section.tsx",
+      "packages/core/core-flows/src/stock-location/workflows/index.ts",
+      "packages/admin/dashboard/src/routes/locations/location-detail/components/location-fulfillment-providers-section/location-fulfillment-providers-section.tsx"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 194,
+    "elapsed_ms": 1353,
+    "error": null
+  },
+  {
+    "task": "t-23878406",
+    "condition": "N-no-context",
+    "named": [
+      "tests/runner.py",
+      "tests/__init__.py",
+      "tests/conftest.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 82,
+    "elapsed_ms": 1166,
+    "error": null
+  },
+  {
+    "task": "t-23878406",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/medusa-test-utils/src/medusa-test-runner.ts",
+      "packages/medusa-test-utils/src/index.ts",
+      "integration-tests/modules/__tests__/customer/admin/list-customer-addresses.ts",
+      "packages/core/framework/src/migrations/index.ts"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 182,
+    "elapsed_ms": 1182,
+    "error": null
+  },
+  {
+    "task": "t-23878406",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/framework/src/migrations/migrator.ts",
+      "packages/core/utils/src/migrations/index.ts",
+      "packages/core/modules-sdk/src/medusa-app.ts",
+      "packages/core/orchestration/src/workflow/local-workflow.ts",
+      "packages/core/orchestration/src/workflow/global-workflow.ts",
+      "packages/medusa-test-utils/src/events.ts",
+      "packages/cli/medusa-dev-cli/src/watch.js",
+      "www/utils/packages/docs-generator/src/commands/run.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 320,
+    "elapsed_ms": 1703,
+    "error": null
+  },
+  {
+    "task": "t-23878406",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/utils/src/dml/helpers/create-mikro-orm-entity.ts",
+      "packages/core/utils/src/dml/helpers/mikro-orm/build-indexes.ts",
+      "packages/core/utils/src/dml/helpers/mikro-orm/apply-indexes.ts",
+      "packages/core/utils/src/dml/helpers/entity-builder/define-relationship.ts",
+      "packages/core/utils/src/dml/helpers/entity-builder/relationship-helpers.ts",
+      "packages/core/utils/src/dml/relations/has-one.ts",
+      "packages/core/utils/src/dml/relations/has-one-fk.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 281,
+    "elapsed_ms": 1454,
+    "error": null
+  },
+  {
+    "task": "t-23878406",
+    "condition": "O-oracle",
+    "named": [
+      "packages/medusa-test-utils/src/medusa-test-runner-utils/use-db.ts",
+      "packages/medusa-test-utils/src/medusa-test-runner.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 127,
+    "elapsed_ms": 1197,
+    "error": null
+  },
+  {
+    "task": "t-23878406",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/medusa-test-utils/src/medusa-test-runner.ts",
+      "packages/core/framework/src/migrations/run-migration-scripts.ts",
+      "packages/core/framework/src/migrations/migrator.ts",
+      "packages/core/utils/src/migrations/index.ts",
+      "packages/core/modules-sdk/src/medusa-app.ts",
+      "packages/medusa-test-utils/src/module-test-runner.ts",
+      "packages/core/utils/src/migrations/integration-tests/__tests__/migrations-generate.spec.ts",
+      "packages/core/framework/src/migrations/__fixtures__/project/migration-scripts/test.ts"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 713,
+    "elapsed_ms": 1737,
+    "error": null
+  },
+  {
+    "task": "t-23878406",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "integration-tests/http/__tests__/shipping-option/admin/shipping-option.spec.ts",
+      "integration-tests/http/__tests__/feature-flag/resources-with-flags.spec.ts",
+      "integration-tests/modules/__tests__/modules/load-standalone.ts",
+      "packages/core/modules-sdk/src/loaders/__mocks__/@modules/default.ts",
+      "packages/core/framework/src/migrations/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 173,
+    "elapsed_ms": 1604,
+    "error": null
+  },
+  {
+    "task": "t-094b2ed4",
+    "condition": "N-no-context",
+    "named": [
+      "accounts/payment_entry.py",
+      "accounts/payment_ledger.py",
+      "accounts/party.py",
+      "accounts/receivable_payable.py",
+      "accounts/transaction_base.py",
+      "accounts/utils.py",
+      "accounts/accounts_settings.py",
+      "accounts/gl_entry.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 80,
+    "elapsed_ms": 1587,
+    "error": null
+  },
+  {
+    "task": "t-094b2ed4",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/plugins/loyalty/src/workflows/carts/workflows/confirm-cart-credit-lines.ts",
+      "packages/plugins/loyalty/src/modules/store-credit/service.ts",
+      "packages/plugins/loyalty/src/workflows/store-credit/index.ts",
+      "packages/plugins/loyalty/src/api/store/store-credit-accounts/query-config.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 157,
+    "elapsed_ms": 1102,
+    "error": null
+  },
+  {
+    "task": "t-094b2ed4",
+    "condition": "R-reify",
+    "named": [
+      "packages/eslint-plugin/src/rules/admin-env-vars-import-meta/rule.ts",
+      "packages/eslint-plugin/src/rules/import-from-framework-not-internal/rule.ts",
+      "packages/eslint-plugin/src/rules/link-create-keys-modules-enum/rule.ts",
+      "packages/eslint-plugin/src/rules/no-async-workflow-constructor/rule.ts",
+      "packages/eslint-plugin/src/rules/no-deprecated-remote-query-config/rule.ts",
+      "packages/eslint-plugin/src/rules/no-mikroorm-direct-import/rule.ts",
+      "packages/eslint-plugin/src/rules/no-trailing-slash-in-route-matcher/rule.ts",
+      "packages/eslint-plugin/src/rules/prefer-container-registration-keys/rule.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 384,
+    "elapsed_ms": 1970,
+    "error": null
+  },
+  {
+    "task": "t-094b2ed4",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/js-sdk/src/admin/user.ts",
+      "packages/core/js-sdk/src/client.ts",
+      "packages/admin/dashboard/src/hooks/api/invites.tsx",
+      "packages/core/js-sdk/src/auth/index.ts",
+      "packages/core/js-sdk/src/admin/upload.ts",
+      "packages/core/js-sdk/src/admin/invite.ts",
+      "packages/core/js-sdk/src/store/index.ts",
+      "packages/core/js-sdk/src/admin/customer.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 203,
+    "elapsed_ms": 1285,
+    "error": null
+  },
+  {
+    "task": "t-094b2ed4",
+    "condition": "O-oracle",
+    "named": [
+      "packages/plugins/loyalty/src/modules/store-credit/service.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 110,
+    "elapsed_ms": 878,
+    "error": null
+  },
+  {
+    "task": "t-094b2ed4",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/plugins/loyalty/src/workflows/store-credit/steps/debit-account.ts",
+      "packages/plugins/loyalty/src/types/store-credit/module.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 693,
+    "elapsed_ms": 1357,
+    "error": null
+  },
+  {
+    "task": "t-094b2ed4",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/plugins/loyalty/src/workflows/carts/workflows/confirm-cart-credit-lines.ts",
+      "packages/plugins/loyalty/src/types/store-credit/service.ts",
+      "packages/plugins/loyalty/src/workflows/store-credit/workflows/claim-store-credit-account.ts",
+      "packages/plugins/loyalty/src/workflows/store-credit/index.ts",
+      "packages/modules/providers/locking-postgres/src/models/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 209,
+    "elapsed_ms": 1440,
+    "error": null
+  },
+  {
+    "task": "t-6d9c5a74",
+    "condition": "N-no-context",
+    "named": [
+      "frappe/public/js/controls/search.js",
+      "frappe/public/js/frappe/ui/search/search.js",
+      "frappe/public/js/frappe/ui/form/form.js",
+      "frappe/public/js/frappe/form/footer.js",
+      "frappe/public/js/frappe/list/list_view.js",
+      "frappe/public/js/frappe/search/search.js",
+      "frappe/public/js/website/doctype/web_page/search.js",
+      "frappe/public/js/frappe/views/workspace/workspace.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 84,
+    "elapsed_ms": 1510,
+    "error": null
+  },
+  {
+    "task": "t-6d9c5a74",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/design-system/ui/src/blocks/data-table/components/data-table-search.tsx",
+      "packages/admin/dashboard/src/providers/search-provider/index.ts",
+      "packages/admin/dashboard/src/hooks/table/query/use-shipping-option-table-query.tsx",
+      "www/packages/docs-ui/src/hooks/use-child-docs/index.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 161,
+    "elapsed_ms": 1221,
+    "error": null
+  },
+  {
+    "task": "t-6d9c5a74",
+    "condition": "R-reify",
+    "named": [
+      "packages/admin/dashboard/src/providers/keybind-provider/types.ts",
+      "packages/admin/dashboard/src/providers/keybind-provider/utils.ts",
+      "packages/admin/dashboard/src/providers/keybind-provider/hooks.tsx",
+      "www/packages/docs-ui/src/hooks/use-keyboard-shortcut/index.tsx",
+      "www/packages/docs-ui/src/utils/os-browser-utils.ts",
+      "www/apps/ui/specs/examples/dropdown-menu-shortcuts.tsx"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 295,
+    "elapsed_ms": 1595,
+    "error": null
+  },
+  {
+    "task": "t-6d9c5a74",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/types/src/product/common.ts",
+      "packages/modules/product/src/services/product-module-service.ts",
+      "packages/core/js-sdk/src/admin/product.ts",
+      "packages/core/framework/src/http/utils/policies/rbac-field-filter.ts",
+      "packages/admin/dashboard/src/hooks/api/products.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 262,
+    "elapsed_ms": 1387,
+    "error": null
+  },
+  {
+    "task": "t-6d9c5a74",
+    "condition": "O-oracle",
+    "named": [
+      "packages/admin/dashboard/src/components/search/use-search-results.tsx",
+      "packages/admin/dashboard/src/providers/keybind-provider/hooks.tsx"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 133,
+    "elapsed_ms": 1213,
+    "error": null
+  },
+  {
+    "task": "t-6d9c5a74",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/admin/dashboard/src/providers/search-provider/use-search.tsx",
+      "packages/admin/dashboard/src/providers/keybind-provider/keybind-provider.tsx",
+      "packages/admin/dashboard/src/providers/keybind-provider/hooks.tsx",
+      "packages/admin/dashboard/src/providers/keybind-provider/utils.ts",
+      "packages/admin/dashboard/src/providers/keybind-provider/types.ts",
+      "www/packages/docs-ui/src/hooks/use-search-navigation/index.ts",
+      "www/packages/docs-ui/src/hooks/use-keyboard-shortcut/index.tsx"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 683,
+    "elapsed_ms": 1659,
+    "error": null
+  },
+  {
+    "task": "t-6d9c5a74",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/admin/dashboard/src/components/search/search.tsx",
+      "packages/admin/dashboard/src/providers/search-provider/use-search.tsx",
+      "packages/admin/dashboard/src/components/inputs/combobox/combobox.tsx",
+      "packages/design-system/ui/src/blocks/data-table/components/data-table-search.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 196,
+    "elapsed_ms": 1328,
+    "error": null
+  },
+  {
+    "task": "t-aeea1f46",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/controllers/status_updater.py",
+      "erpnext/selling/doctype/customer/customer.py",
+      "erpnext/buying/doctype/supplier/supplier.py",
+      "erpnext/hr/doctype/employee/employee.py",
+      "erpnext/support/doctype/service_level_agreement/service_level_agreement.py",
+      "erpnext/setup/doctype/party_type/party_type.py",
+      "erpnext/erpnext_integrations/doctype/plaid_settings/plaid_settings.py",
+      "erpnext/accounts/doctype/payment_request/payment_request.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 90,
+    "elapsed_ms": 2166,
+    "error": null
+  },
+  {
+    "task": "t-aeea1f46",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/core/types/src/workflow/user/index.ts",
+      "packages/admin/dashboard/src/components/common/user-link/index.ts",
+      "integration-tests/http/__tests__/customer/admin/customer.spec.ts"
+    ],
+    "hit": true,
+    "recall": 0.2,
+    "prompt_tokens": 141,
+    "elapsed_ms": 1538,
+    "error": null
+  },
+  {
+    "task": "t-aeea1f46",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/js-sdk/src/admin/user.ts",
+      "packages/core/js-sdk/src/admin/customer.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 302,
+    "elapsed_ms": 1315,
+    "error": null
+  },
+  {
+    "task": "t-aeea1f46",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/cli/create-medusa-app/src/utils/package-manager.ts",
+      "packages/cli/medusa-cli/src/util/package-manager.ts",
+      "packages/modules/caching/src/utils/parser.ts",
+      "packages/cli/http-types-generator/src/utils/index-manager.ts",
+      "packages/core/core-flows/src/product/utils/csvtojson.ts",
+      "packages/medusa-telemetry/src/util/is-ci.js",
+      "packages/core/utils/src/dal/mikro-orm/utils.ts",
+      "packages/cli/create-medusa-app/src/utils/process-manager.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 215,
+    "elapsed_ms": 1768,
+    "error": null
+  },
+  {
+    "task": "t-aeea1f46",
+    "condition": "O-oracle",
+    "named": [
+      "integration-tests/http/__tests__/customer/admin/customer.spec.ts",
+      "integration-tests/http/__tests__/user/admin/user.spec.ts",
+      "packages/core/core-flows/src/auth/steps/index.ts",
+      "packages/core/core-flows/src/customer/workflows/remove-customer-account.ts",
+      "packages/core/core-flows/src/user/workflows/remove-user-account.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 185,
+    "elapsed_ms": 1677,
+    "error": null
+  },
+  {
+    "task": "t-aeea1f46",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/core/js-sdk/src/admin/user.ts",
+      "packages/core/js-sdk/src/admin/customer.ts",
+      "packages/core/js-sdk/src/admin/api-key.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 598,
+    "elapsed_ms": 1069,
+    "error": null
+  },
+  {
+    "task": "t-aeea1f46",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/core/core-flows/src/customer/workflows/remove-customer-account.ts",
+      "packages/core/core-flows/src/user/workflows/remove-user-account.ts",
+      "integration-tests/http/__tests__/customer/admin/customer.spec.ts",
+      "integration-tests/http/__tests__/user/admin/user.spec.ts"
+    ],
+    "hit": true,
+    "recall": 0.8,
+    "prompt_tokens": 185,
+    "elapsed_ms": 1498,
+    "error": null
+  },
+  {
+    "task": "t-941fd67d",
+    "condition": "N-no-context",
+    "named": [
+      "apps/erpnext/controllers/item_prices.py",
+      "apps/erpnext/stock/doctype/item_price/item_price.py",
+      "apps/erpnext/selling/doctype/item_price/item_price.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 86,
+    "elapsed_ms": 1377,
+    "error": null
+  },
+  {
+    "task": "t-941fd67d",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/core/core-flows/src/fulfillment/workflows/create-shipping-options.ts",
+      "packages/core/core-flows/src/product/helpers/normalize-for-import.ts",
+      "packages/admin/dashboard/src/routes/price-lists/price-list-create/components/price-list-create-form/schema.ts",
+      "packages/admin/admin-shared/src/utils/is-object.ts",
+      "packages/admin/dashboard/src/routes/promotions/common/edit-rules/index.ts",
+      "packages/admin/dashboard/src/routes/promotions/common/edit-rules/components/edit-rules-form/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 214,
+    "elapsed_ms": 1536,
+    "error": null
+  },
+  {
+    "task": "t-941fd67d",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/js-sdk/src/admin/price-list.ts",
+      "packages/admin/dashboard/src/hooks/api/price-lists.tsx",
+      "packages/core/js-sdk/src/client.ts",
+      "packages/core/js-sdk/src/admin/currency.ts",
+      "packages/core/js-sdk/src/admin/customer.ts",
+      "packages/core/js-sdk/src/admin/locale.ts",
+      "packages/core/js-sdk/src/admin/upload.ts",
+      "packages/core/js-sdk/src/store/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 211,
+    "elapsed_ms": 1528,
+    "error": null
+  },
+  {
+    "task": "t-941fd67d",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/eslint-plugin/src/rules/admin-env-vars-import-meta/rule.ts",
+      "packages/eslint-plugin/src/rules/import-from-framework-not-internal/rule.ts",
+      "packages/eslint-plugin/src/rules/no-async-workflow-constructor/rule.ts",
+      "packages/eslint-plugin/src/util/strings.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 384,
+    "elapsed_ms": 1141,
+    "error": null
+  },
+  {
+    "task": "t-941fd67d",
+    "condition": "O-oracle",
+    "named": [
+      "packages/modules/pricing/src/services/pricing-module.ts",
+      "packages/modules/pricing/integration-tests/__tests__/services/pricing-module/price-list.spec.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 139,
+    "elapsed_ms": 1061,
+    "error": null
+  },
+  {
+    "task": "t-941fd67d",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/core/js-sdk/src/admin/price-list.ts",
+      "packages/admin/dashboard/src/hooks/api/price-lists.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 494,
+    "elapsed_ms": 1033,
+    "error": null
+  },
+  {
+    "task": "t-941fd67d",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/core/core-flows/src/fulfillment/workflows/create-shipping-options.ts",
+      "packages/core/types/src/pricing/workflows.ts",
+      "packages/medusa/src/api/admin/price-lists/queries/list-prices.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 181,
+    "elapsed_ms": 889,
+    "error": null
+  },
+  {
+    "task": "t-5641bab6",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/www/accept_invitation.py",
+      "erpnext/www/accept_invitation/index.html",
+      "erpnext/templates/pages/accept_invitation.html",
+      "erpnext/public/js/accept_invitation.js",
+      "erpnext/erpnext_integrations/connectors/accept_invitation.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 87,
+    "elapsed_ms": 1402,
+    "error": null
+  },
+  {
+    "task": "t-5641bab6",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/medusa/src/api/admin/invites/query-config.ts",
+      "packages/core/types/src/http/invite/admin/entities.ts",
+      "packages/admin/dashboard/src/routes/invite/index.ts",
+      "packages/admin/dashboard/src/hooks/api/invites.tsx",
+      "www/utils/generated/oas-output/operations/admin/post_auth_[actor_type]_[auth_provider]_callback.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 199,
+    "elapsed_ms": 1126,
+    "error": null
+  },
+  {
+    "task": "t-5641bab6",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/js-sdk/src/admin/invite.ts",
+      "packages/core/modules-sdk/src/medusa-app.ts",
+      "packages/core/modules-sdk/src/remote-query/query.ts",
+      "packages/core/modules-sdk/src/remote-query/remote-query.ts",
+      "packages/core/orchestration/src/joiner/remote-joiner.ts",
+      "packages/modules/index/src/services/index-module-service.ts",
+      "packages/modules/index/src/services/postgres-provider.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 227,
+    "elapsed_ms": 1045,
+    "error": null
+  },
+  {
+    "task": "t-5641bab6",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/modules/order/src/utils/actions/item-add.ts",
+      "packages/modules/order/src/utils/actions/item-remove.ts",
+      "packages/modules/order/src/utils/actions/item-update.ts",
+      "packages/modules/order/src/utils/actions/ship-item.ts",
+      "packages/modules/order/src/utils/actions/return-item.ts",
+      "packages/modules/order/src/utils/actions/deliver-item.ts",
+      "packages/modules/order/src/utils/actions/fulfill-item.ts",
+      "packages/core/modules-sdk/src/link.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 378,
+    "elapsed_ms": 1155,
+    "error": null
+  },
+  {
+    "task": "t-5641bab6",
+    "condition": "O-oracle",
+    "named": [
+      "packages/medusa/src/api/admin/invites/accept/route.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 115,
+    "elapsed_ms": 683,
+    "error": null
+  },
+  {
+    "task": "t-5641bab6",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/core/types/src/workflow/invite/accept-invite.ts",
+      "packages/core/js-sdk/src/admin/invite.ts",
+      "packages/admin/dashboard/src/hooks/api/invites.tsx",
+      "packages/medusa/src/api/admin/invites/accept/route.ts",
+      "packages/medusa/src/api/admin/invites/accept/validators.ts",
+      "packages/medusa/src/api/admin/invites/accept/middlewares.ts",
+      "packages/medusa/src/api/admin/invites/accept/helpers.ts",
+      "packages/medusa/src/api/admin/invites/accept/index.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 631,
+    "elapsed_ms": 1595,
+    "error": null
+  },
+  {
+    "task": "t-5641bab6",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/medusa/src/api/admin/invites/query-config.ts",
+      "packages/core/js-sdk/src/admin/invite.ts",
+      "packages/medusa/src/api/admin/invites/route.ts",
+      "packages/medusa/src/api/admin/invites/helpers.ts",
+      "packages/core/types/src/common/config-module.ts",
+      "packages/core/core-flows/src/invite/workflows/index.ts",
+      "packages/core/core-flows/src/invite/steps/index.ts",
+      "packages/medusa/src/api/admin/invites/middlewares.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 156,
+    "elapsed_ms": 1569,
+    "error": null
+  },
+  {
+    "task": "t-1fb31df2",
+    "condition": "N-no-context",
+    "named": [
+      "frappe/model/document.py",
+      "frappe/model/base_document.py",
+      "frappe/model/db_query.py",
+      "frappe/core/doctype/doctype/doctype.py",
+      "frappe/core/doctype/doctype/boilerplate.py",
+      "frappe/model/rename_doc.py",
+      "frappe/core/doctype/docfield/docfield.py",
+      "frappe/model/meta.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 88,
+    "elapsed_ms": 1287,
+    "error": null
+  },
+  {
+    "task": "t-1fb31df2",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/core/types/src/dml/index.ts",
+      "packages/core/utils/src/dml/helpers/entity-builder/create-big-number-properties.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 181,
+    "elapsed_ms": 883,
+    "error": null
+  },
+  {
+    "task": "t-1fb31df2",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/utils/src/dml/entity-builder.ts",
+      "packages/medusa/src/api/admin/api-keys/route.ts",
+      "packages/medusa/src/api/admin/campaigns/route.ts",
+      "packages/medusa/src/api/admin/customers/route.ts",
+      "packages/medusa/src/api/admin/orders/route.ts",
+      "packages/medusa/src/api/admin/locales/route.ts",
+      "packages/medusa/src/api/cloud/auth/route.ts",
+      "www/apps/api-reference/app/schema/route.ts"
+    ],
+    "hit": true,
+    "recall": 0.25,
+    "prompt_tokens": 295,
+    "elapsed_ms": 1441,
+    "error": null
+  },
+  {
+    "task": "t-1fb31df2",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/modules-sdk/src/medusa-app.ts",
+      "packages/core/modules-sdk/src/remote-query/query.ts",
+      "packages/core/modules-sdk/src/remote-query/remote-query.ts",
+      "packages/core/orchestration/src/joiner/remote-joiner.ts",
+      "packages/core/utils/src/common/is-defined.ts",
+      "packages/modules/index/src/services/index-module-service.ts",
+      "packages/modules/index/src/services/postgres-provider.ts",
+      "packages/core/orchestration/src/joiner/helpers.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 246,
+    "elapsed_ms": 1201,
+    "error": null
+  },
+  {
+    "task": "t-1fb31df2",
+    "condition": "O-oracle",
+    "named": [
+      "packages/core/utils/src/dml/properties/json.ts",
+      "packages/core/utils/src/dml/entity-builder.ts",
+      "packages/core/utils/src/dml/__tests__/json-property.spec.ts",
+      "packages/core/utils/src/dml/__tests__/entity-builder.spec.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 158,
+    "elapsed_ms": 941,
+    "error": null
+  },
+  {
+    "task": "t-1fb31df2",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/core/utils/src/dml/entity-builder.ts",
+      "packages/medusa/src/api/admin/api-keys/route.ts",
+      "packages/medusa/src/api/admin/claims/route.ts",
+      "packages/medusa/src/api/store/carts/route.ts",
+      "packages/medusa/src/api/admin/orders/route.ts",
+      "packages/medusa/src/api/admin/customers/route.ts",
+      "packages/medusa/src/api/admin/stores/route.ts",
+      "packages/medusa/src/api/admin/users/route.ts"
+    ],
+    "hit": true,
+    "recall": 0.25,
+    "prompt_tokens": 585,
+    "elapsed_ms": 1433,
+    "error": null
+  },
+  {
+    "task": "t-1fb31df2",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/core/types/src/dml/index.ts",
+      "packages/core/utils/src/dml/helpers/mikro-orm/build-indexes.ts",
+      "packages/modules/translation/integration-tests/__tests__/translation-module-service.spec.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 142,
+    "elapsed_ms": 1288,
+    "error": null
+  },
+  {
+    "task": "t-11d58f75",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/controllers/accounts.py",
+      "erpnext/accounts/utils.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/accounts/doctype/sales_order/sales_order.py",
+      "erpnext/accounts/doctype/purchase_order/purchase_order.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py",
+      "erpnext/stock/doctype/purchase_receipt/purchase_receipt.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 90,
+    "elapsed_ms": 1724,
+    "error": null
+  },
+  {
+    "task": "t-11d58f75",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/core/core-flows/src/order/workflows/create-order.ts",
+      "packages/core/core-flows/src/common/utils/fields.ts",
+      "packages/medusa/src/api/store/carts/[id]/taxes/route.ts",
+      "packages/admin/dashboard/src/components/table/table-cells/order/total-cell/index.ts",
+      "packages/admin/dashboard/src/routes/campaigns/common/components/create-campaign-form-fields/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 185,
+    "elapsed_ms": 1104,
+    "error": null
+  },
+  {
+    "task": "t-11d58f75",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/js-sdk/src/client.ts",
+      "packages/core/js-sdk/src/admin/currency.ts",
+      "packages/core/js-sdk/src/admin/customer.ts",
+      "packages/core/js-sdk/src/admin/locale.ts",
+      "packages/core/js-sdk/src/admin/upload.ts",
+      "packages/core/js-sdk/src/admin/user.ts",
+      "packages/core/js-sdk/src/auth/index.ts",
+      "packages/core/js-sdk/src/store/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 297,
+    "elapsed_ms": 1085,
+    "error": null
+  },
+  {
+    "task": "t-11d58f75",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/js-sdk/src/admin/payment.ts",
+      "packages/core/utils/src/dal/mikro-orm/mikro-orm-repository.ts",
+      "packages/core/utils/src/dal/mikro-orm/mikro-orm-serializer-old.ts",
+      "packages/core/utils/src/dal/mikro-orm/mikro-orm-serializer.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 352,
+    "elapsed_ms": 1108,
+    "error": null
+  },
+  {
+    "task": "t-11d58f75",
+    "condition": "O-oracle",
+    "named": [
+      "packages/modules/cart/src/services/cart-module.ts",
+      "packages/modules/cart/integration-tests/__tests__/services/cart-module/index.spec.ts",
+      "integration-tests/modules/__tests__/cart/store/cart.workflows.spec.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 157,
+    "elapsed_ms": 1266,
+    "error": null
+  },
+  {
+    "task": "t-11d58f75",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/core/js-sdk/src/client.ts",
+      "packages/core/js-sdk/src/admin/currency.ts",
+      "packages/core/js-sdk/src/admin/customer.ts",
+      "packages/core/js-sdk/src/admin/locale.ts",
+      "packages/core/js-sdk/src/admin/price-list.ts",
+      "packages/core/js-sdk/src/admin/product-tag.ts",
+      "packages/core/js-sdk/src/admin/views.ts",
+      "packages/core/js-sdk/src/store/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 720,
+    "elapsed_ms": 1087,
+    "error": null
+  },
+  {
+    "task": "t-11d58f75",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/core/core-flows/src/order/workflows/create-order.ts",
+      "packages/core/utils/src/totals/__tests__/totals.ts",
+      "packages/core/core-flows/src/cart/steps/retrieve-cart.ts",
+      "packages/core/core-flows/src/common/utils/fields.ts",
+      "packages/admin/dashboard/src/components/table/table-cells/order/total-cell/index.ts",
+      "packages/admin/dashboard/src/routes/campaigns/common/components/create-campaign-form-fields/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 199,
+    "elapsed_ms": 1421,
+    "error": null
+  },
+  {
+    "task": "t-4f2b8a2b",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/shopping_cart/cart.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 92,
+    "elapsed_ms": 908,
+    "error": null
+  },
+  {
+    "task": "t-4f2b8a2b",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/core/core-flows/src/cart/workflows/update-line-item-in-cart.ts",
+      "packages/core/core-flows/src/cart/steps/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 172,
+    "elapsed_ms": 1117,
+    "error": null
+  },
+  {
+    "task": "t-4f2b8a2b",
+    "condition": "R-reify",
+    "named": [
+      "packages/eslint-plugin/src/rules/admin-env-vars-import-meta/rule.ts",
+      "packages/eslint-plugin/src/rules/import-from-framework-not-internal/rule.ts",
+      "packages/eslint-plugin/src/rules/link-create-keys-modules-enum/rule.ts",
+      "packages/eslint-plugin/src/rules/no-async-workflow-constructor/rule.ts",
+      "packages/eslint-plugin/src/rules/no-deprecated-remote-query-config/rule.ts",
+      "packages/eslint-plugin/src/rules/no-mikroorm-direct-import/rule.ts",
+      "packages/eslint-plugin/src/rules/no-trailing-slash-in-route-matcher/rule.ts",
+      "packages/eslint-plugin/src/rules/prefer-container-registration-keys/rule.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 395,
+    "elapsed_ms": 1313,
+    "error": null
+  },
+  {
+    "task": "t-4f2b8a2b",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/eslint-plugin/src/rules/admin-env-vars-import-meta/rule.ts",
+      "packages/eslint-plugin/src/rules/import-from-framework-not-internal/rule.ts",
+      "packages/eslint-plugin/src/rules/link-create-keys-modules-enum/rule.ts",
+      "packages/eslint-plugin/src/rules/no-async-workflow-constructor/rule.ts",
+      "packages/eslint-plugin/src/rules/no-deprecated-remote-query-config/rule.ts",
+      "packages/eslint-plugin/src/rules/no-mikroorm-direct-import/rule.ts",
+      "packages/eslint-plugin/src/rules/no-trailing-slash-in-route-matcher/rule.ts",
+      "packages/eslint-plugin/src/rules/prefer-container-registration-keys/rule.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 395,
+    "elapsed_ms": 1477,
+    "error": null
+  },
+  {
+    "task": "t-4f2b8a2b",
+    "condition": "O-oracle",
+    "named": [
+      "packages/core/core-flows/src/cart/workflows/get-variants-and-items-with-prices.ts",
+      "integration-tests/http/__tests__/cart/store/cart.spec.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 142,
+    "elapsed_ms": 1140,
+    "error": null
+  },
+  {
+    "task": "t-4f2b8a2b",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/modules/order/src/utils/transform-order.ts",
+      "packages/core/types/src/pricing/common/price-set.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 674,
+    "elapsed_ms": 1027,
+    "error": null
+  },
+  {
+    "task": "t-4f2b8a2b",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/core/core-flows/src/cart/workflows/add-to-cart.ts",
+      "packages/core/core-flows/src/cart/workflows/update-line-item-in-cart.ts",
+      "packages/core/core-flows/src/line-item/steps/update-line-items.ts",
+      "integration-tests/http/__tests__/shipping-option/store/shipping-option-calculated.spec.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 230,
+    "elapsed_ms": 1128,
+    "error": null
+  },
+  {
+    "task": "t-0e1ccf49",
+    "condition": "N-no-context",
+    "named": [],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 88,
+    "elapsed_ms": 935,
+    "error": null
+  },
+  {
+    "task": "t-0e1ccf49",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/core/core-flows/src/order/workflows/create-order.ts",
+      "www/utils/generated/oas-output/schemas/AdminUpdateDraftOrder.ts",
+      "packages/admin/dashboard/src/routes/customer-groups/customer-group-add-customers/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 147,
+    "elapsed_ms": 886,
+    "error": null
+  },
+  {
+    "task": "t-0e1ccf49",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/js-sdk/src/admin/draft-order.ts",
+      "packages/plugins/draft-order/src/admin/hooks/api/draft-orders.tsx",
+      "packages/plugins/draft-order/src/admin/routes/draft-orders/[id]/@email/page.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 142,
+    "elapsed_ms": 963,
+    "error": null
+  },
+  {
+    "task": "t-0e1ccf49",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/admin/dashboard/src/routes/locations/common/schema.ts",
+      "packages/admin/dashboard/src/routes/locations/common/components/conditional-price-form/conditional-price-form.tsx",
+      "packages/admin/dashboard/src/routes/locations/location-service-zone-shipping-option-create/components/create-shipping-options-form/schema.ts",
+      "packages/core/types/src/fulfillment/common/shipping-option.ts",
+      "packages/admin/dashboard/src/routes/locations/common/types.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 305,
+    "elapsed_ms": 1409,
+    "error": null
+  },
+  {
+    "task": "t-0e1ccf49",
+    "condition": "O-oracle",
+    "named": [
+      "integration-tests/http/__tests__/draft-order/admin/draft-order.spec.ts",
+      "packages/medusa/src/api/admin/draft-orders/route.ts",
+      "packages/medusa/src/api/admin/draft-orders/validators.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 148,
+    "elapsed_ms": 869,
+    "error": null
+  },
+  {
+    "task": "t-0e1ccf49",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/plugins/draft-order/src/admin/hooks/api/draft-orders.tsx",
+      "packages/plugins/draft-order/src/admin/routes/draft-orders/[id]/@email/page.tsx",
+      "packages/plugins/draft-order/src/admin/components/draft-orders/customer-section.tsx",
+      "packages/plugins/draft-order/src/admin/routes/draft-orders/[id]/page.tsx",
+      "packages/plugins/draft-order/src/admin/hooks/api/orders.tsx",
+      "packages/core/js-sdk/src/admin/draft-order.ts",
+      "packages/admin/dashboard/src/hooks/api/orders.tsx",
+      "packages/plugins/draft-order/src/admin/hooks/order-edits/use-initiate-order-edit.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 607,
+    "elapsed_ms": 1347,
+    "error": null
+  },
+  {
+    "task": "t-0e1ccf49",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/medusa/src/api/admin/draft-orders/validators.ts",
+      "packages/core/core-flows/src/order/workflows/create-order.ts",
+      "packages/core/types/src/http/draft-order/admin/payloads.ts",
+      "integration-tests/http/__tests__/order/admin/transfer-flow.spec.ts"
+    ],
+    "hit": true,
+    "recall": 0.33333334,
+    "prompt_tokens": 197,
+    "elapsed_ms": 1093,
+    "error": null
+  },
+  {
+    "task": "t-f2c9d7d3",
+    "condition": "N-no-context",
+    "named": [
+      "stock/stock_entry.py",
+      "stock/doctype/stock_entry/stock_entry.py",
+      "stock/doctype/stock_entry/stock_entry_list.py",
+      "stock/doctype/purchase_receipt/purchase_receipt.py",
+      "stock/doctype/purchase_invoice/purchase_invoice.py",
+      "stock/doctype/delivery_note/delivery_note.py",
+      "stock/doctype/sales_invoice/sales_invoice.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 89,
+    "elapsed_ms": 1312,
+    "error": null
+  },
+  {
+    "task": "t-f2c9d7d3",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/core/core-flows/src/cart/workflows/confirm-variant-inventory.ts",
+      "packages/core/core-flows/src/cart/utils/fields.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 179,
+    "elapsed_ms": 884,
+    "error": null
+  },
+  {
+    "task": "t-f2c9d7d3",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/workflows-sdk/src/utils/composer/when.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 381,
+    "elapsed_ms": 705,
+    "error": null
+  },
+  {
+    "task": "t-f2c9d7d3",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/js-sdk/src/admin/product.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 365,
+    "elapsed_ms": 818,
+    "error": null
+  },
+  {
+    "task": "t-f2c9d7d3",
+    "condition": "O-oracle",
+    "named": [
+      "packages/core/core-flows/src/cart/utils/prepare-confirm-inventory-input.ts",
+      "packages/core/core-flows/src/cart/utils/__tests__/prepare-confirm-inventory-input.spec.ts",
+      "packages/core/types/src/cart/workflows.ts",
+      "packages/core/types/src/workflow/order/items.ts",
+      "integration-tests/http/__tests__/draft-order/admin/draft-order.spec.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 188,
+    "elapsed_ms": 1152,
+    "error": null
+  },
+  {
+    "task": "t-f2c9d7d3",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/modules/inventory/src/services/inventory-module.ts",
+      "packages/core/core-flows/src/product/workflows/batch-products.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 783,
+    "elapsed_ms": 1044,
+    "error": null
+  },
+  {
+    "task": "t-f2c9d7d3",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/core/core-flows/src/cart/workflows/confirm-variant-inventory.ts",
+      "packages/core/core-flows/src/inventory/steps/index.ts",
+      "packages/core/core-flows/src/order/workflows/claim/confirm-claim-request.ts",
+      "packages/core/core-flows/src/order/workflows/exchange/confirm-exchange-request.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 225,
+    "elapsed_ms": 1411,
+    "error": null
+  },
+  {
+    "task": "t-b0520082",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/public/js/utils.js",
+      "erpnext/public/js/controllers/setup.js",
+      "erpnext/setup/doctype/setup_settings/setup_settings.js",
+      "erpnext/setup/doctype/setup_settings/setup_settings.py",
+      "erpnext/setup/doctype/setup_settings/setup_settings.json",
+      "erpnext/public/js/erpnext.js",
+      "erpnext/setup/doctype/setup_settings/setup_settings_flow.js",
+      "erpnext/setup/doctype/setup_settings/setup_settings_list.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 92,
+    "elapsed_ms": 1566,
+    "error": null
+  },
+  {
+    "task": "t-b0520082",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/admin/dashboard/src/routes/settings/index.ts",
+      "packages/modules/settings/src/utils/column-generator.ts",
+      "packages/medusa/src/api/admin/property-labels/middlewares.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 158,
+    "elapsed_ms": 917,
+    "error": null
+  },
+  {
+    "task": "t-b0520082",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/types/src/settings/common.ts",
+      "packages/core/core-flows/src/settings/workflows/batch-property-labels.ts",
+      "packages/core/core-flows/src/settings/steps/create-property-label.ts",
+      "packages/core/core-flows/src/settings/steps/update-property-label.ts",
+      "packages/core/core-flows/src/settings/steps/delete-property-labels.ts",
+      "packages/modules/settings/src/services/settings-module-service.ts",
+      "packages/core/js-sdk/src/admin/views.ts",
+      "packages/medusa/src/api/admin/views/[entity]/configurations/middleware.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 304,
+    "elapsed_ms": 1568,
+    "error": null
+  },
+  {
+    "task": "t-b0520082",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/js-sdk/src/admin/user.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 300,
+    "elapsed_ms": 975,
+    "error": null
+  },
+  {
+    "task": "t-b0520082",
+    "condition": "O-oracle",
+    "named": [
+      "packages/admin/dashboard/src/components/layout/settings-layout/settings-layout.tsx"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 127,
+    "elapsed_ms": 852,
+    "error": null
+  },
+  {
+    "task": "t-b0520082",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/admin/dashboard/src/hooks/api/views.tsx",
+      "packages/admin/dashboard/src/routes/translations/translations-edit/translations-edit.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 638,
+    "elapsed_ms": 1784,
+    "error": null
+  },
+  {
+    "task": "t-b0520082",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/admin/dashboard/src/routes/settings/index.ts",
+      "packages/modules/settings/src/utils/column-generator.ts",
+      "packages/modules/settings/src/services/settings-module-service.ts",
+      "packages/medusa/src/api/admin/property-labels/middlewares.ts",
+      "www/packages/tags/src/tags/settings.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 307,
+    "elapsed_ms": 1153,
+    "error": null
+  },
+  {
+    "task": "t-8f03b13a",
+    "condition": "N-no-context",
+    "named": [],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 86,
+    "elapsed_ms": 974,
+    "error": null
+  },
+  {
+    "task": "t-8f03b13a",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/plugins/loyalty/src/admin/routes/gift-cards/page.tsx",
+      "packages/plugins/loyalty/src/admin/routes/gift-cards/[id]/page.tsx",
+      "packages/admin/admin-shared/src/extensions/widgets/constants.ts",
+      "packages/admin/admin-shared/src/extensions/widgets/utils.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 257,
+    "elapsed_ms": 1244,
+    "error": null
+  },
+  {
+    "task": "t-8f03b13a",
+    "condition": "R-reify",
+    "named": [
+      "packages/eslint-plugin/src/rules/route-handler-exports-uppercase/rule.ts",
+      "packages/eslint-plugin/src/rules/use-query-context-utility/rule.ts",
+      "packages/eslint-plugin/src/rules/no-deprecated-remote-query-config/rule.ts",
+      "packages/eslint-plugin/src/rules/import-from-framework-not-internal/rule.ts",
+      "packages/eslint-plugin/src/rules/no-async-workflow-constructor/rule.ts",
+      "packages/eslint-plugin/src/rules/service-constructor-must-call-super/rule.ts",
+      "packages/eslint-plugin/src/rules/step-must-return-step-response/rule.ts",
+      "packages/eslint-plugin/src/util/strings.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 390,
+    "elapsed_ms": 1600,
+    "error": null
+  },
+  {
+    "task": "t-8f03b13a",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/eslint-plugin/src/rules/import-from-framework-not-internal/rule.ts",
+      "packages/eslint-plugin/src/rules/link-create-keys-modules-enum/rule.ts",
+      "packages/eslint-plugin/src/util/strings.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 271,
+    "elapsed_ms": 1278,
+    "error": null
+  },
+  {
+    "task": "t-8f03b13a",
+    "condition": "O-oracle",
+    "named": [
+      "packages/admin/admin-shared/src/extensions/widgets/constants.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 117,
+    "elapsed_ms": 734,
+    "error": null
+  },
+  {
+    "task": "t-8f03b13a",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/plugins/loyalty/src/types/http/gift-card.ts",
+      "packages/plugins/loyalty/src/workflows/carts/workflows/add-gift-card-to-cart.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 689,
+    "elapsed_ms": 1593,
+    "error": null
+  },
+  {
+    "task": "t-8f03b13a",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/plugins/loyalty/src/admin/routes/gift-cards/page.tsx",
+      "packages/plugins/loyalty/src/admin/routes/gift-cards/components/gift-card-products-section.tsx",
+      "packages/admin/admin-shared/src/extensions/widgets/constants.ts",
+      "packages/admin/dashboard/src/dashboard-app/dashboard-app.tsx"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 310,
+    "elapsed_ms": 1030,
+    "error": null
+  },
+  {
+    "task": "t-43827181",
+    "condition": "N-no-context",
+    "named": [
+      "apps/desk/page/setup_wizard/setup_wizard.js",
+      "frappe/public/js/frappe/form/controls/table.js",
+      "frappe/public/js/frappe/views/reports/query_report.js",
+      "frappe/public/js/frappe/views/reports/query_report_filters.js",
+      "frappe/public/js/frappe/form/controls/currency.js",
+      "frappe/public/js/frappe/form/controls/table_multiselect.js",
+      "frappe/public/js/frappe/views/workspace/workspace.js",
+      "frappe/public/js/frappe/views/reports/query_report_column.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 91,
+    "elapsed_ms": 1971,
+    "error": null
+  },
+  {
+    "task": "t-43827181",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/admin/dashboard/src/components/table/configurable-data-table/configurable-data-table.tsx",
+      "packages/admin/dashboard/src/hooks/table/columns/use-order-data-table-columns.tsx",
+      "packages/core/utils/src/common/normalize-currency-code.ts",
+      "packages/modules/currency/src/models/index.ts",
+      "packages/design-system/ui/src/components/code/index.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 183,
+    "elapsed_ms": 1121,
+    "error": null
+  },
+  {
+    "task": "t-43827181",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/js-sdk/src/admin/views.ts",
+      "packages/core/js-sdk/src/client.ts",
+      "packages/core/js-sdk/src/admin/currency.ts",
+      "packages/core/js-sdk/src/admin/locale.ts",
+      "packages/core/js-sdk/src/store/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 191,
+    "elapsed_ms": 1074,
+    "error": null
+  },
+  {
+    "task": "t-43827181",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/admin/dashboard/src/routes/categories/common/utils.ts",
+      "packages/core/js-sdk/src/client.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 290,
+    "elapsed_ms": 1221,
+    "error": null
+  },
+  {
+    "task": "t-43827181",
+    "condition": "O-oracle",
+    "named": [
+      "packages/admin/dashboard/src/lib/table/field-utils.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 120,
+    "elapsed_ms": 773,
+    "error": null
+  },
+  {
+    "task": "t-43827181",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/core/js-sdk/src/admin/views.ts",
+      "packages/core/js-sdk/src/admin/currency.ts",
+      "packages/core/js-sdk/src/admin/customer.ts",
+      "packages/core/js-sdk/src/admin/locale.ts",
+      "packages/admin/dashboard/src/hooks/api/views.tsx",
+      "packages/core/js-sdk/src/admin/price-list.ts",
+      "packages/core/js-sdk/src/admin/product.ts",
+      "packages/core/js-sdk/src/admin/price-preference.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 377,
+    "elapsed_ms": 1112,
+    "error": null
+  },
+  {
+    "task": "t-43827181",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/admin/dashboard/src/components/table/configurable-data-table/configurable-data-table.tsx",
+      "packages/admin/dashboard/src/utils/column-utils.ts",
+      "packages/admin/dashboard/src/components/data-grid/data-grid.tsx",
+      "packages/modules/link-modules/src/migration/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 254,
+    "elapsed_ms": 1376,
+    "error": null
+  },
+  {
+    "task": "t-01f31bc5",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/stock/doctype/item_variant/item_variant.py",
+      "erpnext/stock/doctype/item_variant_settings/item_variant_settings.py",
+      "erpnext/stock/doctype/item/item.py",
+      "erpnext/stock/doctype/item/item.js",
+      "erpnext/public/js/utils.js",
+      "erpnext/stock/doctype/item_variant/item_variant.js",
+      "erpnext/stock/doctype/item_variant_settings/item_variant_settings.js",
+      "erpnext/controllers/item_variant.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 84,
+    "elapsed_ms": 1588,
+    "error": null
+  },
+  {
+    "task": "t-01f31bc5",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/core/framework/src/http/__tests__/validate-query.spec.ts",
+      "packages/core/utils/src/common/__tests__/remote-query-object-to-string.spec.ts",
+      "packages/medusa/src/api/store/product-variants/query-config.ts",
+      "packages/admin/dashboard/src/routes/product-variants/product-variant-metadata/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 164,
+    "elapsed_ms": 1112,
+    "error": null
+  },
+  {
+    "task": "t-01f31bc5",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/js-sdk/src/admin/product.ts",
+      "packages/core/js-sdk/src/admin/price-list.ts",
+      "packages/core/modules-sdk/src/link.ts",
+      "packages/core/js-sdk/src/admin/customer.ts",
+      "packages/core/js-sdk/src/admin/region.ts",
+      "packages/core/js-sdk/src/admin/draft-order.ts",
+      "packages/core/js-sdk/src/admin/tax-rate.ts",
+      "packages/core/js-sdk/src/admin/promotion.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 293,
+    "elapsed_ms": 1277,
+    "error": null
+  },
+  {
+    "task": "t-01f31bc5",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/js-sdk/src/admin/product.ts",
+      "packages/core/js-sdk/src/admin/customer.ts",
+      "packages/core/js-sdk/src/admin/price-list.ts",
+      "packages/core/modules-sdk/src/link.ts",
+      "packages/core/utils/src/common/file-system.ts",
+      "packages/design-system/ui/src/utils/toast.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 315,
+    "elapsed_ms": 955,
+    "error": null
+  },
+  {
+    "task": "t-01f31bc5",
+    "condition": "O-oracle",
+    "named": [
+      "packages/modules/product/src/services/product-module-service.ts",
+      "packages/modules/product/integration-tests/__tests__/product-module-service/product-variants.spec.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 140,
+    "elapsed_ms": 1137,
+    "error": null
+  },
+  {
+    "task": "t-01f31bc5",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/core/js-sdk/src/admin/product.ts",
+      "packages/core/js-sdk/src/admin/product-category.ts",
+      "packages/core/js-sdk/src/admin/product-collection.ts",
+      "packages/core/js-sdk/src/admin/product-type.ts",
+      "packages/core/js-sdk/src/admin/price-list.ts",
+      "packages/core/js-sdk/src/admin/customer-group.ts",
+      "packages/core/js-sdk/src/admin/inventory-item.ts",
+      "packages/core/js-sdk/src/admin/tax-rate.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 584,
+    "elapsed_ms": 1755,
+    "error": null
+  },
+  {
+    "task": "t-01f31bc5",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/admin/dashboard/src/routes/product-variants/product-variant-metadata/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 166,
+    "elapsed_ms": 1112,
+    "error": null
+  },
+  {
+    "task": "t-a42ee082",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/shopping_cart/address.py",
+      "erpnext/e_commerce/shopping_cart/cart.py",
+      "erpnext/e_commerce/doctype/e_commerce_settings/e_commerce_settings.py",
+      "erpnext/selling/doctype/quotation/quotation.py",
+      "erpnext/utilities/transaction_base.py",
+      "erpnext/controllers/selling_controller.py",
+      "erpnext/selling/doctype/sales_order/sales_order.py",
+      "erpnext/e_commerce/product_query.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 100,
+    "elapsed_ms": 2067,
+    "error": null
+  },
+  {
+    "task": "t-a42ee082",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/core/types/src/http/shipping-option/store/responses.ts",
+      "packages/admin/dashboard/src/routes/locations/common/utils/get-custom-shipping-option-price-field-info.ts",
+      "packages/admin/dashboard/src/components/table/table-cells/shipping-option/shipping-option-cell/index.ts",
+      "integration-tests/http/__tests__/shipping-option/store/shipping-option-translation.spec.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 211,
+    "elapsed_ms": 1304,
+    "error": null
+  },
+  {
+    "task": "t-a42ee082",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/js-sdk/src/admin/price-list.ts",
+      "packages/core/js-sdk/src/client.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 373,
+    "elapsed_ms": 1012,
+    "error": null
+  },
+  {
+    "task": "t-a42ee082",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/js-sdk/src/admin/promotion.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 368,
+    "elapsed_ms": 771,
+    "error": null
+  },
+  {
+    "task": "t-a42ee082",
+    "condition": "O-oracle",
+    "named": [
+      "integration-tests/http/__tests__/shipping-option/store/shipping-option-calculated.spec.ts",
+      "integration-tests/http/src/utils/providers/fulfillment-manual-calculated/services/manual-fulfillment.ts",
+      "packages/core/core-flows/src/cart/utils/fields.ts",
+      "packages/core/core-flows/src/cart/workflows/list-shipping-options-for-cart-with-pricing.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 200,
+    "elapsed_ms": 1021,
+    "error": null
+  },
+  {
+    "task": "t-a42ee082",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/core/core-flows/src/cart/steps/update-cart.ts",
+      "packages/core/core-flows/src/cart/workflows/update-cart.ts",
+      "packages/core/core-flows/src/fulfillment/workflows/create-shipping-options.ts",
+      "packages/core/core-flows/src/fulfillment/workflows/calculate-shipping-options-prices.ts",
+      "packages/core/types/src/fulfillment/common.ts",
+      "packages/core/types/src/fulfillment/shipping-option.ts",
+      "packages/core/utils/src/fulfillment/shipping-option.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 780,
+    "elapsed_ms": 1746,
+    "error": null
+  },
+  {
+    "task": "t-a42ee082",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/medusa/src/fulfillment/__fixtures__/index.ts",
+      "packages/medusa/src/fulfillment/providers/index.ts",
+      "packages/medusa/src/fulfillment/providers/manual.ts",
+      "packages/medusa/src/fulfillment/providers/shiprocket.ts",
+      "packages/medusa/src/fulfillment/providers/webshipper.ts",
+      "packages/medusa/src/fulfillment/types/index.ts",
+      "packages/medusa/src/fulfillment/__tests__/calculate-shipping-options.spec.ts",
+      "packages/medusa/src/api/store/carts/middlewares.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 253,
+    "elapsed_ms": 1829,
+    "error": null
+  },
+  {
+    "task": "t-fb4a498f",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/selling/doctype/product_bundle/product_bundle.py",
+      "erpnext/selling/page/selling/__init__.py",
+      "erpnext/selling/doctype/sales_order/sales_order.py",
+      "erpnext/selling/doctype/quotation/quotation.py",
+      "erpnext/selling/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/buying/doctype/purchase_order/purchase_order.py",
+      "erpnext/buying/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/stock/doctype/delivery_note/delivery_note.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 89,
+    "elapsed_ms": 1898,
+    "error": null
+  },
+  {
+    "task": "t-fb4a498f",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/admin/dashboard/src/routes/products/product-detail/components/product-variant-section/product-variant-section.tsx",
+      "packages/design-system/ui/src/components/tooltip/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 185,
+    "elapsed_ms": 1229,
+    "error": null
+  },
+  {
+    "task": "t-fb4a498f",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/core-flows/src/product/steps/get-variant-pricing-link.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 112,
+    "elapsed_ms": 859,
+    "error": null
+  },
+  {
+    "task": "t-fb4a498f",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/medusa/src/commands/exec.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 210,
+    "elapsed_ms": 948,
+    "error": null
+  },
+  {
+    "task": "t-fb4a498f",
+    "condition": "O-oracle",
+    "named": [
+      "packages/admin/dashboard/src/routes/price-lists/common/hooks/use-price-list-grid-columns.tsx",
+      "packages/admin/dashboard/src/routes/products/common/variant-pricing-form.tsx"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 147,
+    "elapsed_ms": 911,
+    "error": null
+  },
+  {
+    "task": "t-fb4a498f",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/core/core-flows/src/product/steps/get-variant-pricing-link.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 112,
+    "elapsed_ms": 793,
+    "error": null
+  },
+  {
+    "task": "t-fb4a498f",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/admin/dashboard/src/components/table/table-cells/product/variant-cell/variant-cell.tsx",
+      "packages/admin/dashboard/src/routes/price-lists/price-list-prices-edit/components/price-list-prices-edit-form/price-list-prices-edit-form.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 197,
+    "elapsed_ms": 1185,
+    "error": null
+  },
+  {
+    "task": "t-f16a505c",
+    "condition": "N-no-context",
+    "named": [
+      "admin/product.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 88,
+    "elapsed_ms": 921,
+    "error": null
+  },
+  {
+    "task": "t-f16a505c",
+    "condition": "B-content-grep",
+    "named": [
+      "integration-tests/http/__tests__/returns/returns-translations.spec.ts",
+      "www/utils/generated/oas-output/operations/admin/get_admin_products_[id]_options_[option_id].ts",
+      "packages/core/framework/src/config/types.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 146,
+    "elapsed_ms": 1035,
+    "error": null
+  },
+  {
+    "task": "t-f16a505c",
+    "condition": "R-reify",
+    "named": [
+      "packages/admin/dashboard/src/routes/categories/common/utils.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 380,
+    "elapsed_ms": 815,
+    "error": null
+  },
+  {
+    "task": "t-f16a505c",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/eslint-plugin/src/rules/admin-env-vars-import-meta/rule.ts",
+      "packages/eslint-plugin/src/rules/import-from-framework-not-internal/rule.ts",
+      "packages/eslint-plugin/src/rules/link-create-keys-modules-enum/rule.ts",
+      "packages/eslint-plugin/src/rules/no-async-workflow-constructor/rule.ts",
+      "packages/eslint-plugin/src/rules/no-deprecated-remote-query-config/rule.ts",
+      "packages/eslint-plugin/src/rules/no-mikroorm-direct-import/rule.ts",
+      "packages/eslint-plugin/src/rules/no-trailing-slash-in-route-matcher/rule.ts",
+      "packages/eslint-plugin/src/rules/prefer-container-registration-keys/rule.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 392,
+    "elapsed_ms": 1684,
+    "error": null
+  },
+  {
+    "task": "t-f16a505c",
+    "condition": "O-oracle",
+    "named": [
+      "packages/core/js-sdk/src/admin/product.ts"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 132,
+    "elapsed_ms": 1033,
+    "error": null
+  },
+  {
+    "task": "t-f16a505c",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/core/js-sdk/src/admin/product.ts",
+      "packages/core/types/src/http/product/admin/queries.ts",
+      "packages/admin/dashboard/src/hooks/api/products.tsx"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 799,
+    "elapsed_ms": 1026,
+    "error": null
+  },
+  {
+    "task": "t-f16a505c",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/admin/dashboard/src/routes/products/product-detail/components/product-option-section/index.ts",
+      "packages/admin/dashboard/src/hooks/table/query/use-product-table-query.tsx",
+      "www/utils/generated/oas-output/schemas/AdminProductOptionDeleteResponse.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 173,
+    "elapsed_ms": 922,
+    "error": null
+  },
+  {
+    "task": "t-60346987",
+    "condition": "N-no-context",
+    "named": [
+      "frappe/public/js/frappe/ui/toolbar/navbar.html",
+      "frappe/public/js/frappe/ui/toolbar/navbar.js",
+      "frappe/public/js/frappe/views/page.js",
+      "frappe/public/js/frappe/templates/page_sidebar.html",
+      "frappe/public/js/frappe/ui/sidebar/sidebar.js",
+      "frappe/public/scss/desk/desk.scss",
+      "frappe/public/js/frappe/views/workspace/workspace.js",
+      "frappe/public/js/frappe/views/workspace/workspace_page.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 82,
+    "elapsed_ms": 1526,
+    "error": null
+  },
+  {
+    "task": "t-60346987",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/admin/dashboard/src/components/common/sidebar-link/indext.ts",
+      "packages/admin/dashboard/src/components/common/user-link/index.ts",
+      "www/apps/api-reference/providers/page-title.tsx",
+      "www/packages/docs-ui/src/components/Sidebar/Item/Link/__tests__/index.test.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 172,
+    "elapsed_ms": 1232,
+    "error": null
+  },
+  {
+    "task": "t-60346987",
+    "condition": "R-reify",
+    "named": [
+      "packages/eslint-plugin/src/rules/no-trailing-slash-in-route-matcher/rule.ts",
+      "packages/eslint-plugin/src/rules/route-handler-exports-uppercase/rule.ts",
+      "packages/eslint-plugin/src/util/strings.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 385,
+    "elapsed_ms": 1166,
+    "error": null
+  },
+  {
+    "task": "t-60346987",
+    "condition": "R-shuffled",
+    "named": [
+      "www/packages/docs-ui/src/hooks/use-scroll-utils/index.tsx",
+      "packages/admin/dashboard/src/hooks/use-sidebar-link-detection.tsx",
+      "packages/admin/dashboard/src/components/sidebar/sidebar-item.tsx",
+      "packages/admin/dashboard/src/layouts/dashboard-layout.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 266,
+    "elapsed_ms": 1254,
+    "error": null
+  },
+  {
+    "task": "t-60346987",
+    "condition": "O-oracle",
+    "named": [
+      "packages/admin/dashboard/src/components/layout/nav-item/nav-item.tsx"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 114,
+    "elapsed_ms": 940,
+    "error": null
+  },
+  {
+    "task": "t-60346987",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/admin/dashboard/src/components/common/sidebar-link/sidebar-link.tsx",
+      "packages/plugins/loyalty/src/admin/components/sidebar-link.tsx",
+      "www/packages/docs-ui/src/components/Sidebar/Item/Link/index.tsx",
+      "www/packages/docs-ui/src/utils/sidebar-utils.ts",
+      "www/packages/types/src/sidebar.ts",
+      "www/packages/build-scripts/src/utils/get-sidebar-item-link.ts",
+      "www/packages/remark-rehype-plugins/src/utils/fix-link.ts",
+      "www/packages/remark-rehype-plugins/src/local-links.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 761,
+    "elapsed_ms": 1500,
+    "error": null
+  },
+  {
+    "task": "t-60346987",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "www/packages/docs-ui/src/components/Sidebar/Item/Link/index.tsx",
+      "www/packages/docs-ui/src/hooks/use-child-docs/index.tsx",
+      "www/apps/api-reference/providers/page-title.tsx",
+      "www/packages/docs-ui/src/components/Sidebar/Item/Sidebar/index.tsx",
+      "www/packages/docs-ui/src/providers/Pagination/index.tsx",
+      "www/apps/bloom/sidebars/prompting.mjs",
+      "packages/core/framework/src/links/index.ts",
+      "packages/core/utils/src/link/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 238,
+    "elapsed_ms": 1307,
+    "error": null
+  },
+  {
+    "task": "t-c6188c23",
+    "condition": "N-no-context",
+    "named": [],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 88,
+    "elapsed_ms": 822,
+    "error": null
+  },
+  {
+    "task": "t-c6188c23",
+    "condition": "B-content-grep",
+    "named": [
+      "www/utils/packages/docs-generator/src/classes/helpers/oas-schema.ts",
+      "packages/medusa/src/commands/utils/generate-types.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 151,
+    "elapsed_ms": 859,
+    "error": null
+  },
+  {
+    "task": "t-c6188c23",
+    "condition": "R-reify",
+    "named": [
+      "packages/eslint-plugin/src/util/strings.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 391,
+    "elapsed_ms": 930,
+    "error": null
+  },
+  {
+    "task": "t-c6188c23",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/core-flows/src/stock-location/steps/create-stock-locations.ts",
+      "packages/core/core-flows/src/stock-location/steps/delete-stock-locations.ts",
+      "packages/core/core-flows/src/stock-location/workflows/create-stock-locations.ts",
+      "packages/core/core-flows/src/stock-location/workflows/update-stock-locations.ts",
+      "packages/core/core-flows/src/stock-location/steps/associate-locations-with-fulfillment-sets.ts",
+      "packages/core/utils/src/dml/entity-builder.ts",
+      "packages/core/js-sdk/src/admin/stock-location.ts",
+      "packages/admin/dashboard/src/routes/locations/location-detail/components/location-fulfillment-providers-section/location-fulfillment-providers-section.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 352,
+    "elapsed_ms": 1473,
+    "error": null
+  },
+  {
+    "task": "t-c6188c23",
+    "condition": "O-oracle",
+    "named": [
+      "packages/modules/providers/file-s3/src/services/s3-file.ts",
+      "packages/modules/providers/file-s3/src/services/__tests__/s3-file-url-encoding.spec.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 140,
+    "elapsed_ms": 1133,
+    "error": null
+  },
+  {
+    "task": "t-c6188c23",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/eslint-plugin/src/util/strings.ts",
+      "packages/core/framework/src/migrations/__fixtures__/project/migration-scripts/test.ts",
+      "packages/modules/order/src/utils/transform-order.ts",
+      "www/utils/packages/docs-automator/src/classes/doc-mapper.ts",
+      "packages/cli/medusa-dev-cli/src/watch.js",
+      "www/packages/docs-ui/src/components/AiAssistant/__mocks__/index.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 657,
+    "elapsed_ms": 1564,
+    "error": null
+  },
+  {
+    "task": "t-c6188c23",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/modules/providers/file-s3/src/services/__tests__/s3-file-url-encoding.spec.ts",
+      "packages/modules/providers/file-s3/src/services/s3-file.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 184,
+    "elapsed_ms": 1202,
+    "error": null
+  },
+  {
+    "task": "t-bb9ddf96",
+    "condition": "N-no-context",
+    "named": [
+      "frappe/model/db_query.py",
+      "frappe/model/base_document.py",
+      "frappe/model/utils/rename_field.py",
+      "frappe/desk/reportview.py",
+      "frappe/client.py",
+      "frappe/core/doctype/doctype/doctype.py",
+      "frappe/core/doctype/doctype/boilerplate.py",
+      "frappe/public/js/frappe/model/reportview.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 88,
+    "elapsed_ms": 1458,
+    "error": null
+  },
+  {
+    "task": "t-bb9ddf96",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/core/utils/src/dml/relations/has-one-fk.ts",
+      "packages/medusa/src/modules/api-key.ts",
+      "packages/modules/api-key/src/index.ts",
+      "integration-tests/modules/__tests__/modules/remote-query.spec.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 165,
+    "elapsed_ms": 1154,
+    "error": null
+  },
+  {
+    "task": "t-bb9ddf96",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/utils/src/dal/mikro-orm/decorators/foreign-key.ts",
+      "packages/core/utils/src/dml/helpers/entity-builder/define-relationship.ts",
+      "packages/core/utils/src/dml/helpers/entity-builder/relationship-helpers.ts",
+      "packages/core/utils/src/dml/relations/has-one-fk.ts",
+      "packages/core/utils/src/dml/helpers/create-mikro-orm-entity.ts",
+      "packages/core/utils/src/dml/relations/has-one.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 286,
+    "elapsed_ms": 1330,
+    "error": null
+  },
+  {
+    "task": "t-bb9ddf96",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/utils/src/migrations/index.ts",
+      "packages/core/modules-sdk/src/medusa-app.ts",
+      "packages/core/orchestration/src/workflow/global-workflow.ts",
+      "packages/core/orchestration/src/workflow/local-workflow.ts",
+      "packages/core/framework/src/migrations/migrator.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 325,
+    "elapsed_ms": 995,
+    "error": null
+  },
+  {
+    "task": "t-bb9ddf96",
+    "condition": "O-oracle",
+    "named": [
+      "packages/core/utils/src/modules-sdk/joiner-config-builder.ts",
+      "packages/core/utils/src/modules-sdk/__tests__/joiner-config-builder.spec.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 137,
+    "elapsed_ms": 801,
+    "error": null
+  },
+  {
+    "task": "t-bb9ddf96",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/core/utils/src/dml/relations/has-one-fk.ts",
+      "packages/core/utils/src/dml/relations/has-one.ts",
+      "packages/core/utils/src/dml/relations/has-many.ts",
+      "packages/core/utils/src/dml/relations/many-to-many.ts",
+      "packages/core/utils/src/dml/helpers/entity-builder/define-relationship.ts",
+      "packages/core/utils/src/dml/helpers/entity-builder/relationship-helpers.ts",
+      "packages/core/utils/src/dml/helpers/create-mikro-orm-entity.ts",
+      "packages/core/utils/src/dml/helpers/mikro-orm/build-indexes.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 713,
+    "elapsed_ms": 1707,
+    "error": null
+  },
+  {
+    "task": "t-bb9ddf96",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "integration-tests/modules/__tests__/modules/remote-query.spec.ts",
+      "packages/eslint-plugin/src/rules/link-no-cross-module-relationship/rule.ts",
+      "packages/core/types/src/dml/index.ts",
+      "packages/core/types/src/http/view-configuration/admin/property-descriptor.ts",
+      "packages/modules/fulfillment/src/utils/utils.ts",
+      "packages/core/modules-sdk/src/loaders/register-modules.ts",
+      "packages/modules/api-key/src/services/index.ts",
+      "packages/medusa/src/commands/__fixtures__/instrumentation-no-register/instrumentation.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 220,
+    "elapsed_ms": 1546,
+    "error": null
+  },
+  {
+    "task": "t-0731abc3",
+    "condition": "N-no-context",
+    "named": [
+      "frappe/integrations/oauth2.py",
+      "frappe/auth.py",
+      "frappe/utils/oauth.py",
+      "frappe/integrations/oauth2_utils.py",
+      "frappe/core/doctype/oauth_client/oauth_client.py",
+      "frappe/core/doctype/oauth_provider_settings/oauth_provider_settings.py",
+      "frappe/integrations/oauth2_logins.py",
+      "frappe/integrations/oauth2_rest.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 85,
+    "elapsed_ms": 1610,
+    "error": null
+  },
+  {
+    "task": "t-0731abc3",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/admin/admin-bundler/src/utils/config.ts",
+      "packages/core/core-flows/src/auth/workflows/set-auth-app-metadata.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 207,
+    "elapsed_ms": 1302,
+    "error": null
+  },
+  {
+    "task": "t-0731abc3",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/js-sdk/src/admin/user.ts",
+      "packages/core/js-sdk/src/admin/upload.ts",
+      "packages/core/js-sdk/src/admin/invite.ts",
+      "packages/core/js-sdk/src/client.ts",
+      "packages/core/js-sdk/src/auth/index.ts",
+      "packages/core/js-sdk/src/store/index.ts",
+      "packages/admin/dashboard/src/hooks/api/invites.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 208,
+    "elapsed_ms": 1056,
+    "error": null
+  },
+  {
+    "task": "t-0731abc3",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/eslint-plugin/src/rules/admin-env-vars-import-meta/rule.ts",
+      "packages/eslint-plugin/src/rules/import-from-framework-not-internal/rule.ts",
+      "packages/eslint-plugin/src/rules/link-create-keys-modules-enum/rule.ts",
+      "packages/eslint-plugin/src/rules/no-async-workflow-constructor/rule.ts",
+      "packages/eslint-plugin/src/rules/no-deprecated-remote-query-config/rule.ts",
+      "packages/eslint-plugin/src/rules/no-mikroorm-direct-import/rule.ts",
+      "packages/eslint-plugin/src/rules/no-trailing-slash-in-route-matcher/rule.ts",
+      "packages/eslint-plugin/src/rules/prefer-container-registration-keys/rule.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 388,
+    "elapsed_ms": 1463,
+    "error": null
+  },
+  {
+    "task": "t-0731abc3",
+    "condition": "O-oracle",
+    "named": [
+      "packages/plugins/loyalty/src/admin/lib/sdk.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 111,
+    "elapsed_ms": 1115,
+    "error": null
+  },
+  {
+    "task": "t-0731abc3",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/core/js-sdk/src/auth/index.ts",
+      "packages/core/js-sdk/src/admin/upload.ts",
+      "packages/core/js-sdk/src/admin/invite.ts",
+      "packages/core/js-sdk/src/admin/user.ts",
+      "packages/core/js-sdk/src/client.ts",
+      "packages/core/js-sdk/src/store/index.ts",
+      "packages/admin/dashboard/src/hooks/api/invites.tsx",
+      "www/packages/docs-ui/src/utils/swr-fetcher.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 381,
+    "elapsed_ms": 1245,
+    "error": null
+  },
+  {
+    "task": "t-0731abc3",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/core/js-sdk/src/auth/index.ts",
+      "packages/admin/admin-bundler/src/utils/config.ts",
+      "packages/core/types/src/http/index/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 221,
+    "elapsed_ms": 999,
+    "error": null
+  },
+  {
+    "task": "t-306c22d4",
+    "condition": "N-no-context",
+    "named": [
+      "www/frappe/public/js/frappe/form/controls/select.js",
+      "www/frappe/public/scss/frappe/controls/select.scss",
+      "www/frappe/public/scss/frappe/controls/control.scss",
+      "www/frappe/public/scss/frappe/controls/input_group.scss",
+      "www/frappe/public/scss/frappe/controls/form_control.scss",
+      "www/frappe/public/js/frappe/form/controls/control.js",
+      "www/frappe/public/scss/frappe/controls/select_control.scss",
+      "www/frappe/public/scss/frappe/controls/dropdown.scss"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 91,
+    "elapsed_ms": 1645,
+    "error": null
+  },
+  {
+    "task": "t-306c22d4",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/admin/dashboard/src/routes/products/product-edit-option/index.ts",
+      "packages/admin/dashboard/src/routes/products/product-create-option/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 196,
+    "elapsed_ms": 909,
+    "error": null
+  },
+  {
+    "task": "t-306c22d4",
+    "condition": "R-reify",
+    "named": [
+      "packages/admin/dashboard/src/hooks/api/products.tsx",
+      "packages/modules/product/src/services/product-module-service.ts",
+      "packages/core/types/src/product/common.ts",
+      "packages/core/js-sdk/src/admin/product.ts",
+      "packages/core/utils/src/modules-sdk/decorators/context-parameter.ts",
+      "packages/core/utils/src/event-bus/message-aggregator.ts",
+      "packages/medusa-telemetry/src/util/in-memory-config.js",
+      "packages/core/framework/src/http/utils/policies/rbac-field-filter.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 269,
+    "elapsed_ms": 1212,
+    "error": null
+  },
+  {
+    "task": "t-306c22d4",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/utils/src/modules-sdk/define-link.ts",
+      "packages/core/utils/src/modules-sdk/types/medusa-service.ts",
+      "packages/core/utils/src/dal/mikro-orm/mikro-orm-repository.ts",
+      "packages/core/utils/src/common/array-difference.ts",
+      "packages/core/utils/src/common/promise-all.ts",
+      "packages/admin/dashboard/src/providers/keybind-provider/types.ts",
+      "packages/admin/dashboard/src/providers/keybind-provider/utils.ts",
+      "packages/admin/dashboard/src/providers/keybind-provider/hooks.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 302,
+    "elapsed_ms": 1423,
+    "error": null
+  },
+  {
+    "task": "t-306c22d4",
+    "condition": "O-oracle",
+    "named": [
+      "packages/admin/dashboard/src/components/common/section/section-row.tsx",
+      "packages/admin/dashboard/src/components/inputs/chip-input/chip-input.tsx",
+      "packages/admin/dashboard/src/components/inputs/combobox/combobox.tsx",
+      "packages/admin/dashboard/src/routes/products/product-detail/components/product-option-section/product-option-section.tsx"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 191,
+    "elapsed_ms": 1226,
+    "error": null
+  },
+  {
+    "task": "t-306c22d4",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/modules/product/src/services/product-module-service.ts",
+      "packages/core/types/src/product/common.ts",
+      "packages/core/js-sdk/src/admin/product.ts",
+      "packages/admin/dashboard/src/hooks/api/products.tsx",
+      "packages/design-system/toolbox/src/commands/icons/command.ts",
+      "packages/core/framework/src/http/utils/policies/rbac-field-filter.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 647,
+    "elapsed_ms": 1470,
+    "error": null
+  },
+  {
+    "task": "t-306c22d4",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/admin/dashboard/src/routes/products/product-detail/components/product-option-section/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 175,
+    "elapsed_ms": 687,
+    "error": null
+  },
+  {
+    "task": "t-c02bcaba",
+    "condition": "N-no-context",
+    "named": [],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 82,
+    "elapsed_ms": 777,
+    "error": null
+  },
+  {
+    "task": "t-c02bcaba",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/cli/create-medusa-app/src/utils/package-manager.ts",
+      "packages/cli/medusa-cli/src/util/package-manager.ts",
+      "packages/cli/create-medusa-app/src/utils/start-medusa.ts",
+      "packages/core/utils/src/common/container.ts",
+      "packages/core/modules-sdk/src/loaders/__mocks__/medusa-telemetry.ts",
+      "www/utils/packages/docs-generator/src/commands/run-git-changes.ts"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 176,
+    "elapsed_ms": 1039,
+    "error": null
+  },
+  {
+    "task": "t-c02bcaba",
+    "condition": "R-reify",
+    "named": [
+      "packages/cli/create-medusa-app/src/utils/package-manager.ts",
+      "packages/cli/medusa-cli/src/util/package-manager.ts",
+      "packages/cli/create-medusa-app/src/utils/process-manager.ts",
+      "packages/cli/http-types-generator/src/utils/index-manager.ts",
+      "packages/core/core-flows/src/product/utils/csvtojson.ts",
+      "packages/medusa-telemetry/src/util/is-ci.js",
+      "packages/core/utils/src/dal/mikro-orm/utils.ts",
+      "packages/medusa/src/commands/mcloud.ts"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 207,
+    "elapsed_ms": 1635,
+    "error": null
+  },
+  {
+    "task": "t-c02bcaba",
+    "condition": "R-shuffled",
+    "named": [
+      "yarn/plugins/@yarnpkg/plugin-interactive-tools.cjs",
+      "packages/core/js-sdk/src/admin/api-key.ts",
+      "packages/core/js-sdk/src/admin/campaign.ts",
+      "packages/core/js-sdk/src/admin/customer.ts",
+      "packages/core/js-sdk/src/admin/draft-order.ts",
+      "packages/core/js-sdk/src/admin/invite.ts",
+      "packages/core/js-sdk/src/admin/price-list.ts",
+      "packages/core/js-sdk/src/admin/product-tag.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 293,
+    "elapsed_ms": 1096,
+    "error": null
+  },
+  {
+    "task": "t-c02bcaba",
+    "condition": "O-oracle",
+    "named": [
+      "packages/cli/create-medusa-app/src/utils/package-manager.ts",
+      "packages/cli/create-medusa-app/src/utils/__tests__/package-manager.test.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 131,
+    "elapsed_ms": 1124,
+    "error": null
+  },
+  {
+    "task": "t-c02bcaba",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/cli/create-medusa-app/src/utils/package-manager.ts",
+      "packages/cli/medusa-cli/src/util/package-manager.ts",
+      "packages/cli/create-medusa-app/src/utils/prepare-project.ts",
+      "packages/cli/medusa-cli/src/commands/new.ts",
+      "packages/medusa/src/commands/build.ts",
+      "packages/cli/medusa-dev-cli/src/watch.js",
+      "packages/core/framework/src/build-tools/compiler.ts",
+      "packages/medusa/src/commands/mcloud.ts"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 407,
+    "elapsed_ms": 1179,
+    "error": null
+  },
+  {
+    "task": "t-c02bcaba",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/cli/create-medusa-app/src/utils/package-manager.ts",
+      "packages/cli/create-medusa-app/src/utils/__tests__/package-manager.test.ts",
+      "packages/cli/medusa-cli/src/util/package-manager.ts",
+      "packages/cli/create-medusa-app/src/utils/start-medusa.ts",
+      "packages/cli/create-medusa-app/src/utils/facts.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 174,
+    "elapsed_ms": 1221,
+    "error": null
+  },
+  {
+    "task": "t-dd5b3ee6",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/shopping_cart/cart.py",
+      "erpnext/shopping_cart/utils.py",
+      "erpnext/templates/pages/cart.py",
+      "erpnext/templates/includes/cart/cart_items.html",
+      "erpnext/templates/includes/cart/cart_taxes.html",
+      "erpnext/public/js/shopping_cart.js",
+      "erpnext/public/js/cart.js",
+      "erpnext/controllers/taxes_and_totals.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 91,
+    "elapsed_ms": 1591,
+    "error": null
+  },
+  {
+    "task": "t-dd5b3ee6",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/core/types/src/modules-sdk/__fixtures__/remote-query.ts",
+      "packages/modules/cart/src/models/shipping-method.ts",
+      "packages/admin/dashboard/src/routes/locations/location-list/constants.ts",
+      "packages/admin/dashboard/src/routes/orders/order-edit-shipping-address/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 165,
+    "elapsed_ms": 940,
+    "error": null
+  },
+  {
+    "task": "t-dd5b3ee6",
+    "condition": "R-reify",
+    "named": [],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 390,
+    "elapsed_ms": 1139,
+    "error": null
+  },
+  {
+    "task": "t-dd5b3ee6",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/js-sdk/src/admin/price-list.ts",
+      "packages/admin/dashboard/src/hooks/api/price-lists.tsx",
+      "packages/core/js-sdk/src/client.ts",
+      "packages/core/js-sdk/src/admin/currency.ts",
+      "packages/core/js-sdk/src/admin/customer.ts",
+      "packages/core/js-sdk/src/admin/locale.ts",
+      "packages/core/js-sdk/src/admin/upload.ts",
+      "packages/core/js-sdk/src/admin/user.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 217,
+    "elapsed_ms": 1477,
+    "error": null
+  },
+  {
+    "task": "t-dd5b3ee6",
+    "condition": "O-oracle",
+    "named": [
+      "integration-tests/http/__tests__/cart/store/cart.spec.ts",
+      "packages/core/core-flows/src/cart/workflows/update-cart.ts",
+      "packages/core/types/src/cart/workflows.ts",
+      "packages/medusa/src/api/store/carts/validators.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 160,
+    "elapsed_ms": 946,
+    "error": null
+  },
+  {
+    "task": "t-dd5b3ee6",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/core/core-flows/src/cart/workflows/update-tax-lines.ts",
+      "packages/core/core-flows/src/cart/workflows/upsert-tax-lines.ts",
+      "packages/core/core-flows/src/cart/steps/set-tax-lines-for-items.ts",
+      "packages/core/core-flows/src/cart/steps/upsert-tax-lines-for-items.ts",
+      "packages/core/types/src/cart/common.ts",
+      "packages/modules/order/src/utils/transform-order.ts",
+      "packages/core/core-flows/src/tax/steps/get-item-tax-lines.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 783,
+    "elapsed_ms": 1618,
+    "error": null
+  },
+  {
+    "task": "t-dd5b3ee6",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/modules/cart/src/models/cart.ts",
+      "packages/modules/cart/src/models/index.ts",
+      "packages/admin/dashboard/src/routes/orders/order-edit-shipping-address/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 173,
+    "elapsed_ms": 979,
+    "error": null
+  },
+  {
+    "task": "t-cd0aeef3",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/stock/doctype/batch/batch.py",
+      "erpnext/stock/doctype/batch/batch.js",
+      "erpnext/stock/doctype/batch/batch.json",
+      "erpnext/stock/doctype/batch_link/batch_link.py",
+      "erpnext/stock/doctype/batch_link/batch_link.js",
+      "erpnext/stock/doctype/batch_link/batch_link.json"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 88,
+    "elapsed_ms": 1152,
+    "error": null
+  },
+  {
+    "task": "t-cd0aeef3",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/core/types/src/common/batch.ts",
+      "packages/core/utils/src/link/index.ts",
+      "packages/core/framework/src/links/__tests__/index.spec.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 219,
+    "elapsed_ms": 1209,
+    "error": null
+  },
+  {
+    "task": "t-cd0aeef3",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/modules-sdk/src/link.ts",
+      "packages/modules/order/src/utils/actions/item-add.ts",
+      "packages/modules/order/src/utils/actions/item-update.ts",
+      "packages/modules/order/src/utils/actions/reinstate-item.ts",
+      "packages/modules/order/src/utils/actions/fulfill-item.ts",
+      "packages/modules/order/src/utils/actions/deliver-item.ts",
+      "packages/modules/order/src/utils/actions/return-item.ts",
+      "packages/modules/order/src/utils/actions/ship-item.ts"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 379,
+    "elapsed_ms": 1422,
+    "error": null
+  },
+  {
+    "task": "t-cd0aeef3",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/modules-sdk/src/medusa-app.ts",
+      "packages/core/modules-sdk/src/remote-query/query.ts",
+      "packages/modules/index/src/services/index-module-service.ts",
+      "packages/modules/index/src/services/postgres-provider.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 228,
+    "elapsed_ms": 1155,
+    "error": null
+  },
+  {
+    "task": "t-cd0aeef3",
+    "condition": "O-oracle",
+    "named": [
+      "packages/core/modules-sdk/src/link.ts",
+      "packages/core/modules-sdk/src/__tests__/remote-link.spec.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 128,
+    "elapsed_ms": 746,
+    "error": null
+  },
+  {
+    "task": "t-cd0aeef3",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/core/modules-sdk/src/link.ts",
+      "packages/modules/order/src/utils/actions/item-add.ts",
+      "packages/modules/order/src/utils/actions/fulfill-item.ts",
+      "packages/modules/order/src/utils/actions/ship-item.ts",
+      "packages/modules/order/src/utils/actions/deliver-item.ts",
+      "packages/modules/order/src/utils/actions/return-item.ts",
+      "packages/modules/order/src/utils/actions/transfer-customer.ts",
+      "packages/core/js-sdk/src/admin/product.ts"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 716,
+    "elapsed_ms": 1909,
+    "error": null
+  },
+  {
+    "task": "t-cd0aeef3",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/core/core-flows/src/common/workflows/batch-links.ts",
+      "packages/core/types/src/common/batch.ts",
+      "packages/core/utils/src/link/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 200,
+    "elapsed_ms": 1014,
+    "error": null
+  },
+  {
+    "task": "t-36915a5f",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/e_commerce/variant_utils.py",
+      "erpnext/shopping_cart/cart.py",
+      "erpnext/shopping_cart/utils.py",
+      "erpnext/templates/pages/cart.py",
+      "erpnext/templates/includes/cart/cart_items.html",
+      "erpnext/templates/includes/checkout/checkout.html",
+      "erpnext/e_commerce/doctype/e_commerce_settings/e_commerce_settings.py",
+      "erpnext/controllers/website_list_for_contact.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 89,
+    "elapsed_ms": 1895,
+    "error": null
+  },
+  {
+    "task": "t-36915a5f",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/medusa/src/api/store/payment-providers/middlewares.ts",
+      "packages/admin/dashboard/src/components/filtering/query/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 146,
+    "elapsed_ms": 920,
+    "error": null
+  },
+  {
+    "task": "t-36915a5f",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/modules-sdk/src/medusa-app.ts",
+      "packages/core/modules-sdk/src/remote-query/query.ts",
+      "packages/core/modules-sdk/src/remote-query/remote-query.ts",
+      "packages/core/orchestration/src/joiner/remote-joiner.ts",
+      "packages/modules/index/src/services/index-module-service.ts",
+      "packages/modules/index/src/services/postgres-provider.ts",
+      "packages/core/utils/src/common/is-defined.ts",
+      "packages/medusa-telemetry/src/util/in-memory-config.js"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 247,
+    "elapsed_ms": 1193,
+    "error": null
+  },
+  {
+    "task": "t-36915a5f",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/medusa/src/api/admin/payments/route.ts",
+      "packages/medusa/src/api/admin/orders/route.ts",
+      "packages/medusa/src/api/store/payment-collections/route.ts",
+      "packages/medusa/src/api/store/payment-collections/[id]/route.ts",
+      "packages/medusa/src/api/store/payment-collections/middlewares.ts",
+      "packages/medusa/src/api/store/carts/route.ts",
+      "packages/medusa/src/api/store/carts/middlewares.ts",
+      "packages/medusa/src/api/store/payment-collections/[id]/payment-sessions/route.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 296,
+    "elapsed_ms": 1473,
+    "error": null
+  },
+  {
+    "task": "t-36915a5f",
+    "condition": "O-oracle",
+    "named": [
+      "packages/admin/dashboard/src/routes/orders/order-detail/components/copy-payment-link/copy-payment-link.tsx",
+      "packages/admin/dashboard/src/routes/profile/profile-edit/components/edit-profile-form/edit-profile-form.tsx"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 158,
+    "elapsed_ms": 909,
+    "error": null
+  },
+  {
+    "task": "t-36915a5f",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/core/js-sdk/src/admin/payment-collection.ts",
+      "packages/core/js-sdk/src/admin/order.ts",
+      "packages/core/js-sdk/src/admin/payment.ts",
+      "packages/medusa/src/api/store/payment-collections/[id]/route.ts",
+      "packages/medusa/src/api/store/payment-collections/route.ts",
+      "packages/medusa/src/api/store/orders/[id]/route.ts",
+      "packages/medusa/src/api/store/payment-providers/route.ts",
+      "packages/medusa/src/api/store/payment/route.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 630,
+    "elapsed_ms": 1583,
+    "error": null
+  },
+  {
+    "task": "t-36915a5f",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/core/types/src/common/config-module.ts",
+      "packages/core/core-flows/src/order/workflows/get-orders-list.ts",
+      "packages/admin/dashboard/src/routes/orders/order-detail/loader.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 149,
+    "elapsed_ms": 1106,
+    "error": null
+  },
+  {
+    "task": "t-0b678b4c",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/accounts/utils.py",
+      "erpnext/accounts/party.py",
+      "erpnext/accounts/doctype/payment_entry/payment_entry.py",
+      "erpnext/accounts/doctype/journal_entry/journal_entry.py",
+      "erpnext/accounts/doctype/sales_invoice/sales_invoice.py",
+      "erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py",
+      "erpnext/buying/doctype/supplier_scorecard/supplier_scorecard.py",
+      "erpnext/stock/delivery_note/delivery_note.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 98,
+    "elapsed_ms": 1474,
+    "error": null
+  },
+  {
+    "task": "t-0b678b4c",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/modules/payment/src/models/refund-reason.ts",
+      "packages/medusa/jest.config.js",
+      "integration-tests/http/__tests__/payment/admin/payment.spec.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 140,
+    "elapsed_ms": 843,
+    "error": null
+  },
+  {
+    "task": "t-0b678b4c",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/utils/src/dal/mikro-orm/mikro-orm-repository.ts",
+      "packages/core/js-sdk/src/admin/payment.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 359,
+    "elapsed_ms": 952,
+    "error": null
+  },
+  {
+    "task": "t-0b678b4c",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/js-sdk/src/client.ts",
+      "packages/core/js-sdk/src/admin/currency.ts",
+      "packages/core/js-sdk/src/admin/customer.ts",
+      "packages/core/js-sdk/src/admin/locale.ts",
+      "packages/core/js-sdk/src/admin/upload.ts",
+      "packages/core/js-sdk/src/admin/user.ts",
+      "packages/core/js-sdk/src/auth/index.ts",
+      "packages/core/js-sdk/src/store/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 305,
+    "elapsed_ms": 1007,
+    "error": null
+  },
+  {
+    "task": "t-0b678b4c",
+    "condition": "O-oracle",
+    "named": [
+      "packages/modules/payment/src/services/payment-module.ts",
+      "packages/modules/promotion/src/services/promotion-module.ts",
+      "packages/modules/payment/integration-tests/__tests__/services/payment-module/index.spec.ts",
+      "packages/modules/promotion/integration-tests/__tests__/services/promotion-module/register-usage.spec.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 192,
+    "elapsed_ms": 1317,
+    "error": null
+  },
+  {
+    "task": "t-0b678b4c",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/core/utils/src/dal/mikro-orm/mikro-orm-repository.ts",
+      "packages/core/utils/src/dal/mikro-orm/mikro-orm-serializer.ts",
+      "packages/core/js-sdk/src/admin/payment.ts",
+      "packages/admin/dashboard/src/hooks/api/payments.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 782,
+    "elapsed_ms": 1083,
+    "error": null
+  },
+  {
+    "task": "t-0b678b4c",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/core/core-flows/src/payment/workflows/index.ts",
+      "packages/core/core-flows/src/payment/steps/index.ts",
+      "packages/core/core-flows/src/cart/workflows/complete-cart.ts",
+      "packages/modules/promotion/src/utils/compute-actions/buy-get.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 208,
+    "elapsed_ms": 912,
+    "error": null
+  },
+  {
+    "task": "t-1ffae136",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/stock/doctype/stock_reservation_entry/stock_reservation_entry.py",
+      "erpnext/stock/doctype/stock_reservation_entry/stock_reservation_entry.js",
+      "erpnext/stock/doctype/stock_reservation_entry/stock_reservation_entry.json",
+      "erpnext/stock/doctype/stock_reservation_entry/stock_reservation_entry_list.js",
+      "erpnext/stock/doctype/stock_reservation_entry/stock_reservation_entry_dashboard.py",
+      "erpnext/stock/doctype/stock_reservation_entry/stock_reservation_entry_list.html",
+      "erpnext/stock/doctype/stock_reservation_entry/stock_reservation_entry_row.js",
+      "erpnext/stock/doctype/stock_reservation_entry/stock_reservation_entry_row.html"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 85,
+    "elapsed_ms": 1532,
+    "error": null
+  },
+  {
+    "task": "t-1ffae136",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/admin/dashboard/src/routes/orders/order-balance-settlement/components/order-balance-settlement-form/order-balance-settlement-form.tsx",
+      "packages/admin/dashboard/src/components/common/form/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 176,
+    "elapsed_ms": 1075,
+    "error": null
+  },
+  {
+    "task": "t-1ffae136",
+    "condition": "R-reify",
+    "named": [
+      "packages/eslint-plugin/src/rules/no-async-workflow-constructor/rule.ts",
+      "packages/eslint-plugin/src/rules/service-constructor-must-call-super/rule.ts",
+      "packages/eslint-plugin/src/rules/step-id-kebab-case/rule.ts",
+      "packages/eslint-plugin/src/rules/step-must-return-step-response/rule.ts",
+      "packages/eslint-plugin/src/rules/use-query-context-utility/rule.ts",
+      "packages/eslint-plugin/src/rules/zod-import-source/rule.ts",
+      "packages/eslint-plugin/src/util/strings.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 389,
+    "elapsed_ms": 1264,
+    "error": null
+  },
+  {
+    "task": "t-1ffae136",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/eslint-plugin/src/util/strings.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 389,
+    "elapsed_ms": 935,
+    "error": null
+  },
+  {
+    "task": "t-1ffae136",
+    "condition": "O-oracle",
+    "named": [
+      "packages/admin/dashboard/src/routes/reservations/reservation-detail/components/edit-reservation/edit-reservation-modal.tsx"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 131,
+    "elapsed_ms": 896,
+    "error": null
+  },
+  {
+    "task": "t-1ffae136",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/eslint-plugin/src/rules/admin-component-must-be-arrow-function/rule.ts",
+      "packages/eslint-plugin/src/rules/no-async-workflow-constructor/rule.ts",
+      "packages/eslint-plugin/src/rules/service-constructor-must-call-super/rule.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 654,
+    "elapsed_ms": 1091,
+    "error": null
+  },
+  {
+    "task": "t-1ffae136",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/admin/dashboard/src/routes/locations/location-service-zone-shipping-option-edit/components/edit-region-form/edit-shipping-option-form.tsx",
+      "packages/admin/dashboard/src/routes/roles/role-edit/components/edit-role-form/index.ts",
+      "packages/admin/dashboard/src/routes/policies/policy-edit/components/edit-policy-form/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 215,
+    "elapsed_ms": 1107,
+    "error": null
+  },
+  {
+    "task": "t-a207803c",
+    "condition": "N-no-context",
+    "named": [
+      "apps/shipping/shipping_rule.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 91,
+    "elapsed_ms": 883,
+    "error": null
+  },
+  {
+    "task": "t-a207803c",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/core/core-flows/src/cart/workflows/list-shipping-options-for-cart-with-pricing.ts",
+      "packages/medusa/src/api/store/shipping-options/[id]/calculate/route.ts",
+      "packages/core/core-flows/src/price-list/workflows/create-price-list-prices.ts",
+      "packages/admin/dashboard/src/routes/locations/common/components/conditional-price-form/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 181,
+    "elapsed_ms": 1141,
+    "error": null
+  },
+  {
+    "task": "t-a207803c",
+    "condition": "R-reify",
+    "named": [
+      "packages/admin/dashboard/src/routes/locations/common/components/conditional-price-form/conditional-price-form.tsx",
+      "packages/admin/dashboard/src/routes/locations/common/schema.ts",
+      "packages/admin/dashboard/src/routes/locations/common/types.ts",
+      "packages/core/types/src/fulfillment/common/shipping-option.ts",
+      "packages/admin/dashboard/src/routes/locations/location-service-zone-shipping-option-create/components/create-shipping-options-form/schema.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 308,
+    "elapsed_ms": 1157,
+    "error": null
+  },
+  {
+    "task": "t-a207803c",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/js-sdk/src/admin/draft-order.ts",
+      "packages/plugins/draft-order/src/admin/hooks/api/draft-orders.tsx",
+      "packages/plugins/draft-order/src/admin/routes/draft-orders/[id]/@email/page.tsx"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 145,
+    "elapsed_ms": 1077,
+    "error": null
+  },
+  {
+    "task": "t-a207803c",
+    "condition": "O-oracle",
+    "named": [
+      "packages/admin/dashboard/src/routes/locations/common/schema.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 121,
+    "elapsed_ms": 1015,
+    "error": null
+  },
+  {
+    "task": "t-a207803c",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/admin/dashboard/src/routes/locations/common/components/conditional-price-form/conditional-price-form.tsx",
+      "packages/admin/dashboard/src/routes/locations/common/components/shipping-option-price-provider/shipping-option-price-provider.tsx",
+      "packages/admin/dashboard/src/routes/locations/common/components/shipping-option-price-provider/shipping-option-price-context.tsx",
+      "packages/admin/dashboard/src/routes/locations/common/schema.ts",
+      "packages/admin/dashboard/src/routes/locations/location-service-zone-shipping-option-create/components/create-shipping-options-form/schema.ts",
+      "packages/core/types/src/fulfillment/common/shipping-option.ts",
+      "packages/admin/dashboard/src/routes/locations/common/utils/price-rule-helpers.ts",
+      "packages/core/types/src/http/shipping-option/admin/entities.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 917,
+    "elapsed_ms": 1531,
+    "error": null
+  },
+  {
+    "task": "t-a207803c",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/modules/promotion/src/utils/compute-actions/buy-get.ts",
+      "packages/core/core-flows/src/cart/workflows/list-shipping-options-for-cart-with-pricing.ts",
+      "packages/medusa/src/api/store/shipping-options/[id]/calculate/route.ts",
+      "packages/medusa/src/api/admin/order-edits/validators.ts",
+      "packages/admin/dashboard/src/routes/locations/common/components/shipping-option-price-provider/shipping-option-price-provider.tsx",
+      "packages/core/core-flows/src/product/workflows/create-product-variants.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 220,
+    "elapsed_ms": 1341,
+    "error": null
+  },
+  {
+    "task": "t-d75e69a5",
+    "condition": "N-no-context",
+    "named": [
+      "frontend/src/Product.vue"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 90,
+    "elapsed_ms": 628,
+    "error": null
+  },
+  {
+    "task": "t-d75e69a5",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/medusa/src/api/utils/middlewares/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 168,
+    "elapsed_ms": 748,
+    "error": null
+  },
+  {
+    "task": "t-d75e69a5",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/js-sdk/src/admin/product.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 366,
+    "elapsed_ms": 2374,
+    "error": null
+  },
+  {
+    "task": "t-d75e69a5",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/core/utils/src/common/is-defined.ts",
+      "packages/core/workflows-sdk/src/utils/composer/when.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 382,
+    "elapsed_ms": 1383,
+    "error": null
+  },
+  {
+    "task": "t-d75e69a5",
+    "condition": "O-oracle",
+    "named": [
+      "packages/core/js-sdk/src/admin/product.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 116,
+    "elapsed_ms": 1245,
+    "error": null
+  },
+  {
+    "task": "t-d75e69a5",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/core/js-sdk/src/admin/product.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 764,
+    "elapsed_ms": 1390,
+    "error": null
+  },
+  {
+    "task": "t-d75e69a5",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/modules/link-modules/src/definitions/product-variant-inventory-item.ts",
+      "packages/medusa/src/api/utils/middlewares/index.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 197,
+    "elapsed_ms": 1432,
+    "error": null
+  },
+  {
+    "task": "t-dea11e3d",
+    "condition": "N-no-context",
+    "named": [
+      "erpnext/stock/doctype/item/item.py",
+      "erpnext/stock/doctype/item/item_list.js",
+      "erpnext/stock/doctype/item/item.js",
+      "erpnext/stock/doctype/item/events.py"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 86,
+    "elapsed_ms": 1493,
+    "error": null
+  },
+  {
+    "task": "t-dea11e3d",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/modules/product/src/services/product-category.ts",
+      "packages/core/core-flows/src/product-category/workflows/delete-product-categories.ts",
+      "packages/core/utils/src/product/events.ts",
+      "packages/core/utils/src/event-bus/common-events.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 202,
+    "elapsed_ms": 1424,
+    "error": null
+  },
+  {
+    "task": "t-dea11e3d",
+    "condition": "R-reify",
+    "named": [
+      "packages/core/js-sdk/src/admin/product-category.ts",
+      "packages/core/modules-sdk/src/link.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 295,
+    "elapsed_ms": 1175,
+    "error": null
+  },
+  {
+    "task": "t-dea11e3d",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/modules/settings/src/services/settings-module-service.ts",
+      "packages/core/core-flows/src/settings/steps/delete-property-labels.ts",
+      "packages/core/core-flows/src/settings/workflows/batch-property-labels.ts",
+      "packages/core/types/src/settings/common.ts",
+      "packages/core/core-flows/src/settings/steps/create-property-label.ts",
+      "packages/core/core-flows/src/settings/steps/update-property-label.ts",
+      "packages/core/js-sdk/src/admin/views.ts",
+      "packages/medusa/src/api/admin/views/[entity]/configurations/middleware.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 299,
+    "elapsed_ms": 1350,
+    "error": null
+  },
+  {
+    "task": "t-dea11e3d",
+    "condition": "O-oracle",
+    "named": [
+      "packages/modules/product/src/services/product-module-service.ts",
+      "packages/modules/product/integration-tests/__tests__/product-module-service/events.spec.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 140,
+    "elapsed_ms": 1250,
+    "error": null
+  },
+  {
+    "task": "t-dea11e3d",
+    "condition": "R-reify-iter3",
+    "named": [
+      "packages/core/js-sdk/src/admin/product-category.ts",
+      "packages/medusa-test-utils/src/__tests__/events.spec.ts",
+      "packages/medusa-test-utils/src/mock-event-bus-service.ts",
+      "packages/modules/link-modules/src/services/link.ts",
+      "packages/core/utils/src/dal/mikro-orm/mikro-orm-repository.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 586,
+    "elapsed_ms": 1311,
+    "error": null
+  },
+  {
+    "task": "t-dea11e3d",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/modules/product/src/services/product-category.ts",
+      "packages/modules/product/integration-tests/__tests__/product-module-service/events.spec.ts",
+      "packages/core/utils/src/event-bus/common-events.ts",
+      "packages/core/utils/src/core-flows/index.ts"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 154,
+    "elapsed_ms": 1154,
+    "error": null
+  },
+  {
+    "task": "t-fc8d4665",
+    "condition": "N-no-context",
+    "named": [],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 83,
+    "elapsed_ms": 708,
+    "error": null
+  },
+  {
+    "task": "t-fc8d4665",
+    "condition": "B-content-grep",
+    "named": [
+      "packages/cli/create-medusa-app/src/utils/package-manager.ts",
+      "packages/medusa/src/commands/utils/dev-server/errors.ts",
+      "packages/admin/dashboard/src/components/utilities/error-boundary/index.ts"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 151,
+    "elapsed_ms": 961,
+    "error": null
+  },
+  {
+    "task": "t-fc8d4665",
+    "condition": "R-reify",
+    "named": [
+      "yarn/plugins/@yarnpkg/plugin-interactive-tools.cjs"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 267,
+    "elapsed_ms": 815,
+    "error": null
+  },
+  {
+    "task": "t-fc8d4665",
+    "condition": "R-shuffled",
+    "named": [
+      "packages/eslint-plugin/src/rules/admin-env-vars-import-meta/rule.ts",
+      "packages/eslint-plugin/src/rules/import-from-framework-not-internal/rule.ts",
+      "packages/eslint-plugin/src/rules/link-create-keys-modules-enum/rule.ts",
+      "packages/eslint-plugin/src/rules/no-async-workflow-constructor/rule.ts",
+      "packages/eslint-plugin/src/rules/no-deprecated-remote-query-config/rule.ts",
+      "packages/eslint-plugin/src/rules/no-mikroorm-direct-import/rule.ts",
+      "packages/eslint-plugin/src/rules/no-trailing-slash-in-route-matcher/rule.ts",
+      "packages/eslint-plugin/src/rules/prefer-container-registration-keys/rule.ts"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 387,
+    "elapsed_ms": 1586,
+    "error": null
+  },
+  {
+    "task": "t-fc8d4665",
+    "condition": "O-oracle",
+    "named": [
+      "packages/cli/create-medusa-app/src/utils/package-manager.ts",
+      "packages/cli/create-medusa-app/src/utils/__tests__/package-manager.test.ts"
+    ],
+    "hit": true,
+    "recall": 1.0,
+    "prompt_tokens": 132,
+    "elapsed_ms": 817,
+    "error": null
+  },
+  {
+    "task": "t-fc8d4665",
+    "condition": "R-reify-iter3",
+    "named": [
+      "yarn/plugins/@yarnpkg/plugin-interactive-tools.cjs",
+      "yarn/plugins/@yarnpkg/plugin-workspace-tools.cjs"
+    ],
+    "hit": false,
+    "recall": 0.0,
+    "prompt_tokens": 744,
+    "elapsed_ms": 999,
+    "error": null
+  },
+  {
+    "task": "t-fc8d4665",
+    "condition": "B-content-grep-x3",
+    "named": [
+      "packages/cli/create-medusa-app/src/utils/package-manager.ts",
+      "packages/core/framework/src/build-tools/compiler.ts",
+      "packages/medusa/src/commands/utils/dev-server/errors.ts"
+    ],
+    "hit": true,
+    "recall": 0.5,
+    "prompt_tokens": 200,
+    "elapsed_ms": 924,
+    "error": null
+  }
+]
