@@ -1,260 +1,207 @@
-# Reify
+<h1 align="center">Reify</h1>
 
-**A local knowledge engine that gives AI coding agents the smallest context they need
-to change a ten-year-old business system correctly.**
+<p align="center">
+  <em>Your agent doesn't know why that line is there. Reify does.</em>
+</p>
 
-Reify compiles your source, SQL, structured model metadata, documents and Git history
-into a fast local knowledge graph, then answers three questions an agent cannot answer
-by grepping:
+<p align="center">
+  <img src="https://img.shields.io/badge/license-Apache--2.0-111111?style=flat-square" alt="Apache-2.0">
+  <img src="https://img.shields.io/badge/languages-11-111111?style=flat-square" alt="11 languages">
+  <img src="https://img.shields.io/badge/doc%20formats-10-111111?style=flat-square" alt="10 document formats">
+  <img src="https://img.shields.io/badge/network%20calls-0-111111?style=flat-square" alt="Zero network calls">
+  <img src="https://img.shields.io/badge/tests-338-111111?style=flat-square" alt="338 tests">
+</p>
 
-```
-reify why erpnext/selling/doctype/customer/customer.py:514
-reify impact "move the credit limit check to the party level"
-reify context "add a discount tier for strategic enterprise customers"
-```
-
-Everything runs offline. **This build makes no network call at all.**
+<p align="center">
+  <strong>Finds the right file 60% of the time vs grep's 32% &middot; 4.6s to index 5,000 files &middot; never opens a socket</strong><br>
+  <sub>Measured with a real model on real merged commits from ERPNext, indexed at a commit <em>before</em> those changes were made, every condition on the same 4,000-token budget. On a second repository (OpenMRS, Java) the same measurement gives 45% vs 41% — <strong>not a distinguishable win</strong>. Why the two differ is the most useful thing this benchmark found, and it's in <a href="#numbers">Numbers</a>. <a href="benchmarks/REPORT.md">Full writeup</a> &middot; <a href="benchmarks/">reproduce it</a>.</sub>
+</p>
 
 ---
 
-## The problem
+Every mature team has one. Eleven years on the same system. You point at a line and ask why it's there; they don't read the code, they say "the 2019 invoice thing" and walk off. Nothing they know is written down anywhere you can grep.
 
-AI agents are excellent on greenfield code and unreliable on mature systems, because
-the knowledge that decides correctness is not in any one file. It is spread across a
-BRD nobody has opened since 2019, a `customer_group == 7` magic number, a guard clause
-added to fix a production incident, and a Vietnamese requirements document the code
-never referenced.
+Reify puts them inside your AI agent.
 
-The agent cannot read all of it, so it reads the wrong subset — confidently.
+## Before / after
 
-## What Reify does about it
+You ask your agent to change the order approval threshold. It greps for `50000000`, finds one hit, changes it, and ships. It never learns that the BRD says corporate customers always need approval while the code has been quietly bypassing it since 2019.
 
-**Deterministic first. Semantic second. LLM last.** Symbols, call edges, SQL table
-access, entity definitions, document structure, commit lineage and terminology
-mappings are extracted deterministically. Retrieval is lexical and graph-based. This
-build calls no model at all.
+With reify:
+
+```
+$ reify why erpnext/selling/doctype/sales_order/sales_order.py:812
+
+  [CONFLICT] documentation and implementation disagree about approval
+    documented   Corporate customers must require approval    docs/BRD-42.md:6
+    observed     Corporate customers bypass approval          sales_order.py:812
+
+  Called by     3 services, 1 batch job
+  Writes        tabSales Order, approval_log
+  History       8a31c2f  2019-04-17  fix: enterprise approval flow
+```
+
+Three of those four sections are things grep structurally cannot produce.
+
+## Numbers
+
+The honest measurement is a real model doing a real task: 40 tickets taken from merged ERPNext commits, where the prompt is the developer's own description and the answer is the files they actually changed. **The index is built at a commit before any of those changes existed**, so the code being asked for is genuinely absent.
+
+Three of the five conditions exist to try to break the result, not support it.
+
+| ERPNext, n=40 | | hit rate | 95% CI |
+|---|---|--:|--:|
+| no context at all | *memorisation control* | 22% | 12–38% |
+| content grep, same budget | *baseline* | 32% | 20–48% |
+| **reify** | | **60%** | **45–74%** |
+| reify, another task's context | *decoy control* | 25% | 14–40% |
+| perfect context | *ceiling* | 100% | 91–100% |
+
+Perfect context scores 100% where none scores 22%. That 78-point gap is the whole space any retrieval tool can compete in, and it is wide — which was the one thing this benchmark had to establish before anything else mattered. **Reify recovers 49% of it. Grep recovers 13%.** A decoy of identical shape and size scores 25%, so the gain comes from what the context says, not from being handed a list.
+
+### Where it doesn't work
+
+Same method, second repository. OpenMRS, Java, 22 tasks:
+
+| | hit rate | 95% CI |
+|---|--:|--:|
+| content grep | 41% | 23–61% |
+| **reify** | **45%** | 27–65% |
+
+Four points, intervals almost fully overlapping. **On this repository Reify is not measurably better than grep**, and saying otherwise would be a lie the confidence intervals would catch.
+
+The cause is measurable. ERPNext *declares* 528 concepts in its entity metadata; OpenMRS declares 41. The rest Reify infers, and inferred vocabulary is weaker evidence than declared vocabulary — no amount of Rust changes that.
+
+**The rule was never "index harder."** It is: the more a team has written its domain down — entity metadata, ORM mappings, a glossary, translation files — the more Reify has to work with. `reify concepts --suggest` exists to move a repository from the second case toward the first.
+
+<details>
+<summary><strong>Older numbers, and why they were wrong</strong></summary>
+
+An earlier run indexed at `HEAD` instead of before each change, so the code being asked for was already present. Reify scored 55% and grep 40%.
+
+That gap was too small, and in the flattering direction for the wrong arm: the new code contains the ticket's own words, so leakage helped the *lexical* baseline most. Fixing it moved grep 40% → 32% and Reify 55% → 60%.
+
+The leaky numbers are gone from this README. They stay here because a benchmark that quietly deletes its mistakes is not a benchmark.
+
+</details>
+
+## How it works
+
+**Deterministic first. Semantic second. LLM last.** In this build there is no LLM at all unless you configure one, and every command still works.
+
+```
+1. Is it in the AST?          → symbols, calls, imports, inheritance
+2. Is it in the data layer?   → tables, columns, ORM mappings, embedded SQL
+3. Is it in a document?       → sections, cited by heading
+4. Is it in git?              → who introduced it, what fixed it, what moves with it
+5. Is it declared anywhere?   → glossary, entity metadata, translation files
+6. Only then: infer it        → and mark it INFERRED, with the evidence
+```
 
 Every claim carries where it came from and how much to trust it:
 
-| Status | Meaning |
+| | |
 |---|---|
-| `CONFIRMED` | Read directly out of a source artifact |
-| `OBSERVED` | Derived deterministically from confirmed facts |
-| `INFERRED` | Heuristic. Verify against the citation before acting |
-| `CONFLICTED` | Two sources disagree — resolve before changing anything |
-| `UNKNOWN` | Explicitly unresolved, so absence is never read as evidence |
+| `CONFIRMED` | read straight out of a source file |
+| `OBSERVED` | derived deterministically from confirmed facts |
+| `INFERRED` | a heuristic. **Check the citation before you act on it** |
+| `CONFLICTED` | two sources disagree. Resolve it before changing behaviour |
+| `UNKNOWN` | explicitly unresolved, so absence is never read as evidence |
 
----
+`Status::Unknown` is the `Default` on purpose. Anything that forgets to state its footing lands on the one an agent may not act on.
 
-## Measured results
+## What it reads
 
-Run on **ERPNext**, 5,284 files and 60,946 commits, with 40 tasks derived from real
-merged commits: the prompt is the developer's own description of the change, the ground
-truth is the files they actually changed.
+**Code, 11 languages.** Python, TypeScript, JavaScript, Java, Go, C#, Rust, Ruby, PHP, C/C++, Kotlin, plus SQL. Each has a test asserting it yields containers, callables *and* calls — because a missing grammar node gives you an index that looks healthy and holds one symbol per file. That is not hypothetical; it shipped, and the test now catches it.
 
-**The index is built at a commit before any of those changes were made**, so the code
-being asked for is genuinely absent. Every condition is held to the same 4,000-token
-budget.
+**Documents, however the analyst wrote them.** Markdown, text, HTML, DOCX, legacy binary DOC, ODT, RTF, XLSX, PPTX, PDF. Formats with no usable pure-Rust reader get delegated to an external converter, and when none is installed Reify says so loudly rather than indexing nothing quietly.
 
-### With a model in the loop
+**Whatever the team declared.** Frappe DocType JSON, Hibernate mappings, Spring `.properties` bundles, i18n CSV tables. The highest-precision vocabulary a repo can offer, because the application itself reads it and so it stays true.
 
-The model is given the task and one context block, and asked which files must change.
-Three of the five conditions exist to try to falsify the result rather than support it.
+## Multilingual
 
-**ERPNext** — Python/JS, 5,064 files, 40 tasks.
+No language is canonical, English included. A Vietnamese, Thai, Korean or German requirement reaches English code through the concept layer — not an embedding model — which is why it is deterministic and citable.
 
-| Condition | | Hit rate | 95% CI | Recall |
-|---|---|---:|---:|---:|
-| No context at all | *memorisation control* | 22% | 12–38% | 0.16 |
-| Content grep, budget-matched | *baseline* | 32% | 20–48% | 0.27 |
-| **Reify** | | **60%** | **45–74%** | **0.54** |
-| Reify with another task's context | *negative control* | 25% | 14–40% | 0.17 |
-| Perfect context | *ceiling* | 100% | 91–100% | 1.00 |
+~60 locales on translation files. Obligation and exemption language in 11 languages, so a rule written in any of them is mined as a rule.
 
-**What the controls establish:**
+Three things that only break once you leave Latin script, each of which broke here first:
 
-- **Context is the bottleneck.** Perfect context scores 100% where none scores 22%.
-  That 78-point gap is the entire space any retrieval system can compete in, and it is
-  wide — the single most important thing this benchmark had to determine.
-- **Reify recovers 49% of that gap. Grep recovers 13%.**
-- **The content does the work, not the framing.** A decoy context of identical shape and
-  size scores 25% against Reify's 60%.
-- **Contamination is modest** and subtracted above rather than ignored.
+- **Thai, Lao, Khmer, Japanese and Chinese have no word spaces**, so a word index stores one giant token and searching for a word *inside* it finds nothing. There's a trigram substring index for non-ASCII content; ASCII repos never pay for it.
+- **Korean glues particles to stems.** `승인` becomes `승인을`. Whole-word matching finds neither.
+- **Sentence length can't be counted in spaces**, or every Thai requirement is rejected as too short to be a rule.
 
-### Retrieval quality, without a model
-
-Does the tool put the right file in front of the agent at all?
-
-| | content grep | path grep | **Reify** |
-|---|---:|---:|---:|
-| Tasks where a changed file was surfaced | 4/40 (10%) | 7/40 (18%) | **23/40 (57%)** |
-| Mean recall | 0.08 | 0.16 | **0.50** |
-| MRR of the first correct file | 0.07 | 0.12 | **0.23** |
-| Median files put in front of the agent | 3 | 88 | 13 |
-| Median latency | 43 ms | 0 ms | 57 ms |
-
-### Does it generalise? A second repository, in a typed language
-
-**OpenMRS** — Java, 1,603 files, 13,182 commits, 22 tasks, same leakage-free method.
-
-| Condition | Hit rate | 95% CI |
-|---|---:|---:|
-| No context at all | **0%** | 0–15% |
-| Content grep, budget-matched | 41% | 23–61% |
-| **Reify** | **45%** | 27–65% |
-| Decoy context | 14% | 5–33% |
-| Perfect context | 100% | 85–100% |
-
-The controls are *cleaner* than ERPNext's — zero memorisation, and a decoy at 14%
-against 45%. **But the margin over grep is 4 points and the intervals overlap almost
-entirely. On this repository Reify is not measurably better than grep.**
-
-That difference between the two repositories is the most useful thing this benchmark
-found, and it is not mysterious. Reify builds **948 concepts on ERPNext and 568 on
-OpenMRS**, but ERPNext *declares* 528 of its own in entity metadata while OpenMRS
-declares 41. The rest are inferred, and inferred vocabulary is weaker evidence.
-
-**So the honest claim is:** Reify's advantage scales with how much vocabulary a
-repository declares. Where a team has written its domain down — entity metadata, ORM
-mappings, a glossary, translation files — the gain is large. Where it has not, Reify is
-roughly grep with better structure. `reify concepts --suggest` exists precisely to move
-a repository from the second case toward the first.
-
-
-### Measured performance
-
-ERPNext, 5,064 files, 8-core M-series laptop.
-
-| | Measured | Target | |
-|---|---:|---:|---|
-| Full index, no model | 4.6 s | < 10 min | ✅ |
-| Reindex, nothing changed | 0.6 s | — | ✅ |
-| Reindex, one file edited | 0.7 s | < 500 ms | ~ |
-| `reify context` | 57 ms | < 100 ms | ✅ |
-| `reify impact` | 0.2 ms | < 50 ms | ✅ |
-| `reify why` | 205 ms | < 20 ms | ❌ includes a `git log -L` subprocess; ~5 ms without |
-| Peak memory, full index | 224 MB | < 2 GB | ✅ |
-| Store size | 47 MB (33% of the 144 MB working tree) | < 5% | ❌ |
-
-A full index took 78 seconds until the full-text index was keyed by node id. `uid` is
-`UNINDEXED` in FTS5, so `DELETE ... WHERE uid = ?` scanned the whole table once per
-node — quadratic, and invisible until it was timed per stage. Editing one file took
-5.9 seconds until the repository-wide stages learned to skip when their inputs are
-provably unchanged.
-
----
-
-## Install and use
+## Install
 
 ```bash
-# From a release build (recommended once tagged):
-#   curl -sSL https://github.com/lambiengcode/reify/releases/latest/download/... | tar xz
 cargo install --path crates/reify-cli
 
 cd your-repo
-reify init      # reports what it will and will not index, and why
-reify index     # ~80s for a 5,000-file repository; 0.6s when nothing changed
+reify init      # tells you what it will and won't index, and why
+reify index     # 4.6s for 5,000 files; 0.7s after you edit one
 ```
 
-`reify init --write-agent-instructions` appends Reify's usage block to your `AGENTS.md`
-or `CLAUDE.md`. `reify completions <shell>` prints a completion script.
-
-Then tell your agent, in `AGENTS.md` or `CLAUDE.md`:
+Then tell your agent, or let `reify init --write-agent-instructions` do it:
 
 ```markdown
 Before changing code here, run `reify context "<what you are about to do>"`.
 Run `reify why <file>:<line>` before modifying unfamiliar logic.
-Treat `status: INFERRED` claims as leads to verify, not as facts.
+Treat INFERRED claims as leads to verify, not facts.
 ```
 
-Every command takes `--json` for agent consumption and `--budget <tokens>` to bound
-the answer.
+That's the integration. No protocol, no server, no per-turn schema tax. `reify serve --mcp` exists for clients that can't run a shell command — three tools, and three is the whole surface, because an MCP server's schemas are re-sent every turn and a tool built to save context shouldn't charge rent to deliver it.
 
-| Command | Answers |
+## Commands
+
+| Command | What it does |
 |---|---|
-| `reify context "<task>"` | The minimum knowledge needed, plus a reading plan |
-| `reify why <file:line>` | What this is, what calls it, what data it touches, what changed it |
-| `reify impact "<change>"` | What depends on this, including through the database |
-| `reify conflicts` | Documentation that disagrees with the implementation |
+| `reify context "<task>"` | The minimum knowledge for a change, plus a reading plan. **The one that matters.** |
+| `reify why <file>:<line>` | What this is, what calls it, what data it touches, what changed it |
+| `reify impact "<symbol>"` | What depends on it — including through the database, where no call edge exists |
+| `reify explain "<term>"` | A business concept across every language, table and file it appears in |
+| `reify flow "<process>"` | The call sequence that carries out a business process |
+| `reify conflicts` | Documentation that disagrees with the code |
 | `reify rules` | Mined business rules, with evidence |
-| `reify report` | A system-level scorecard |
+| `reify preflight <file>` | A risk header for an editor hook. Under 300 tokens, asserted |
+| `reify report` | System scorecard |
 
----
-
-## What it reads
-
-**Code — 11 languages.** Python, TypeScript, JavaScript, Java, Go, C#, Rust, Ruby, PHP,
-C/C++, Kotlin, plus SQL. Each has a test asserting it yields containers, callables and
-calls, because a missing grammar node produces an index that looks healthy while holding
-one symbol per file.
-
-**Documents — whatever the analyst wrote it in.** Markdown, plain text, HTML (including
-Confluence exports), DOCX, legacy binary DOC, ODT, RTF, XLSX, PPTX and PDF. Formats with
-no usable pure-Rust reader are delegated to an external converter, and when none is
-installed Reify **says so loudly** rather than indexing nothing quietly.
-
-**Structured metadata.** Frappe/ERPNext DocType JSON, Hibernate ORM mappings, Java and
-Spring `.properties` message bundles, and i18n CSV translation tables. These are the
-highest-precision vocabulary a repository can offer: a team declared them, and the
-application reads them, so they stay current.
-
-## Multilingual
-
-Concept ids are opaque and every label carries a language tag, including English — no
-language is canonical. A Vietnamese, Thai, Korean or German requirement reaches English
-code through the concept layer, not through a multilingual embedding model, which is why
-it is deterministic and citable.
-
-Around sixty locales are recognised on translation files and message bundles. Obligation
-and exemption language is detected in English, Vietnamese, German, Spanish, French,
-Portuguese, Indonesian, Thai, Korean, Japanese and Chinese, so a rule written in any of
-them is mined as a rule.
-
-Three details that only matter once you leave Latin script, each of which was a real bug:
-
-- **Thai, Lao, Khmer, Japanese and Chinese are written without spaces**, so a word index
-  stores one enormous token and a query for a word inside it matches nothing. Reify keeps
-  a trigram substring index for non-ASCII content and falls back to it.
-- **Korean attaches particles to the stem** — `승인` becomes `승인을` — so whole-word
-  matching finds neither. Non-ASCII terms match by substring.
-- **Sentence length cannot be counted in spaces.** Where there is no spacing, characters
-  stand in for it, or every claim in those languages is rejected as too short to be a rule.
-
-## Four bridges from business vocabulary to code
-
-In precision order. The last one is what makes Reify work on a repository that declares
-nothing at all.
-
-| Bridge | Source | Available when |
-|---|---|---|
-| **Declared** | `.reify/glossary.toml`, entity metadata, ORM mappings | a human or a framework wrote it down |
-| **Translation** | i18n tables, message bundles | the product has been localised |
-| **Co-occurrence** | document headings that also name code | there is documentation |
-| **Code vocabulary** | phrases the identifiers keep repeating | **always** |
-
-The last runs only on what the others left uncovered, so it fills gaps rather than
-competing with better evidence.
+Everything takes `--json` against a versioned schema and `--budget <tokens>`.
 
 ## Privacy
 
-1. No network connection is made. A test runs the whole suite and fails if one is attempted.
-2. Indexing and querying work entirely offline.
-3. The store lives in `.reify/` and is gitignored by `reify init`.
-4. Reify never executes anything in your repository. tree-sitter parses; it does not run.
+**Reify opens no network connection.** Not "by default" — at all. There is no HTTP client in the dependency tree, and `cargo test` fails if one appears.
 
-## What Reify is not
+Model assistance is a command *you* configure, not an embedded client:
 
-Not an agent, not an editor, not a chatbot, not a vector database, not a cloud service.
+```toml
+# .reify/llm.toml
+command = ["ollama", "run", "llama3"]
+```
 
-**And not useful on small repositories.** Under roughly 20k LOC, `ripgrep` is genuinely
-better and you should use it.
+Local models work with no extra code, no credential ever passes through Reify, `reify llm preview` prints the exact bytes before any are sent, and `REIFY_OFFLINE=1` makes it unreachable no matter what a config file says. Full threat model, including what is **not** covered: [docs/privacy.md](docs/privacy.md).
+
+## FAQ
+
+**Do I have to write a glossary?**
+No, and Reify works without one. It also gets visibly better with one, which is the whole finding in [Numbers](#numbers). `reify concepts --suggest` writes you a first draft to edit down.
+
+**Is it another RAG thing?**
+There is no vector database, no embedding model, and no chunking. Retrieval is lexical and graph-based, which is why every answer comes with a line number instead of a similarity score.
+
+**My repo is 3,000 lines. Should I use it?**
+No. Use ripgrep. Under roughly 20k LOC Reify buys you nothing that a grep and a scroll wheel don't.
+
+**Why is `reify why` slower than everything else?**
+It shells out to `git log -L` for precise line history. 205ms with it, ~5ms without. That one is still on the list.
+
+**What does "reify" mean?**
+To make an abstract thing concrete. The knowledge was always there; it just wasn't a file.
 
 ## Status
 
-Early. The first vertical slice is complete and measured: Python, TypeScript,
-JavaScript and SQL; Markdown and text documents; structured model metadata; Git
-history; concepts; rules; conflicts; incremental indexing. See
-[`docs/PLAN.md`](docs/PLAN.md) for the full plan, including the kill criteria this
-project holds itself to.
+Early, and measured. The full plan, including the conditions under which this project should be considered a failure, is in [docs/PLAN.md](docs/PLAN.md) — the kill criteria are written down because a project that can't say when to stop isn't being engineered, it's being believed in.
 
-Licensed under Apache-2.0.
+Known misses, all in [docs/](docs/): store is 33% of the working tree against a 5% target, `reify why` is 205ms against 20ms, Windows is untested.
+
+## License
+
+[Apache-2.0](LICENSE). Patent grant included, so an agent vendor can actually ship it.
