@@ -1,5 +1,5 @@
 {
-  "repository": "/Users/lambiengcode/Documents/reify/projects/reify/.bench/erpnext",
+  "repository": ".bench/erpnext",
   "head": "2328e6da94d3787180251a339384e4ecfebdbef5",
   "generated_from_commits": 600,
   "base": "f493417c3d81670bbc5827258f9670e2d59bd4a8",

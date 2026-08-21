@@ -13,7 +13,7 @@ measure whether an agent then makes the change correctly — see Limitations.
 
 | | |
 |---|---|
-| Repository | `/Users/lambiengcode/Documents/reify/projects/reify/.bench/openmrs` |
+| Repository | `.bench/openmrs` |
 | Commit | `b5ec6fa66d017ac9df75d58ab20314eff84fbfc0` |
 | Tasks | 22 |
 | Token budget per condition | 4000 |

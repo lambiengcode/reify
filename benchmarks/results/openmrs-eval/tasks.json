@@ -1,5 +1,5 @@
 {
-  "repository": "/Users/lambiengcode/Documents/reify/projects/reify/.bench/openmrs",
+  "repository": ".bench/openmrs",
   "head": "b5ec6fa66d017ac9df75d58ab20314eff84fbfc0",
   "generated_from_commits": 400,
   "base": "e9bb1b7a48f97d1ef009c5324ba13d10e439fe54",

@@ -13,7 +13,7 @@ measure whether an agent then makes the change correctly — see Limitations.
 
 | | |
 |---|---|
-| Repository | `/Users/lambiengcode/Documents/reify/projects/reify/.bench/medusa` |
+| Repository | `.bench/medusa` |
 | Commit | `a6fff7ec920f3fa15b2f35429e186ebd76d0f1d4` |
 | Tasks | 40 |
 | Token budget per condition | 4000 |

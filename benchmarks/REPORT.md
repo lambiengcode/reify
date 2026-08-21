@@ -13,7 +13,7 @@ measure whether an agent then makes the change correctly — see Limitations.
 
 | | |
 |---|---|
-| Repository | `/Users/lambiengcode/Documents/reify/projects/reify/.bench/erpnext` |
+| Repository | `.bench/erpnext` |
 | Commit | `2328e6da94d3787180251a339384e4ecfebdbef5` |
 | Tasks | 40 |
 | Token budget per condition | 4000 |

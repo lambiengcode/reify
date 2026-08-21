@@ -13,7 +13,7 @@ measure whether an agent then makes the change correctly — see Limitations.
 
 | | |
 |---|---|
-| Repository | `/Users/lambiengcode/Documents/reify/projects/reify/.bench/ofbiz` |
+| Repository | `.bench/ofbiz` |
 | Commit | `fac1ba4911c16d84cf25424318af126e5e78b8d2` |
 | Tasks | 40 |
 | Token budget per condition | 4000 |
