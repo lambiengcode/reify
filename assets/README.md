@@ -5,7 +5,7 @@
 | `logo.svg` / `logo-dark.svg` | Wordmark, light and dark | **Generated** by `make-logo.py` |
 | `mark.svg` / `mark-dark.svg` | Square mark, for avatars and favicons | **Generated** by `make-logo.py` |
 | `social-preview.png` / `.svg` | 1280×640 link card | **Generated** by `make-social-preview.py` |
-| `demo.gif` | The README's terminal demo | **Recorded** by terminalizer from `demo-script.sh` + `terminalizer.yml` |
+| `demo.gif` / `demo.tg` | The README's feature tour | **Recorded** by `termgif record assets/demo.tg` |
 | `benchmark-agent.svg` | The headline chart | **Generated** by `reify-bench chart` |
 | `benchmark-retrieval.svg` | Retrieval-only chart | **Generated** by `reify-bench chart` |
 
@@ -57,24 +57,22 @@ from rendered markdown.
 ## Regenerating the demo
 
 ```bash
-# terminalizer needs Node 20 (its node-pty dependency has no prebuilt for Node 24),
-# and a real TTY, which `script` provides in a non-interactive shell.
-nvm use 20 && npm i -g terminalizer
-export REIFY_DEMO_REPO=/path/to/an/indexed/erpnext
-export REIFY_DEMO_BIN=target/release
-script -q /dev/null terminalizer record demo --config assets/terminalizer.yml --skip-sharing
-script -q /dev/null terminalizer render demo -o demo-raw.gif
+pip install termgif numpy pillow          # numpy/pillow are needed by the GIF exporter
+cd /path/to/an/indexed/repository          # the tape's commands run here, for real
+PATH=/path/to/reify/target/release:$PATH termgif record /path/to/assets/demo.tg
 
-# The raw render is huge; re-time and compress it before it touches the README.
-ffmpeg -i demo-raw.gif -vf "fps=7,scale=1062:-1:flags=lanczos,palettegen=max_colors=96" pal.png
-ffmpeg -i demo-raw.gif -i pal.png \
-  -lavfi "fps=7,scale=1062:-1:flags=lanczos[x];[x][1:v]paletteuse=dither=bayer:bayer_scale=4" demo-ff.gif
-gifsicle -O3 --lossy=90 demo-ff.gif -o assets/demo.gif
+# The raw render is ~34 MB. Re-time and quantise it before it touches the README.
+ffmpeg -i demo.gif -vf "fps=4,scale=860:-1:flags=lanczos,palettegen=max_colors=32:stats_mode=diff" pal.png
+ffmpeg -i demo.gif -i pal.png \
+  -lavfi "fps=4,scale=860:-1:flags=lanczos[x];[x][1:v]paletteuse=dither=none:diff_mode=rectangle" ff.gif
+gifsicle -O3 --lossy=200 ff.gif -o assets/demo.gif
 ```
 
-Every command in `demo-script.sh` runs for real against the named index — the same
-generated-not-drawn rule the charts follow. If the GIF ever disagrees with the tool,
-re-record the GIF, not the README.
+The tape is a **feature tour**, not a story: `index`, `context`, `why`, `impact`,
+`explain`, and `context --toon`, each run for real against a real ERPNext index. Record
+from inside the indexed repository — `@cwd` is not honoured by every termgif build, and
+a recording made in the wrong directory silently produces a demo where every command
+answers "nothing indexed".
 
 ## Regenerating the charts
 

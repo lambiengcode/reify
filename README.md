@@ -27,12 +27,12 @@
 </p>
 
 <p align="center">
-  <a href="#claude-code"><img src="https://img.shields.io/badge/Claude_Code-supported-2da44e?style=flat-square" alt="Claude Code supported"></a>
-  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img src="https://img.shields.io/badge/Cursor-supported-2da44e?style=flat-square" alt="Cursor supported"></a>
-  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img src="https://img.shields.io/badge/Codex-supported-2da44e?style=flat-square" alt="Codex supported"></a>
-  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img src="https://img.shields.io/badge/OpenCode-supported-2da44e?style=flat-square" alt="OpenCode supported"></a>
-  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img src="https://img.shields.io/badge/Aider-supported-2da44e?style=flat-square" alt="Aider supported"></a>
-  <a href="#mcp"><img src="https://img.shields.io/badge/MCP-3_tools-2da44e?style=flat-square" alt="MCP supported"></a>
+  <a href="#claude-code"><img src="https://img.shields.io/badge/Claude_Code-supported-111111?style=flat-square" alt="Claude Code supported"></a>
+  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img src="https://img.shields.io/badge/Cursor-supported-111111?style=flat-square" alt="Cursor supported"></a>
+  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img src="https://img.shields.io/badge/Codex-supported-111111?style=flat-square" alt="Codex supported"></a>
+  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img src="https://img.shields.io/badge/OpenCode-supported-111111?style=flat-square" alt="OpenCode supported"></a>
+  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img src="https://img.shields.io/badge/Aider-supported-111111?style=flat-square" alt="Aider supported"></a>
+  <a href="#mcp"><img src="https://img.shields.io/badge/MCP-3_tools-111111?style=flat-square" alt="MCP supported"></a>
   <a href="#install"><img src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux-prebuilt-111111?style=flat-square" alt="macOS and Linux prebuilt"></a>
 </p>
 
@@ -42,11 +42,11 @@
 </p>
 
 <p align="center">
-  <img src="assets/demo.gif" width="920" alt="A 50-second terminal demo. A grep for check_credit_limit returns 49 raw matches and zero answers. reify why on the same line returns its callers, the tables it writes, the files it historically changes with, and the 2023 fix commits that explain it, in about 200 milliseconds. reify context then compiles a 1,290-token briefing for the task 'add a discount tier for strategic customers', with every claim carrying its evidence.">
+  <img src="assets/demo.gif" width="920" alt="A terminal feature tour against a real ERPNext index: reify index rebuilds the graph; reify context compiles a briefing for adding a discount tier under a 1,500-token budget; reify why on one line of customer.py returns its callers, the tables it writes, the files it co-changes with and the 2022-2025 commits that explain it; reify impact traces the blast radius of check_credit_limit through multiple hops; reify explain shows the credit-limit concept across every file it appears in; and reify context --toon emits the same facts in the agent format.">
 </p>
 
 <p align="center">
-  <sub>Every command in the demo is real, against a real ERPNext index. The recording script is <a href="assets/demo-script.sh">committed</a> (recorded with terminalizer); if the GIF ever disagrees with the tool, re-record the GIF.</sub>
+  <sub>Every command in the demo is real, against a real ERPNext index. The recording script is <a href="assets/demo.tg">committed</a> (recorded with <a href="https://github.com/aayushadhikari7/termgif">termgif</a>); if the GIF ever disagrees with the tool, re-record the GIF.</sub>
 </p>
 
 ## Two minutes to first answer
@@ -70,8 +70,7 @@ showing their plan first. Per-agent wiring, hooks and MCP: <a href="#install">In
 
 ---
 
-<details>
-<summary><strong>Contents</strong></summary>
+**Contents**
 
 - [Two minutes to first answer](#two-minutes-to-first-answer)
 - [The one-person problem](#the-one-person-problem)
@@ -90,8 +89,6 @@ showing their plan first. Per-agent wiring, hooks and MCP: <a href="#install">In
 - [Development](#development)
 - [FAQ](#faq)
 - [Roadmap](#roadmap) · [Status](#status) · [License](#license)
-
-</details>
 
 ## The one-person problem
 
@@ -248,27 +245,6 @@ produces — spans, rules, citations, conflicts, the budgeted reading plan. Feed
 compiled context instead is the obvious next experiment. It has not been run, so it
 proves nothing yet.
 
-<details>
-<summary><strong>Getting SWE-bench to run at all on Apple Silicon</strong></summary>
-
-Two things had to be fixed before either arm could be measured honestly, and both are in
-[`benchmarks/swe/`](benchmarks/swe/):
-
-- **40 instances had no runnable environment.** Their conda specs pin packages such as
-  `setuptools==38.2.4` that were never built for `aarch64`, which is why SWE-bench
-  publishes no arm64 image for them and why building locally fails too. The fix is to
-  force the harness's own `USE_X86` escape hatch on for every instance and pre-pull each
-  image with `--platform linux/amd64`, since the harness otherwise pulls with the
-  daemon's native platform and 404s. After that: zero environment errors.
-- **Roughly 45% of patches would not apply,** because a model asked for exact SEARCH text
-  reproduces these famous repositories from memory rather than from the listing. Numbering
-  every line of the context and asking for line-range replacements dropped that to ~1%.
-
-Images are pulled, graded and deleted in batches, so peak disk stays near 18 GB instead
-of the ~200 GB a naive pre-pull needs.
-
-</details>
-
 ## Numbers, on four repositories chosen to hurt
 
 The honest measurement is a real model doing a real task: tickets taken from merged
@@ -346,28 +322,6 @@ shows the largest margin of all. What the four repositories actually separate on
 whether *commit history and file naming speak the vocabulary the tasks are written
 in*. Where they do, Reify recovers 54–62% of the oracle gap. Where they don't
 (Medusa), it is grep with better structure.
-
-<details>
-<summary><strong>Older numbers, superseded measurements, and one fitting failure</strong></summary>
-
-Three things a reader auditing this benchmark should know:
-
-1. **An early run indexed at `HEAD`**, so the code being asked for was already present.
-   That leaked toward the *lexical* baseline (new code contains the ticket's words).
-   Fixed by indexing before each task window; all published numbers use that protocol.
-2. **A weight-fitting experiment failed validation, as its pre-registration allowed
-   for.** Grid search on training tasks (commits earlier than every benchmark task)
-   preferred a history-prior weight of 2.2–5.5; every value in that range scored worse
-   than the pre-fit default on the frozen tasks. The default reverted, the full
-   training surface is committed in `benchmarks/weights/`, and the code comment on the
-   constant tells the story.
-3. **The frozen tasks were evaluated more than once** while diagnosing that failure
-   and the Medusa result, so the margins should be read slightly softer than a
-   one-look protocol would justify. Decisions were made on training data or from
-   structural diagnosis — never by picking whatever maximised the frozen score — and
-   the roadmap states this multiplicity in its own words.
-
-</details>
 
 ## How it works
 

@@ -27,12 +27,12 @@
 </p>
 
 <p align="center">
-  <a href="#claude-code"><img src="https://img.shields.io/badge/Claude_Code-supported-2da44e?style=flat-square" alt="Claude Code"></a>
-  <a href="#other-agents"><img src="https://img.shields.io/badge/Cursor-supported-2da44e?style=flat-square" alt="Cursor"></a>
-  <a href="#other-agents"><img src="https://img.shields.io/badge/Codex-supported-2da44e?style=flat-square" alt="Codex"></a>
-  <a href="#other-agents"><img src="https://img.shields.io/badge/OpenCode-supported-2da44e?style=flat-square" alt="OpenCode"></a>
-  <a href="#other-agents"><img src="https://img.shields.io/badge/Aider-supported-2da44e?style=flat-square" alt="Aider"></a>
-  <a href="#mcp"><img src="https://img.shields.io/badge/MCP-3_tools-2da44e?style=flat-square" alt="MCP"></a>
+  <a href="#claude-code"><img src="https://img.shields.io/badge/Claude_Code-supported-111111?style=flat-square" alt="Claude Code"></a>
+  <a href="#other-agents"><img src="https://img.shields.io/badge/Cursor-supported-111111?style=flat-square" alt="Cursor"></a>
+  <a href="#other-agents"><img src="https://img.shields.io/badge/Codex-supported-111111?style=flat-square" alt="Codex"></a>
+  <a href="#other-agents"><img src="https://img.shields.io/badge/OpenCode-supported-111111?style=flat-square" alt="OpenCode"></a>
+  <a href="#other-agents"><img src="https://img.shields.io/badge/Aider-supported-111111?style=flat-square" alt="Aider"></a>
+  <a href="#mcp"><img src="https://img.shields.io/badge/MCP-3_tools-111111?style=flat-square" alt="MCP"></a>
   <a href="#install"><img src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux-prebuilt-111111?style=flat-square" alt="macOS / Linux"></a>
 </p>
 
@@ -42,11 +42,11 @@
 </p>
 
 <p align="center">
-  <img src="assets/demo.gif" width="920" alt="Đoạn demo terminal dài 50 giây. Lệnh grep tìm check_credit_limit trả về 49 kết quả thô và không câu trả lời nào. reify why trên cùng dòng đó trả về những nơi gọi nó, các bảng nó ghi vào, những file thường thay đổi cùng nó, và các commit sửa lỗi năm 2023 giải thích nó, trong khoảng 200 mili giây. Sau đó reify context biên dịch một bản tóm tắt 1.290 token cho task 'thêm bậc chiết khấu cho khách hàng chiến lược', với mọi khẳng định đều kèm bằng chứng.">
+  <img src="assets/demo.gif" width="920" alt="Tour tính năng trên terminal chạy với một index ERPNext thật: reify index dựng lại đồ thị; reify context biên dịch bản tóm tắt cho việc thêm bậc chiết khấu dưới ngân sách 1.500 token; reify why trên một dòng của customer.py trả về nơi gọi nó, các bảng nó ghi, các file thường đổi cùng nó và những commit 2022-2025 giải thích nó; reify impact truy vết bán kính ảnh hưởng của check_credit_limit qua nhiều bước; reify explain cho thấy khái niệm hạn mức tín dụng trên mọi file nó xuất hiện; và reify context --toon xuất cùng dữ kiện đó ở định dạng dành cho agent.">
 </p>
 
 <p align="center">
-  <sub>Mọi lệnh trong đoạn demo đều là thật, chạy trên một index ERPNext thật. Kịch bản ghi hình đã được <a href="assets/demo-script.sh">commit</a> (ghi bằng terminalizer); nếu ảnh động có bao giờ mâu thuẫn với công cụ, hãy ghi lại ảnh động.</sub>
+  <sub>Mọi lệnh trong đoạn demo đều là thật, chạy trên một index ERPNext thật. Kịch bản ghi hình đã được <a href="assets/demo.tg">commit</a> (ghi bằng <a href="https://github.com/aayushadhikari7/termgif">termgif</a>); nếu ảnh động có bao giờ mâu thuẫn với công cụ, hãy ghi lại ảnh động.</sub>
 </p>
 
 ## <a id="two-minutes"></a>Hai phút đến câu trả lời đầu tiên
@@ -70,8 +70,7 @@ repository, cả hai đều in kế hoạch trước. Nối từng agent, hook v
 
 ---
 
-<details>
-<summary><strong>Mục lục</strong></summary>
+**Mục lục**
 
 - [Hai phút đến câu trả lời đầu tiên](#two-minutes)
 - [Vấn đề phụ thuộc một người](#the-one-person-problem)
@@ -90,8 +89,6 @@ repository, cả hai đều in kế hoạch trước. Nối từng agent, hook v
 - [Phát triển](#development)
 - [Câu hỏi thường gặp](#faq)
 - [Lộ trình](#roadmap) · [Trạng thái](#status) · [Giấy phép](#license)
-
-</details>
 
 ## <a id="the-one-person-problem"></a>Vấn đề phụ thuộc một người
 
@@ -327,28 +324,6 @@ ERPNext làm, vậy mà lại cho mức chênh lớn nhất. Thứ thực sự p
 *lịch sử commit và cách đặt tên file có nói cùng thứ ngôn ngữ mà task được viết ra hay
 không*. Ở đâu có, Reify thu hẹp được 54–62% khoảng cách tới ngưỡng lý tưởng. Ở đâu
 không (Medusa), nó chỉ là grep có cấu trúc tốt hơn.
-
-<details>
-<summary><strong>Số liệu cũ, phép đo đã bị thay thế, và một lần fit thất bại</strong></summary>
-
-Ba điều mà người đọc muốn soi lại benchmark này nên biết:
-
-1. **Một lần chạy sớm đã index tại `HEAD`**, nên đoạn code đang được hỏi vốn đã có sẵn.
-   Điều đó rò rỉ lợi thế về phía baseline *từ vựng* (code mới chứa đúng những từ trong
-   ticket). Đã sửa bằng cách index trước mỗi cửa sổ task; mọi số liệu công bố đều theo
-   giao thức đó.
-2. **Một thí nghiệm fit trọng số đã trượt khâu kiểm định, đúng như phần đăng ký trước
-   của nó đã lường.** Grid search trên tập train (các commit sớm hơn mọi task benchmark)
-   ưu tiên trọng số lịch sử 2,2–5,5; mọi giá trị trong khoảng đó đều tệ hơn giá trị mặc
-   định trước khi fit khi chạy trên tập task đã đóng băng. Mặc định được khôi phục, toàn
-   bộ bề mặt huấn luyện được commit trong `benchmarks/weights/`, và comment ngay tại
-   hằng số kể lại câu chuyện này.
-3. **Tập task đóng băng đã được đánh giá nhiều hơn một lần** trong lúc chẩn đoán thất
-   bại đó và kết quả Medusa, nên các mức chênh nên được đọc nhẹ tay hơn một chút so với
-   giao thức chỉ nhìn một lần. Các quyết định đều dựa trên dữ liệu huấn luyện hoặc chẩn
-   đoán cấu trúc — không bao giờ bằng cách chọn thứ tối đa hoá điểm trên tập đóng băng.
-
-</details>
 
 ## <a id="how-it-works"></a>Cách nó hoạt động
 

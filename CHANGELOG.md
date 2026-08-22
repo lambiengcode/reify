@@ -4,7 +4,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project adheres to semantic versioning once it reaches 1.0; before then, minor
 versions may break the store schema, and `reify index --force` rebuilds it.
 
-## [Unreleased]
+## [0.2.0] - 2026-08-22
 
 ### Added
 - **SWE-bench Verified evaluation** ([`benchmarks/swe/`](benchmarks/swe/)). Retrieval over
@@ -26,6 +26,14 @@ versions may break the store schema, and `reify index --force` rebuilds it.
 - `reify uninit --yes` — remove one repository's `.reify/` store and the instruction
   block `init --write-agent-instructions` appended. Both new removal commands print
   their plan and change nothing without `--yes`.
+
+### Changed
+- The README demo is a feature tour recorded with
+  [termgif](https://github.com/aayushadhikari7/termgif) from a committed `assets/demo.tg`,
+  replacing the narrated vhs/terminalizer recording.
+- Store schema is unchanged; `reify index` needs no rebuild coming from 0.1.0.
+
+## [Unreleased]
 
 ## [0.1.0] - 2026-08-21
 

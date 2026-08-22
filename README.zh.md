@@ -27,12 +27,12 @@
 </p>
 
 <p align="center">
-  <a href="#claude-code"><img src="https://img.shields.io/badge/Claude_Code-supported-2da44e?style=flat-square" alt="Claude Code"></a>
-  <a href="#other-agents"><img src="https://img.shields.io/badge/Cursor-supported-2da44e?style=flat-square" alt="Cursor"></a>
-  <a href="#other-agents"><img src="https://img.shields.io/badge/Codex-supported-2da44e?style=flat-square" alt="Codex"></a>
-  <a href="#other-agents"><img src="https://img.shields.io/badge/OpenCode-supported-2da44e?style=flat-square" alt="OpenCode"></a>
-  <a href="#other-agents"><img src="https://img.shields.io/badge/Aider-supported-2da44e?style=flat-square" alt="Aider"></a>
-  <a href="#mcp"><img src="https://img.shields.io/badge/MCP-3_tools-2da44e?style=flat-square" alt="MCP"></a>
+  <a href="#claude-code"><img src="https://img.shields.io/badge/Claude_Code-supported-111111?style=flat-square" alt="Claude Code"></a>
+  <a href="#other-agents"><img src="https://img.shields.io/badge/Cursor-supported-111111?style=flat-square" alt="Cursor"></a>
+  <a href="#other-agents"><img src="https://img.shields.io/badge/Codex-supported-111111?style=flat-square" alt="Codex"></a>
+  <a href="#other-agents"><img src="https://img.shields.io/badge/OpenCode-supported-111111?style=flat-square" alt="OpenCode"></a>
+  <a href="#other-agents"><img src="https://img.shields.io/badge/Aider-supported-111111?style=flat-square" alt="Aider"></a>
+  <a href="#mcp"><img src="https://img.shields.io/badge/MCP-3_tools-111111?style=flat-square" alt="MCP"></a>
   <a href="#install"><img src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux-prebuilt-111111?style=flat-square" alt="macOS / Linux"></a>
 </p>
 
@@ -42,11 +42,11 @@
 </p>
 
 <p align="center">
-  <img src="assets/demo.gif" width="920" alt="一段 50 秒的终端演示。grep 搜索 check_credit_limit 返回 49 条原始匹配，没有任何答案。在同一行上运行 reify why，约 200 毫秒内返回它的调用方、它写入的表、历史上与它一同变更的文件，以及解释它的 2023 年修复提交。随后 reify context 为任务「为战略客户增加折扣档位」编译出一份 1290 token 的简报，每条结论都附带证据。">
+  <img src="assets/demo.gif" width="920" alt="在真实 ERPNext 索引上的终端功能巡览：reify index 重建图谱；reify context 在 1500 token 预算内为「新增折扣档位」编译简报；reify why 针对 customer.py 的某一行返回它的调用方、它写入的表、历史上与它一同变更的文件，以及解释它的 2022-2025 年提交；reify impact 跨多跳追踪 check_credit_limit 的影响半径；reify explain 展示信用额度这一概念出现过的每个文件；reify context --toon 以 agent 格式输出同样的事实。">
 </p>
 
 <p align="center">
-  <sub>demo 中的每一条命令都是真实执行的，跑在真实的 ERPNext 索引上。录制脚本已<a href="assets/demo-script.sh">提交入库</a>（由 terminalizer 录制）；如果这段动图哪天与工具本身对不上，就重新录制动图。</sub>
+  <sub>demo 中的每一条命令都是真实执行的，跑在真实的 ERPNext 索引上。录制脚本已<a href="assets/demo.tg">提交入库</a>（由 <a href="https://github.com/aayushadhikari7/termgif">termgif</a> 录制）；如果这段动图哪天与工具本身对不上，就重新录制动图。</sub>
 </p>
 
 ## <a id="two-minutes"></a>两分钟得到第一个答案
@@ -70,8 +70,7 @@ reify context "你即将进行的改动" --toon
 
 ---
 
-<details>
-<summary><strong>目录</strong></summary>
+**目录**
 
 - [两分钟得到第一个答案](#two-minutes)
 - [只有一个人懂的问题](#the-one-person-problem)
@@ -90,8 +89,6 @@ reify context "你即将进行的改动" --toon
 - [开发](#development)
 - [常见问题](#faq)
 - [路线图](#roadmap) · [项目状态](#status) · [许可证](#license)
-
-</details>
 
 ## <a id="the-one-person-problem"></a>只有一个人懂的问题
 
@@ -302,24 +299,6 @@ Medusa 的任务描述的是界面行为（「去掉重复的云登录按钮」�
 并不像 ERPNext 那样声明大量词汇，却拿到了所有代码库中最大的领先幅度。四个代码库真正
 的分界线是：*提交历史和文件命名，是否说着和任务描述同一套词汇*。说着同一套词汇时，
 Reify 能回收 54–62% 的理论差距；不说时（Medusa），它就只是结构更好的 grep。
-
-<details>
-<summary><strong>旧数据、已被取代的度量，以及一次失败的参数拟合</strong></summary>
-
-想审视这份基准测试的读者应当知道三件事：
-
-1. **早期有一次在 `HEAD` 上建立索引**，于是被问到的代码本来就已经存在。这会向*词法*
-   基线泄漏优势（新代码里含有工单中的词）。修正办法是在每个任务窗口之前建索引；所有
-   已公布的数字都采用该协议。
-2. **一次权重拟合实验没有通过验证，正如其事前登记所允许的那样。** 在训练任务（早于
-   全部基准任务的提交）上做网格搜索，偏好 2.2–5.5 的历史先验权重；而该区间内的每一个
-   取值，在冻结任务集上都比拟合前的默认值更差。默认值被恢复，完整的训练结果面已提交在
-   `benchmarks/weights/` 中，常量处的代码注释记录了整个经过。
-3. **冻结任务集被评估了不止一次** —— 是在诊断上述失败和 Medusa 结果的过程中，因此这些
-   领先幅度应当比「只看一次」的协议读得更保守一些。所有决策都基于训练数据或结构性诊断
-   做出，绝没有靠挑选能让冻结集分数最高的配置来决定。
-
-</details>
 
 ## <a id="how-it-works"></a>工作原理
 
