@@ -4,6 +4,28 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project adheres to semantic versioning once it reaches 1.0; before then, minor
 versions may break the store schema, and `reify index --force` rebuilds it.
 
+## [0.2.1] - 2026-08-22
+
+### Changed
+- Brand: a hand-drawn mascot replaces the geometric mark. `assets/mascot.png` is the
+  only hand-made file; the light and dark lockups, the dark-background variant and the
+  16–512px icon ladder are all derived from it by `assets/make-logo.py`, so the set
+  cannot drift the way four separately-edited SVGs did. Adds a favicon, which the
+  repository did not have. The link card leads with the mascot.
+- Demo: re-recorded **in colour**, on Dracula, with a `reify` header. termgif's ordinary
+  recorder forces `NO_COLOR=1` and `TERM=dumb` on every command and reads output through
+  a pipe, so reify printed flat text; the tape now records in screen-capture mode against
+  a real terminal, and the status tags are green and amber as a user sees them. New
+  `assets/make-demo.py` crops the recording terminal's chrome and draws the header, so it
+  no longer depends on whose terminal recorded it. 3.7 MB → 0.7 MB.
+
+### Fixed
+- The demo's window dots quantised to grey: the documented `max_colors=32` palette spent
+  itself on antialiasing greys, the frame being almost entirely monochrome text. Now 64.
+- The dark logo variant lost the mascot's pupils — repainting the black outline for dark
+  backgrounds repainted them too, into the cream of the eyes they sit in. The repaint now
+  spares the eyes.
+
 ## [0.2.0] - 2026-08-22
 
 ### Added

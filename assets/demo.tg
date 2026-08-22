@@ -1,12 +1,26 @@
-// The Reify feature tour. Recorded by `termgif record assets/demo.tg`.
+// The Reify feature tour. Recorded by `termgif record assets/demo.tg --terminal`.
+//
+// Screen-capture mode, not termgif's normal recorder, and that is the whole point:
+// the normal recorder forces NO_COLOR=1 and TERM=dumb onto every command and reads
+// its output through a pipe, so reify prints no colour at all. Screen-capture mode
+// runs each command against a real terminal, so the status tags are coloured here
+// exactly as a user sees them.
+//
+// Each command is prefixed with the prompt because screen-capture mode never draws
+// one. `\u276f` is a real executable on PATH that execs its arguments, so the line both
+// reads as a prompt and runs as the command.
 //
 // Every command runs for real against a real ERPNext index (~5,000 files, 15 years of
 // history). Nothing is staged: if the GIF ever disagrees with the tool, re-record it.
+//
+// @theme, @size and @window-frame below are ignored in screen-capture mode - the look
+// comes from the recording terminal, and assets/make-demo.py replaces its chrome.
 
 @output "assets/demo.gif"
+@title "reify"
 @size 104x30
 @font 15
-@theme "mocha"
+@theme "dracula"
 @fps 8
 @speed 22ms
 @colors 64
@@ -18,26 +32,26 @@
 ~500ms
 
 // Build the graph.
--> "reify index" >>
+-> "❯ reify index" >>
 ~1600ms
 
 // The flagship: the minimum context for a task, under a token budget.
--> "reify context \"add a discount tier for strategic customers\" --budget 1500" >>
+-> "❯ reify context \"add a discount tier for strategic customers\" --budget 1500" >>
 ~2600ms
 
 // Provenance for one line: callers, data, co-change, the commits that explain it.
--> "reify why erpnext/selling/doctype/customer/customer.py:514" >>
+-> "❯ reify why erpnext/selling/doctype/customer/customer.py:514" >>
 ~2600ms
 
 // Blast radius, including hops no single grep would follow.
--> "reify impact \"check_credit_limit\"" >>
+-> "❯ reify impact \"check_credit_limit\"" >>
 ~2200ms
 
 // One business concept across every language, table and file it appears in.
--> "reify explain \"credit limit\"" >>
+-> "❯ reify explain \"credit limit\"" >>
 ~2200ms
 
 // The agent-facing format: columns declared once, one row per record.
--> "reify context \"block orders above the approval cap\" --budget 1200 --toon" >>
+-> "❯ reify context \"block orders above the approval cap\" --budget 1200 --toon" >>
 ~2400ms
 ~1200ms

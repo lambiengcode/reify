@@ -7,7 +7,7 @@
 | `logo.png` / `logo-dark.png` | Horizontal lockup, light and dark | **Generated** by `make-logo.py` |
 | `icon-*.png`, `favicon.ico` | Icon ladder, 512px down to 16px | **Generated** by `make-logo.py` |
 | `social-preview.png` / `.svg` | 1280×640 link card | **Generated** by `make-social-preview.py` |
-| `demo.gif` / `demo.tg` | The README's feature tour | **Recorded** by `termgif record assets/demo.tg` |
+| `demo.gif` / `demo.tg` | The README's feature tour | **Recorded** by `termgif --terminal`, finished by `make-demo.py` |
 | `benchmark-agent.svg` | The headline chart | **Generated** by `reify-bench chart` |
 | `benchmark-retrieval.svg` | Retrieval-only chart | **Generated** by `reify-bench chart` |
 
@@ -71,23 +71,52 @@ the way four separately hand-edited files do.
 
 ## Regenerating the demo
 
-```bash
-pip install termgif numpy pillow          # numpy/pillow are needed by the GIF exporter
-cd /path/to/an/indexed/repository          # the tape's commands run here, for real
-PATH=/path/to/reify/target/release:$PATH termgif record /path/to/assets/demo.tg
+The demo is recorded in termgif's **screen-capture** mode, against a real terminal
+window. That is not a stylistic choice: termgif's ordinary recorder sets `NO_COLOR=1`
+and `TERM=dumb` on every command it runs and reads the output through a pipe, so reify
+— which colours only when a terminal is attached — prints flat text. Screen-capture
+mode runs each command with a real terminal, which is why the status tags in the GIF
+are green and amber, exactly as a user sees them.
 
-# The raw render is ~34 MB. Re-time and quantise it before it touches the README.
-ffmpeg -i demo.gif -vf "fps=4,scale=860:-1:flags=lanczos,palettegen=max_colors=32:stats_mode=diff" pal.png
-ffmpeg -i demo.gif -i pal.png \
-  -lavfi "fps=4,scale=860:-1:flags=lanczos[x];[x][1:v]paletteuse=dither=none:diff_mode=rectangle" ff.gif
-gifsicle -O3 --lossy=200 ff.gif -o assets/demo.gif
+It needs macOS, a visible terminal window, and two permissions for the recording
+terminal in **System Settings → Privacy & Security**: *Accessibility* (termgif locates
+the window through System Events) and *Screen Recording* (it screenshots that window).
+Without Accessibility the run dies on `osascript is not allowed assistive access`;
+without Screen Recording, on `--terminal requires screen capture support`.
+
+Screen-capture mode never draws a prompt, so the tape prefixes each command with `❯`
+— a real executable that runs its arguments, which makes the line both read as a
+prompt and work as a command:
+
+```bash
+mkdir -p /tmp/promptbin
+printf '#!/bin/sh\nexec "$@"\n' > /tmp/promptbin/❯ && chmod +x /tmp/promptbin/❯
+```
+
+Record from inside an indexed repository, with `reify` and that shim on `PATH`:
+
+```bash
+cd /path/to/an/indexed/repository
+PATH=/tmp/promptbin:/path/to/reify/target/release:$PATH \
+  termgif record /path/to/assets/demo.tg --terminal -o /tmp/raw.gif
+```
+
+Do not redirect the recorder's stdout — in this mode its stdout *is* the typing that
+appears on screen, and redirecting it produces a recording of an empty window.
+
+The raw capture carries the host terminal's own title and tab bars, and Terminal.app
+appends the running process to the window title whatever the title flags say. So the
+last step crops that chrome off and draws the header itself, then re-times, scales and
+quantises:
+
+```bash
+python3 assets/make-demo.py /tmp/raw.gif    # needs ffmpeg and gifsicle
 ```
 
 The tape is a **feature tour**, not a story: `index`, `context`, `why`, `impact`,
 `explain`, and `context --toon`, each run for real against a real ERPNext index. Record
-from inside the indexed repository — `@cwd` is not honoured by every termgif build, and
-a recording made in the wrong directory silently produces a demo where every command
-answers "nothing indexed".
+from inside the indexed repository — a recording made in the wrong directory silently
+produces a demo where every command answers "nothing indexed".
 
 ## Regenerating the charts
 
