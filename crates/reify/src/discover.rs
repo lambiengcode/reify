@@ -6,6 +6,8 @@
 
 use anyhow::{Context, Result};
 use ignore::WalkBuilder;
+use rayon::prelude::*;
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use crate::model::Lang;
@@ -63,6 +65,7 @@ pub struct Discovered {
     pub abs: PathBuf,
     pub lang: Lang,
     pub hash: String,
+    pub mtime: i64,
     pub bytes: u64,
     pub lines: u32,
 }
@@ -118,7 +121,42 @@ impl Discovery {
 }
 
 /// Walk `root`, honouring `.gitignore` and `.reifyignore`, and read every indexable file.
+/// What a previous index recorded about one file.
+///
+/// Enough to decide whether it needs re-reading, and to reconstruct its row without
+/// reading it when it does not.
+#[derive(Clone)]
+pub struct Stamp {
+    pub hash: String,
+    pub bytes: u64,
+    pub lines: u32,
+    pub mtime: i64,
+}
+
+/// Modification time in nanoseconds, or 0 when the platform will not say.
+///
+/// Zero is deliberately a value that never matches a stored stamp, so a file whose
+/// time cannot be read is simply always re-read rather than wrongly assumed unchanged.
+fn mtime_nanos(meta: &std::fs::Metadata) -> i64 {
+    meta.modified()
+        .ok()
+        .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+        .and_then(|d| i64::try_from(d.as_nanos()).ok())
+        .unwrap_or(0)
+}
+
 pub fn discover(root: &Path) -> Result<Discovery> {
+    discover_with(root, &HashMap::new())
+}
+
+/// Walk the repository, reading only the files a previous index cannot vouch for.
+///
+/// A file whose size and modification time both match what was recorded is taken to be
+/// unchanged and its stored hash reused. This is the same bet git makes in its own
+/// index, and the reason it is safe here is that it only ever decides whether to *read*
+/// a file: the hash still decides whether anything changed, and `--force` ignores
+/// stamps entirely. The files that must be read are hashed in parallel.
+pub fn discover_with(root: &Path, known: &HashMap<String, Stamp>) -> Result<Discovery> {
     let mut walker = WalkBuilder::new(root);
     walker
         .hidden(false)
@@ -131,7 +169,9 @@ pub fn discover(root: &Path) -> Result<Discovery> {
             !EXCLUDED_DIRS.contains(&name.as_ref())
         });
 
+    // Walk first, collecting what to look at, so the reading below can be parallel.
     let mut out = Discovery::default();
+    let mut candidates: Vec<(String, PathBuf, Lang, std::fs::Metadata)> = Vec::new();
     for entry in walker.build() {
         let entry = match entry {
             Ok(e) => e,
@@ -165,31 +205,53 @@ pub fn discover(root: &Path) -> Result<Discovery> {
             out.skipped.push((rel, SkipReason::TooLarge(meta.len())));
             continue;
         }
-        let bytes = match std::fs::read(&abs) {
-            Ok(b) => b,
-            Err(_) => continue,
-        };
-        if bytes.contains(&0) {
-            out.skipped.push((rel, SkipReason::Binary));
-            continue;
-        }
-        let text = match String::from_utf8(bytes) {
-            Ok(t) => t,
-            Err(_) => {
-                out.skipped.push((rel, SkipReason::Binary));
-                continue;
+        candidates.push((rel, abs, lang, meta));
+    }
+
+    // Reading and hashing is the expensive half - 222 ms of a 274 ms walk on a 137 MB
+    // tree - so do it on all cores, and only for files a stamp cannot vouch for.
+    let read: Vec<Result<Discovered, (String, SkipReason)>> = candidates
+        .into_par_iter()
+        .filter_map(|(rel, abs, lang, meta)| {
+            let mtime = mtime_nanos(&meta);
+            if let Some(stamp) = known.get(&rel) {
+                if mtime != 0 && stamp.mtime == mtime && stamp.bytes == meta.len() {
+                    return Some(Ok(Discovered {
+                        path: rel,
+                        abs,
+                        lang,
+                        hash: stamp.hash.clone(),
+                        mtime,
+                        bytes: stamp.bytes,
+                        lines: stamp.lines,
+                    }));
+                }
             }
-        };
-        let hash = blake3::hash(text.as_bytes()).to_hex().to_string();
-        let lines = text.lines().count() as u32;
-        out.files.push(Discovered {
-            path: rel,
-            abs,
-            lang,
-            hash,
-            bytes: meta.len(),
-            lines,
-        });
+            let bytes = std::fs::read(&abs).ok()?;
+            if bytes.contains(&0) {
+                return Some(Err((rel, SkipReason::Binary)));
+            }
+            let Ok(text) = String::from_utf8(bytes) else {
+                return Some(Err((rel, SkipReason::Binary)));
+            };
+            let hash = blake3::hash(text.as_bytes()).to_hex().to_string();
+            let lines = text.lines().count() as u32;
+            Some(Ok(Discovered {
+                path: rel,
+                abs,
+                lang,
+                hash,
+                mtime,
+                bytes: meta.len(),
+                lines,
+            }))
+        })
+        .collect();
+    for item in read {
+        match item {
+            Ok(file) => out.files.push(file),
+            Err(skip) => out.skipped.push(skip),
+        }
     }
 
     out.files.sort_by(|a, b| a.path.cmp(&b.path));
@@ -220,6 +282,7 @@ pub fn read_one(root: &Path, rel: &str) -> Result<Option<Discovered>> {
         abs,
         lang,
         hash,
+        mtime: mtime_nanos(&meta),
         bytes: meta.len(),
         lines,
     }))

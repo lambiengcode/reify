@@ -205,6 +205,13 @@ impl IndexReport {
     }
 }
 
+/// Above this many affected names and paths, re-resolve the whole repository instead.
+///
+/// The narrowed path issues one indexed query per name; past a few hundred that costs
+/// more than the single scan it replaces, and a change that large is usually a first
+/// index or a branch switch, where the full pass is the right shape anyway.
+const RESOLVE_NARROW_MAX: usize = 400;
+
 /// Run the pipeline against `store`.
 pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     let started = Instant::now();
@@ -212,8 +219,17 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     let mut stages = Stages::new(opts);
 
     // --- 1-2. discover and classify ------------------------------------------
+    //
+    // What the last index recorded about each file, so discovery can `stat` its way
+    // past everything that has not moved instead of reading the whole tree. `--force`
+    // hands it nothing, which is exactly what forcing should mean: read everything.
+    let stamps = if opts.force {
+        std::collections::HashMap::new()
+    } else {
+        store.file_stamps()?
+    };
     stages.begin("discovering files");
-    let found: Discovery = discover::discover(&opts.root)
+    let found: Discovery = discover::discover_with(&opts.root, &stamps)
         .with_context(|| format!("walking {}", opts.root.display()))?;
     report.files_total = found.files.len();
     report.files_skipped = found.skipped.len();
@@ -224,7 +240,16 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
         .collect();
 
     // --- decide what actually needs work -------------------------------------
-    let previous = store.file_hashes()?;
+    // Under `--force` the stamps are empty, so ask the store directly for what it
+    // holds; otherwise the stamps already carry every hash the check below needs.
+    let previous: std::collections::HashMap<String, String> = if opts.force {
+        store.file_hashes()?
+    } else {
+        stamps
+            .iter()
+            .map(|(path, stamp)| (path.clone(), stamp.hash.clone()))
+            .collect()
+    };
     let present: HashSet<&str> = found.files.iter().map(|f| f.path.as_str()).collect();
     for gone in previous.keys().filter(|p| !present.contains(p.as_str())) {
         store.forget_file(gone)?;
@@ -260,6 +285,21 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
         report.elapsed_ms = started.elapsed().as_millis();
         return Ok(report);
     }
+
+    // The names these files define *before* they are re-parsed. Together with the
+    // names they define afterwards, this bounds which references elsewhere in the
+    // repository could resolve differently - see `Store::refs_touching`.
+    // Only worth collecting when the narrowed path will actually be taken: under
+    // `--force`, or a change big enough to fall back to a full pass, this would be one
+    // query per changed file - 5,285 of them on a first index - to build a set that is
+    // then thrown away.
+    let changed_paths: Vec<String> = changed.iter().map(|f| f.path.clone()).collect();
+    let narrow = !opts.force && changed_paths.len() <= RESOLVE_NARROW_MAX;
+    let mut affected_names = if narrow {
+        store.symbol_names_in(&changed_paths)?
+    } else {
+        HashSet::new()
+    };
 
     for file in &changed {
         store.forget_file_content(&file.path)?;
@@ -364,6 +404,7 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
             hash: file.hash.clone(),
             bytes: file.bytes,
             lines: file.lines,
+            mtime: file.mtime,
         })?;
     }
 
@@ -396,7 +437,18 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
     for (name, node_uid, path, lang) in store.symbol_triples()? {
         symbols.add(&name, &node_uid, &path, lang);
     }
-    let all_refs = store.all_refs()?;
+    // ...and the names they define now. A name in either set may resolve differently.
+    if narrow {
+        affected_names.extend(store.symbol_names_in(&changed_paths)?);
+    }
+    // A very wide edit can still blow the budget through the names it touches, in
+    // which case the single scan is cheaper than thousands of indexed lookups.
+    let narrow = narrow && affected_names.len() + changed_paths.len() <= RESOLVE_NARROW_MAX;
+    let all_refs = if narrow {
+        store.refs_touching(&affected_names, &changed_paths)?
+    } else {
+        store.all_refs()?
+    };
     let pending_refs: Vec<extract::PendingRef> = all_refs
         .into_iter()
         .map(|(from, name, file, kind)| extract::PendingRef {

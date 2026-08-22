@@ -301,3 +301,67 @@ fn indexing_a_fixture_twice_changes_nothing() {
         "indexing is idempotent"
     );
 }
+
+/// A reference in one file must resolve once a *different* file defines it.
+///
+/// This is the exact failure mode of resolving incrementally. Re-resolving only the
+/// references inside the file that changed would leave `a.py` pointing at nothing
+/// forever, because `a.py` itself never changes — the affected set has to be driven by
+/// the symbol *names* the edit added or removed, not by the edited file alone.
+#[test]
+fn a_reference_resolves_when_another_file_later_defines_it() {
+    use std::fs;
+
+    let dir = std::env::temp_dir().join(format!(
+        "reify-incr-{}-{:?}",
+        std::process::id(),
+        std::thread::current().id()
+    ));
+    let _ = fs::remove_dir_all(&dir);
+    fs::create_dir_all(&dir).expect("temp repository");
+
+    fs::write(
+        dir.join("a.py"),
+        "def caller():\n    return apply_discount_tier(1)\n",
+    )
+    .unwrap();
+
+    let mut store = Store::open(dir.join(".reify").join("store.db")).expect("store");
+    index(&mut store, &IndexOptions::new(dir.clone())).expect("first index");
+
+    assert!(
+        store
+            .symbols_named("apply_discount_tier")
+            .expect("lookup")
+            .is_empty(),
+        "nothing defines it yet"
+    );
+
+    // Now a second file defines it. Only b.py changed; a.py is untouched.
+    fs::write(
+        dir.join("b.py"),
+        "def apply_discount_tier(pct):\n    return pct\n",
+    )
+    .unwrap();
+    let report = index(&mut store, &IndexOptions::new(dir.clone())).expect("second index");
+    assert_eq!(report.files_parsed, 1, "only the new file should be parsed");
+
+    let target = store
+        .symbols_named("apply_discount_tier")
+        .expect("lookup")
+        .into_iter()
+        .next()
+        .expect("the definition is indexed");
+    let callers = store
+        .neighbors(target.id, Direction::In, &[EdgeKind::Calls])
+        .expect("callers");
+    assert!(
+        callers
+            .iter()
+            .any(|(node, _, _)| node.path.as_deref() == Some("a.py")),
+        "a.py's call must resolve to the definition added in b.py, but callers were {:?}",
+        callers.iter().map(|(n, _, _)| &n.name).collect::<Vec<_>>()
+    );
+
+    let _ = fs::remove_dir_all(&dir);
+}

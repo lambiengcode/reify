@@ -528,6 +528,7 @@ difference between a tool they can evaluate and one they cannot.
 | Networking crates in `Cargo.lock` | asserted zero, in CI |
 | Sockets in the source | asserted zero, in CI |
 | Subprocesses | `git`, reviewed document converters, and — for `reify upgrade` only — `curl` and `tar`; each named in a test |
+| `git` reaching the network | forbidden: every invocation sets `GIT_NO_LAZY_FETCH=1`, so a partial clone cannot fetch |
 | Code from your repo, executed | never. tree-sitter parses; it does not run |
 | The store | `.reify/`, gitignored by `reify init` |
 
@@ -555,18 +556,41 @@ ERPNext, 5,064 files, 8-core M-series laptop.
 
 | | measured |
 |---|--:|
-| full index, no model | 4.6 s |
-| reindex, nothing changed | 0.6 s |
-| reindex, one file edited | 0.7 s |
+| full index, no model | 4.2 s |
+| reindex, nothing changed | 0.10 s |
+| reindex, one file edited | 0.49 s |
 | `reify context` | 57 ms |
 | `reify impact` | 0.2 ms |
-| `reify why` | 205 ms — a `git log -L` subprocess; ~5 ms without |
+| `reify why` | 87 ms median, 168 ms worst — a `git log -L` subprocess; ~5 ms without |
 | peak memory, full index | 224 MB |
 | store size | 47 MB (33% of a 144 MB working tree) |
 
 A full index took **78 seconds** until the full-text index was keyed by node id. `uid` is `UNINDEXED` in FTS5, so `DELETE ... WHERE uid = ?` scanned the whole table once per node — quadratic, and invisible until it was timed per stage. Editing one file took **5.9 seconds** until the repository-wide stages learned to skip when their inputs are provably unchanged.
 
-`REIFY_TIMING=1 reify index` prints the per-stage breakdown that found both.
+Reindexing was **2× slower** until two things stopped being done repository-wide for
+a one-line edit. Discovery read and hashed all 5,285 files on every run — 222 ms of
+reading to find the handful that moved — and now `stat`s past anything whose size and
+modification time are unchanged, hashing the rest across all cores. Reference
+resolution reloaded and re-resolved all **144,309** references, 167 ms to resolve and
+145 ms to commit, regardless of how little changed; it now re-resolves only references
+whose *name* the edit added or removed, plus those inside the edited files, which is
+provably the whole affected set. Measured against the previous build on the same
+machine: full index 6.75 s → 4.25 s, no-op reindex 256 ms → 101 ms, one file edited
+974 ms → 486 ms.
+
+`reify why` was **1.5 seconds** on a blobless clone, and returned a *worse* answer than
+it does now. `git log -L` needs the file's blob at every revision it walks, and on a
+partial clone those blobs are not local — so git was silently fetching them from the
+remote, one query costing 29.5 s of network and 0.07 s of work. The subprocess now runs
+with `GIT_NO_LAZY_FETCH=1`: git answers from local objects or fails, and either way the
+command returns in milliseconds. Eleven of twelve sampled symbols used to hit the
+timeout; none do.
+
+That fix is also why the privacy claim below is true of the whole process tree rather
+than just this binary. Reify never opened a socket; the git it spawned did.
+
+`REIFY_TIMING=1 reify index` prints the per-stage breakdown that found every one of
+these.
 
 ## Reproducing the benchmark
 

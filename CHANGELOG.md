@@ -4,6 +4,48 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project adheres to semantic versioning once it reaches 1.0; before then, minor
 versions may break the store schema, and `reify index --force` rebuilds it.
 
+## [0.2.2] - 2026-08-22
+
+### Fixed
+- `reify why` no longer lets git reach the network. `git log -L` needs the file's blob
+  at every revision it walks; on a blobless clone those blobs are not local, so git was
+  silently fetching them from the promisor remote — one query measured at 29.5 s of
+  network against 0.07 s of actual work. Query-time git now runs with
+  `GIT_NO_LAZY_FETCH=1`, so it answers from local objects or fails fast. Reify itself
+  never opened a socket, but a subprocess that lazily fetches does, and "your code never
+  leaves the machine" has to hold for the whole process tree.
+
+### Changed
+- **The store schema is v7.** Files now carry a modification time, so `reify index
+  --force` is needed once to rebuild an older store; the store says so when opened.
+- Indexing is roughly twice as fast, measured against the previous build on the same
+  machine: full index **6.75 s → 4.25 s**, reindex with nothing changed **256 ms →
+  101 ms**, reindex after one edit **974 ms → 486 ms**.
+- Discovery no longer reads the whole tree to find what changed. It `stat`s past any
+  file whose size and modification time match what the last index recorded — the same
+  bet git makes in its own index, and safe here because it only decides whether to
+  *read* a file, never whether it changed; the hash still decides that, and `--force`
+  ignores stamps entirely. The files that must be read are hashed across all cores.
+- Reference resolution is incremental. It reloaded and re-resolved all 144,309
+  references on ERPNext for a one-line edit — 167 ms to resolve, 145 ms to commit — and
+  now re-resolves only references whose name the edit added or removed, plus those
+  inside the edited files. That is the whole affected set: a reference can only resolve
+  differently if the symbols matching its name changed, and symbols only change in
+  re-parsed files. `commit` is an upsert and never deletes edges it was not given, so
+  the rest keep the edges they have. Stage cost on that edit: **356 ms → 23 ms**.
+- `reify why` is **1517 ms → 87 ms median** on a 60,000-commit blobless clone, with the
+  worst of twelve sampled symbols at 168 ms. Eleven of those twelve previously hit the
+  1.5 s timeout and fell back to file-level history; none do now, so the answer is both
+  faster and more precise.
+- `is_repository` reads the filesystem instead of spawning `git rev-parse`, which cost a
+  whole process — 18 ms of a 205 ms command — to answer a question `.git` already
+  answers. Worktree and submodule `.git` files, and subdirectories, are all handled.
+- `line_history` results are memoised for the life of the process, keyed by the commit
+  `HEAD` points at. The first walk is inherently expensive — git must go back through
+  history until it finds enough commits touching those exact lines, and a line stable
+  for years means walking years — so the thing worth avoiding is walking it twice, which
+  `reify serve` did every time an agent revisited a symbol.
+
 ## [0.2.1] - 2026-08-22
 
 ### Changed

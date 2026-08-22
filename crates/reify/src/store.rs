@@ -7,7 +7,7 @@
 
 use anyhow::{Context, Result};
 use rusqlite::{params, Connection, OptionalExtension};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 
 use crate::model::{EdgeKind, Lang, NewEdge, NewNode, Node, NodeKind, Status};
@@ -15,7 +15,7 @@ use crate::tokens;
 
 /// Bumped whenever the schema changes shape. A store whose version differs from the
 /// binary's is rebuilt rather than migrated in place; rebuilds are cheap by design.
-pub const SCHEMA_VERSION: i64 = 6;
+pub const SCHEMA_VERSION: i64 = 7;
 
 /// Edge kinds derived from a single file's content, invalidated when its hash changes.
 pub const CONTENT_EDGE_KINDS: &[EdgeKind] = &[
@@ -47,7 +47,10 @@ CREATE TABLE IF NOT EXISTS files (
     lang   TEXT NOT NULL,
     hash   TEXT NOT NULL,
     bytes  INTEGER NOT NULL,
-    lines  INTEGER NOT NULL
+    lines  INTEGER NOT NULL,
+    -- Modification time, nanoseconds. Only ever used to decide whether a file needs
+    -- re-reading; the hash remains the authority on whether it actually changed.
+    mtime  INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS nodes (
@@ -232,6 +235,7 @@ pub struct FileRecord {
     pub hash: String,
     pub bytes: u64,
     pub lines: u32,
+    pub mtime: i64,
 }
 
 pub struct Store {
@@ -353,6 +357,34 @@ impl Store {
 
     // ---- file tracking --------------------------------------------------------
 
+    /// What is known about every indexed file, for deciding what to re-read.
+    ///
+    /// Discovery used to read and hash all 5,285 files on every index - 222 ms of the
+    /// 274 ms it spent - to find the handful that changed. With a stamp it reads only
+    /// the files whose size or modification time moved, which costs a `stat` each.
+    pub fn file_stamps(&self) -> Result<HashMap<String, crate::discover::Stamp>> {
+        let mut stmt = self
+            .conn
+            .prepare("SELECT path, hash, bytes, lines, mtime FROM files")?;
+        let rows = stmt.query_map([], |r| {
+            Ok((
+                r.get::<_, String>(0)?,
+                crate::discover::Stamp {
+                    hash: r.get(1)?,
+                    bytes: r.get::<_, i64>(2)? as u64,
+                    lines: r.get::<_, i64>(3)? as u32,
+                    mtime: r.get(4)?,
+                },
+            ))
+        })?;
+        let mut out = HashMap::new();
+        for row in rows {
+            let (path, stamp) = row?;
+            out.insert(path, stamp);
+        }
+        Ok(out)
+    }
+
     pub fn file_hashes(&self) -> Result<HashMap<String, String>> {
         let mut stmt = self.conn.prepare("SELECT path, hash FROM files")?;
         let rows = stmt.query_map([], |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?)))?;
@@ -367,7 +399,7 @@ impl Store {
     pub fn files(&self) -> Result<Vec<FileRecord>> {
         let mut stmt = self
             .conn
-            .prepare("SELECT path, lang, hash, bytes, lines FROM files ORDER BY path")?;
+            .prepare("SELECT path, lang, hash, bytes, lines, mtime FROM files ORDER BY path")?;
         let rows = stmt.query_map([], |r| {
             Ok(FileRecord {
                 path: r.get(0)?,
@@ -375,6 +407,7 @@ impl Store {
                 hash: r.get(2)?,
                 bytes: r.get::<_, i64>(3)? as u64,
                 lines: r.get::<_, i64>(4)? as u32,
+                mtime: r.get(5)?,
             })
         })?;
         rows.map(|r| r.map_err(Into::into)).collect()
@@ -382,16 +415,19 @@ impl Store {
 
     pub fn upsert_file(&self, rec: &FileRecord) -> Result<()> {
         self.conn.execute(
-            "INSERT INTO files(path, lang, hash, bytes, lines) VALUES (?1, ?2, ?3, ?4, ?5)
+            "INSERT INTO files(path, lang, hash, bytes, lines, mtime)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6)
              ON CONFLICT(path) DO UPDATE SET
                 lang = excluded.lang, hash = excluded.hash,
-                bytes = excluded.bytes, lines = excluded.lines",
+                bytes = excluded.bytes, lines = excluded.lines,
+                mtime = excluded.mtime",
             params![
                 rec.path,
                 rec.lang.as_str(),
                 rec.hash,
                 rec.bytes as i64,
-                rec.lines as i64
+                rec.lines as i64,
+                rec.mtime
             ],
         )?;
         Ok(())
@@ -647,6 +683,88 @@ impl Store {
     }
 
     /// Every stored reference, for a repository-wide re-resolve.
+    /// Distinct symbol names defined in `paths`.
+    ///
+    /// Taken before and after a file is re-parsed, the two sets bound which references
+    /// in the rest of the repository could possibly resolve differently now.
+    pub fn symbol_names_in(&self, paths: &[String]) -> Result<HashSet<String>> {
+        let mut out = HashSet::new();
+        let mut stmt = self
+            .conn
+            .prepare("SELECT DISTINCT name FROM nodes WHERE kind = 'Symbol' AND path = ?1")?;
+        for path in paths {
+            let rows = stmt.query_map(params![path], |r| r.get::<_, String>(0))?;
+            for row in rows {
+                out.insert(row?);
+            }
+        }
+        Ok(out)
+    }
+
+    /// The references whose resolution a change to `paths` could alter.
+    ///
+    /// Re-resolving the whole repository costs the same whether one file changed or a
+    /// thousand: on ERPNext that is 144,000 references, 167 ms to resolve and 145 ms to
+    /// commit, for a one-line edit. A reference can only resolve differently if the set
+    /// of symbols matching its *name* changed, and symbols only change in files that
+    /// were re-parsed - so those names, plus every reference originating inside those
+    /// files, is the whole affected set. `commit` is an upsert and never deletes edges
+    /// it was not given, so the references left out keep the edges they already have.
+    pub fn refs_touching(
+        &self,
+        names: &HashSet<String>,
+        paths: &[String],
+    ) -> Result<Vec<(String, String, String, EdgeKind)>> {
+        let mut seen = HashSet::new();
+        let mut out = Vec::new();
+        let mut by_name = self.conn.prepare(
+            "SELECT r.id, n.uid, r.name, p.path, r.kind
+             FROM refs r
+             JOIN nodes n ON n.id = r.from_id
+             JOIN paths p ON p.id = r.path_id
+             WHERE r.name = ?1",
+        )?;
+        let mut by_path = self.conn.prepare(
+            "SELECT r.id, n.uid, r.name, p.path, r.kind
+             FROM refs r
+             JOIN nodes n ON n.id = r.from_id
+             JOIN paths p ON p.id = r.path_id
+             WHERE p.path = ?1",
+        )?;
+        let mut collect = |stmt: &mut rusqlite::Statement, key: &String| -> Result<()> {
+            let rows = stmt.query_map(params![key], |r| {
+                Ok((
+                    r.get::<_, i64>(0)?,
+                    r.get::<_, String>(1)?,
+                    r.get::<_, String>(2)?,
+                    r.get::<_, String>(3)?,
+                    r.get::<_, String>(4)?,
+                ))
+            })?;
+            for row in rows {
+                let (id, from, name, path, kind) = row?;
+                if seen.insert(id) {
+                    // Same fallback as `all_refs`: an unrecognised kind is treated as
+                    // a call rather than dropping the reference on the floor.
+                    out.push((
+                        from,
+                        name,
+                        path,
+                        EdgeKind::parse(&kind).unwrap_or(EdgeKind::Calls),
+                    ));
+                }
+            }
+            Ok(())
+        };
+        for name in names {
+            collect(&mut by_name, name)?;
+        }
+        for path in paths {
+            collect(&mut by_path, path)?;
+        }
+        Ok(out)
+    }
+
     pub fn all_refs(&self) -> Result<Vec<(String, String, String, EdgeKind)>> {
         let mut stmt = self.conn.prepare(
             "SELECT n.uid, r.name, p.path, r.kind
@@ -1450,6 +1568,7 @@ mod tests {
             hash: "h".into(),
             bytes: 1,
             lines: 1,
+            mtime: 0,
         })
         .unwrap();
 

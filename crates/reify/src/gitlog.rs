@@ -11,8 +11,9 @@
 
 use anyhow::{Context, Result};
 use std::collections::HashMap;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::sync::{Mutex, OnceLock};
 use std::time::{Duration, Instant};
 
 /// Field separator in git's *output*. A NUL cannot appear in any of the fields.
@@ -142,12 +143,64 @@ impl History {
 
 /// Is `root` inside a git working tree?
 pub fn is_repository(root: &Path) -> bool {
-    Command::new("git")
-        .args(["rev-parse", "--is-inside-work-tree"])
-        .current_dir(root)
-        .output()
-        .map(|o| o.status.success())
-        .unwrap_or(false)
+    git_dir(root).is_some()
+}
+
+/// The `.git` directory governing `root`, found without spawning anything.
+///
+/// This used to be `git rev-parse --is-inside-work-tree`, which cost a whole process
+/// spawn - 18 ms of the 205 ms `reify why` spends, a tenth of the command, to answer a
+/// question the filesystem already knows. `.git` is a directory in an ordinary
+/// checkout and a file containing `gitdir: <path>` in a worktree or submodule; both
+/// are accepted, and ancestors are searched because `root` may be a subdirectory.
+fn git_dir(root: &Path) -> Option<PathBuf> {
+    for dir in root.ancestors() {
+        let candidate = dir.join(".git");
+        match std::fs::metadata(&candidate) {
+            Ok(meta) if meta.is_dir() => return Some(candidate),
+            Ok(meta) if meta.is_file() => {
+                let text = std::fs::read_to_string(&candidate).ok()?;
+                let target = text.strip_prefix("gitdir:")?.trim();
+                let path = Path::new(target);
+                return Some(if path.is_absolute() {
+                    path.to_path_buf()
+                } else {
+                    dir.join(path)
+                });
+            }
+            _ => {}
+        }
+    }
+    None
+}
+
+/// The commit `HEAD` points at, read from the filesystem rather than from git.
+///
+/// Only used to key the query cache, so it may answer `None` and simply cost a cache
+/// miss. Resolving a ref means a loose file under `refs/`, or a line in `packed-refs`
+/// once git has packed them; a detached `HEAD` holds the id directly.
+fn head_id(root: &Path) -> Option<String> {
+    let git = git_dir(root)?;
+    let head = std::fs::read_to_string(git.join("HEAD")).ok()?;
+    let head = head.trim();
+    let Some(reference) = head.strip_prefix("ref:").map(str::trim) else {
+        return is_object_id(head).then(|| head.to_string());
+    };
+    if let Ok(loose) = std::fs::read_to_string(git.join(reference)) {
+        let id = loose.trim().to_string();
+        if is_object_id(&id) {
+            return Some(id);
+        }
+    }
+    let packed = std::fs::read_to_string(git.join("packed-refs")).ok()?;
+    packed.lines().find_map(|line| {
+        let (id, name) = line.split_once(' ')?;
+        (name.trim() == reference && is_object_id(id)).then(|| id.to_string())
+    })
+}
+
+fn is_object_id(text: &str) -> bool {
+    matches!(text.len(), 40 | 64) && text.chars().all(|c| c.is_ascii_hexdigit())
 }
 
 /// The commit `HEAD` currently points at.
@@ -155,6 +208,8 @@ pub fn head_sha(root: &Path) -> Option<String> {
     let out = Command::new("git")
         .args(["rev-parse", "HEAD"])
         .current_dir(root)
+        .env("GIT_TERMINAL_PROMPT", "0")
+        .env("GIT_NO_LAZY_FETCH", "1")
         .output()
         .ok()?;
     out.status
@@ -178,6 +233,8 @@ pub fn bodies(root: &Path, max_commits: usize) -> Result<HashMap<String, String>
             &format!("-n{max_commits}"),
         ])
         .current_dir(root)
+        .env("GIT_TERMINAL_PROMPT", "0")
+        .env("GIT_NO_LAZY_FETCH", "1")
         .output()
         .context("running git log for commit bodies")?;
     anyhow::ensure!(
@@ -220,6 +277,8 @@ pub fn history(root: &Path, max_commits: usize) -> Result<History> {
             &format!("-n{max_commits}"),
         ])
         .current_dir(root)
+        .env("GIT_TERMINAL_PROMPT", "0")
+        .env("GIT_NO_LAZY_FETCH", "1")
         .output()
         .context("running git log")?;
     if !output.status.success() {
@@ -326,6 +385,27 @@ pub fn line_history(
     end: u32,
     limit: usize,
 ) -> Result<Vec<Commit>> {
+    // Answered from memory when this process has asked before at the same commit.
+    //
+    // The call costs about 200 ms on a mature repository and the cost is inherent:
+    // git must walk back through history diffing the file until it has found `limit`
+    // commits that touched these particular lines, and a line that has been stable for
+    // years means walking years. Nothing makes that first walk cheap, so the thing
+    // worth avoiding is walking it twice - which `reify serve` otherwise does every
+    // time an agent revisits a symbol.
+    let key = head_id(root).map(|head| CacheKey {
+        head,
+        path: path.to_string(),
+        start,
+        end,
+        limit,
+    });
+    if let Some(key) = &key {
+        if let Some(hit) = cache().lock().ok().and_then(|c| c.get(key).cloned()) {
+            return Ok(hit);
+        }
+    }
+
     let mut command = Command::new("git");
     command
         .args([
@@ -358,7 +438,29 @@ pub fn line_history(
             });
         }
     }
+    if let Some(key) = key {
+        if let Ok(mut c) = cache().lock() {
+            c.insert(key, commits.clone());
+        }
+    }
     Ok(commits)
+}
+
+/// Identity of one `line_history` answer. The head id is part of it, so a commit made
+/// while `reify serve` is running invalidates every entry rather than serving history
+/// that is quietly one commit stale.
+#[derive(PartialEq, Eq, Hash)]
+struct CacheKey {
+    head: String,
+    path: String,
+    start: u32,
+    end: u32,
+    limit: usize,
+}
+
+fn cache() -> &'static Mutex<HashMap<CacheKey, Vec<Commit>>> {
+    static CACHE: OnceLock<Mutex<HashMap<CacheKey, Vec<Commit>>>> = OnceLock::new();
+    CACHE.get_or_init(|| Mutex::new(HashMap::new()))
 }
 
 /// Run a git command with a wall-clock bound.
@@ -368,9 +470,21 @@ pub fn line_history(
 fn run_bounded(mut command: Command, timeout: Duration) -> Result<Option<std::process::Output>> {
     // Never let git block on a credential or terminal prompt inside a tool that is
     // being driven by an agent.
+    //
+    // `GIT_NO_LAZY_FETCH` is the load-bearing one. On a blobless clone `git log -L`
+    // needs the file's blob at every revision it walks, and those blobs are not local:
+    // git silently fetches them from the promisor remote. Measured on a 60,000-commit
+    // blobless ERPNext clone, one query took 29.5 s with fetching allowed and 0.07 s
+    // with it forbidden - the same answer, because git returns what it could compute
+    // from local objects and then fails, which is already the fallback path here.
+    //
+    // It is also a correctness fix for the promise this tool makes. Reify itself opens
+    // no socket, but a git subprocess that lazily fetches does, and "your code never
+    // leaves the machine" has to hold for the whole process tree, not just our half.
     command
         .env("GIT_TERMINAL_PROMPT", "0")
         .env("GIT_OPTIONAL_LOCKS", "0")
+        .env("GIT_NO_LAZY_FETCH", "1")
         .stdout(Stdio::piped())
         .stderr(Stdio::null());
     let mut child = command.spawn().context("spawning git")?;
@@ -453,6 +567,77 @@ mod tests {
             class: ChangeClass::Other,
             files: files.iter().map(|s| s.to_string()).collect(),
         }
+    }
+
+    /// The two filesystem reads that replaced a `git rev-parse` subprocess.
+    ///
+    /// Worth a test precisely because they duplicate git's own logic: if either drifts
+    /// from what git would answer, `reify why` silently stops finding history rather
+    /// than failing, which is the kind of regression nobody notices.
+    #[test]
+    fn head_and_git_dir_are_read_without_spawning_git() {
+        // Unique per run, not just per process: `git init` refuses to populate a
+        // directory that already holds a half-written `.git`, so a name that can
+        // collide turns this into a test that fails for the wrong reason.
+        let dir = std::env::temp_dir().join(format!(
+            "reify-head-{}-{:?}",
+            std::process::id(),
+            std::thread::current().id()
+        ));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        let git = |args: &[&str]| {
+            let out = Command::new("git")
+                .args(args)
+                .current_dir(&dir)
+                .env("GIT_AUTHOR_NAME", "t")
+                .env("GIT_AUTHOR_EMAIL", "t@t")
+                .env("GIT_COMMITTER_NAME", "t")
+                .env("GIT_COMMITTER_EMAIL", "t@t")
+                .output()
+                .unwrap();
+            assert!(
+                out.status.success(),
+                "git {args:?}: {}",
+                String::from_utf8_lossy(&out.stderr)
+            );
+        };
+        assert!(!is_repository(&dir), "no .git yet");
+
+        git(&["init", "-q"]);
+        std::fs::write(dir.join("a.py"), "x = 1\n").unwrap();
+        git(&["add", "."]);
+        git(&["commit", "-q", "-m", "first"]);
+
+        assert!(is_repository(&dir));
+        // A subdirectory resolves to the same repository, as `rev-parse` did.
+        let nested = dir.join("deep/er");
+        std::fs::create_dir_all(&nested).unwrap();
+        assert!(is_repository(&nested));
+
+        let expected = String::from_utf8(
+            Command::new("git")
+                .args(["rev-parse", "HEAD"])
+                .current_dir(&dir)
+                .output()
+                .unwrap()
+                .stdout,
+        )
+        .unwrap()
+        .trim()
+        .to_string();
+        assert_eq!(head_id(&dir).as_deref(), Some(expected.as_str()));
+
+        // Packing the refs moves HEAD's target out of refs/heads into packed-refs;
+        // the loose-file read alone would return None from here on.
+        git(&["pack-refs", "--all"]);
+        assert_eq!(
+            head_id(&dir).as_deref(),
+            Some(expected.as_str()),
+            "packed refs must resolve too"
+        );
+
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]
