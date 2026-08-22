@@ -7,7 +7,8 @@
 | `logo.png` / `logo-dark.png` | Horizontal lockup, light and dark | **Generated** by `make-logo.py` |
 | `icon-*.png`, `favicon.ico` | Icon ladder, 512px down to 16px | **Generated** by `make-logo.py` |
 | `social-preview.gif` / `.png` / `.svg` | 1280×640 link card, animated | **Generated** by `make-social-preview.py --gif` |
-| `demo.gif` / `demo.tg` | The README's feature tour | **Recorded** by `termgif --terminal`, finished by `make-demo.py` |
+| `demo.gif` / `demo.tape` | The README's feature tour | **Recorded** by `vhs`, then re-timed and quantised |
+| `demo-shell/.zshrc` | The prompt and highlighting the demo records with | Hand-written; sourced by the tape |
 | `benchmark-agent.svg` | The headline chart | **Generated** by `reify-bench chart` |
 | `benchmark-retrieval.svg` | Retrieval-only chart | **Generated** by `reify-bench chart` |
 
@@ -80,46 +81,37 @@ the way four separately hand-edited files do.
 
 ## Regenerating the demo
 
-The demo is recorded in termgif's **screen-capture** mode, against a real terminal
-window. That is not a stylistic choice: termgif's ordinary recorder sets `NO_COLOR=1`
-and `TERM=dumb` on every command it runs and reads the output through a pipe, so reify
-— which colours only when a terminal is attached — prints flat text. Screen-capture
-mode runs each command with a real terminal, which is why the status tags in the GIF
-are green and amber, exactly as a user sees them.
+Recorded with [vhs](https://github.com/charmbracelet/vhs), which runs each command in
+a real terminal. That is what makes the output **coloured**: reify prints colour only
+when a terminal is attached, so any recorder that captures through a pipe — termgif's
+ordinary mode among them, which additionally forces `NO_COLOR=1` and `TERM=dumb` —
+gets flat text and nothing in the tape can change that.
 
-It needs macOS, a visible terminal window, and two permissions for the recording
-terminal in **System Settings → Privacy & Security**: *Accessibility* (termgif locates
-the window through System Events) and *Screen Recording* (it screenshots that window).
-Without Accessibility the run dies on `osascript is not allowed assistive access`;
-without Screen Recording, on `--terminal requires screen capture support`.
-
-Screen-capture mode never draws a prompt, so the tape prefixes each command with `❯`
-— a real executable that runs its arguments, which makes the line both read as a
-prompt and work as a command:
+The shell is zsh, configured by `demo-shell/.zshrc`: a green prompt, and the command
+word highlighted green as it is typed. That highlighting is a dozen lines of `zle`
+rather than a syntax-highlighting plugin, so recording the demo does not depend on
+what the recorder happens to have installed. The tape sources it **explicitly** rather
+than through `ZDOTDIR`, because vhs installs its own prompt after the shell starts and
+would otherwise overwrite it.
 
 ```bash
-mkdir -p /tmp/promptbin
-printf '#!/bin/sh\nexec "$@"\n' > /tmp/promptbin/❯ && chmod +x /tmp/promptbin/❯
+brew install vhs
+cd /path/to/an/indexed/repository        # the tape's commands run here, for real
+REIFY_ASSETS=/path/to/reify/assets \
+  PATH=/path/to/reify/target/release:$PATH \
+  vhs $REIFY_ASSETS/demo.tape -o /tmp/raw.gif
 ```
 
-Record from inside an indexed repository, with `reify` and that shim on `PATH`:
+The raw render is ~1.4 MB. Re-time and quantise it before it touches the README. Use
+64 colours, not 32: the frame is almost entirely monochrome text, so a small palette
+spends itself on antialiasing greys and quantises away the coloured status tags, which
+are the point of recording this way at all.
 
 ```bash
-cd /path/to/an/indexed/repository
-PATH=/tmp/promptbin:/path/to/reify/target/release:$PATH \
-  termgif record /path/to/assets/demo.tg --terminal -o /tmp/raw.gif
-```
-
-Do not redirect the recorder's stdout — in this mode its stdout *is* the typing that
-appears on screen, and redirecting it produces a recording of an empty window.
-
-The raw capture carries the host terminal's own title and tab bars, and Terminal.app
-appends the running process to the window title whatever the title flags say. So the
-last step crops that chrome off and draws the header itself, then re-times, scales and
-quantises:
-
-```bash
-python3 assets/make-demo.py /tmp/raw.gif    # needs ffmpeg and gifsicle
+ffmpeg -i /tmp/raw.gif -vf "fps=8,scale=920:-1:flags=lanczos,palettegen=max_colors=64:stats_mode=diff" /tmp/pal.png
+ffmpeg -i /tmp/raw.gif -i /tmp/pal.png \
+  -lavfi "fps=8,scale=920:-1:flags=lanczos[x];[x][1:v]paletteuse=dither=none:diff_mode=rectangle" /tmp/ff.gif
+gifsicle -O3 --lossy=80 /tmp/ff.gif -o assets/demo.gif
 ```
 
 The tape is a **feature tour**, not a story: `index`, `context`, `why`, `impact`,

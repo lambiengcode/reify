@@ -39,7 +39,7 @@
 </p>
 
 <p align="center">
-  <sub>Every command in the demo is real, against a real ERPNext index. The recording script is <a href="assets/demo.tg">committed</a> (recorded with <a href="https://github.com/aayushadhikari7/termgif">termgif</a>); if the GIF ever disagrees with the tool, re-record the GIF.</sub>
+  <sub>Every command in the demo is real, against a real ERPNext index. The recording script is <a href="assets/demo.tape">committed</a> (recorded with <a href="https://github.com/charmbracelet/vhs">vhs</a>); if the GIF ever disagrees with the tool, re-record the GIF.</sub>
 </p>
 
 ## Two minutes to first answer

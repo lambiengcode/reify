@@ -39,7 +39,7 @@
 </p>
 
 <p align="center">
-  <sub>demo 中的每一条命令都是真实执行的，跑在真实的 ERPNext 索引上。录制脚本已<a href="assets/demo.tg">提交入库</a>（由 <a href="https://github.com/aayushadhikari7/termgif">termgif</a> 录制）；如果这段动图哪天与工具本身对不上，就重新录制动图。</sub>
+  <sub>demo 中的每一条命令都是真实执行的，跑在真实的 ERPNext 索引上。录制脚本已<a href="assets/demo.tape">提交入库</a>（由 <a href="https://github.com/charmbracelet/vhs">vhs</a> 录制）；如果这段动图哪天与工具本身对不上，就重新录制动图。</sub>
 </p>
 
 ## <a id="two-minutes"></a>两分钟得到第一个答案

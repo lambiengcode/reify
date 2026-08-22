@@ -39,7 +39,7 @@
 </p>
 
 <p align="center">
-  <sub>Mọi lệnh trong đoạn demo đều là thật, chạy trên một index ERPNext thật. Kịch bản ghi hình đã được <a href="assets/demo.tg">commit</a> (ghi bằng <a href="https://github.com/aayushadhikari7/termgif">termgif</a>); nếu ảnh động có bao giờ mâu thuẫn với công cụ, hãy ghi lại ảnh động.</sub>
+  <sub>Mọi lệnh trong đoạn demo đều là thật, chạy trên một index ERPNext thật. Kịch bản ghi hình đã được <a href="assets/demo.tape">commit</a> (ghi bằng <a href="https://github.com/charmbracelet/vhs">vhs</a>); nếu ảnh động có bao giờ mâu thuẫn với công cụ, hãy ghi lại ảnh động.</sub>
 </p>
 
 ## <a id="two-minutes"></a>Hai phút đến câu trả lời đầu tiên

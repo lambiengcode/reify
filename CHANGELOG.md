@@ -17,12 +17,12 @@ versions may break the store schema, and `reify index --force` rebuilds it.
   repositories — and now animated, the bars growing and the numbers counting up. Frame
   one is the finished card, because most link unfurlers render only that frame. It reads
   its numbers from the committed results rather than having them typed in.
-- Demo: re-recorded **in colour**, on Dracula, with a `reify` header. termgif's ordinary
-  recorder forces `NO_COLOR=1` and `TERM=dumb` on every command and reads output through
-  a pipe, so reify printed flat text; the tape now records in screen-capture mode against
-  a real terminal, and the status tags are green and amber as a user sees them. New
-  `assets/make-demo.py` crops the recording terminal's chrome and draws the header, so it
-  no longer depends on whose terminal recorded it. 3.7 MB → 0.7 MB.
+- Demo: re-recorded **in colour**, on Dracula, in zsh, with no window chrome. Recorded
+  with vhs, which runs each command in a real terminal — reify colours only when one is
+  attached, so a recorder that captures through a pipe gets flat text whatever the tape
+  says. All three status tags are now coloured as a user sees them, the prompt is green,
+  and the command word highlights green as it is typed, by a dozen lines of `zle` rather
+  than a plugin the recorder would have to install. 3.7 MB → 0.63 MB.
 
 ### Fixed
 - The demo's window dots quantised to grey: the documented `max_colors=32` palette spent
