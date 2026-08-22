@@ -17,6 +17,7 @@ PNG, JPG or GIF, not SVG.
 import json
 import subprocess
 import sys
+from base64 import b64encode
 from pathlib import Path
 
 # Shared with make-logo.py. Kept as literals rather than imported because these two
@@ -59,23 +60,17 @@ def hit_rates(root: Path) -> tuple[int, int, int]:
     )
 
 
-def mark(x: int, y: int, scale: float) -> str:
-    """The logo mark, scaled. Geometry mirrors make-logo.py's FRAGMENTS/COMPILED."""
-    fragments = [
-        (0, 0, 9, 0.16), (15, 0, 14, 0.34), (35, 0, 21, 0.58),
-        (5, 36, 7, 0.16), (18, 36, 17, 0.36), (41, 36, 15, 0.58),
-        (0, 72, 12, 0.18), (19, 72, 11, 0.34), (36, 72, 20, 0.58),
-    ]
-    compiled = [(72, 0, 56, 30), (72, 33, 56, 30), (72, 66, 56, 30)]
-    out = [f'  <g transform="translate({x} {y}) scale({scale})" fill="{GREEN}">']
-    for fx, fy, fw, opacity in fragments:
-        out.append(
-            f'    <rect x="{fx}" y="{fy}" width="{fw}" height="24" rx="2" opacity="{opacity}"/>'
-        )
-    for cx, cy, cw, ch in compiled:
-        out.append(f'    <rect x="{cx}" y="{cy}" width="{cw}" height="{ch}" rx="3"/>')
-    out.append("  </g>")
-    return "\n".join(out)
+def mark(x: int, y: int, size: int) -> str:
+    """The mascot, embedded rather than linked.
+
+    rsvg-convert resolves a relative href against its own working directory, not the
+    SVG's, so a plain path renders here and silently vanishes when the card is built
+    from anywhere else. Inlining it removes the question. The dark variant is the one
+    used: the card background is near-black, and the mascot's own outline is black.
+    """
+    data = b64encode((Path(__file__).parent / "mascot-dark.png").read_bytes()).decode()
+    return (f'  <image x="{x}" y="{y}" width="{size}" height="{size}" '
+            f'xlink:href="data:image/png;base64,{data}"/>')
 
 
 def bar(y: int, label: str, pct: int, colour: str, emphasis: bool) -> str:
@@ -97,13 +92,14 @@ def bar(y: int, label: str, pct: int, colour: str, emphasis: bool) -> str:
 
 def card(reify_pct: int, grep_pct: int, tasks: int) -> str:
     return f"""<svg viewBox="0 0 {W} {H}" width="{W}" height="{H}"
-     xmlns="http://www.w3.org/2000/svg" role="img"
+     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     role="img"
      aria-label="Reify: at the same token cost a model finds the file that had to change
      {reify_pct}% of the time, against {grep_pct}% for grep.">
   <rect width="{W}" height="{H}" fill="{BACKGROUND}"/>
 
-{mark(MARGIN, 74, 0.62)}
-  <text x="{MARGIN + 108}" y="{74 + 50}" font-family="{FONT}" font-size="52"
+{mark(MARGIN - 10, 56, 120)}
+  <text x="{MARGIN + 122}" y="{74 + 54}" font-family="{FONT}" font-size="52"
         font-weight="700" letter-spacing="-1.5" fill="{INK}">reify</text>
 
   <text x="{MARGIN}" y="268" font-family="{FONT}" font-size="46" font-weight="700"

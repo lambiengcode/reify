@@ -1,96 +1,164 @@
 #!/usr/bin/env python3
-"""Generate the Reify logo and mark, light and dark.
+"""Generate the Reify logo set from the mascot drawing.
 
-Written as a script rather than four hand-edited files so the palette lives in one
-place: a colour changed in one variant and not the others is the usual way a logo set
-drifts. Run `python3 assets/make-logo.py` after changing anything here.
+`mascot.png` is the master and the only hand-made file here: a transparent, optically
+centred drawing of the mascot. Everything else - the light and dark lockups, the icon
+ladder, the favicon - is derived from it by this script, so the set cannot drift the
+way four hand-edited files do.
+
+    python3 assets/make-logo.py
+
+Two things in here are corrections rather than decoration, and both were found by
+rendering the result and looking at it:
+
+  - The dark variant repaints the near-black outline to the light ink colour. A
+    black-outlined mascot has no outline at all against a dark README; it reads as a
+    green smudge.
+  - That repaint deliberately spares the pupils. Flipping every dark pixel turns the
+    black pupils the same cream as the eye-whites they sit in, and the mascot loses
+    its gaze entirely - a defect invisible in the code and obvious the moment the dark
+    lockup is rendered and looked at.
+  - The lockup carries no tagline. The first draft had one, and rendering it showed
+    both why not: it was nearly as wide as the wordmark itself, and every README that
+    uses this puts its own tagline two lines underneath.
 """
 
 from pathlib import Path
 
-# GitHub's own success greens, which is not a coincidence: these are the exact colours
-# the benchmark charts already draw the reify bars in, so the logo wears the colour it
-# was measured in. Each is chosen for contrast against its own background.
-GREEN_LIGHT = "#2da44e"
-GREEN_DARK = "#3fb950"
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-# The wordmark stays neutral. A green mark beside an ink wordmark reads at any size;
-# an all-green lockup loses contrast on white, where the tagline sits right under it.
-INK_LIGHT = "#111111"
-INK_DARK = "#e6edf3"
+HERE = Path(__file__).parent
+MASTER = HERE / "mascot.png"
 
-DESC = (
-    "Three rows of scattered fragments on the left - code, documents, history - become "
-    "the same three rows aligned into one solid column on the right. Thin seams remain "
-    "between them, because compiled knowledge keeps its sources traceable."
-)
-
-RATIONALE = """  <!--
-    The mark is the word, drawn. The same three rows appear twice: loose and faint on
-    the left, aligned and solid on the right. Nothing is added between them and nothing
-    is lost - the seams stay, because Reify compiles knowledge without dissolving where
-    it came from, and every claim it makes still carries its evidence.
-
-    Green is the compiled half's colour and the fragments only borrow it, faintly: what
-    Reify produces is the thing worth pointing at.
-  -->"""
-
-# (x, y, width) for each fragment, and the opacity ramp that carries the eye rightward.
-FRAGMENTS = [
-    (0, 0, 9, 0.16), (15, 0, 14, 0.34), (35, 0, 21, 0.58),
-    (5, 36, 7, 0.16), (18, 36, 17, 0.36), (41, 36, 15, 0.58),
-    (0, 72, 12, 0.18), (19, 72, 11, 0.34), (36, 72, 20, 0.58),
+# The wordmark's rounded sans echoes the mascot's hand-drawn wobble; a grotesque beside
+# it reads as two logos that happened to meet. First one present wins, so the script
+# still runs off macOS - the committed PNGs are what ships, this only regenerates them.
+FONTS = [
+    "/System/Library/Fonts/Supplemental/Arial Rounded Bold.ttf",
+    "/System/Library/Fonts/SFNSRounded.ttf",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+    "/Library/Fonts/Arial Bold.ttf",
 ]
-# The compiled model: the same three rows, aligned, solid, still separable.
-COMPILED = [(72, 0, 56, 30), (72, 33, 56, 30), (72, 66, 56, 30)]
+
+INK_LIGHT = (17, 17, 17)
+INK_DARK = (230, 237, 243)          # matches the charts' dark-mode text
+
+# The largest thing derived from the master is a 512px icon and a 400px lockup, so
+# anything past 1024 is weight with nothing to show for it.
+MASTER_MAX = 1024
+ICON_SIZES = (512, 256, 180, 128, 64, 48, 32, 16)
+FAVICON_SIZES = [(16, 16), (32, 32), (48, 48)]
 
 
-def mark_group(green: str, dx: int, dy: int) -> str:
-    rows = [f'  <g transform="translate({dx} {dy})" fill="{green}">']
-    for x, y, w, opacity in FRAGMENTS:
-        rows.append(
-            f'    <rect x="{x}" y="{y}" width="{w}" height="24" rx="2" opacity="{opacity}"/>'
-        )
-    for x, y, w, h in COMPILED:
-        rows.append(f'    <rect x="{x}" y="{y}" width="{w}" height="{h}" rx="3"/>')
-    rows.append("  </g>")
-    return "\n".join(rows)
+def font(size: int) -> ImageFont.FreeTypeFont:
+    for path in FONTS:
+        if Path(path).exists():
+            return ImageFont.truetype(path, size)
+    raise SystemExit(f"no usable font found; tried:\n  " + "\n  ".join(FONTS))
 
 
-def logo(green: str, ink: str) -> str:
-    return f"""<svg viewBox="0 0 566 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Reify">
-  <title>Reify</title>
-  <desc>{DESC}</desc>
-
-{RATIONALE}
-{mark_group(green, 26, 22)}
-
-  <text x="188" y="93" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif"
-        font-size="76" font-weight="700" letter-spacing="-2" fill="{ink}">reify</text>
-</svg>
-"""
+EYE_DILATE = 9   # px, enough to reach the pupil from the cream ring around it
 
 
-def mark(green: str) -> str:
-    return f"""<svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Reify">
-  <title>Reify</title>
-  <desc>The Reify mark: scattered fragments resolving into one aligned column.</desc>
-{mark_group(green, 26, 42)}
-</svg>
-"""
+def eye_mask(im: Image.Image) -> Image.Image:
+    """Where the eyes are.
+
+    Cream appears nowhere on this drawing except inside the eyes, so the eye-whites
+    locate themselves; dilating that mask a little swallows the pupil sitting in the
+    middle of them.
+    """
+    px = im.load()
+    w, h = im.size
+    mask = Image.new("L", (w, h), 0)
+    mp = mask.load()
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if a > 128 and r > 205 and g > 200 and b > 175 and abs(r - b) < 60:
+                mp[x, y] = 255
+    return mask.filter(ImageFilter.MaxFilter(EYE_DILATE))
+
+
+def flip_ink(im: Image.Image, to: tuple[int, int, int] = INK_DARK) -> Image.Image:
+    """Repaint the near-black outline so it survives on a dark background.
+
+    Blended rather than replaced, so the drawing's anti-aliased edge stays soft instead
+    of turning into a hard stair-stepped line. Pixels inside the eyes are left alone,
+    or the pupils disappear into the whites around them.
+    """
+    im = im.copy()
+    px = im.load()
+    eyes = eye_mask(im).load()
+    w, h = im.size
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if a and r < 80 and g < 80 and b < 80 and not eyes[x, y]:
+                k = max(r, g, b) / 80.0
+                px[x, y] = (
+                    int(to[0] * (1 - k) + r * k),
+                    int(to[1] * (1 - k) + g * k),
+                    int(to[2] * (1 - k) + b * k),
+                    a,
+                )
+    return im
+
+
+def compress(im: Image.Image, colours: int = 48) -> Image.Image:
+    """Quantise to a small adaptive palette, keeping the alpha channel intact.
+
+    The drawing is flat colour with anti-aliased edges, so a few dozen colours is
+    visually lossless - and it also scrubs the JPEG ringing the source came with.
+    Without this the master alone is over a megabyte, which is not a thing to commit.
+    """
+    alpha = im.getchannel("A")
+    rgb = im.convert("RGB").quantize(colors=colours, method=Image.MEDIANCUT).convert("RGB")
+    rgb.putalpha(alpha)
+    return rgb
+
+
+def lockup(mark: Image.Image, ink, path: Path, height: int = 400) -> None:
+    """Mascot beside the wordmark, at 2x for retina; the READMEs display it at half.
+
+    The wordmark is centred on the mascot's optical middle using its cap height rather
+    than its full bounding box, so the descender of the y does not drag it low.
+    """
+    mark = mark.resize((height, height), Image.LANCZOS)
+    word = font(int(height * 0.46))
+    gap = int(height * 0.10)
+    text_w = ImageDraw.Draw(Image.new("RGB", (1, 1))).textlength("reify", font=word)
+    im = Image.new("RGBA", (int(height + gap + text_w + height * 0.05), height), (0, 0, 0, 0))
+    im.paste(mark, (0, 0), mark)
+
+    left, top, _, bottom = word.getbbox("reify")
+    cap = word.getbbox("R")[3] - word.getbbox("R")[1]
+    ImageDraw.Draw(im).text(
+        (height + gap - left, height // 2 - cap // 2 - top), "reify", font=word, fill=ink)
+    compress(im).save(path, optimize=True)
 
 
 def main() -> None:
-    here = Path(__file__).parent
-    written = {
-        "logo.svg": logo(GREEN_LIGHT, INK_LIGHT),
-        "logo-dark.svg": logo(GREEN_DARK, INK_DARK),
-        "mark.svg": mark(GREEN_LIGHT),
-        "mark-dark.svg": mark(GREEN_DARK),
-    }
-    for name, svg in written.items():
-        (here / name).write_text(svg)
-        print(f"wrote {name}")
+    if not MASTER.exists():
+        raise SystemExit(f"{MASTER.name} missing: it is the hand-made master, not output")
+    mascot = Image.open(MASTER).convert("RGBA")
+    if mascot.width > MASTER_MAX:
+        mascot = mascot.resize((MASTER_MAX, MASTER_MAX), Image.LANCZOS)
+
+    compress(mascot).save(MASTER, optimize=True)
+    dark = flip_ink(mascot)
+    compress(dark).save(HERE / "mascot-dark.png", optimize=True)
+
+    lockup(mascot, INK_LIGHT, HERE / "logo.png")
+    lockup(dark, INK_DARK, HERE / "logo-dark.png")
+
+    for size in ICON_SIZES:
+        compress(mascot.resize((size, size), Image.LANCZOS)).save(
+            HERE / f"icon-{size}.png", optimize=True)
+    mascot.resize((256, 256), Image.LANCZOS).save(HERE / "favicon.ico", sizes=FAVICON_SIZES)
+
+    for name in ("mascot.png", "mascot-dark.png", "logo.png", "logo-dark.png"):
+        print(f"  {name:20} {(HERE / name).stat().st_size // 1024:>4} KB")
+    print(f"  icon-*.png, favicon.ico")
 
 
 if __name__ == "__main__":
