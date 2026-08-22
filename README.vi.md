@@ -14,31 +14,18 @@
 </p>
 
 <p align="center">
-  <strong>đồ thị tri thức xác định &middot; mọi khẳng định đều có trích dẫn &middot; từ tài liệu BA đến code &middot; một binary, không daemon &middot; không bao giờ mở socket</strong>
-</p>
-
-<p align="center">
   <a href="https://github.com/lambiengcode/reify/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/lambiengcode/reify/ci.yml?style=flat-square&label=ci" /></a>
   <a href="https://github.com/lambiengcode/reify/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/lambiengcode/reify?style=flat-square&color=blue" /></a>
   <a href="LICENSE"><img alt="Apache-2.0" src="https://img.shields.io/github/license/lambiengcode/reify?style=flat-square&color=blue" /></a>
-  <a href="#install"><img alt="nền tảng" src="https://img.shields.io/badge/nền%20tảng-macOS%20%7C%20Linux-blue?style=flat-square" /></a>
-  <a href="#privacy"><img alt="lượt gọi mạng: 0" src="https://img.shields.io/badge/lượt%20gọi%20mạng-0-success?style=flat-square" /></a>
-  <a href="#development"><img alt="369 test" src="https://img.shields.io/badge/test-369-success?style=flat-square" /></a>
+  <a href="#swebench"><img alt="SWE-bench retrieval 84.6%" src="https://img.shields.io/badge/SWE--bench%20retrieval-84.6%25-blueviolet?style=flat-square" /></a>
+  <a href="#privacy"><img alt="network calls: 0" src="https://img.shields.io/badge/network%20calls-0-success?style=flat-square" /></a>
 </p>
 
 <p align="center">
-  <a href="#swebench"><img alt="SWE-bench retrieval 84.6%" src="https://img.shields.io/badge/truy%20xuất%20SWE--bench-84.6%25-blueviolet?style=flat-square" /></a>
-  <a href="#what-it-reads"><img alt="11 ngôn ngữ" src="https://img.shields.io/badge/ngôn%20ngữ-11-informational?style=flat-square" /></a>
-  <a href="#what-it-reads"><img alt="10 định dạng tài liệu" src="https://img.shields.io/badge/định%20dạng%20tài%20liệu-10-informational?style=flat-square" /></a>
-  <a href="#architecture"><img alt="Rust" src="https://img.shields.io/badge/rust-1.75%2B-dea584?style=flat-square&logo=rust&logoColor=white" /></a>
-</p>
-
-<p align="center">
-  <a href="#claude-code"><img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-supported-2da44e?style=flat-square" /></a>
+  <a href="#other-agents"><img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-supported-2da44e?style=flat-square" /></a>
   <a href="#other-agents"><img alt="Cursor" src="https://img.shields.io/badge/Cursor-supported-2da44e?style=flat-square" /></a>
   <a href="#other-agents"><img alt="Codex" src="https://img.shields.io/badge/Codex-supported-2da44e?style=flat-square" /></a>
   <a href="#other-agents"><img alt="OpenCode" src="https://img.shields.io/badge/OpenCode-supported-2da44e?style=flat-square" /></a>
-  <a href="#other-agents"><img alt="Aider" src="https://img.shields.io/badge/Aider-supported-2da44e?style=flat-square" /></a>
   <a href="#mcp"><img alt="MCP" src="https://img.shields.io/badge/MCP-3%20tools-2da44e?style=flat-square" /></a>
 </p>
 
@@ -78,23 +65,11 @@ repository, cả hai đều in kế hoạch trước. Nối từng agent, hook v
 
 **Mục lục**
 
-- [Hai phút đến câu trả lời đầu tiên](#two-minutes)
-- [Vấn đề phụ thuộc một người](#the-one-person-problem)
-- [Reify thực sự cho bạn cái gì](#what-it-actually-gives-you)
-- [Trước / sau](#before--after)
-- [SWE-bench Verified](#swebench) — 84,6% so với 6,6% của grep
-- [Số liệu](#numbers) — [chỉ riêng truy xuất](#retrieval-alone) · [bảng điểm](#the-scorecard) · [chỗ nó không chạy được](#where-it-doesnt-work)
-- [Cách nó hoạt động](#how-it-works) — [bốn cây cầu sang code](#four-bridges)
-- [Nó đọc được gì](#what-it-reads)
-- [Đa ngôn ngữ](#multilingual)
-- [Cài đặt](#install) — [Claude Code](#claude-code) · [agent khác](#other-agents) · [MCP](#mcp) · [dùng mô hình](#optional-a-model)
-- [Các lệnh](#commands)
-- [Quyền riêng tư](#privacy)
-- [Kiến trúc](#architecture) — [hiệu năng đo được](#measured-performance)
-- [Tái lập benchmark](#reproducing-the-benchmark)
-- [Phát triển](#development)
-- [Câu hỏi thường gặp](#faq)
-- [Lộ trình](#roadmap) · [Trạng thái](#status) · [Giấy phép](#license)
+- [Hai phút đến câu trả lời đầu tiên](#two-minutes) · [vấn đề phụ thuộc một người](#the-one-person-problem) · [nó cho bạn cái gì](#what-it-actually-gives-you)
+- **Số liệu:** [SWE-bench Verified](#swebench) · [bốn repository](#numbers) · [chỗ nó không chạy được](#where-it-doesnt-work)
+- **Dùng nó:** [cài đặt](#install) · [nối vào agent](#other-agents) · [các lệnh](#commands) · [quyền riêng tư](#privacy)
+- **Bên dưới:** [cách hoạt động](#how-it-works) · [nó đọc gì](#what-it-reads) · [đa ngôn ngữ](#multilingual) · [kiến trúc](#architecture)
+- [Câu hỏi thường gặp](#faq) · [phát triển](#development) · [lộ trình](#roadmap) · [giấy phép](#license)
 
 ## <a id="the-one-person-problem"></a>Vấn đề phụ thuộc một người
 
@@ -221,35 +196,43 @@ hình, không ảnh hưởng tới việc một bộ truy xuất đề xuất fi
 [`benchmarks/swe/`](benchmarks/swe/).
 
 
-### Kết quả đầu-cuối, và nó không nghiêng về phía chúng tôi
+### Đầu-cuối: hoà, và cái giá để đến được đó
 
-Truy xuất không phải tuyên bố cuối cùng của dự án này — giải quyết được issue mới là.
-Vì vậy cùng benchmark đó được chạy qua chính giao thức "truy xuất rồi sinh bản vá" của
-bài báo SWE-bench: một mô hình, một ngân sách ngữ cảnh, bộ truy xuất là khác biệt duy
-nhất giữa các nhánh, và mọi bản vá đều do **bộ chấm chính thức của SWE-bench** trong
-Docker phán quyết. 101 instance phân tầng; 72 trong số đó được chấm ở cả hai nhánh.
+Truy xuất không phải tuyên bố cuối cùng — giải quyết được issue mới là. Cùng benchmark
+đó, chạy qua chính giao thức của bài báo SWE-bench (một mô hình, một ngân sách, bộ truy
+xuất là khác biệt duy nhất), mọi bản vá do **bộ chấm chính thức của SWE-bench** phán quyết:
 
-| giải quyết được issue | | KTC 95% |
+| giải quyết được issue, 63 instance chấm ở cả hai nhánh | | |
 |---|--:|---|
-| BM25 | **18,1%** (13/72) | [10,9–28,5] |
-| Reify | 11,1% (8/72) | [5,7–20,4] |
+| BM25 | 23,8% | |
+| **Reify** | **23,8%** | 6–6, p = 1,0 |
 
-BM25 giải được 8 instance mà Reify không giải được; Reify giải được 3 cái BM25 không
-(McNemar chính xác p = 0,23). Với cỡ mẫu này đó không phải khác biệt có ý nghĩa thống kê
-— nhưng ước lượng điểm nghiêng về BM25, và nó được báo cáo đúng theo chiều đó, vì đó là
-chiều mà kết quả đã đi ra.
+Hoà — và cần nói thẳng, vì lần thử đầu tiên là **thua**: 11,1% so với 18,1%. Điều thú vị
+nằm ở chỗ đã khép lại khoảng cách đó bằng cách nào.
 
-**Phần chẩn đoán còn giá trị hơn con số.** Trong 5 trên 8 instance mà BM25 giải được còn
-Reify thì không, **Reify đã từng đề xuất một file mà bản vá có sửa.** Vậy đây không phải
-thất bại về truy xuất. Đặt đúng file trước mặt mô hình và đưa cho mô hình thứ nó cần để
-viết bản vá là hai bài toán khác nhau, và Reify được đo là giỏi hơn hẳn ở bài toán thứ
-nhất so với bài toán thứ hai.
+Reify tìm đúng file thường xuyên hơn hẳn (77% so với 60% của BM25) mà mô hình vẫn làm tệ
+hơn. Dựng lại đúng những prompt đó cho thấy lý do: một cửa sổ ngữ cảnh được đổ đầy bằng
+nguyên cả file theo thứ tự xếp hạng sẽ tiêu hết vào thứ đứng đầu, và cách xếp hạng của
+Reify mù trước kích thước file, trong khi BM25 có chuẩn hoá độ dài ngay trong công thức.
+**File đúng đã được tìm ra rồi không bao giờ được cho xem** — chỉ hiện diện trong 27% số
+prompt, so với 40% của BM25.
 
-Một giới hạn, nêu ra như một giới hạn chứ không phải để bào chữa: giao thức này dùng
-Reify như một *bộ xếp hạng file*, nạp nguyên cả file, tức là vứt bỏ đúng thứ mà
-`reify context` thực sự tạo ra — các đoạn code, luật, trích dẫn nguồn, mâu thuẫn, và kế
-hoạch đọc theo ngân sách. Nạp thẳng ngữ cảnh đã biên dịch mới là thí nghiệm tiếp theo
-hiển nhiên. Nó chưa được chạy, nên nó chưa chứng minh điều gì.
+`reify context --for-edit` sửa từ gốc: các vùng được nới ra thành định nghĩa trọn vẹn,
+phần import của file được đưa vào một lần, các vùng chồng nhau được gộp, ngân sách vẫn
+cứng. Không còn mất gì ở cửa sổ nữa:
+
+| | tìm được file đúng | **hiện diện trong prompt** |
+|---|--:|--:|
+| BM25 | 60,0% | 40,0% |
+| Reify, nguyên file | 76,7% | 26,7% |
+| **Reify `--for-edit`** | **80,0%** | **56,7%** |
+
+Hai cách sửa đã bị **bác bỏ dựa trên bằng chứng**: giới hạn theo từng file làm mọi thứ tệ
+hơn (một file bị cắt cụt thì cũng không sửa được), và xếp hạng theo chi phí làm giảm truy
+xuất bảy điểm mà chẳng đem lại gì khi các vùng đã khiến kích thước file không còn quan trọng.
+
+Vậy: Reify thắng rõ ràng ở truy xuất và hoà ở kết quả vá cuối cùng. Ràng buộc còn lại nằm
+ở vòng lặp viết bản vá chứ không phải ở ngữ cảnh — cả hai nhánh đều chạm trần quanh 24%.
 
 ## <a id="numbers"></a>Số liệu, trên bốn repository chọn để làm khó
 

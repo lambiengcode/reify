@@ -14,31 +14,18 @@
 </p>
 
 <p align="center">
-  <strong>确定性知识图谱 &middot; 每条结论皆有引用 &middot; 从 BA 文档到代码 &middot; 单一二进制、无常驻进程 &middot; 从不打开 socket</strong>
-</p>
-
-<p align="center">
   <a href="https://github.com/lambiengcode/reify/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/lambiengcode/reify/ci.yml?style=flat-square&label=ci" /></a>
   <a href="https://github.com/lambiengcode/reify/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/lambiengcode/reify?style=flat-square&color=blue" /></a>
   <a href="LICENSE"><img alt="Apache-2.0" src="https://img.shields.io/github/license/lambiengcode/reify?style=flat-square&color=blue" /></a>
-  <a href="#install"><img alt="平台" src="https://img.shields.io/badge/平台-macOS%20%7C%20Linux-blue?style=flat-square" /></a>
-  <a href="#privacy"><img alt="网络调用: 0" src="https://img.shields.io/badge/网络调用-0-success?style=flat-square" /></a>
-  <a href="#development"><img alt="369 测试" src="https://img.shields.io/badge/测试-369-success?style=flat-square" /></a>
+  <a href="#swebench"><img alt="SWE-bench retrieval 84.6%" src="https://img.shields.io/badge/SWE--bench%20retrieval-84.6%25-blueviolet?style=flat-square" /></a>
+  <a href="#privacy"><img alt="network calls: 0" src="https://img.shields.io/badge/network%20calls-0-success?style=flat-square" /></a>
 </p>
 
 <p align="center">
-  <a href="#swebench"><img alt="SWE-bench retrieval 84.6%" src="https://img.shields.io/badge/SWE--bench%20检索-84.6%25-blueviolet?style=flat-square" /></a>
-  <a href="#what-it-reads"><img alt="11 语言" src="https://img.shields.io/badge/语言-11-informational?style=flat-square" /></a>
-  <a href="#what-it-reads"><img alt="10 文档格式" src="https://img.shields.io/badge/文档格式-10-informational?style=flat-square" /></a>
-  <a href="#architecture"><img alt="Rust" src="https://img.shields.io/badge/rust-1.75%2B-dea584?style=flat-square&logo=rust&logoColor=white" /></a>
-</p>
-
-<p align="center">
-  <a href="#claude-code"><img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-supported-2da44e?style=flat-square" /></a>
+  <a href="#other-agents"><img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-supported-2da44e?style=flat-square" /></a>
   <a href="#other-agents"><img alt="Cursor" src="https://img.shields.io/badge/Cursor-supported-2da44e?style=flat-square" /></a>
   <a href="#other-agents"><img alt="Codex" src="https://img.shields.io/badge/Codex-supported-2da44e?style=flat-square" /></a>
   <a href="#other-agents"><img alt="OpenCode" src="https://img.shields.io/badge/OpenCode-supported-2da44e?style=flat-square" /></a>
-  <a href="#other-agents"><img alt="Aider" src="https://img.shields.io/badge/Aider-supported-2da44e?style=flat-square" /></a>
   <a href="#mcp"><img alt="MCP" src="https://img.shields.io/badge/MCP-3%20tools-2da44e?style=flat-square" /></a>
 </p>
 
@@ -78,23 +65,11 @@ reify context "你即将进行的改动" --toon
 
 **目录**
 
-- [两分钟得到第一个答案](#two-minutes)
-- [只有一个人懂的问题](#the-one-person-problem)
-- [它到底给你什么](#what-it-actually-gives-you)
-- [改造前 / 改造后](#before--after)
-- [SWE-bench Verified](#swebench) — 84.6% 对 grep 的 6.6%
-- [数据](#numbers) — [纯检索表现](#retrieval-alone) · [记分卡](#the-scorecard) · [它失效的地方](#where-it-doesnt-work)
-- [工作原理](#how-it-works) — [通往代码的四座桥](#four-bridges)
-- [它能读什么](#what-it-reads)
-- [多语言](#multilingual)
-- [安装](#install) — [Claude Code](#claude-code) · [其他 agent](#other-agents) · [MCP](#mcp) · [接入模型](#optional-a-model)
-- [命令](#commands)
-- [隐私](#privacy)
-- [架构](#architecture) — [实测性能](#measured-performance)
-- [复现基准测试](#reproducing-the-benchmark)
-- [开发](#development)
-- [常见问题](#faq)
-- [路线图](#roadmap) · [项目状态](#status) · [许可证](#license)
+- [两分钟得到第一个答案](#two-minutes) · [只有一个人懂的问题](#the-one-person-problem) · [它给你什么](#what-it-actually-gives-you)
+- **数据：** [SWE-bench Verified](#swebench) · [四个代码库](#numbers) · [它失效的地方](#where-it-doesnt-work)
+- **使用：** [安装](#install) · [接入 agent](#other-agents) · [命令](#commands) · [隐私](#privacy)
+- **底层：** [工作原理](#how-it-works) · [它能读什么](#what-it-reads) · [多语言](#multilingual) · [架构](#architecture)
+- [常见问题](#faq) · [开发](#development) · [路线图](#roadmap) · [许可证](#license)
 
 ## <a id="the-one-person-problem"></a>只有一个人懂的问题
 
@@ -212,31 +187,38 @@ $ reify why erpnext/selling/doctype/sales_order/sales_order.py:812
 [`benchmarks/swe/`](benchmarks/swe/) 中的驱动脚本复现。
 
 
-### 端到端的结果，而且它对我们不利
+### 端到端：打平，以及走到这一步的代价
 
-检索并不是这个项目最终的主张 —— 解决 issue 才是。因此同一份基准被放进 SWE-bench 论文
-自己的「检索增强生成补丁」协议：一个模型、一份上下文预算，各组之间唯一的差别是检索器，
-每个补丁都由 Docker 中的 **SWE-bench 官方评测器**判定。101 个分层抽样实例，其中 72 个
-在两组下都被判定过。
+检索不是最终的主张 —— 解决 issue 才是。同一份基准，跑在 SWE-bench 论文自己的协议上
+（一个模型、一份预算，检索器是唯一变量），每个补丁都由 **SWE-bench 官方评测器**判定：
 
-| 解决了 issue | | 95% 置信区间 |
+| 解决了 issue，两组都判定过的 63 个实例 | | |
 |---|--:|---|
-| BM25 | **18.1%**（13/72） | [10.9–28.5] |
-| Reify | 11.1%（8/72） | [5.7–20.4] |
+| BM25 | 23.8% | |
+| **Reify** | **23.8%** | 6–6，p = 1.0 |
 
-BM25 解决了 8 个 Reify 没解决的实例；Reify 解决了 3 个 BM25 没解决的（精确 McNemar
-检验 p = 0.23）。在这个样本量下这不是显著差异 —— 但点估计偏向 BM25，而这里就按这个方向
-报告，因为结果本来就是这个方向。
+打平 —— 而且必须说清楚，因为第一次尝试是**落败**：11.1% 对 18.1%。有意思的是它是怎么被
+追平的。
 
-**诊断比数字更有价值。** 在 BM25 解决而 Reify 没解决的那 8 个实例中，有 5 个
-**Reify 其实已经提供了修复所改动的文件**。所以这些并不是检索失败。把正确的文件送到模型
-面前，和给模型足够写出补丁的材料，是两个不同的问题，而实测显示 Reify 在前者上远强于
-后者。
+Reify 找到正确文件的频率高得多（77% 对 BM25 的 60%），模型却表现更差。重建那些 prompt
+后原因很清楚：一个按排名顺序用整份文件填满的上下文窗口，会把额度全花在排第一的东西上，
+而 Reify 的排名对文件大小视而不见，BM25 的公式里却自带长度归一化。**正确的文件被检索到
+了，然后从未被展示** —— 只出现在 27% 的 prompt 中，而 BM25 是 40%。
 
-一条限制，作为限制而非辩解陈述：该协议把 Reify 当作*文件排序器*使用，喂入的是整份文件，
-这恰恰丢掉了 `reify context` 真正产出的东西 —— 代码片段、规则、出处引用、冲突，以及按
-预算编排的阅读计划。改为喂入编译好的上下文，是显而易见的下一个实验。它还没有被跑过，
-所以它目前什么也没证明。
+`reify context --for-edit` 从源头解决：区域扩展到完整定义、文件的 import 只包含一次、
+重叠区域合并、预算依然是硬约束。检索到的东西不再在窗口处丢失：
+
+| | 检索到正确文件 | **在 prompt 中可见** |
+|---|--:|--:|
+| BM25 | 60.0% | 40.0% |
+| Reify，整份文件 | 76.7% | 26.7% |
+| **Reify `--for-edit`** | **80.0%** | **56.7%** |
+
+有两种修法**依据证据被否决**：按文件设上限反而更糟（被截断的文件同样无法编辑），而
+成本感知排名让检索下降七个百分点，且在区域化让文件大小失去意义之后毫无收益。
+
+所以：Reify 在检索上明显胜出，在最终补丁成功率上打平。剩下的瓶颈在写补丁的循环，而不在
+上下文 —— 两组都卡在 24% 附近。
 
 ## <a id="numbers"></a>数据：在四个刻意挑难的代码库上
 

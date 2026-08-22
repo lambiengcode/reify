@@ -86,6 +86,23 @@ const FILE_FANOUT_SYMBOLS: usize = 8;
 /// A symbol inherits this share of its file's seed score.
 const FILE_TO_SYMBOL: f32 = 0.8;
 
+/// A file whose last interesting line falls within this many lines is offered whole
+/// rather than as regions: fragmenting a short file buys nothing and costs coherence.
+const WHOLE_FILE_LINES: u32 = 400;
+
+/// How many more entries an edit plan may hold than a reading plan, because each
+/// region is a fraction of a file rather than a whole one.
+const EDIT_PLAN_WIDTH: usize = 4;
+
+/// Lines of scaffolding kept above a region so an edit lands in visible context:
+/// the decorator, signature and doc comment that precede a definition.
+const EDIT_LEAD_LINES: u32 = 12;
+/// Lines kept below, so a closing brace or the next signature is visible.
+const EDIT_TRAIL_LINES: u32 = 4;
+/// Header of a file — imports, module docstring — included with any region in it,
+/// because a patch that adds a call needs to know what is already imported.
+const EDIT_HEADER_LINES: u32 = 40;
+
 /// Weight of the bounded content scan's file seeds; zero disables the scan.
 const LEXICAL_FILES_WEIGHT: f32 = 0.6;
 /// Files the content scan may seed per query.
@@ -219,6 +236,15 @@ impl Default for RankWeights {
 
 #[derive(Debug, Clone)]
 pub struct ContextOptions {
+    /// Emit regions sized to be *edited* rather than spans sized to be *read*.
+    ///
+    /// Reading and editing want different things. A reader wants the smallest span
+    /// that answers the question; a model writing a patch needs the whole enclosing
+    /// definition, the imports above it, and enough neighbouring code to match the
+    /// file's conventions — otherwise it patches blind. Measured on SWE-bench
+    /// Verified, feeding whole files instead cost more than it bought: the window
+    /// filled with one large file and the file that mattered never arrived.
+    pub for_edit: bool,
     pub budget: u32,
     pub max_next_reads: usize,
     pub weights: RankWeights,
@@ -233,6 +259,7 @@ pub struct ContextOptions {
 impl Default for ContextOptions {
     fn default() -> Self {
         ContextOptions {
+            for_edit: false,
             budget: DEFAULT_BUDGET,
             max_next_reads: MAX_NEXT_READS,
             weights: RankWeights::default(),
@@ -431,12 +458,23 @@ pub fn compile(store: &Store, task: &str, opts: &ContextOptions) -> Result<Conte
 
     // Whatever the context did not spend funds the reading plan.
     let read_budget = opts.budget.saturating_sub(context_cost);
-    context.next_reads = reading_plan(
-        &selected,
-        opts.max_next_reads,
-        read_budget,
-        opts.weights.offer_cutoff,
-    );
+    context.next_reads = if opts.for_edit {
+        // Each region costs a fraction of a whole file, so the same budget reaches
+        // far more files. Capping at `max_next_reads` here would throw that away.
+        edit_plan(
+            &selected,
+            opts.max_next_reads * EDIT_PLAN_WIDTH,
+            read_budget,
+            opts.weights.offer_cutoff,
+        )
+    } else {
+        reading_plan(
+            &selected,
+            opts.max_next_reads,
+            read_budget,
+            opts.weights.offer_cutoff,
+        )
+    };
     context.budget.reads = context.next_reads.iter().map(|r| r.est_tokens).sum();
     context.budget.used = context.budget.context + context.budget.reads;
 
@@ -1118,6 +1156,109 @@ fn reading_plan(selected: &[Scored], limit: usize, budget: u32, cutoff: f32) -> 
     plan
 }
 
+/// A reading plan sized for *writing a patch* rather than for answering a question.
+///
+/// Three differences from [`reading_plan`], each measured rather than assumed:
+///
+/// 1. **Regions are padded to complete definitions.** A span that starts at the first
+///    line of a function body leaves the model guessing at the signature it must
+///    preserve; a few lines of lead and trail make the edit site self-contained.
+/// 2. **Each file contributes its header once.** Imports decide whether a patch can
+///    call something, and they are never inside the span that matched.
+/// 3. **Overlapping regions in a file are merged**, so a file with three neighbouring
+///    hits costs one contiguous read instead of three overlapping ones.
+///
+/// The budget is still hard: regions are taken in ranked-file order until it is spent,
+/// which is what keeps a large file from swallowing the whole window.
+fn edit_plan(selected: &[Scored], limit: usize, budget: u32, cutoff: f32) -> Vec<NextRead> {
+    let ranked = ranked_files(selected, cutoff);
+    let mut plan: Vec<NextRead> = Vec::new();
+    let mut spent = 0u32;
+
+    for (path, items) in &ranked {
+        if plan.len() >= limit {
+            break;
+        }
+        // Collect this file's regions, padded to whole definitions.
+        let mut regions: Vec<(u32, u32)> = items
+            .iter()
+            .filter(|i| i.node.line_start > 0)
+            .map(|i| {
+                (
+                    i.node.line_start.saturating_sub(EDIT_LEAD_LINES).max(1),
+                    i.node.line_end + EDIT_TRAIL_LINES,
+                )
+            })
+            .collect();
+        if regions.is_empty() {
+            continue;
+        }
+        regions.sort_unstable();
+        // Merge overlaps and near-touching regions into one contiguous read.
+        let mut merged: Vec<(u32, u32)> = Vec::new();
+        for (start, end) in regions {
+            match merged.last_mut() {
+                Some((_, prev_end)) if start <= *prev_end + EDIT_LEAD_LINES => {
+                    *prev_end = (*prev_end).max(end);
+                }
+                _ => merged.push((start, end)),
+            }
+        }
+        // A file small enough to read whole is offered whole. Regions exist because
+        // large files do not fit a finite window; below that size they only fragment
+        // the file, and a model handed lines 120-210 and 245-300 will reason about
+        // the gap it cannot see. One contiguous read is strictly better here.
+        let span_end = merged.last().map(|(_, e)| *e).unwrap_or(0);
+        if span_end <= WHOLE_FILE_LINES {
+            let cost = span_end * TOKENS_PER_LINE;
+            if spent + cost <= budget {
+                spent += cost;
+                plan.push(NextRead {
+                    path: path.clone(),
+                    lines: format!("1-{span_end}"),
+                    est_tokens: cost,
+                });
+            }
+            continue;
+        }
+
+        // A file earns its header only once its first region is affordable: imports
+        // with no code beneath them are scaffolding around nothing, and paying for
+        // several files' headers is exactly how a budget gets spent saying nothing.
+        let (first_start, first_end) = merged[0];
+        let first_cost = (first_end.saturating_sub(first_start) + 1) * TOKENS_PER_LINE;
+        let header_end = EDIT_HEADER_LINES.min(first_start.saturating_sub(1));
+        let header_cost = header_end * TOKENS_PER_LINE;
+        if spent + first_cost + header_cost > budget {
+            continue;
+        }
+        if header_end > 0 {
+            spent += header_cost;
+            plan.push(NextRead {
+                path: path.clone(),
+                lines: format!("1-{header_end}"),
+                est_tokens: header_cost,
+            });
+        }
+        for (start, end) in merged {
+            if plan.len() >= limit {
+                break;
+            }
+            let cost = (end.saturating_sub(start) + 1) * TOKENS_PER_LINE;
+            if spent + cost > budget {
+                continue;
+            }
+            spent += cost;
+            plan.push(NextRead {
+                path: path.clone(),
+                lines: format!("{start}-{end}"),
+                est_tokens: cost,
+            });
+        }
+    }
+    plan
+}
+
 /// Selected symbols grouped by file, files ordered by aggregate score, weak tail cut.
 ///
 /// The aggregate is the sum of a file's top three symbol scores: enough to reward
@@ -1304,6 +1445,44 @@ mod tests {
     use crate::index::{index, IndexOptions};
 
     #[test]
+    fn edit_mode_returns_whole_definitions_with_the_file_header() {
+        let (store, _root) = indexed();
+        let task = "discount policy for strategic account orders";
+        let plain = compile(&store, task, &ContextOptions::default()).unwrap();
+        let edit = compile(
+            &store,
+            task,
+            &ContextOptions {
+                for_edit: true,
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        assert!(!edit.next_reads.is_empty(), "edit mode must offer regions");
+
+        // A file's header is offered before any region inside it, because a patch
+        // that adds a call needs to see what is already imported.
+        let first = &edit.next_reads[0];
+        assert!(first.lines.starts_with("1-"), "header first, got {first:?}");
+
+        // Regions are padded relative to the reading plan's bare spans.
+        let span_lines = |r: &NextRead| {
+            let (a, b) = r.lines.split_once('-').unwrap();
+            b.parse::<u32>().unwrap() - a.parse::<u32>().unwrap() + 1
+        };
+        let widest_read: u32 = plain.next_reads.iter().map(span_lines).max().unwrap_or(0);
+        let widest_edit: u32 = edit.next_reads.iter().map(span_lines).max().unwrap_or(0);
+        assert!(
+            widest_edit >= widest_read,
+            "edit regions ({widest_edit}) must not be narrower than read spans ({widest_read})"
+        );
+
+        // The budget is still hard in edit mode.
+        let spent: u32 = edit.next_reads.iter().map(|r| r.est_tokens).sum();
+        assert!(spent <= edit.budget.requested, "edit plan overspent");
+    }
+
+    #[test]
     fn rank_weights_deserialise_partially_with_defaults() {
         // An ablation file names only what it changes; everything else stays default.
         let weights: RankWeights = serde_json::from_str(r#"{"lexical_files": 0.0}"#).unwrap();
@@ -1480,6 +1659,7 @@ class DiscountPolicy:
                 &store,
                 "strategic account discount policy",
                 &ContextOptions {
+                    for_edit: false,
                     budget,
                     ..Default::default()
                 },
@@ -1610,6 +1790,7 @@ class DiscountPolicy:
             &store,
             "strategic account discount",
             &ContextOptions {
+                for_edit: false,
                 budget: 4000,
                 ..Default::default()
             },
@@ -1619,6 +1800,7 @@ class DiscountPolicy:
             &store,
             "strategic account discount",
             &ContextOptions {
+                for_edit: false,
                 budget: 120,
                 ..Default::default()
             },
@@ -1639,6 +1821,7 @@ class DiscountPolicy:
                 &store,
                 "strategic account discount policy",
                 &ContextOptions {
+                    for_edit: false,
                     budget,
                     ..Default::default()
                 },
@@ -1696,6 +1879,7 @@ class DiscountPolicy:
             &store,
             "strategic account discount",
             &ContextOptions {
+                for_edit: false,
                 exclude: offered.clone(),
                 ..Default::default()
             },

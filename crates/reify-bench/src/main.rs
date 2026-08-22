@@ -775,16 +775,32 @@ fn execute(
             &iterated,
             &task.ground_truth,
         ));
+
+        // Edit mode: regions padded to whole definitions instead of the smallest
+        // spans that answer the question, scored on the same ground truth so the
+        // cost of that padding is visible beside what it buys.
+        let edit = conditions::reify_context_for_edit(&store, &task.prompt, budget)?;
+        outcomes.push(metrics::score(
+            &task.id,
+            "R-reify-edit",
+            &edit,
+            &task.ground_truth,
+        ));
     }
     eprintln!();
 
     std::fs::create_dir_all(out)?;
     write_json(&out.join("outcomes.json"), &outcomes)?;
-    let summaries: Vec<metrics::Summary> =
-        ["B-content-grep", "C-path-grep", "R-reify", "R-reify-iter3"]
-            .iter()
-            .map(|n| metrics::summarise(n, &outcomes))
-            .collect();
+    let summaries: Vec<metrics::Summary> = [
+        "B-content-grep",
+        "C-path-grep",
+        "R-reify",
+        "R-reify-iter3",
+        "R-reify-edit",
+    ]
+    .iter()
+    .map(|n| metrics::summarise(n, &outcomes))
+    .collect();
     write_json(&out.join("summary.json"), &summaries)?;
     write_json(&out.join("tasks.json"), &set)?;
     write_json(

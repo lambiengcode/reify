@@ -147,6 +147,17 @@ pub fn reify_context(store: &Store, prompt: &str, budget: u32) -> Result<Answer>
     reify_context_weighted(store, prompt, budget, &context::RankWeights::default())
 }
 
+/// Reify in edit mode: regions padded to whole definitions, headers included.
+pub fn reify_context_for_edit(store: &Store, prompt: &str, budget: u32) -> Result<Answer> {
+    reify_context_inner(
+        store,
+        prompt,
+        budget,
+        &context::RankWeights::default(),
+        true,
+    )
+}
+
 /// The same condition with explicit ranking weights, for the fitting harness.
 pub fn reify_context_weighted(
     store: &Store,
@@ -154,11 +165,22 @@ pub fn reify_context_weighted(
     budget: u32,
     weights: &context::RankWeights,
 ) -> Result<Answer> {
+    reify_context_inner(store, prompt, budget, weights, false)
+}
+
+fn reify_context_inner(
+    store: &Store,
+    prompt: &str,
+    budget: u32,
+    weights: &context::RankWeights,
+    for_edit: bool,
+) -> Result<Answer> {
     let started = std::time::Instant::now();
     let compiled = context::compile(
         store,
         prompt,
         &ContextOptions {
+            for_edit,
             budget,
             max_next_reads: 12,
             weights: weights.clone(),
@@ -250,6 +272,7 @@ pub fn reify_context_iterative_weighted(
             store,
             prompt,
             &ContextOptions {
+                for_edit: false,
                 budget,
                 max_next_reads: 12,
                 exclude: exclude.clone(),

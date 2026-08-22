@@ -15,14 +15,68 @@ use crate::metrics::Summary;
 
 /// GitHub renders markdown on both light and dark backgrounds, so every colour here is
 /// one that stays legible on either. Greys come from GitHub's own palette.
+// Colours are referenced through CSS custom properties so one SVG reads correctly on
+// GitHub's light and dark themes; `defs()` defines both and swaps them under
+// `prefers-color-scheme`. The literals here are the light-theme values.
 const INK: &str = "#8b949e";
 const GRID: &str = "#8b949e";
-const BASELINE: &str = "#8b949e";
-const RIVAL: &str = "#d9822b";
-const REIFY: &str = "#2da44e";
-const DECOY: &str = "#8957e5";
-const CEILING: &str = "#57606a";
-const RIVAL_ALT: &str = "#bf8700";
+const BASELINE: &str = "url(#gNone)";
+const RIVAL: &str = "url(#gRival)";
+const REIFY: &str = "url(#gReify)";
+const DECOY: &str = "url(#gDecoy)";
+const CEILING: &str = "url(#gCeiling)";
+const RIVAL_ALT: &str = "url(#gRivalAlt)";
+
+/// Gradients, theme tokens and the type scale, emitted once per chart.
+fn defs() -> String {
+    let bar = |id: &str, top: &str, bottom: &str| {
+        format!(
+            r##"    <linearGradient id="{id}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="{top}"/><stop offset="100%" stop-color="{bottom}"/>
+    </linearGradient>"##
+        )
+    };
+    format!(
+        r##"  <defs>
+{}
+{}
+{}
+{}
+{}
+{}
+    <filter id="lift" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-color="#000" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <style>
+    text {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }}
+    /* The base fills are a mid tone legible on both backgrounds, so a renderer that
+       ignores the media queries below still produces a readable chart. The queries
+       are an enhancement, never a requirement. */
+    .t  {{ font-size: 16px; font-weight: 650; fill: #7d8590; }}
+    .st {{ font-size: 12px; fill: #8b949e; }}
+    .ax {{ font-size: 11px; fill: #8b949e; }}
+    .vl {{ font-size: 12px; font-weight: 700; fill: #7d8590; }}
+    .cl {{ font-size: 10px; fill: #8b949e; }}
+    .rp {{ font-size: 13px; font-weight: 650; fill: #7d8590; }}
+    @media (prefers-color-scheme: light) {{
+      .t, .vl, .rp {{ fill: #24292f; }}
+      .st, .ax, .cl {{ fill: #57606a; }}
+    }}
+    @media (prefers-color-scheme: dark) {{
+      .t, .vl, .rp {{ fill: #e6edf3; }}
+      .st, .ax, .cl {{ fill: #9aa4ae; }}
+    }}
+  </style>
+"##,
+        bar("gReify", "#3fb950", "#2da44e"),
+        bar("gRival", "#e8a13c", "#d9822b"),
+        bar("gRivalAlt", "#d4a017", "#bf8700"),
+        bar("gDecoy", "#a371f7", "#8957e5"),
+        bar("gCeiling", "#8b949e", "#6e7781"),
+        bar("gNone", "#a8b1ba", "#9aa4ae"),
+    )
+}
 
 const WIDTH: f32 = 860.0;
 
@@ -80,8 +134,9 @@ pub fn agent_chart(series: &[Series]) -> String {
         svg,
         r#"<svg viewBox="0 0 {WIDTH} {height}" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
   <title>Share of tasks where the model named a file that actually had to change, by condition, for each repository. Whiskers are 95% confidence intervals.</title>
-  <text x="{mid}" y="26" font-size="15" font-weight="600" fill="{INK}" text-anchor="middle">Did the model name a file that actually had to change?</text>
-  <text x="{mid}" y="46" font-size="12" fill="{INK}" text-anchor="middle">Tasks from real merged commits, indexed before those commits existed. Whiskers: 95% CI.</text>"#,
+{defs}  <text x="{mid}" y="28" class="t" text-anchor="middle">Did the model name a file that actually had to change?</text>
+  <text x="{mid}" y="48" class="st" text-anchor="middle">Tasks from real merged commits, indexed before those commits existed. Whiskers: 95% CI.</text>"#,
+        defs = defs(),
         mid = WIDTH / 2.0
     );
 
@@ -89,10 +144,10 @@ pub fn agent_chart(series: &[Series]) -> String {
     // the width of a proportional font is how legend entries end up on top of each
     // other, and there is no layout engine here to catch it.
     let legend = [
-        (BASELINE, "no context (memorisation control)"),
-        (RIVAL, "grep, tripled budget"),
-        (REIFY, "reify, three rounds (same cost)"),
-        (CEILING, "perfect context (ceiling)"),
+        ("#9aa4ae", "no context (memorisation control)"),
+        ("#d9822b", "grep, tripled budget"),
+        ("#2da44e", "reify, three rounds (same cost)"),
+        ("#6e7781", "perfect context (ceiling)"),
     ];
     let columns = 2usize;
     let column_width = (WIDTH - 132.0) / columns as f32;
@@ -101,7 +156,7 @@ pub fn agent_chart(series: &[Series]) -> String {
         let y = 62.0 + (index / columns) as f32 * 19.0;
         let _ = writeln!(
             svg,
-            r#"  <rect x="{x:.1}" y="{y:.1}" width="11" height="11" rx="2" fill="{colour}"/><text x="{tx:.1}" y="{ty:.1}" font-size="11" fill="{INK}">{text}</text>"#,
+            r#"  <rect x="{x:.1}" y="{y:.1}" width="10" height="10" rx="2.5" fill="{colour}"/><text x="{tx:.1}" y="{ty:.1}" class="ax">{text}</text>"#,
             tx = x + 16.0,
             ty = y + 10.0
         );
@@ -111,18 +166,23 @@ pub fn agent_chart(series: &[Series]) -> String {
     for step in 0..=4 {
         let value = step as f32 * 25.0;
         let y = plot_bottom - (value / 100.0) * plot_height;
-        let opacity = if step == 0 { 0.55 } else { 0.16 };
+        let (opacity, dash) = if step == 0 {
+            (1.0, "")
+        } else {
+            (0.7, r#" stroke-dasharray="3 5""#)
+        };
+        let stroke = if step == 0 { BASELINE } else { GRID };
         let _ = writeln!(
             svg,
-            r#"  <line x1="{left}" y1="{y:.1}" x2="{right}" y2="{y:.1}" stroke="{GRID}" stroke-opacity="{opacity}"/>
-  <text x="{tx}" y="{ty:.1}" font-size="11" fill="{INK}" text-anchor="end">{value:.0}%</text>"#,
+            r#"  <line x1="{left}" y1="{y:.1}" x2="{right}" y2="{y:.1}" stroke="{stroke}" stroke-opacity="{opacity}"{dash}/>
+  <text x="{tx}" y="{ty:.1}" class="ax" text-anchor="end">{value:.0}%</text>"#,
             tx = left - 8.0,
             ty = y + 4.0
         );
     }
     let _ = writeln!(
         svg,
-        r#"  <text x="24" y="{mid:.0}" font-size="12" fill="{INK}" text-anchor="middle" transform="rotate(-90 24 {mid:.0})">tasks with a correct file</text>"#,
+        r#"  <text x="22" y="{mid:.0}" class="st" text-anchor="middle" transform="rotate(-90 22 {mid:.0})">tasks with a correct file</text>"#,
         mid = (plot_top + plot_bottom) / 2.0
     );
 
@@ -145,36 +205,38 @@ pub fn agent_chart(series: &[Series]) -> String {
             let (label_y, label_fill) = if label_above {
                 (hy - 8.0, INK)
             } else {
-                (top + 16.0, "#ffffff")
+                (top + 18.0, "#ffffff")
             };
             let _ = writeln!(
                 svg,
-                r#"  <rect x="{bx:.1}" y="{top:.1}" width="{bar_width:.1}" height="{h:.1}" rx="2" fill="{colour}"/>
-  <text x="{cx:.1}" y="{label_y:.1}" font-size="11" font-weight="600" fill="{label_fill}" text-anchor="middle">{value:.0}%</text>"#,
+                r#"  <rect x="{bx:.1}" y="{top:.1}" width="{bar_width:.1}" height="{h:.1}" rx="3.5" fill="{colour}" filter="url(#lift)"/>
+  <text x="{cx:.1}" y="{label_y:.1}" class="vl" fill="{label_fill}" text-anchor="middle">{value:.0}%</text>"#,
                 h = (plot_bottom - top).max(1.0)
             );
             // Interval whisker.
             let ly = plot_bottom - (low / 100.0) * plot_height;
             let _ = writeln!(
                 svg,
-                r#"  <line x1="{cx:.1}" y1="{hy:.1}" x2="{cx:.1}" y2="{ly:.1}" stroke="{INK}" stroke-opacity="0.85"/>
-  <line x1="{a:.1}" y1="{hy:.1}" x2="{b:.1}" y2="{hy:.1}" stroke="{INK}" stroke-opacity="0.85"/>
-  <line x1="{a:.1}" y1="{ly:.1}" x2="{b:.1}" y2="{ly:.1}" stroke="{INK}" stroke-opacity="0.85"/>"#,
+                r#"  <line x1="{cx:.1}" y1="{hy:.1}" x2="{cx:.1}" y2="{ly:.1}" stroke="{INK}" stroke-opacity="0.5" stroke-linecap="round"/>
+  <line x1="{a:.1}" y1="{hy:.1}" x2="{b:.1}" y2="{hy:.1}" stroke="{INK}" stroke-opacity="0.5" stroke-linecap="round"/>
+  <line x1="{a:.1}" y1="{ly:.1}" x2="{b:.1}" y2="{ly:.1}" stroke="{INK}" stroke-opacity="0.5" stroke-linecap="round"/>"#,
                 a = cx - 5.0,
                 b = cx + 5.0
             );
+            // Two rows, alternating: four condition labels do not fit on one line at
+            // this panel width, and a legend already carries the full names.
             let _ = writeln!(
                 svg,
-                r#"  <text x="{cx:.1}" y="{ly2:.1}" font-size="10" fill="{INK}" text-anchor="middle">{label}</text>"#,
-                ly2 = plot_bottom + 16.0,
+                r#"  <text x="{cx:.1}" y="{ly2:.1}" class="cl" text-anchor="middle">{label}</text>"#,
+                ly2 = plot_bottom + if slot_index % 2 == 0 { 16.0 } else { 29.0 },
                 label = label_for(&group.bars[slot_index].0)
             );
         }
 
         let _ = writeln!(
             svg,
-            r#"  <text x="{cx:.1}" y="{y:.1}" font-size="13" font-weight="600" fill="{INK}" text-anchor="middle">{repo}</text>
-  <text x="{cx:.1}" y="{y2:.1}" font-size="11" fill="{INK}" text-anchor="middle">n = {tasks}</text>"#,
+            r#"  <text x="{cx:.1}" y="{y:.1}" class="rp" text-anchor="middle">{repo}</text>
+  <text x="{cx:.1}" y="{y2:.1}" class="ax" text-anchor="middle">n = {tasks}</text>"#,
             cx = group_left + group_width / 2.0,
             y = plot_bottom + 44.0,
             y2 = plot_bottom + 60.0,
@@ -193,7 +255,7 @@ pub fn agent_chart(series: &[Series]) -> String {
 
     let _ = writeln!(
         svg,
-        r#"  <text x="{mid}" y="{y:.0}" font-size="11" fill="{INK}" text-anchor="middle">Overlapping whiskers mean the difference is not established. On Medusa, reify and grep overlap.</text>
+        r#"  <text x="{mid}" y="{y:.0}" class="ax" text-anchor="middle">Overlapping whiskers mean the difference is not established. On Medusa, reify and grep overlap.</text>
 </svg>"#,
         mid = WIDTH / 2.0,
         y = height - 12.0
@@ -215,19 +277,25 @@ pub fn retrieval_chart(series: &[Series]) -> String {
         svg,
         r#"<svg viewBox="0 0 {WIDTH} {height}" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
   <title>Retrieval quality with no model involved: the share of tasks where the tool put a changed file in front of the agent, per repository.</title>
-  <text x="{mid}" y="26" font-size="15" font-weight="600" fill="{INK}" text-anchor="middle">Retrieval only, no model: was the changed file offered at all?</text>
-  <text x="{mid}" y="46" font-size="12" fill="{INK}" text-anchor="middle">Every condition held to the same 4,000-token budget.</text>"#,
+{defs}  <text x="{mid}" y="28" class="t" text-anchor="middle">Retrieval only, no model: was the changed file offered at all?</text>
+  <text x="{mid}" y="48" class="st" text-anchor="middle">Every condition held to the same 4,000-token budget.</text>"#,
+        defs = defs(),
         mid = WIDTH / 2.0
     );
 
     for step in 0..=4 {
         let value = step as f32 * 25.0;
         let y = plot_bottom - (value / 100.0) * plot_height;
-        let opacity = if step == 0 { 0.55 } else { 0.16 };
+        let (opacity, dash) = if step == 0 {
+            (1.0, "")
+        } else {
+            (0.7, r#" stroke-dasharray="3 5""#)
+        };
+        let stroke = if step == 0 { BASELINE } else { GRID };
         let _ = writeln!(
             svg,
-            r#"  <line x1="{left}" y1="{y:.1}" x2="{right}" y2="{y:.1}" stroke="{GRID}" stroke-opacity="{opacity}"/>
-  <text x="{tx}" y="{ty:.1}" font-size="11" fill="{INK}" text-anchor="end">{value:.0}%</text>"#,
+            r#"  <line x1="{left}" y1="{y:.1}" x2="{right}" y2="{y:.1}" stroke="{stroke}" stroke-opacity="{opacity}"{dash}/>
+  <text x="{tx}" y="{ty:.1}" class="ax" text-anchor="end">{value:.0}%</text>"#,
             tx = left - 8.0,
             ty = y + 4.0
         );
@@ -243,9 +311,9 @@ pub fn retrieval_chart(series: &[Series]) -> String {
             let top = plot_bottom - (value / 100.0) * plot_height;
             let _ = writeln!(
                 svg,
-                r#"  <rect x="{bx:.1}" y="{top:.1}" width="{bar_width:.1}" height="{h:.1}" rx="2" fill="{colour}"/>
-  <text x="{cx:.1}" y="{vy:.1}" font-size="11" font-weight="600" fill="{INK}" text-anchor="middle">{value:.0}%</text>
-  <text x="{cx:.1}" y="{ly:.1}" font-size="10" fill="{INK}" text-anchor="middle">{label}</text>"#,
+                r#"  <rect x="{bx:.1}" y="{top:.1}" width="{bar_width:.1}" height="{h:.1}" rx="3.5" fill="{colour}" filter="url(#lift)"/>
+  <text x="{cx:.1}" y="{vy:.1}" class="vl" text-anchor="middle">{value:.0}%</text>
+  <text x="{cx:.1}" y="{ly:.1}" class="cl" text-anchor="middle">{label}</text>"#,
                 bx = cx - bar_width / 2.0,
                 h = (plot_bottom - top).max(1.0),
                 vy = top - 8.0,
@@ -382,7 +450,9 @@ mod tests {
         // Two bars whose whiskers overlap have not been shown to differ, and a chart
         // that omits them is arguing rather than reporting.
         let svg = agent_chart(&series());
-        let whiskers = svg.matches("stroke-opacity=\"0.85\"").count();
+        // Counted by the cap style whiskers use, not by an exact opacity, so a
+        // change of shade does not read as a change of substance.
+        let whiskers = svg.matches("stroke-linecap=\"round\"").count();
         assert!(
             whiskers >= 9,
             "expected three whiskers per bar, got {whiskers}"

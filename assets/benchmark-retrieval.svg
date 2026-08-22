@@ -1,68 +1,111 @@
 <svg viewBox="0 0 860 330" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
   <title>Retrieval quality with no model involved: the share of tasks where the tool put a changed file in front of the agent, per repository.</title>
-  <text x="430" y="26" font-size="15" font-weight="600" fill="#8b949e" text-anchor="middle">Retrieval only, no model: was the changed file offered at all?</text>
-  <text x="430" y="46" font-size="12" fill="#8b949e" text-anchor="middle">Every condition held to the same 4,000-token budget.</text>
-  <line x1="74" y1="246.0" x2="832" y2="246.0" stroke="#8b949e" stroke-opacity="0.55"/>
-  <text x="66" y="250.0" font-size="11" fill="#8b949e" text-anchor="end">0%</text>
-  <line x1="74" y1="203.0" x2="832" y2="203.0" stroke="#8b949e" stroke-opacity="0.16"/>
-  <text x="66" y="207.0" font-size="11" fill="#8b949e" text-anchor="end">25%</text>
-  <line x1="74" y1="160.0" x2="832" y2="160.0" stroke="#8b949e" stroke-opacity="0.16"/>
-  <text x="66" y="164.0" font-size="11" fill="#8b949e" text-anchor="end">50%</text>
-  <line x1="74" y1="117.0" x2="832" y2="117.0" stroke="#8b949e" stroke-opacity="0.16"/>
-  <text x="66" y="121.0" font-size="11" fill="#8b949e" text-anchor="end">75%</text>
-  <line x1="74" y1="74.0" x2="832" y2="74.0" stroke="#8b949e" stroke-opacity="0.16"/>
-  <text x="66" y="78.0" font-size="11" fill="#8b949e" text-anchor="end">100%</text>
-  <rect x="125.2" y="228.8" width="12.4" height="17.2" rx="2" fill="#d9822b"/>
-  <text x="131.4" y="220.8" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">10%</text>
-  <text x="131.4" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">grep</text>
-  <rect x="150.1" y="215.9" width="12.4" height="30.1" rx="2" fill="#bf8700"/>
-  <text x="156.3" y="207.9" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">18%</text>
-  <text x="156.3" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">path grep</text>
-  <rect x="175.0" y="147.1" width="12.4" height="98.9" rx="2" fill="#2da44e"/>
-  <text x="181.2" y="139.1" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">58%</text>
-  <text x="181.2" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">reify</text>
-  <rect x="199.8" y="117.0" width="12.4" height="129.0" rx="2" fill="#2da44e"/>
-  <text x="206.1" y="109.0" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">75%</text>
-  <text x="206.1" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">reify ×3</text>
+  <defs>
+    <linearGradient id="gReify" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3fb950"/><stop offset="100%" stop-color="#2da44e"/>
+    </linearGradient>
+    <linearGradient id="gRival" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8a13c"/><stop offset="100%" stop-color="#d9822b"/>
+    </linearGradient>
+    <linearGradient id="gRivalAlt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d4a017"/><stop offset="100%" stop-color="#bf8700"/>
+    </linearGradient>
+    <linearGradient id="gDecoy" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a371f7"/><stop offset="100%" stop-color="#8957e5"/>
+    </linearGradient>
+    <linearGradient id="gCeiling" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8b949e"/><stop offset="100%" stop-color="#6e7781"/>
+    </linearGradient>
+    <linearGradient id="gNone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a8b1ba"/><stop offset="100%" stop-color="#9aa4ae"/>
+    </linearGradient>
+    <filter id="lift" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-color="#000" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+    /* The base fills are a mid tone legible on both backgrounds, so a renderer that
+       ignores the media queries below still produces a readable chart. The queries
+       are an enhancement, never a requirement. */
+    .t  { font-size: 16px; font-weight: 650; fill: #7d8590; }
+    .st { font-size: 12px; fill: #8b949e; }
+    .ax { font-size: 11px; fill: #8b949e; }
+    .vl { font-size: 12px; font-weight: 700; fill: #7d8590; }
+    .cl { font-size: 10px; fill: #8b949e; }
+    .rp { font-size: 13px; font-weight: 650; fill: #7d8590; }
+    @media (prefers-color-scheme: light) {
+      .t, .vl, .rp { fill: #24292f; }
+      .st, .ax, .cl { fill: #57606a; }
+    }
+    @media (prefers-color-scheme: dark) {
+      .t, .vl, .rp { fill: #e6edf3; }
+      .st, .ax, .cl { fill: #9aa4ae; }
+    }
+  </style>
+  <text x="430" y="28" class="t" text-anchor="middle">Retrieval only, no model: was the changed file offered at all?</text>
+  <text x="430" y="48" class="st" text-anchor="middle">Every condition held to the same 4,000-token budget.</text>
+  <line x1="74" y1="246.0" x2="832" y2="246.0" stroke="url(#gNone)" stroke-opacity="1"/>
+  <text x="66" y="250.0" class="ax" text-anchor="end">0%</text>
+  <line x1="74" y1="203.0" x2="832" y2="203.0" stroke="#8b949e" stroke-opacity="0.7" stroke-dasharray="3 5"/>
+  <text x="66" y="207.0" class="ax" text-anchor="end">25%</text>
+  <line x1="74" y1="160.0" x2="832" y2="160.0" stroke="#8b949e" stroke-opacity="0.7" stroke-dasharray="3 5"/>
+  <text x="66" y="164.0" class="ax" text-anchor="end">50%</text>
+  <line x1="74" y1="117.0" x2="832" y2="117.0" stroke="#8b949e" stroke-opacity="0.7" stroke-dasharray="3 5"/>
+  <text x="66" y="121.0" class="ax" text-anchor="end">75%</text>
+  <line x1="74" y1="74.0" x2="832" y2="74.0" stroke="#8b949e" stroke-opacity="0.7" stroke-dasharray="3 5"/>
+  <text x="66" y="78.0" class="ax" text-anchor="end">100%</text>
+  <rect x="125.2" y="228.8" width="12.4" height="17.2" rx="3.5" fill="url(#gRival)" filter="url(#lift)"/>
+  <text x="131.4" y="220.8" class="vl" text-anchor="middle">10%</text>
+  <text x="131.4" y="262.0" class="cl" text-anchor="middle">grep</text>
+  <rect x="150.1" y="215.9" width="12.4" height="30.1" rx="3.5" fill="url(#gRivalAlt)" filter="url(#lift)"/>
+  <text x="156.3" y="207.9" class="vl" text-anchor="middle">18%</text>
+  <text x="156.3" y="262.0" class="cl" text-anchor="middle">path grep</text>
+  <rect x="175.0" y="147.1" width="12.4" height="98.9" rx="3.5" fill="url(#gReify)" filter="url(#lift)"/>
+  <text x="181.2" y="139.1" class="vl" text-anchor="middle">58%</text>
+  <text x="181.2" y="262.0" class="cl" text-anchor="middle">reify</text>
+  <rect x="199.8" y="117.0" width="12.4" height="129.0" rx="3.5" fill="url(#gReify)" filter="url(#lift)"/>
+  <text x="206.1" y="109.0" class="vl" text-anchor="middle">75%</text>
+  <text x="206.1" y="262.0" class="cl" text-anchor="middle">reify ×3</text>
   <text x="168.8" y="288.0" font-size="13" font-weight="600" fill="#8b949e" text-anchor="middle">ERPNext (Python/JS)</text>
-  <rect x="314.7" y="224.5" width="12.4" height="21.5" rx="2" fill="#d9822b"/>
-  <text x="320.9" y="216.5" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">12%</text>
-  <text x="320.9" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">grep</text>
-  <rect x="339.6" y="220.2" width="12.4" height="25.8" rx="2" fill="#bf8700"/>
-  <text x="345.8" y="212.2" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">15%</text>
-  <text x="345.8" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">path grep</text>
-  <rect x="364.5" y="125.6" width="12.4" height="120.4" rx="2" fill="#2da44e"/>
-  <text x="370.7" y="117.6" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">70%</text>
-  <text x="370.7" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">reify</text>
-  <rect x="389.3" y="112.7" width="12.4" height="133.3" rx="2" fill="#2da44e"/>
-  <text x="395.6" y="104.7" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">78%</text>
-  <text x="395.6" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">reify ×3</text>
+  <rect x="314.7" y="224.5" width="12.4" height="21.5" rx="3.5" fill="url(#gRival)" filter="url(#lift)"/>
+  <text x="320.9" y="216.5" class="vl" text-anchor="middle">12%</text>
+  <text x="320.9" y="262.0" class="cl" text-anchor="middle">grep</text>
+  <rect x="339.6" y="220.2" width="12.4" height="25.8" rx="3.5" fill="url(#gRivalAlt)" filter="url(#lift)"/>
+  <text x="345.8" y="212.2" class="vl" text-anchor="middle">15%</text>
+  <text x="345.8" y="262.0" class="cl" text-anchor="middle">path grep</text>
+  <rect x="364.5" y="125.6" width="12.4" height="120.4" rx="3.5" fill="url(#gReify)" filter="url(#lift)"/>
+  <text x="370.7" y="117.6" class="vl" text-anchor="middle">70%</text>
+  <text x="370.7" y="262.0" class="cl" text-anchor="middle">reify</text>
+  <rect x="389.3" y="112.7" width="12.4" height="133.3" rx="3.5" fill="url(#gReify)" filter="url(#lift)"/>
+  <text x="395.6" y="104.7" class="vl" text-anchor="middle">78%</text>
+  <text x="395.6" y="262.0" class="cl" text-anchor="middle">reify ×3</text>
   <text x="358.2" y="288.0" font-size="13" font-weight="600" fill="#8b949e" text-anchor="middle">OFBiz (Java+XML)</text>
-  <rect x="504.2" y="191.3" width="12.4" height="54.7" rx="2" fill="#d9822b"/>
-  <text x="510.4" y="183.3" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">32%</text>
-  <text x="510.4" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">grep</text>
-  <rect x="529.1" y="214.7" width="12.4" height="31.3" rx="2" fill="#bf8700"/>
-  <text x="535.3" y="206.7" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">18%</text>
-  <text x="535.3" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">path grep</text>
-  <rect x="554.0" y="175.6" width="12.4" height="70.4" rx="2" fill="#2da44e"/>
-  <text x="560.2" y="167.6" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">41%</text>
-  <text x="560.2" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">reify</text>
-  <rect x="578.8" y="152.2" width="12.4" height="93.8" rx="2" fill="#2da44e"/>
-  <text x="585.1" y="144.2" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">55%</text>
-  <text x="585.1" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">reify ×3</text>
+  <rect x="504.2" y="191.3" width="12.4" height="54.7" rx="3.5" fill="url(#gRival)" filter="url(#lift)"/>
+  <text x="510.4" y="183.3" class="vl" text-anchor="middle">32%</text>
+  <text x="510.4" y="262.0" class="cl" text-anchor="middle">grep</text>
+  <rect x="529.1" y="214.7" width="12.4" height="31.3" rx="3.5" fill="url(#gRivalAlt)" filter="url(#lift)"/>
+  <text x="535.3" y="206.7" class="vl" text-anchor="middle">18%</text>
+  <text x="535.3" y="262.0" class="cl" text-anchor="middle">path grep</text>
+  <rect x="554.0" y="175.6" width="12.4" height="70.4" rx="3.5" fill="url(#gReify)" filter="url(#lift)"/>
+  <text x="560.2" y="167.6" class="vl" text-anchor="middle">41%</text>
+  <text x="560.2" y="262.0" class="cl" text-anchor="middle">reify</text>
+  <rect x="578.8" y="152.2" width="12.4" height="93.8" rx="3.5" fill="url(#gReify)" filter="url(#lift)"/>
+  <text x="585.1" y="144.2" class="vl" text-anchor="middle">55%</text>
+  <text x="585.1" y="262.0" class="cl" text-anchor="middle">reify ×3</text>
   <text x="547.8" y="288.0" font-size="13" font-weight="600" fill="#8b949e" text-anchor="middle">OpenMRS (Java)</text>
-  <rect x="693.7" y="215.9" width="12.4" height="30.1" rx="2" fill="#d9822b"/>
-  <text x="699.9" y="207.9" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">18%</text>
-  <text x="699.9" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">grep</text>
-  <rect x="718.6" y="215.9" width="12.4" height="30.1" rx="2" fill="#bf8700"/>
-  <text x="724.8" y="207.9" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">18%</text>
-  <text x="724.8" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">path grep</text>
-  <rect x="743.5" y="215.9" width="12.4" height="30.1" rx="2" fill="#2da44e"/>
-  <text x="749.7" y="207.9" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">18%</text>
-  <text x="749.7" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">reify</text>
-  <rect x="768.3" y="198.7" width="12.4" height="47.3" rx="2" fill="#2da44e"/>
-  <text x="774.6" y="190.7" font-size="11" font-weight="600" fill="#8b949e" text-anchor="middle">28%</text>
-  <text x="774.6" y="262.0" font-size="10" fill="#8b949e" text-anchor="middle">reify ×3</text>
+  <rect x="693.7" y="215.9" width="12.4" height="30.1" rx="3.5" fill="url(#gRival)" filter="url(#lift)"/>
+  <text x="699.9" y="207.9" class="vl" text-anchor="middle">18%</text>
+  <text x="699.9" y="262.0" class="cl" text-anchor="middle">grep</text>
+  <rect x="718.6" y="215.9" width="12.4" height="30.1" rx="3.5" fill="url(#gRivalAlt)" filter="url(#lift)"/>
+  <text x="724.8" y="207.9" class="vl" text-anchor="middle">18%</text>
+  <text x="724.8" y="262.0" class="cl" text-anchor="middle">path grep</text>
+  <rect x="743.5" y="215.9" width="12.4" height="30.1" rx="3.5" fill="url(#gReify)" filter="url(#lift)"/>
+  <text x="749.7" y="207.9" class="vl" text-anchor="middle">18%</text>
+  <text x="749.7" y="262.0" class="cl" text-anchor="middle">reify</text>
+  <rect x="768.3" y="198.7" width="12.4" height="47.3" rx="3.5" fill="url(#gReify)" filter="url(#lift)"/>
+  <text x="774.6" y="190.7" class="vl" text-anchor="middle">28%</text>
+  <text x="774.6" y="262.0" class="cl" text-anchor="middle">reify ×3</text>
   <text x="737.2" y="288.0" font-size="13" font-weight="600" fill="#8b949e" text-anchor="middle">Medusa (TypeScript)</text>
   <text x="430" y="316" font-size="11" fill="#8b949e" text-anchor="middle">Path grep offers 88 files to reach 18%. Offering everything is not retrieval.</text>
 </svg>

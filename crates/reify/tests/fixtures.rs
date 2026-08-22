@@ -195,6 +195,7 @@ fn a_known_contradiction_is_never_dropped_for_budget_reasons() {
         &store,
         "corporate approval",
         &ContextOptions {
+            for_edit: false,
             budget: 60,
             ..Default::default()
         },

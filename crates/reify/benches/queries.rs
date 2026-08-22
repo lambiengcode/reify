@@ -81,6 +81,7 @@ fn bench_context(c: &mut Criterion) {
                     &store,
                     "approval for corporate orders on the strategic tier",
                     &ContextOptions {
+                        for_edit: false,
                         budget,
                         ..Default::default()
                     },

@@ -77,6 +77,11 @@ enum Command {
         /// offered, and the freed budget goes to the next-best candidates.
         #[arg(long)]
         exclude: Vec<String>,
+        /// Return regions sized to be *edited*: whole enclosing definitions, the
+        /// file's imports, and neighbouring code, instead of the smallest spans that
+        /// answer the question. Use this when the next step is writing a patch.
+        #[arg(long)]
+        for_edit: bool,
         /// Emit TOON, the agent-facing format: columns stated once, one row per
         /// record. Roughly a third of the JSON envelope's tokens for the same facts.
         #[arg(long)]
@@ -246,12 +251,14 @@ fn run() -> Result<()> {
             budget,
             exclude,
             toon,
+            for_edit,
         } => {
             let store = open_existing(&root)?;
             let compiled = context::compile(
                 &store,
                 task,
                 &ContextOptions {
+                    for_edit: *for_edit,
                     budget: *budget,
                     exclude: exclude.clone(),
                     ..Default::default()

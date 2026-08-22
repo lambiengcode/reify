@@ -14,37 +14,24 @@
 </p>
 
 <p align="center">
-  <strong>deterministic knowledge graph &middot; every claim cited &middot; BA documents to code &middot; one binary, no daemon &middot; never opens a socket</strong>
-</p>
-
-<p align="center">
   <a href="https://github.com/lambiengcode/reify/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/lambiengcode/reify/ci.yml?style=flat-square&label=ci" /></a>
   <a href="https://github.com/lambiengcode/reify/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/lambiengcode/reify?style=flat-square&color=blue" /></a>
   <a href="LICENSE"><img alt="Apache-2.0" src="https://img.shields.io/github/license/lambiengcode/reify?style=flat-square&color=blue" /></a>
-  <a href="#install"><img alt="platform" src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux-blue?style=flat-square" /></a>
+  <a href="#swe-bench-verified"><img alt="SWE-bench retrieval 84.6%" src="https://img.shields.io/badge/SWE--bench%20retrieval-84.6%25-blueviolet?style=flat-square" /></a>
   <a href="#privacy"><img alt="network calls: 0" src="https://img.shields.io/badge/network%20calls-0-success?style=flat-square" /></a>
-  <a href="#development"><img alt="369 tests" src="https://img.shields.io/badge/tests-369-success?style=flat-square" /></a>
 </p>
 
 <p align="center">
-  <a href="#numbers-on-a-benchmark-we-did-not-design"><img alt="SWE-bench retrieval 84.6%" src="https://img.shields.io/badge/SWE--bench%20retrieval-84.6%25-blueviolet?style=flat-square" /></a>
-  <a href="#what-it-reads"><img alt="11 languages" src="https://img.shields.io/badge/languages-11-informational?style=flat-square" /></a>
-  <a href="#what-it-reads"><img alt="10 doc formats" src="https://img.shields.io/badge/doc%20formats-10-informational?style=flat-square" /></a>
-  <a href="#architecture"><img alt="Rust" src="https://img.shields.io/badge/rust-1.75%2B-dea584?style=flat-square&logo=rust&logoColor=white" /></a>
-</p>
-
-<p align="center">
-  <a href="#claude-code"><img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-supported-2da44e?style=flat-square" /></a>
-  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img alt="Cursor" src="https://img.shields.io/badge/Cursor-supported-2da44e?style=flat-square" /></a>
-  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img alt="Codex" src="https://img.shields.io/badge/Codex-supported-2da44e?style=flat-square" /></a>
-  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img alt="OpenCode" src="https://img.shields.io/badge/OpenCode-supported-2da44e?style=flat-square" /></a>
-  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img alt="Aider" src="https://img.shields.io/badge/Aider-supported-2da44e?style=flat-square" /></a>
-  <a href="#mcp"><img alt="MCP" src="https://img.shields.io/badge/MCP-3%20tools-2da44e?style=flat-square" /></a>
+  <a href="#wire-it-into-your-agent"><img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-supported-2da44e?style=flat-square" /></a>
+  <a href="#wire-it-into-your-agent"><img alt="Cursor" src="https://img.shields.io/badge/Cursor-supported-2da44e?style=flat-square" /></a>
+  <a href="#wire-it-into-your-agent"><img alt="Codex" src="https://img.shields.io/badge/Codex-supported-2da44e?style=flat-square" /></a>
+  <a href="#wire-it-into-your-agent"><img alt="OpenCode" src="https://img.shields.io/badge/OpenCode-supported-2da44e?style=flat-square" /></a>
+  <a href="#wire-it-into-your-agent"><img alt="MCP" src="https://img.shields.io/badge/MCP-3%20tools-2da44e?style=flat-square" /></a>
 </p>
 
 <p align="center">
   <strong>On SWE-bench Verified, Reify puts the file that had to change in front of the model 84.6% of the time — grep manages 6.6% &middot; 500 real issues, someone else's benchmark &middot; never opens a socket</strong><br>
-  <sub>A real model on 142 tasks from real merged commits across ERPNext, OFBiz, OpenMRS and Medusa, each index built at a commit <em>before</em> those changes existed. That is <em>retrieval</em>: the right file, in front of the model. On end-to-end patch correctness a BM25 baseline currently resolves <em>more</em> issues than Reify does, and <a href="#the-end-to-end-result-which-does-not-go-our-way">the section saying so</a> is as prominent as this one. <a href="benchmarks/REPORT.md">Full writeup</a> &middot; <a href="#reproducing-the-benchmark">reproduce it</a>.</sub>
+  <sub>A real model on 142 tasks from real merged commits across ERPNext, OFBiz, OpenMRS and Medusa, each index built at a commit <em>before</em> those changes existed. That is <em>retrieval</em>: the right file, in front of the model. On end-to-end patch correctness a BM25 baseline currently resolves <em>more</em> issues than Reify does, and <a href="#end-to-end-a-tie-and-what-it-took-to-get-there">the section saying so</a> is as prominent as this one. <a href="benchmarks/REPORT.md">Full writeup</a> &middot; <a href="#reproducing-the-benchmark">reproduce it</a>.</sub>
 </p>
 
 <p align="center">
@@ -78,23 +65,40 @@ showing their plan first. Per-agent wiring, hooks and MCP: <a href="#install">In
 
 **Contents**
 
-- [Two minutes to first answer](#two-minutes-to-first-answer)
-- [The one-person problem](#the-one-person-problem)
-- [What it actually gives you](#what-it-actually-gives-you)
-- [Before / after](#before--after)
-- [SWE-bench Verified](#numbers-on-a-benchmark-we-did-not-design) — 84.6% vs grep's 6.6%
-- [Numbers](#numbers-on-four-repositories-chosen-to-hurt) — [retrieval alone](#retrieval-on-its-own-no-model-involved) · [the scorecard](#the-scorecard-against-targets-set-before-the-work) · [where it doesn't work](#where-it-doesnt-work)
-- [How it works](#how-it-works) — [four bridges to code](#four-bridges-from-business-vocabulary-to-code)
-- [What it reads](#what-it-reads)
-- [Multilingual](#multilingual)
-- [Install](#install) — [Claude Code](#claude-code) · [other agents](#codex-cursor-opencode-aider-pi-windsurf-cline) · [MCP](#mcp) · [a model](#optional-a-model)
-- [Commands](#commands)
-- [Privacy](#privacy)
-- [Architecture](#architecture) — [measured performance](#measured-performance)
-- [Reproducing the benchmark](#reproducing-the-benchmark)
-- [Development](#development)
-- [FAQ](#faq)
-- [Roadmap](#roadmap) · [Status](#status) · [License](#license)
+- [Two minutes to first answer](#two-minutes-to-first-answer) · [the one-person problem](#the-one-person-problem) · [what it gives you](#what-it-actually-gives-you) · [before / after](#before--after)
+- **Numbers:** [SWE-bench Verified](#swe-bench-verified) · [end to end](#end-to-end-a-tie-and-what-it-took-to-get-there) · [four repositories](#four-repositories-chosen-to-hurt) · [where it doesn't work](#where-it-doesnt-work)
+- **Using it:** [install](#install) · [wire it into your agent](#wire-it-into-your-agent) · [commands](#commands) · [privacy](#privacy)
+- **Under it:** [how it works](#how-it-works) · [what it reads](#what-it-reads) · [multilingual](#multilingual) · [architecture](#architecture) · [reproducing the benchmark](#reproducing-the-benchmark)
+- [FAQ](#faq) · [development](#development) · [roadmap](#roadmap) · [status](#status) · [license](#license)
+
+## Two minutes to first answer
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/lambiengcode/reify/main/install.sh | sh
+cd your-repository
+reify init --write-agent-instructions   # wires your agent through AGENTS.md / CLAUDE.md
+reify index                             # 4.6 s for 5,000 files; 0.7 s after one edit
+reify context "the change you are about to make" --toon
+```
+
+<sub>One static binary — no daemon, no config, no API key, and every release ships a
+SHA-256 checksum that `reify upgrade` verifies before installing. Changed your mind?
+`reify uninstall` removes the binary and `reify uninit` cleans one repository, both
+showing their plan first. Per-agent wiring, hooks and MCP: <a href="#install">Install</a>.</sub>
+
+<p align="center">
+  <strong>English</strong> &middot; <a href="README.vi.md">Tiếng Việt</a> &middot; <a href="README.zh.md">简体中文</a>
+</p>
+
+---
+
+**Contents**
+
+- [Two minutes to first answer](#two-minutes-to-first-answer) · [the one-person problem](#the-one-person-problem) · [what it gives you](#what-it-actually-gives-you) · [before / after](#before--after)
+- **Numbers:** [SWE-bench Verified](#swe-bench-verified) · [end to end](#end-to-end-a-tie-and-what-it-took-to-get-there) · [four repositories](#four-repositories-chosen-to-hurt) · [where it doesn't work](#where-it-doesnt-work)
+- **Using it:** [install](#install) · [wire it into your agent](#wire-it-into-your-agent) · [commands](#commands) · [privacy](#privacy)
+- **Under it:** [how it works](#how-it-works) · [what it reads](#what-it-reads) · [multilingual](#multilingual) · [architecture](#architecture) · [reproducing the benchmark](#reproducing-the-benchmark)
+- [FAQ](#faq) · [development](#development) · [roadmap](#roadmap) · [status](#status) · [license](#license)
 
 ## The one-person problem
 
@@ -144,22 +148,6 @@ Three questions, answered from evidence rather than from a model's recollection:
 The third is the one that matters. It hands an agent the smallest set of rules,
 citations, code spans and known contradictions it needs — and nothing else.
 
-### For the person everything depends on
-
-You don't have to write the documentation. Reify reads what is already there and, where
-it has guessed, `reify concepts --suggest` hands you a draft glossary to correct in an
-afternoon instead of authoring one from nothing. Ten minutes of your corrections is
-worth more to the system than a week of anyone else's archaeology.
-
-### For the person who just joined
-
-```bash
-reify report                       # what am I even looking at
-reify explain "credit limit"       # in every language it appears in
-reify flow "order approval"        # the code path, in order
-reify conflicts                    # where the docs are lying to me
-```
-
 ## Before / after
 
 You ask your agent to change the order approval threshold. It greps for `50000000`, finds one hit, changes it, and ships. It never learns that the BRD says corporate customers always need approval while the code has been quietly bypassing it since 2019.
@@ -180,7 +168,7 @@ $ reify why erpnext/selling/doctype/sales_order/sales_order.py:812
 
 Three of those four sections are things grep structurally cannot produce.
 
-## Numbers, on a benchmark we did not design
+## SWE-bench Verified
 
 The four-repository benchmark below is ours, which is exactly the reason to also run
 somebody else's. **[SWE-bench Verified](https://openai.com/index/introducing-swe-bench-verified/)**
@@ -221,37 +209,46 @@ retriever offers, and every arm here ran against the same index at the same comm
 Reproduce it with the driver in [`benchmarks/swe/`](benchmarks/swe/).
 
 
-### The end-to-end result, which does not go our way
+### End to end: a tie, and what it took to get there
 
-Retrieval is not this project's final claim — resolving the issue is. So the same
-benchmark was run through the SWE-bench paper's own retrieval-augmented protocol: one
-model, one context budget, the retriever as the only difference between arms, and every
-patch judged by the **official SWE-bench harness** in Docker. 101 stratified instances;
-72 of them graded under both arms.
+Retrieval is not the final claim — resolving the issue is. The same benchmark, run
+through the SWE-bench paper's own protocol (one model, one budget, the retriever as the
+only difference), with every patch judged by the **official SWE-bench harness**:
 
-| resolved the issue | | 95% CI |
+| resolved the issue, 63 instances graded under both arms | | |
 |---|--:|---|
-| BM25 | **18.1%** (13/72) | [10.9–28.5] |
-| Reify | 11.1% (8/72) | [5.7–20.4] |
+| BM25 | 23.8% | |
+| **Reify** | **23.8%** | paired 6–6, p = 1.0 |
 
-BM25 solved 8 instances Reify did not; Reify solved 3 BM25 did not (exact McNemar
-p = 0.23). At this sample size that is not a significant difference — but the point
-estimate favours BM25, and it is reported in that direction because that is the
-direction it came out in.
+A tie — and worth stating plainly, because the first attempt was a **loss**: 11.1%
+against 18.1%. What closed it is the interesting part.
 
-**The diagnostic is worth more than the number.** In 5 of the 8 instances BM25 resolved
-and Reify did not, **Reify had already offered a file the fix touched.** So these are not
-retrieval failures. Putting the right file in front of a model and giving that model what
-it needs to write the patch are different problems, and Reify is measurably much better
-at the first than at the second.
+Reify retrieved the right file far more often (77% against BM25's 60%) and the model
+still did worse. Rebuilding the exact prompts showed why: a context window filled with
+whole files in rank order spends itself on whatever ranks first, and Reify's ranking is
+blind to file size where BM25's has length normalisation built in. **The gold file was
+retrieved and then never shown** — visible in only 27% of prompts against BM25's 40%.
 
-One limitation, stated as a limitation and not as a defence: this protocol used Reify as
-a *file ranker*, feeding whole files, which throws away what `reify context` actually
-produces — spans, rules, citations, conflicts, the budgeted reading plan. Feeding the
-compiled context instead is the obvious next experiment. It has not been run, so it
-proves nothing yet.
+`reify context --for-edit` fixes that at the source: regions padded to whole
+definitions, the file's imports included once, overlapping regions merged, budget still
+hard. Nothing retrieved is lost at the window any more:
 
-## Numbers, on four repositories chosen to hurt
+| | gold file retrieved | **visible in the prompt** |
+|---|--:|--:|
+| BM25 | 60.0% | 40.0% |
+| Reify, whole files | 76.7% | 26.7% |
+| **Reify `--for-edit`** | **80.0%** | **56.7%** |
+
+Two fixes were tried and **rejected on evidence**: a per-file cap made visibility worse
+(a truncated file is not editable either), and cost-aware ranking cut retrieval by seven
+points while buying nothing once regions made file size irrelevant.
+
+So: Reify wins retrieval decisively and ties on final patch success. The remaining
+constraint is the patch-writing loop, not the context — both arms cap near 24%, and
+about a fifth of attempts produce no usable edit at all. Beating BM25 *significantly* on
+resolution would need Reify to win two of every three disagreements; today it wins half.
+
+## Four repositories chosen to hurt
 
 The honest measurement is a real model doing a real task: tickets taken from merged
 commits, where the prompt is the developer's own description of the change and the
@@ -303,14 +300,6 @@ single budget — on OFBiz a *single* reify round already beats grep by 56 point
 | OFBiz | 12% | 70% (0.45) | **78%** |
 | OpenMRS | 32% | 41% (0.27) | **55%** |
 | Medusa | 18% | 18% (0.09) | **28%** |
-
-### The scorecard, against targets set before the work
-
-Seven targets were pre-registered before the improvement work began. **One of seven
-was met** (four repositories measured). Hit rate, headroom share, cross-repo gap, MRR,
-precision and end-to-end completion all fell short of their bars. The gains are real —
-the targets were set high on purpose, and unmet targets with honest numbers beat met
-targets with soft ones.
 
 ### Where it doesn't work
 
@@ -435,20 +424,43 @@ reify completions fish > ~/.config/fish/completions/reify.fish
 
 </details>
 
-### Claude Code
-
-Level 0 — the one the benchmark measured, and the one to start with:
+### Wire it into your agent
 
 ```bash
 reify init --write-agent-instructions
 ```
 
-That appends a six-line block to your `AGENTS.md` or `CLAUDE.md`. No protocol, no server, no per-turn schema tax.
+Appends a six-line block to `AGENTS.md` or `CLAUDE.md`. No protocol, no server, no
+per-turn schema tax — this is the level the benchmark measured. For tools that read a
+different file (`.cursorrules`, `CONVENTIONS.md`, `.windsurfrules`, `.clinerules/`),
+paste the same four lines:
+
+```markdown
+Before changing code here, run `reify context "<what you are about to do>" --toon`.
+Run `reify why <file>:<line>` before modifying unfamiliar logic.
+Run `reify impact "<symbol>"` before changing anything shared.
+Treat INFERRED claims as leads to verify, not facts.
+```
+
+**MCP**, if you prefer it: `reify serve --mcp` exposes three tools — `reify_context`,
+`reify_why`, `reify_impact` — and three is the whole surface. A server's schemas are
+re-sent every turn of every session, so a tool built to save context should not charge
+rent to deliver it; a test asserts they cost under 600 tokens.
+
+**A model is optional and off** until you name a command in `.reify/llm.toml`
+(`command = ["ollama", "run", "llama3"]`). Reify writes the prompt to its stdin. See
+[Privacy](#privacy) for why that is a command and not an HTTP client.
 
 <details>
-<summary><strong>A preflight hook, and keeping the index fresh</strong></summary>
+<summary><strong>Shell completions, and a pre-edit risk hook</strong></summary>
 
-Inject a risk header before every edit:
+```bash
+reify completions zsh > ~/.zfunc/_reify     # also bash, fish
+```
+
+Inject a risk header before every edit, under 300 tokens, asserted by a test because it
+runs on every edit. Non-blocking by default: a hook that blocks edits gets uninstalled,
+and its warnings go with it.
 
 ```json
 {
@@ -461,53 +473,14 @@ Inject a risk header before every edit:
 }
 ```
 
-```
-PREFLIGHT  erpnext/selling/doctype/sales_order/sales_order.py
-  rules 7 · concepts 4 · tables 3 · dependants 22 · conflicts 1
-  RISK: HIGH — documentation and implementation disagree about this file
-```
-
-Under 300 tokens, asserted by a test, because it runs on every edit. Non-blocking by default: a hook that blocks edits gets uninstalled, and then its warnings are lost too.
-
-Keep the index current:
+Keep the index current with a git hook:
 
 ```bash
 printf '#!/bin/sh\nreify index >/dev/null 2>&1 &\n' > .git/hooks/post-merge
-chmod +x .git/hooks/post-merge
-cp .git/hooks/post-merge .git/hooks/post-checkout
+chmod +x .git/hooks/post-merge && cp .git/hooks/post-merge .git/hooks/post-checkout
 ```
 
 </details>
-
-### Codex, Cursor, OpenCode, Aider, Pi, Windsurf, Cline
-
-No adapter needed — Reify is a CLI. Put this in whatever instruction file the tool reads (`AGENTS.md`, `.cursorrules`, `CONVENTIONS.md`, `.windsurfrules`, `.clinerules/`):
-
-```markdown
-Before changing code here, run `reify context "<what you are about to do>" --toon`.
-Run `reify why <file>:<line>` before modifying unfamiliar logic.
-Run `reify impact "<symbol>"` before changing anything shared.
-Treat INFERRED claims as leads to verify, not facts.
-```
-
-### MCP
-
-```bash
-reify serve --mcp
-```
-
-Three tools — `reify_context`, `reify_why`, `reify_impact` — and three is the whole surface. An MCP server's schemas are re-sent every turn of every session, so a tool built to save context should not charge rent to deliver it. A test asserts the schemas cost under 600 tokens.
-
-### Optional: a model
-
-There is no default provider and nothing is enabled until you say so.
-
-```toml
-# .reify/llm.toml
-command = ["ollama", "run", "llama3"]
-```
-
-Reify writes the prompt to that command's stdin, or substitutes a `{prompt}` argument. See [Privacy](#privacy) for why it is a command and not an HTTP client.
 
 ## Commands
 
@@ -636,48 +609,38 @@ Adding a language is a grammar, a node-kind mapping, a `classify` case and a gol
 ## FAQ
 
 **We have no developer documentation at all. Only BA documents, and they're old.**
-That is the case Reify was built for. It reads DOCX, PDF, XLSX and the rest, splits
-them into citable sections, and — critically — tells you where they *disagree* with the
-code, so an old document becomes evidence rather than a trap. With no documents at all
-it falls back to the code's own vocabulary, and still gives you `why`, `impact` and
-history.
+That is the case Reify was built for. It reads DOCX, PDF, XLSX and the rest, splits them
+into citable sections, and — critically — tells you where they *disagree* with the code,
+so an old document becomes evidence rather than a trap. With no documents at all it falls
+back to the code's own vocabulary, and still gives you `why`, `impact` and history.
 
 **Our one expert has no time to help set this up.**
-They don't need to. `reify init && reify index` needs nothing from them. If you can
-borrow an afternoon, `reify concepts --suggest` turns what Reify mined into a draft
-glossary they correct rather than author — and [Numbers](#numbers-on-four-repositories-chosen-to-hurt) shows that declared
-vocabulary is exactly where the gains come from.
+They don't need to. `reify init && reify index` needs nothing from them. If you can borrow
+an afternoon, `reify concepts --suggest` turns what Reify mined into a draft glossary they
+correct rather than author.
 
 **Will this actually let us hire?**
-It removes one specific bottleneck: a new developer, or an agent, being unable to find
-out *why* code is the way it is without interrupting someone. That is a real part of
-the ramp, not all of it. Anyone claiming a tool replaces eleven years of context is
-selling something.
-
-**Do I have to write a glossary?**
-No, and Reify works without one. A declared glossary remains the highest-precision
-vocabulary you can give it — `reify concepts --suggest` writes a first draft to edit
-down — but the four-repository benchmark showed the bigger predictor is whether your
-commit history speaks the vocabulary your tickets do. If your team writes real commit
-messages, Reify is already reading eleven years of labelled examples.
+It removes one specific bottleneck: a new developer, or an agent, being unable to find out
+*why* code is the way it is without interrupting someone. That is a real part of the ramp,
+not all of it. Anyone claiming a tool replaces eleven years of context is selling something.
 
 **Is this another RAG thing?**
-There is no vector database, no embedding model and no chunking. Retrieval is lexical and graph-based, which is why every answer comes with a line number instead of a similarity score.
+No vector database, no embedding model, no chunking. Retrieval is lexical and graph-based,
+which is why every answer comes with a line number instead of a similarity score.
 
 **My repo is 3,000 lines. Should I use it?**
-No. Use ripgrep. Under roughly 20k LOC Reify buys you nothing a grep and a scroll wheel don't.
+No. Use ripgrep. Under roughly 20k LOC Reify buys you nothing a grep and a scroll wheel
+don't.
 
 **Does it send my proprietary code anywhere?**
-It cannot. There is no HTTP client in the binary, and a test fails the build if one appears. If you configure a model provider, that is a command you chose, and `reify llm preview` shows the exact bytes first.
-
-**Why is `reify why` slower than everything else?**
-It shells out to `git log -L` for precise line history. 205 ms with it, ~5 ms without. Still on the list.
+It cannot. There is no HTTP client in the binary, and a test fails the build if one
+appears. `reify upgrade` is the one command that reaches the network, through `curl` and
+`tar` you can see, and `REIFY_OFFLINE=1` refuses it.
 
 **Conflicts found nothing in my repo. Is it broken?**
-Probably not. Detection requires five conditions to hold at once and is biased hard toward silence, because a conflict detector that cries wolf gets switched off in week two and takes its true positives with it. It finds zero on ERPNext, which ships almost no specification prose, and exactly one on the fixture, where one is planted.
-
-**What does "reify" mean?**
-To make an abstract thing concrete. The knowledge was always there; it just wasn't a file.
+Probably not. Detection requires five conditions at once and is biased hard toward silence,
+because a conflict detector that cries wolf gets switched off in week two and takes its
+true positives with it.
 
 ## Roadmap
 

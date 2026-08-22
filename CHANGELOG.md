@@ -35,6 +35,21 @@ versions may break the store schema, and `reify index --force` rebuilds it.
 
 ## [Unreleased]
 
+### Added
+- `reify context --for-edit` — regions sized to be *edited* rather than spans sized to be
+  *read*: each hit padded to its whole enclosing definition, the file's imports included
+  once, overlapping regions merged, budget still hard. Measured on SWE-bench Verified,
+  this raises the share of prompts that actually contain a file the fix touched from 26.7%
+  to 56.7%, against BM25's 40.0%, and turns an end-to-end loss (11.1% vs 18.1%) into a tie
+  (23.8% vs 23.8%).
+
+### Changed
+- Benchmark charts redrawn: gradient bars, dashed grid, staggered condition labels, and
+  colours that adapt to light and dark themes with a mid-tone fallback for renderers that
+  ignore `prefers-color-scheme`.
+- READMEs refactored — one badge style, fewer badges, a grouped contents list, install and
+  agent wiring consolidated into one section, and the vestigial scorecard removed.
+
 ## [0.1.0] - 2026-08-21
 
 First vertical slice: a repository can be compiled, queried and benchmarked end to end.
