@@ -18,22 +18,28 @@
 </p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-111111?style=flat-square" alt="Apache-2.0"></a>
-  <a href="#what-it-reads"><img src="https://img.shields.io/badge/languages-11-111111?style=flat-square" alt="11 种语言"></a>
-  <a href="#what-it-reads"><img src="https://img.shields.io/badge/doc%20formats-10-111111?style=flat-square" alt="10 种文档格式"></a>
-  <a href="#privacy"><img src="https://img.shields.io/badge/network%20calls-0-111111?style=flat-square" alt="零网络调用"></a>
-  <a href="#development"><img src="https://img.shields.io/badge/tests-369-111111?style=flat-square" alt="369 个测试"></a>
-  <a href="#architecture"><img src="https://img.shields.io/badge/built%20with-Rust-111111?style=flat-square" alt="Rust"></a>
+  <a href="https://github.com/lambiengcode/reify/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/lambiengcode/reify/ci.yml?style=flat-square&label=ci" /></a>
+  <a href="https://github.com/lambiengcode/reify/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/lambiengcode/reify?style=flat-square&color=blue" /></a>
+  <a href="LICENSE"><img alt="Apache-2.0" src="https://img.shields.io/github/license/lambiengcode/reify?style=flat-square&color=blue" /></a>
+  <a href="#install"><img alt="平台" src="https://img.shields.io/badge/平台-macOS%20%7C%20Linux-blue?style=flat-square" /></a>
+  <a href="#privacy"><img alt="网络调用: 0" src="https://img.shields.io/badge/网络调用-0-success?style=flat-square" /></a>
+  <a href="#development"><img alt="369 测试" src="https://img.shields.io/badge/测试-369-success?style=flat-square" /></a>
 </p>
 
 <p align="center">
-  <a href="#claude-code"><img src="https://img.shields.io/badge/Claude_Code-supported-111111?style=flat-square" alt="Claude Code"></a>
-  <a href="#other-agents"><img src="https://img.shields.io/badge/Cursor-supported-111111?style=flat-square" alt="Cursor"></a>
-  <a href="#other-agents"><img src="https://img.shields.io/badge/Codex-supported-111111?style=flat-square" alt="Codex"></a>
-  <a href="#other-agents"><img src="https://img.shields.io/badge/OpenCode-supported-111111?style=flat-square" alt="OpenCode"></a>
-  <a href="#other-agents"><img src="https://img.shields.io/badge/Aider-supported-111111?style=flat-square" alt="Aider"></a>
-  <a href="#mcp"><img src="https://img.shields.io/badge/MCP-3_tools-111111?style=flat-square" alt="MCP"></a>
-  <a href="#install"><img src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux-prebuilt-111111?style=flat-square" alt="macOS / Linux"></a>
+  <a href="#swebench"><img alt="SWE-bench retrieval 84.6%" src="https://img.shields.io/badge/SWE--bench%20检索-84.6%25-blueviolet?style=flat-square" /></a>
+  <a href="#what-it-reads"><img alt="11 语言" src="https://img.shields.io/badge/语言-11-informational?style=flat-square" /></a>
+  <a href="#what-it-reads"><img alt="10 文档格式" src="https://img.shields.io/badge/文档格式-10-informational?style=flat-square" /></a>
+  <a href="#architecture"><img alt="Rust" src="https://img.shields.io/badge/rust-1.75%2B-dea584?style=flat-square&logo=rust&logoColor=white" /></a>
+</p>
+
+<p align="center">
+  <a href="#claude-code"><img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-supported-2da44e?style=flat-square" /></a>
+  <a href="#other-agents"><img alt="Cursor" src="https://img.shields.io/badge/Cursor-supported-2da44e?style=flat-square" /></a>
+  <a href="#other-agents"><img alt="Codex" src="https://img.shields.io/badge/Codex-supported-2da44e?style=flat-square" /></a>
+  <a href="#other-agents"><img alt="OpenCode" src="https://img.shields.io/badge/OpenCode-supported-2da44e?style=flat-square" /></a>
+  <a href="#other-agents"><img alt="Aider" src="https://img.shields.io/badge/Aider-supported-2da44e?style=flat-square" /></a>
+  <a href="#mcp"><img alt="MCP" src="https://img.shields.io/badge/MCP-3%20tools-2da44e?style=flat-square" /></a>
 </p>
 
 <p align="center">

@@ -18,22 +18,28 @@
 </p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-111111?style=flat-square" alt="Apache-2.0"></a>
-  <a href="#what-it-reads"><img src="https://img.shields.io/badge/languages-11-111111?style=flat-square" alt="11 languages"></a>
-  <a href="#what-it-reads"><img src="https://img.shields.io/badge/doc%20formats-10-111111?style=flat-square" alt="10 document formats"></a>
-  <a href="#privacy"><img src="https://img.shields.io/badge/network%20calls-0-111111?style=flat-square" alt="Zero network calls"></a>
-  <a href="#development"><img src="https://img.shields.io/badge/tests-369-111111?style=flat-square" alt="369 tests"></a>
-  <a href="#architecture"><img src="https://img.shields.io/badge/built%20with-Rust-111111?style=flat-square" alt="Rust"></a>
+  <a href="https://github.com/lambiengcode/reify/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/lambiengcode/reify/ci.yml?style=flat-square&label=ci" /></a>
+  <a href="https://github.com/lambiengcode/reify/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/lambiengcode/reify?style=flat-square&color=blue" /></a>
+  <a href="LICENSE"><img alt="Apache-2.0" src="https://img.shields.io/github/license/lambiengcode/reify?style=flat-square&color=blue" /></a>
+  <a href="#install"><img alt="platform" src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux-blue?style=flat-square" /></a>
+  <a href="#privacy"><img alt="network calls: 0" src="https://img.shields.io/badge/network%20calls-0-success?style=flat-square" /></a>
+  <a href="#development"><img alt="369 tests" src="https://img.shields.io/badge/tests-369-success?style=flat-square" /></a>
 </p>
 
 <p align="center">
-  <a href="#claude-code"><img src="https://img.shields.io/badge/Claude_Code-supported-111111?style=flat-square" alt="Claude Code supported"></a>
-  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img src="https://img.shields.io/badge/Cursor-supported-111111?style=flat-square" alt="Cursor supported"></a>
-  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img src="https://img.shields.io/badge/Codex-supported-111111?style=flat-square" alt="Codex supported"></a>
-  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img src="https://img.shields.io/badge/OpenCode-supported-111111?style=flat-square" alt="OpenCode supported"></a>
-  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img src="https://img.shields.io/badge/Aider-supported-111111?style=flat-square" alt="Aider supported"></a>
-  <a href="#mcp"><img src="https://img.shields.io/badge/MCP-3_tools-111111?style=flat-square" alt="MCP supported"></a>
-  <a href="#install"><img src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux-prebuilt-111111?style=flat-square" alt="macOS and Linux prebuilt"></a>
+  <a href="#numbers-on-a-benchmark-we-did-not-design"><img alt="SWE-bench retrieval 84.6%" src="https://img.shields.io/badge/SWE--bench%20retrieval-84.6%25-blueviolet?style=flat-square" /></a>
+  <a href="#what-it-reads"><img alt="11 languages" src="https://img.shields.io/badge/languages-11-informational?style=flat-square" /></a>
+  <a href="#what-it-reads"><img alt="10 doc formats" src="https://img.shields.io/badge/doc%20formats-10-informational?style=flat-square" /></a>
+  <a href="#architecture"><img alt="Rust" src="https://img.shields.io/badge/rust-1.75%2B-dea584?style=flat-square&logo=rust&logoColor=white" /></a>
+</p>
+
+<p align="center">
+  <a href="#claude-code"><img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-supported-2da44e?style=flat-square" /></a>
+  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img alt="Cursor" src="https://img.shields.io/badge/Cursor-supported-2da44e?style=flat-square" /></a>
+  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img alt="Codex" src="https://img.shields.io/badge/Codex-supported-2da44e?style=flat-square" /></a>
+  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img alt="OpenCode" src="https://img.shields.io/badge/OpenCode-supported-2da44e?style=flat-square" /></a>
+  <a href="#codex-cursor-opencode-aider-pi-windsurf-cline"><img alt="Aider" src="https://img.shields.io/badge/Aider-supported-2da44e?style=flat-square" /></a>
+  <a href="#mcp"><img alt="MCP" src="https://img.shields.io/badge/MCP-3%20tools-2da44e?style=flat-square" /></a>
 </p>
 
 <p align="center">

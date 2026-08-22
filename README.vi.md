@@ -18,22 +18,28 @@
 </p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-111111?style=flat-square" alt="Apache-2.0"></a>
-  <a href="#what-it-reads"><img src="https://img.shields.io/badge/languages-11-111111?style=flat-square" alt="11 ngôn ngữ"></a>
-  <a href="#what-it-reads"><img src="https://img.shields.io/badge/doc%20formats-10-111111?style=flat-square" alt="10 định dạng tài liệu"></a>
-  <a href="#privacy"><img src="https://img.shields.io/badge/network%20calls-0-111111?style=flat-square" alt="Không gọi mạng"></a>
-  <a href="#development"><img src="https://img.shields.io/badge/tests-369-111111?style=flat-square" alt="369 test"></a>
-  <a href="#architecture"><img src="https://img.shields.io/badge/built%20with-Rust-111111?style=flat-square" alt="Rust"></a>
+  <a href="https://github.com/lambiengcode/reify/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/lambiengcode/reify/ci.yml?style=flat-square&label=ci" /></a>
+  <a href="https://github.com/lambiengcode/reify/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/lambiengcode/reify?style=flat-square&color=blue" /></a>
+  <a href="LICENSE"><img alt="Apache-2.0" src="https://img.shields.io/github/license/lambiengcode/reify?style=flat-square&color=blue" /></a>
+  <a href="#install"><img alt="nền tảng" src="https://img.shields.io/badge/nền%20tảng-macOS%20%7C%20Linux-blue?style=flat-square" /></a>
+  <a href="#privacy"><img alt="lượt gọi mạng: 0" src="https://img.shields.io/badge/lượt%20gọi%20mạng-0-success?style=flat-square" /></a>
+  <a href="#development"><img alt="369 test" src="https://img.shields.io/badge/test-369-success?style=flat-square" /></a>
 </p>
 
 <p align="center">
-  <a href="#claude-code"><img src="https://img.shields.io/badge/Claude_Code-supported-111111?style=flat-square" alt="Claude Code"></a>
-  <a href="#other-agents"><img src="https://img.shields.io/badge/Cursor-supported-111111?style=flat-square" alt="Cursor"></a>
-  <a href="#other-agents"><img src="https://img.shields.io/badge/Codex-supported-111111?style=flat-square" alt="Codex"></a>
-  <a href="#other-agents"><img src="https://img.shields.io/badge/OpenCode-supported-111111?style=flat-square" alt="OpenCode"></a>
-  <a href="#other-agents"><img src="https://img.shields.io/badge/Aider-supported-111111?style=flat-square" alt="Aider"></a>
-  <a href="#mcp"><img src="https://img.shields.io/badge/MCP-3_tools-111111?style=flat-square" alt="MCP"></a>
-  <a href="#install"><img src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux-prebuilt-111111?style=flat-square" alt="macOS / Linux"></a>
+  <a href="#swebench"><img alt="SWE-bench retrieval 84.6%" src="https://img.shields.io/badge/truy%20xuất%20SWE--bench-84.6%25-blueviolet?style=flat-square" /></a>
+  <a href="#what-it-reads"><img alt="11 ngôn ngữ" src="https://img.shields.io/badge/ngôn%20ngữ-11-informational?style=flat-square" /></a>
+  <a href="#what-it-reads"><img alt="10 định dạng tài liệu" src="https://img.shields.io/badge/định%20dạng%20tài%20liệu-10-informational?style=flat-square" /></a>
+  <a href="#architecture"><img alt="Rust" src="https://img.shields.io/badge/rust-1.75%2B-dea584?style=flat-square&logo=rust&logoColor=white" /></a>
+</p>
+
+<p align="center">
+  <a href="#claude-code"><img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-supported-2da44e?style=flat-square" /></a>
+  <a href="#other-agents"><img alt="Cursor" src="https://img.shields.io/badge/Cursor-supported-2da44e?style=flat-square" /></a>
+  <a href="#other-agents"><img alt="Codex" src="https://img.shields.io/badge/Codex-supported-2da44e?style=flat-square" /></a>
+  <a href="#other-agents"><img alt="OpenCode" src="https://img.shields.io/badge/OpenCode-supported-2da44e?style=flat-square" /></a>
+  <a href="#other-agents"><img alt="Aider" src="https://img.shields.io/badge/Aider-supported-2da44e?style=flat-square" /></a>
+  <a href="#mcp"><img alt="MCP" src="https://img.shields.io/badge/MCP-3%20tools-2da44e?style=flat-square" /></a>
 </p>
 
 <p align="center">
