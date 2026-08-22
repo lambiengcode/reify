@@ -12,6 +12,11 @@ versions may break the store schema, and `reify index --force` rebuilds it.
   16–512px icon ladder are all derived from it by `assets/make-logo.py`, so the set
   cannot drift the way four separately-edited SVGs did. Adds a favicon, which the
   repository did not have. The link card leads with the mascot.
+- Link card: rebuilt around SWE-bench Verified — a file the fix touched is offered
+  84.6% of the time against grep's 6.6%, over 500 real issues, winning on all 12
+  repositories — and now animated, the bars growing and the numbers counting up. Frame
+  one is the finished card, because most link unfurlers render only that frame. It reads
+  its numbers from the committed results rather than having them typed in.
 - Demo: re-recorded **in colour**, on Dracula, with a `reify` header. termgif's ordinary
   recorder forces `NO_COLOR=1` and `TERM=dumb` on every command and reads output through
   a pipe, so reify printed flat text; the tape now records in screen-capture mode against

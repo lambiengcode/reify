@@ -6,7 +6,7 @@
 | `mascot-dark.png` | Mascot with a light outline, for dark backgrounds | **Generated** by `make-logo.py` |
 | `logo.png` / `logo-dark.png` | Horizontal lockup, light and dark | **Generated** by `make-logo.py` |
 | `icon-*.png`, `favicon.ico` | Icon ladder, 512px down to 16px | **Generated** by `make-logo.py` |
-| `social-preview.png` / `.svg` | 1280×640 link card | **Generated** by `make-social-preview.py` |
+| `social-preview.gif` / `.png` / `.svg` | 1280×640 link card, animated | **Generated** by `make-social-preview.py --gif` |
 | `demo.gif` / `demo.tg` | The README's feature tour | **Recorded** by `termgif --terminal`, finished by `make-demo.py` |
 | `benchmark-agent.svg` | The headline chart | **Generated** by `reify-bench chart` |
 | `benchmark-retrieval.svg` | Retrieval-only chart | **Generated** by `reify-bench chart` |
@@ -30,18 +30,27 @@ the light ink colour, blending rather than replacing it so the drawn edge stays 
 The wordmark stays neutral. A green mascot beside an ink wordmark reads at any size; an
 all-green lockup loses contrast on white.
 
-The link card reads its two headline percentages out of
-`benchmarks/results/nolek-eval/agent-summary.json` rather than having them typed in,
-for the same reason the charts are generated: the card is the half people screenshot,
-so it must not be able to drift from the results. Regenerate it after a new benchmark
-run:
+The link card reads its headline percentages out of
+`benchmarks/swe/results/stage1-retrieval.txt` rather than having them typed in, for the
+same reason the charts are generated: the card is the half people screenshot, so it must
+not be able to drift from the results. It leads with SWE-bench Verified rather than this
+project's own benchmark, because a number measured on someone else's dataset of real
+issues is worth more than a larger number a reader has to take on trust. Regenerate it
+after a new benchmark run:
 
 ```bash
-python3 assets/make-social-preview.py   # needs rsvg-convert (brew install librsvg)
+python3 assets/make-social-preview.py --gif   # needs rsvg-convert and gifsicle
 ```
 
+GitHub accepts an animated GIF here, so the bars grow and the numbers count up. Two
+things shape how that is built. GitHub caps the image near 1 MB, and many services that
+unfurl a link render only the first frame — so **frame one is the finished card**, with
+the bars already at full length, and the animation replays after it. A reader who never
+sees it move still sees the whole result.
+
 Setting it on the repository is a manual step — GitHub exposes no API for the social
-preview, only the image picker in **Settings → General → Social preview**.
+preview, only the image picker in **Settings → General → Social preview**. Upload
+`social-preview.gif` for the animated card, or `social-preview.png` for a static one.
 
 Change any of this in `make-logo.py` and rerun it — the palette lives in one place
 because a colour changed in one variant and not the others is the usual way a logo set
