@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docs — Reify</title>
+<meta name="description" content="Install Reify, index a repository, wire it into your coding agent, and read the command reference.">
+<link rel="icon" href="assets/favicon.ico">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="./"><img src="assets/icon-64.png" alt="">reify</a>
+    <nav>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a href="#commands">Commands</a>
+      <a href="index.html#measured">Benchmarks</a>
+      <a href="https://github.com/lambiengcode/reify">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs">
+  <aside class="side">
+    <strong>Start</strong>
+    <a href="#install">Install</a>
+    <a href="#quickstart">Quickstart</a>
+    <a href="#agents">Wire it into your agent</a>
+    <strong>Reference</strong>
+    <a href="#commands">Commands</a>
+    <a href="#context">reify context</a>
+    <a href="#mcp">MCP server</a>
+    <a href="#status">Epistemic status</a>
+    <strong>Detail</strong>
+    <a href="#reads">What it reads</a>
+    <a href="#multilingual">Multilingual</a>
+    <a href="#privacy">Privacy</a>
+    <a href="#manage">Upgrade &amp; uninstall</a>
+  </aside>
+
+  <main class="doc">
+
+    <h2 id="install">Install</h2>
+    <p>Prebuilt binaries for macOS (Apple Silicon and Intel) and Linux (x86_64 and aarch64).</p>
+    <div class="term">
+      <div class="term-head"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+<pre><span class="c-prompt">❯</span> <span class="c-cmd">curl</span> -fsSL https://raw.githubusercontent.com/lambiengcode/reify/main/install.sh | sh</pre>
+    </div>
+    <p>Or build from source, which needs a Rust toolchain:</p>
+    <div class="term">
+      <div class="term-head"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+<pre><span class="c-prompt">❯</span> <span class="c-cmd">cargo</span> install --path crates/reify-cli</pre>
+    </div>
+
+    <h2 id="quickstart">Quickstart</h2>
+    <p>
+      Two minutes to the first answer. <code>init</code> reports what will and will not be
+      indexed before it does anything, so you can see the shape of the job first.
+    </p>
+    <div class="term">
+      <div class="term-head"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:8px">in your repository</span></div>
+<pre><span class="c-prompt">❯</span> <span class="c-cmd">reify</span> init
+<span class="c-prompt">❯</span> <span class="c-cmd">reify</span> index
+<span class="c-prompt">❯</span> <span class="c-cmd">reify</span> context <span class="c-str">"add a discount tier for strategic customers"</span> --budget 1500</pre>
+    </div>
+    <p>
+      Indexing is incremental after the first run; <code>--force</code> rebuilds. Everything
+      lives in a single <code>.reify/</code> directory, which you can delete at any time.
+    </p>
+    <div class="note">
+      <b>Nothing leaves the machine.</b> Reify opens no network connection at any point.
+      See <a href="#privacy">Privacy</a> for how that is enforced rather than promised.
+    </div>
+
+    <h2 id="agents">Wire it into your agent</h2>
+    <p>One command appends a short instruction block to <code>AGENTS.md</code> or <code>CLAUDE.md</code>.</p>
+    <div class="term">
+      <div class="term-head"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+<pre><span class="c-prompt">❯</span> <span class="c-cmd">reify</span> init --write-agent-instructions</pre>
+    </div>
+    <p>
+      For tools that read a different file — <code>.cursorrules</code>,
+      <code>CONVENTIONS.md</code>, <code>.windsurfrules</code>, <code>.clinerules/</code> —
+      paste the same lines yourself:
+    </p>
+    <div class="term">
+      <div class="term-head"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:8px">agent instructions</span></div>
+<pre>Before changing code here, run `reify context "&lt;what you are about to do&gt;" --toon`.
+Run `reify why &lt;file&gt;:&lt;line&gt;` before modifying unfamiliar logic.</pre>
+    </div>
+    <p>
+      This plain-text level is what the benchmark measured — no protocol, no server, no
+      per-turn schema tax. Use the <a href="#mcp">MCP server</a> only if your agent
+      prefers structured tools.
+    </p>
+
+    <h2 id="commands">Commands</h2>
+    <p>Every command takes <code>--json</code> for machine-readable output, and <code>-C &lt;path&gt;</code> to point at another repository.</p>
+    <div class="scroll">
+    <table>
+      <tr><th>Command</th><th>What it answers</th></tr>
+      <tr><td><code>reify init</code></td><td>Create <code>.reify/</code>, and report what will and will not be indexed</td></tr>
+      <tr><td><code>reify index</code></td><td>Compile the system model. Incremental unless <code>--force</code></td></tr>
+      <tr><td><code>reify status</code></td><td>Freshness and coverage of the current store</td></tr>
+      <tr><td><code>reify context</code></td><td>The minimum useful context for a task. The flagship command</td></tr>
+      <tr><td><code>reify why</code></td><td>Why this exists: rules, concepts, documents, history and blast radius</td></tr>
+      <tr><td><code>reify impact</code></td><td>What breaks if this changes</td></tr>
+      <tr><td><code>reify conflicts</code></td><td>Documentation that disagrees with the implementation</td></tr>
+      <tr><td><code>reify rules</code></td><td>Mined business rules</td></tr>
+      <tr><td><code>reify report</code></td><td>A system-level scorecard</td></tr>
+      <tr><td><code>reify explain</code></td><td>Everything known about a concept, in every language it appears in</td></tr>
+      <tr><td><code>reify flow</code></td><td>The sequence of code that carries out a business process</td></tr>
+      <tr><td><code>reify concepts</code></td><td>Inspect and extend the concept glossary</td></tr>
+      <tr><td><code>reify preflight</code></td><td>A compact risk header for a file about to be edited, for an editor hook</td></tr>
+      <tr><td><code>reify llm</code></td><td>Model-assistance status and prompt inspection</td></tr>
+      <tr><td><code>reify serve</code></td><td>Serve the Model Context Protocol on stdio</td></tr>
+      <tr><td><code>reify completions</code></td><td>Print a shell completion script</td></tr>
+    </table>
+    </div>
+
+    <h2 id="context">reify context</h2>
+    <p>
+      The command everything else exists to support. Give it a task in plain language and
+      a token budget; it returns the smallest set of facts that answers it, ordered, each
+      with a citation.
+    </p>
+    <div class="term">
+      <div class="term-head"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+<pre><span class="c-prompt">❯</span> <span class="c-cmd">reify</span> context <span class="c-str">"block orders above the approval cap"</span> --budget 1200 --toon</pre>
+    </div>
+    <ul>
+      <li><code>--budget &lt;n&gt;</code> — the ceiling, in tokens. Reify fills it and stops.</li>
+      <li><code>--toon</code> — the agent-facing format: columns declared once, one row per record, far cheaper than JSON.</li>
+      <li><code>--for-edit</code> — return whole definitions padded for editing, rather than minimal read spans.</li>
+      <li><code>--json</code> — the same facts against a versioned schema.</li>
+    </ul>
+
+    <h2 id="mcp">MCP server</h2>
+    <p>
+      Three tools, and that is the whole surface. An MCP server's schemas are paid for on
+      every turn, so a large one is a tax on every message an agent sends.
+    </p>
+    <div class="scroll">
+    <table>
+      <tr><th>Tool</th><th>Use</th></tr>
+      <tr><td><code>reify_context</code></td><td>The minimum context for a task, under a budget</td></tr>
+      <tr><td><code>reify_why</code></td><td>Provenance for one file and line</td></tr>
+      <tr><td><code>reify_impact</code></td><td>The blast radius of a symbol</td></tr>
+    </table>
+    </div>
+    <div class="term">
+      <div class="term-head"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:8px">stdio</span></div>
+<pre><span class="c-prompt">❯</span> <span class="c-cmd">reify</span> serve</pre>
+    </div>
+
+    <h2 id="status">Epistemic status</h2>
+    <p>
+      Every claim is tagged with how it is known. A renderer that prints an inference as
+      bare prose is a bug here, and there is a test that says so.
+    </p>
+    <div class="scroll">
+    <table>
+      <tr><th>Tag</th><th>Means</th></tr>
+      <tr><td><code class="c-ok">confirmed</code></td><td>Parsed directly from source. A fact.</td></tr>
+      <tr><td><code class="c-ok">observed</code></td><td>Seen in behaviour or history, repeatedly.</td></tr>
+      <tr><td><code class="c-warn">inferred</code></td><td>A lead to verify against its citation — never a fact.</td></tr>
+      <tr><td><code>conflicted</code></td><td>Two sources disagree, and both are shown.</td></tr>
+      <tr><td><code class="c-dim">unknown</code></td><td>Nothing is known. Said plainly rather than guessed.</td></tr>
+    </table>
+    </div>
+
+    <h2 id="reads">What it reads</h2>
+    <p>
+      Source in 11 languages via tree-sitter, SQL schemas and migrations, business
+      documents, and the git history — which is often the only place a decision was ever
+      written down. Nothing is sent anywhere to be understood.
+    </p>
+
+    <h2 id="multilingual">Multilingual</h2>
+    <p>
+      No language is canonical, English included. Concept ids are opaque and every label
+      carries a language tag, so a Vietnamese, Thai, Korean or German requirement reaches
+      English code through the concept layer rather than an embedding model — which is
+      why the answer arrives with a line number instead of a similarity score.
+    </p>
+    <ul>
+      <li><strong>Thai, Lao, Khmer, Japanese and Chinese have no word spaces</strong>, so a word index stores one enormous token. There is a trigram substring index for non-ASCII content; ASCII-only repositories never pay for it.</li>
+      <li><strong>Korean glues particles to stems.</strong> <code>승인</code> becomes <code>승인을</code>, and whole-word matching finds neither.</li>
+      <li>Obligation and exemption language is detected in 11 languages, so a rule written in any of them is mined as a rule.</li>
+    </ul>
+
+    <h2 id="privacy">Privacy</h2>
+    <p>
+      <strong>Your source code and your business documents never leave the machine.</strong>
+      Reify opens no network connection — not "by default", at all.
+    </p>
+    <div class="scroll">
+    <table>
+      <tr><th>Networking crates in <code>Cargo.lock</code></th><td>asserted zero, in CI</td></tr>
+      <tr><th>Sockets in the source</th><td>asserted zero, in CI</td></tr>
+      <tr><th>Subprocesses</th><td><code>git</code>, reviewed document converters, and — for <code>reify upgrade</code> only — <code>curl</code> and <code>tar</code>; each named in a test</td></tr>
+      <tr><th>Telemetry</th><td>none, and no flag that turns any on</td></tr>
+    </table>
+    </div>
+    <p>Set <code>REIFY_OFFLINE=1</code> to refuse even the upgrade path.</p>
+
+    <h2 id="manage">Upgrade &amp; uninstall</h2>
+    <div class="term">
+      <div class="term-head"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+<pre><span class="c-prompt">❯</span> <span class="c-cmd">reify</span> upgrade --check     <span class="c-dim"># is there a newer release?</span>
+<span class="c-prompt">❯</span> <span class="c-cmd">reify</span> upgrade             <span class="c-dim"># fetch and replace this binary</span>
+<span class="c-prompt">❯</span> <span class="c-cmd">reify</span> uninstall --yes     <span class="c-dim"># remove the binary, and nothing else</span>
+<span class="c-prompt">❯</span> <span class="c-cmd">reify</span> uninit --yes        <span class="c-dim"># remove this repository's .reify/ store</span></pre>
+    </div>
+    <p>
+      Both removal commands print their plan and change nothing without <code>--yes</code>.
+      <code>uninstall</code> never touches a repository store, and <code>uninit</code> never
+      touches the binary.
+    </p>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>Apache-2.0 · 11 languages · zero network calls</span>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="https://github.com/lambiengcode/reify">GitHub</a>
+      <a href="https://github.com/lambiengcode/reify/blob/main/CHANGELOG.md">Changelog</a>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>

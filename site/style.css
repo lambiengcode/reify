@@ -1,0 +1,192 @@
+/* Reify documentation site.
+ *
+ * Hand-written, no generator and no build step: the site is three files plus the
+ * assets the README already carries, so publishing it cannot break in a toolchain
+ * nobody on this project maintains.
+ *
+ * Dark only, deliberately. This is a tool for people who spend the day in a terminal,
+ * and a single committed palette is one fewer thing that can be subtly wrong in a
+ * theme nobody checked. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  border-radius: 0;          /* sharp corners are the house style; no exceptions */
+}
+
+:root {
+  --bg: #0b0d10;
+  --panel: #11151a;
+  --panel-2: #0e1216;
+  --line: #222a33;
+  --line-bright: #2f3945;
+  --ink: #e6edf3;
+  --muted: #8b949e;
+  --dim: #6e7781;
+  --accent: #3fb950;
+  --accent-dim: #2da44e;
+  --amber: #d4a017;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", "JetBrains Mono", Menlo, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+  --gutter: clamp(20px, 5vw, 64px);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 var(--gutter); }
+
+/* ---------- nav ---------------------------------------------------------- */
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(11, 13, 16, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.nav .wrap { display: flex; align-items: center; gap: 28px; height: 60px; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-weight: 700; letter-spacing: -0.02em; color: var(--ink); }
+.brand img { width: 26px; height: 26px; display: block; }
+.nav nav { display: flex; gap: 22px; margin-left: auto; font-family: var(--mono); font-size: 14px; }
+.nav nav a { color: var(--muted); }
+.nav nav a:hover, .nav nav a[aria-current] { color: var(--accent); text-decoration: none; }
+
+/* ---------- hero --------------------------------------------------------- */
+
+.hero { padding: 88px 0 64px; border-bottom: 1px solid var(--line); }
+.eyebrow {
+  font-family: var(--mono); font-size: 13px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--accent); margin: 0 0 20px;
+}
+.hero h1 {
+  font-size: clamp(34px, 5.4vw, 58px); line-height: 1.08; letter-spacing: -0.03em;
+  margin: 0 0 22px; font-weight: 800; max-width: 20ch;
+}
+.hero h1 em { font-style: normal; color: var(--accent); }
+.lede { font-size: clamp(17px, 2vw, 20px); color: var(--muted); max-width: 62ch; margin: 0 0 34px; }
+
+.cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.btn {
+  display: inline-block; font-family: var(--mono); font-size: 14px; font-weight: 600;
+  padding: 11px 20px; border: 1px solid var(--accent); color: #06210d;
+  background: var(--accent);
+}
+.btn:hover { background: var(--accent-dim); border-color: var(--accent-dim); text-decoration: none; }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line-bright); }
+.btn.ghost:hover { border-color: var(--accent); color: var(--accent); background: transparent; }
+
+/* ---------- terminal / code ---------------------------------------------- */
+
+.term { border: 1px solid var(--line); background: var(--panel-2); margin: 26px 0; }
+.term-head {
+  display: flex; align-items: center; gap: 8px; padding: 9px 14px;
+  border-bottom: 1px solid var(--line); font-family: var(--mono);
+  font-size: 12px; color: var(--dim);
+}
+.dot { width: 9px; height: 9px; background: var(--line-bright); display: block; }
+.term pre { margin: 0; padding: 16px 18px; overflow-x: auto; }
+pre, code { font-family: var(--mono); font-size: 13.5px; }
+pre { margin: 0; line-height: 1.6; }
+p code, li code, td code {
+  background: var(--panel); border: 1px solid var(--line);
+  padding: 1px 5px; font-size: 0.9em; color: var(--ink);
+}
+.c-prompt { color: var(--accent); }
+.c-cmd { color: var(--accent); }
+.c-ok { color: var(--accent); }
+.c-warn { color: var(--amber); }
+.c-dim { color: var(--dim); }
+.c-str { color: var(--ink); }
+
+/* ---------- sections ----------------------------------------------------- */
+
+section { padding: 72px 0; border-bottom: 1px solid var(--line); }
+section > .wrap > h2 {
+  font-size: clamp(24px, 3vw, 32px); letter-spacing: -0.02em; margin: 0 0 10px; font-weight: 700;
+}
+section > .wrap > h2 + p { color: var(--muted); max-width: 68ch; margin: 0 0 34px; }
+h3 { font-size: 19px; letter-spacing: -0.01em; margin: 34px 0 10px; }
+
+/* ---------- measurement band --------------------------------------------- */
+
+.numbers { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); border: 1px solid var(--line); }
+.numbers div { padding: 26px 24px; border-right: 1px solid var(--line); }
+.numbers div:last-child { border-right: 0; }
+.numbers b { display: block; font-family: var(--mono); font-size: clamp(28px, 4vw, 38px); font-weight: 700; letter-spacing: -0.02em; }
+.numbers .up b { color: var(--accent); }
+.numbers span { display: block; color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+.bars { margin-top: 30px; display: grid; gap: 14px; max-width: 640px; }
+.bar-row { display: grid; grid-template-columns: 88px 1fr 74px; gap: 14px; align-items: center; font-family: var(--mono); font-size: 14px; }
+.track { height: 26px; background: var(--panel); border: 1px solid var(--line); }
+.fill { height: 100%; background: var(--accent); display: block; }
+.fill.grey { background: var(--dim); }
+.bar-row i { font-style: normal; text-align: right; font-weight: 700; }
+
+/* ---------- cards -------------------------------------------------------- */
+
+/* The outer edge is drawn by the cards themselves, not by the container. A container
+   border would sit on top of the last row's and last column's own borders and render
+   as a double line. */
+.grid { display: grid; gap: 0; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+        border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.grid.tight { grid-template-columns: repeat(auto-fit, minmax(min(196px, 100%), 1fr)); }
+.grid.tight .card { padding: 22px 20px; }
+.card { padding: 28px 26px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.card h3 { margin: 0 0 8px; font-family: var(--mono); font-size: 15px; color: var(--accent); letter-spacing: 0; }
+.card p { margin: 0; color: var(--muted); font-size: 15px; }
+
+/* ---------- tables ------------------------------------------------------- */
+
+table { width: 100%; border-collapse: collapse; margin: 22px 0; font-size: 14.5px; }
+th, td { text-align: left; padding: 11px 14px; border: 1px solid var(--line); vertical-align: top; }
+th { background: var(--panel); font-family: var(--mono); font-size: 13px; color: var(--muted); font-weight: 600; }
+td code { white-space: nowrap; }
+.scroll { overflow-x: auto; }
+
+/* ---------- docs layout -------------------------------------------------- */
+
+.docs { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 48px; align-items: start; padding: 48px 0 96px; }
+.side { position: sticky; top: 84px; font-family: var(--mono); font-size: 13.5px; border-left: 1px solid var(--line); }
+.side strong { display: block; padding: 6px 0 6px 16px; color: var(--dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; font-size: 11.5px; margin-top: 18px; }
+.side strong:first-child { margin-top: 0; }
+.side a { display: block; padding: 5px 0 5px 16px; color: var(--muted); margin-left: -1px; border-left: 1px solid transparent; }
+.side a:hover { color: var(--accent); border-left-color: var(--accent); text-decoration: none; }
+.doc h2 { font-size: 26px; letter-spacing: -0.02em; margin: 52px 0 12px; padding-top: 10px; }
+.doc h2:first-child { margin-top: 0; }
+.doc p, .doc li { color: var(--muted); }
+.doc p strong, .doc li strong { color: var(--ink); }
+.doc ul { padding-left: 20px; }
+
+.note { border-left: 2px solid var(--accent); background: var(--panel); padding: 14px 18px; margin: 22px 0; font-size: 15px; color: var(--muted); }
+.note b { color: var(--ink); }
+
+/* ---------- footer ------------------------------------------------------- */
+
+footer { padding: 44px 0 64px; color: var(--dim); font-size: 14px; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 18px 32px; align-items: center; }
+footer nav { display: flex; gap: 22px; margin-left: auto; font-family: var(--mono); font-size: 13.5px; }
+footer a { color: var(--muted); }
+
+img.shot { width: 100%; display: block; border: 1px solid var(--line); margin: 26px 0; }
+
+@media (max-width: 860px) {
+  .docs { grid-template-columns: 1fr; gap: 24px; }
+  .side { position: static; border-left: 0; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+  .nav nav { gap: 16px; }
+}

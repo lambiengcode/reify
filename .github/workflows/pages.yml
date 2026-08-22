@@ -1,0 +1,67 @@
+# Publish the documentation site.
+#
+# The site is hand-written HTML and one stylesheet - no generator, no lockfile, no
+# node_modules - so this job has nothing to build. It copies the pages, and the few
+# assets they link, into an artifact and hands it to Pages. Only the assets actually
+# referenced are copied: the full assets/ directory carries benchmark sources and a
+# megabyte of logo masters that no page loads.
+name: pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "assets/demo.gif"
+      - "assets/icon-64.png"
+      - "assets/favicon.ico"
+      - "assets/social-preview.png"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time, and never cancel one midway: a half-published site is
+# worse than a stale one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Stage the site with the assets it links
+        run: |
+          set -euo pipefail
+          mkdir -p _site/assets
+          cp site/index.html site/docs.html site/style.css _site/
+          for asset in demo.gif icon-64.png favicon.ico social-preview.png; do
+            cp "assets/$asset" _site/assets/
+          done
+          touch _site/.nojekyll
+
+      - name: Fail if a page links an asset that was not staged
+        run: |
+          set -euo pipefail
+          missing=0
+          for ref in $(grep -rhoE '(src|href)="[^"#:]+"' _site/*.html \
+                       | sed -E 's/^(src|href)="//; s/"$//'); do
+            [ -e "_site/$ref" ] || { echo "missing: $ref"; missing=1; }
+          done
+          exit "$missing"
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deploy
+        uses: actions/deploy-pages@v4

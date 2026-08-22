@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reify — a local knowledge engine for AI coding agents</title>
+<meta name="description" content="Reify compiles a brownfield codebase — source, SQL, business documents and git history — into a queryable knowledge graph, and hands your agent the smallest cited context it needs. Runs entirely offline.">
+<meta property="og:title" content="Reify — a local knowledge engine for AI coding agents">
+<meta property="og:description" content="On SWE-bench Verified it puts the file that had to change in front of the model 84.6% of the time. grep manages 6.6%. Never opens a socket.">
+<meta property="og:image" content="assets/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/favicon.ico">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="./"><img src="assets/icon-64.png" alt="">reify</a>
+    <nav>
+      <a href="docs.html">Docs</a>
+      <a href="docs.html#commands">Commands</a>
+      <a href="#measured">Benchmarks</a>
+      <a href="https://github.com/lambiengcode/reify">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <p class="eyebrow">local · offline · cited</p>
+    <h1>The business logic is in one person's head. <em>Reify compiles it out.</em></h1>
+    <p class="lede">
+      Reify reads a brownfield codebase — source, SQL, business documents and fifteen
+      years of git history — and compiles it into a queryable model. Your agent asks for
+      a task and gets back the smallest set of facts that answers it, every one carrying
+      a file and a line number.
+    </p>
+    <div class="cta">
+      <a class="btn" href="docs.html">Get started</a>
+      <a class="btn ghost" href="https://github.com/lambiengcode/reify">View on GitHub</a>
+    </div>
+
+    <div class="term">
+      <div class="term-head"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:8px">install</span></div>
+<pre><span class="c-prompt">❯</span> <span class="c-cmd">curl</span> -fsSL https://raw.githubusercontent.com/lambiengcode/reify/main/install.sh | sh
+<span class="c-prompt">❯</span> <span class="c-cmd">reify</span> init &amp;&amp; <span class="c-cmd">reify</span> index
+<span class="c-prompt">❯</span> <span class="c-cmd">reify</span> context <span class="c-str">"add a discount tier for strategic customers"</span> --budget 1500</pre>
+    </div>
+  </div>
+</div>
+
+<section id="measured">
+  <div class="wrap">
+    <h2>Measured on someone else's benchmark</h2>
+    <p>
+      SWE-bench Verified is 500 real GitHub issues. For each one the index is built at
+      that issue's own base commit, so the fix cannot leak into what Reify is allowed to
+      know. Both arms get the same token budget.
+    </p>
+
+    <div class="numbers">
+      <div class="up"><b>84.6%</b><span>Reify offered a file the fix touched</span></div>
+      <div><b>6.6%</b><span>grep, same budget</span></div>
+      <div class="up"><b>12 / 12</b><span>repositories where Reify wins</span></div>
+      <div class="up"><b>0</b><span>network calls, asserted in CI</span></div>
+    </div>
+
+    <div class="bars">
+      <div class="bar-row"><span>reify</span><span class="track"><i class="fill" style="width:84.6%"></i></span><i>84.6%</i></div>
+      <div class="bar-row"><span class="c-dim">grep</span><span class="track"><i class="fill grey" style="width:6.6%"></i></span><i class="c-dim">6.6%</i></div>
+    </div>
+
+    <p style="margin-top:30px">
+      Retrieval is not the same as resolution, and the README says so with equal
+      prominence: end to end, Reify and a BM25 baseline currently resolve the same
+      number of issues. <a href="https://github.com/lambiengcode/reify#swe-bench-verified">The full write-up</a>
+      shows both, including the arms that failed.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>What it does</h2>
+    <p>Six commands, each answering a question an agent otherwise guesses at.</p>
+    <img class="shot" src="assets/demo.gif" alt="A terminal tour: reify index rebuilds the graph; reify context compiles a briefing under a token budget; reify why returns the callers, tables, co-changes and commits behind one line; reify impact traces the blast radius through multiple hops; reify explain shows a business concept across every file it appears in; and reify context --toon emits the same facts in the agent format.">
+
+    <div class="grid">
+      <div class="card">
+        <h3>reify context</h3>
+        <p>The flagship. Compiles the minimum useful context for a task, under a token budget you set.</p>
+      </div>
+      <div class="card">
+        <h3>reify why</h3>
+        <p>For one line: its callers, the tables it writes, the files it co-changes with, and the commits that explain it.</p>
+      </div>
+      <div class="card">
+        <h3>reify impact</h3>
+        <p>What breaks if this changes, including hops no single grep would follow.</p>
+      </div>
+      <div class="card">
+        <h3>reify explain</h3>
+        <p>One business concept across every language, table and file it appears in.</p>
+      </div>
+      <div class="card">
+        <h3>reify conflicts</h3>
+        <p>Documentation that disagrees with the implementation, with both sides cited.</p>
+      </div>
+      <div class="card">
+        <h3>reify serve</h3>
+        <p>The Model Context Protocol over stdio, three tools, for agents that speak it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Every claim carries its evidence</h2>
+    <p>
+      Reify never states a guess as a fact. Each claim is tagged with how it is known,
+      so an agent — or a reviewer — can tell a parsed fact from an inference without
+      reading the docs.
+    </p>
+    <div class="term">
+      <div class="term-head"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:8px">reify why erpnext/selling/doctype/customer/customer.py:514</span></div>
+<pre><span class="c-ok">[confirmed]</span> erpnext/accounts/doctype/journal_entry/journal_entry.py:492  calls check_credit_limit
+<span class="c-ok">[observed]</span>  customer  (is written by after_insert)
+<span class="c-warn">[inferred]</span>  journal entry check credit limit: if customers from …customer import check credit limit
+<span class="c-dim">[unknown]</span>   no document section describes this symbol</pre>
+    </div>
+    <div class="grid tight">
+      <div class="card"><h3>confirmed</h3><p>Parsed directly from source. A fact.</p></div>
+      <div class="card"><h3>observed</h3><p>Seen in behaviour or history, repeatedly.</p></div>
+      <div class="card"><h3>inferred</h3><p>A lead to verify against its citation, never a fact.</p></div>
+      <div class="card"><h3>conflicted</h3><p>Two sources disagree, and both are shown.</p></div>
+      <div class="card"><h3>unknown</h3><p>Nothing is known — said plainly, not guessed.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>It never opens a socket</h2>
+    <p>
+      Not "by default" — at all. There is no HTTP client in the dependency tree, and the
+      test suite fails the build if one appears. For a company that will not let
+      proprietary code near a cloud service, that is the difference between a tool they
+      can evaluate and one they cannot.
+    </p>
+    <div class="scroll">
+      <table>
+        <tr><th>Networking crates in <code>Cargo.lock</code></th><td>asserted zero, in CI</td></tr>
+        <tr><th>Sockets in the source</th><td>asserted zero, in CI</td></tr>
+        <tr><th>Subprocesses</th><td><code>git</code>, reviewed document converters, and — for <code>reify upgrade</code> only — <code>curl</code> and <code>tar</code>; each named in a test</td></tr>
+        <tr><th>Telemetry</th><td>none, and no flag that turns any on</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section style="border-bottom:0">
+  <div class="wrap">
+    <h2>Wire it into your agent</h2>
+    <p>No protocol, no server, no per-turn schema tax — this is the level the benchmark measured.</p>
+    <div class="term">
+      <div class="term-head"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:8px">one command</span></div>
+<pre><span class="c-prompt">❯</span> <span class="c-cmd">reify</span> init --write-agent-instructions</pre>
+    </div>
+    <p>
+      Appends a short block to <code>AGENTS.md</code> or <code>CLAUDE.md</code>. For tools
+      that read a different file — <code>.cursorrules</code>, <code>CONVENTIONS.md</code>,
+      <code>.windsurfrules</code>, <code>.clinerules/</code> — paste the same lines.
+      <a href="docs.html#agents">Full instructions</a>.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Apache-2.0 · 11 languages · zero network calls</span>
+    <nav>
+      <a href="docs.html">Docs</a>
+      <a href="https://github.com/lambiengcode/reify">GitHub</a>
+      <a href="https://github.com/lambiengcode/reify/blob/main/CHANGELOG.md">Changelog</a>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
