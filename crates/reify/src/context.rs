@@ -44,6 +44,15 @@ const MIN_SCORE: f32 = 0.02;
 const LEXICAL_SEEDS: usize = 60;
 /// Cap on the reading plan.
 const MAX_NEXT_READS: usize = 6;
+/// Symbol slots any one file may claim.
+///
+/// Relevance spreads along edges, so every member of a file that matched loosely
+/// arrives holding a plausible score. Without this cap a single such file takes the
+/// whole symbol budget: measured on Medusa, one HTTP router and one arithmetic helper
+/// between them held 13 of 20 slots for a task about discounts, and the promotion
+/// service that actually had to change ranked eighteenth. Four is enough to show that
+/// several signals agree on a file, and low enough to leave room for five others.
+const MAX_SYMBOLS_PER_FILE: usize = 4;
 /// Rough tokens per line of source, for estimating the cost of a recommended read.
 const TOKENS_PER_LINE: u32 = 10;
 
@@ -52,6 +61,12 @@ const PATH_AFFINITY_WEIGHT: f32 = 1.0;
 
 /// Floor of the question-coverage factor in seed scoring.
 const COVERAGE_FLOOR: f32 = 0.35;
+
+/// Score a test, fixture or mock gives up to the implementation it exercises.
+///
+/// Half, not all: enough to put the source above its own test in every ordering
+/// measured, small enough that a task genuinely about a test still reaches it.
+const TEST_PATH_PENALTY: f32 = 0.5;
 
 /// Concepts whose other surface forms get searched too.
 const CONCEPT_EXPANSIONS: usize = 3;
@@ -215,6 +230,9 @@ pub struct RankWeights {
     pub fanout_symbols: usize,
     /// Share of a file's score its symbols inherit through fan-out.
     pub file_to_symbol: f32,
+    /// Score a test, fixture or mock gives up to the implementation it exercises;
+    /// zero disables the penalty, one hides tests entirely.
+    pub test_path_penalty: f32,
 }
 
 impl Default for RankWeights {
@@ -230,6 +248,7 @@ impl Default for RankWeights {
             file_fanout: FILE_FANOUT,
             fanout_symbols: FILE_FANOUT_SYMBOLS,
             file_to_symbol: FILE_TO_SYMBOL,
+            test_path_penalty: TEST_PATH_PENALTY,
         }
     }
 }
@@ -714,10 +733,16 @@ fn rank(store: &Store, task: &str, weights: &RankWeights) -> Result<Vec<Scored>>
     let mut out: Vec<Scored> = scores
         .into_iter()
         .filter_map(|(id, (score, reason))| {
-            nodes.remove(&id).map(|node| Scored {
-                node,
-                score,
-                reason,
+            nodes.remove(&id).map(|node| {
+                // Applied here, once, rather than at seed time: a test is reached far
+                // more often by spreading from the code it exercises than by matching
+                // the task itself, so penalising only the seeds would miss most of them.
+                let score = score * test_path_factor(&node, weights.test_path_penalty);
+                Scored {
+                    node,
+                    score,
+                    reason,
+                }
             })
         })
         .filter(|s| s.score >= MIN_SCORE)
@@ -784,6 +809,57 @@ fn path_affinity(node: &Node, asked: &BTreeSet<String>) -> f32 {
 /// Match singular against plural. One shared definition, in `concepts`.
 fn stem_match(candidate: &str, asked: &str) -> bool {
     crate::concepts::same_word(candidate, asked)
+}
+
+/// How much of its score a node keeps for living in a test, fixture or mock.
+///
+/// Tests are excellent evidence about *which* code matters and poor evidence about
+/// *what to change*: a test names the domain vocabulary densely, so it scores well,
+/// and then tells a reader nothing they can edit. Measured on Medusa, a promotion
+/// spec and its fixture both outranked the promotion service they exercise.
+///
+/// A penalty rather than an exclusion, deliberately. "Fix the failing test for X" is a
+/// real task, and a reproduction is genuinely the right place to start; the test
+/// should lose to its implementation, not disappear behind it.
+fn test_path_factor(node: &Node, penalty: f32) -> f32 {
+    let Some(path) = &node.path else {
+        return 1.0;
+    };
+    if is_test_path(path) {
+        (1.0 - penalty).clamp(0.0, 1.0)
+    } else {
+        1.0
+    }
+}
+
+/// Whether a path is test, fixture or mock material.
+///
+/// Segment-wise rather than substring, so `src/contest/` and `src/latest/` are not
+/// mistaken for tests. Covers the conventions the indexed languages actually use.
+fn is_test_path(path: &str) -> bool {
+    path.split('/').any(|segment| {
+        let s = segment.trim_matches('_').to_ascii_lowercase();
+        let stem = s.split('.').next().unwrap_or("");
+        matches!(
+            s.as_str(),
+            "test"
+                | "tests"
+                | "testing"
+                | "spec"
+                | "specs"
+                | "fixture"
+                | "fixtures"
+                | "mock"
+                | "mocks"
+                | "e2e"
+                | "testdata"
+                | "integration-tests"
+        ) || stem.ends_with("_test")
+            || stem.ends_with("_spec")
+            || stem.starts_with("test_")
+            || s.contains(".test.")
+            || s.contains(".spec.")
+    })
 }
 
 /// Edge kinds relevance travels along. History edges are excluded from the general
@@ -1026,12 +1102,23 @@ fn seed_weight(kind: NodeKind) -> f32 {
     }
 }
 
+/// The file a symbol lives in, for the per-file cap. `None` for everything else,
+/// because concepts, rules and documents are already capped by count and by share.
+fn symbol_file(item: &Scored) -> Option<String> {
+    match item.node.kind {
+        NodeKind::Symbol => item.node.path.clone(),
+        _ => None,
+    }
+}
+
 /// Fill the budget, best value per token first.
 ///
-/// Two deliberate asymmetries. A `CONFLICTED` node is admitted regardless of budget,
+/// Three deliberate asymmetries. A `CONFLICTED` node is admitted regardless of budget,
 /// because budget pressure may drop useful context but must never drop a known
-/// contradiction. And the single best concept and document are reserved, so a
-/// symbol-heavy result never crowds out the two things that explain it.
+/// contradiction. The single best concept and document are reserved, so a
+/// symbol-heavy result never crowds out the two things that explain it. And no single
+/// file may claim more than [`MAX_SYMBOLS_PER_FILE`] of the symbol slots, so one
+/// loosely-matched file cannot spend the window on its own members.
 fn select(scored: &[Scored], budget: u32) -> Vec<Scored> {
     let mut chosen: Vec<Scored> = Vec::new();
     let mut spent = 0u32;
@@ -1072,39 +1159,62 @@ fn select(scored: &[Scored], budget: u32) -> Vec<Scored> {
     // Count what the reserved picks already used, so the caps bind on the total.
     let mut count_by_kind: HashMap<NodeKind, usize> = HashMap::new();
     let mut tokens_by_kind: HashMap<NodeKind, u32> = HashMap::new();
+    let mut symbols_by_file: HashMap<String, usize> = HashMap::new();
     for item in &chosen {
         *count_by_kind.entry(item.node.kind).or_insert(0) += 1;
         *tokens_by_kind.entry(item.node.kind).or_insert(0) += item.node.tokens;
+        if let Some(path) = symbol_file(item) {
+            *symbols_by_file.entry(path).or_insert(0) += 1;
+        }
     }
 
-    // Best value per token, subject to both caps.
+    // Best value per token, subject to every cap.
     for item in &remaining {
         let kind = item.node.kind;
         let token_cap = (budget as f32 * budget_share(kind)) as u32;
         let count = *count_by_kind.get(&kind).unwrap_or(&0);
         let used = *tokens_by_kind.get(&kind).unwrap_or(&0);
+        let file = symbol_file(item);
         if spent + item.node.tokens > budget
             || count >= max_items(kind)
             || used + item.node.tokens > token_cap
+            || file.as_ref().is_some_and(|p| {
+                symbols_by_file
+                    .get(p)
+                    .is_some_and(|n| *n >= MAX_SYMBOLS_PER_FILE)
+            })
         {
             continue;
         }
         *count_by_kind.entry(kind).or_insert(0) += 1;
         *tokens_by_kind.entry(kind).or_insert(0) += item.node.tokens;
+        if let Some(path) = file {
+            *symbols_by_file.entry(path).or_insert(0) += 1;
+        }
         admit(item, &mut chosen, &mut spent, &mut taken);
     }
     // Spend budget the shares left unused on more code, which is what a change needs
-    // — but never past the count cap, or the answer becomes a directory listing.
+    // — but never past the count cap, or the answer becomes a directory listing, and
+    // never past the per-file cap, or it becomes one file's table of contents.
     for item in &remaining {
         let kind = item.node.kind;
+        let file = symbol_file(item);
         if taken.contains(&item.node.id)
             || kind != NodeKind::Symbol
             || *count_by_kind.get(&kind).unwrap_or(&0) >= max_items(kind)
             || spent + item.node.tokens > budget
+            || file.as_ref().is_some_and(|p| {
+                symbols_by_file
+                    .get(p)
+                    .is_some_and(|n| *n >= MAX_SYMBOLS_PER_FILE)
+            })
         {
             continue;
         }
         *count_by_kind.entry(kind).or_insert(0) += 1;
+        if let Some(path) = file {
+            *symbols_by_file.entry(path).or_insert(0) += 1;
+        }
         admit(item, &mut chosen, &mut spent, &mut taken);
     }
 
@@ -1121,6 +1231,12 @@ fn select(scored: &[Scored], budget: u32) -> Vec<Scored> {
 /// A span that does not fit is skipped rather than truncated, and a cheaper span
 /// further down the list may still be taken — a 400-line class must not block six
 /// precise 20-line methods.
+///
+/// Spans are drawn one file at a time in rounds rather than by draining each file in
+/// turn. Draining spent the whole plan on the top file: measured on Medusa, two tasks
+/// in three produced six entries naming a single file, so the plan pointed at one
+/// place and called it a reading list. A round-robin gives every ranked file a span
+/// before any file gets a second, which is what makes the plan a *plan*.
 fn reading_plan(selected: &[Scored], limit: usize, budget: u32, cutoff: f32) -> Vec<NextRead> {
     // Ordered by *file aggregate* rather than by individual symbol score: three
     // moderately-scored symbols in one file are stronger evidence about that file
@@ -1129,17 +1245,22 @@ fn reading_plan(selected: &[Scored], limit: usize, budget: u32, cutoff: f32) -> 
 
     let mut plan: Vec<NextRead> = Vec::new();
     let mut spent = 0u32;
-    for (_, items) in &ranked {
-        for item in items {
+    let deepest = ranked
+        .iter()
+        .map(|(_, items)| items.len())
+        .max()
+        .unwrap_or(0);
+    for round in 0..deepest {
+        for (path, items) in &ranked {
             if plan.len() >= limit {
                 return plan;
             }
+            let Some(item) = items.get(round) else {
+                continue;
+            };
             if item.node.line_start == 0 {
                 continue;
             }
-            let Some(path) = &item.node.path else {
-                continue;
-            };
             let span = item.node.line_end.saturating_sub(item.node.line_start) + 1;
             let cost = span * TOKENS_PER_LINE;
             if spent + cost > budget {
@@ -1995,5 +2116,139 @@ class DiscountPolicy:
         let cost = tokens::estimate(&rendered);
         assert!(cost < 4_000, "context rendered to {cost} tokens");
         let _ = fs::remove_dir_all(&root);
+    }
+
+    /// One symbol per line of a file, scored so that `flood` outranks everything.
+    ///
+    /// Built by hand rather than indexed from a fixture: the pathology only appears
+    /// when one file holds more symbols than the whole cap, which no fixture small
+    /// enough to keep in the repository would reproduce.
+    #[cfg(test)]
+    fn crowded(flood_file: &str, flood: usize, others: usize) -> Vec<Scored> {
+        let mut out = Vec::new();
+        let mut make = |id: i64, path: &str, score: f32| {
+            out.push(Scored {
+                node: crate::model::Node {
+                    id,
+                    uid: format!("{path}#{id}"),
+                    kind: NodeKind::Symbol,
+                    name: format!("member_{id}"),
+                    path: Some(path.into()),
+                    line_start: id as u32 * 10,
+                    line_end: id as u32 * 10 + 5,
+                    lang: None,
+                    status: Status::Confirmed,
+                    confidence: 1.0,
+                    tokens: 10,
+                    data: serde_json::Value::Null,
+                },
+                score,
+                reason: "test".into(),
+            });
+        };
+        for i in 0..flood {
+            make(i as i64 + 1, flood_file, 1.0 - i as f32 * 0.001);
+        }
+        for i in 0..others {
+            make(1_000 + i as i64, &format!("src/other_{i}.rs"), 0.5);
+        }
+        out
+    }
+
+    #[test]
+    fn no_single_file_can_claim_every_symbol_slot() {
+        // Relevance spreads along edges, so every member of a loosely-matched file
+        // arrives holding a plausible score. Measured on Medusa before this cap, one
+        // HTTP router held 8 of 20 slots for a task about discounts.
+        let scored = crowded("src/router.rs", 12, 8);
+        let chosen = select(&scored, 4_000);
+        let mut per_file: HashMap<&str, usize> = HashMap::new();
+        for item in &chosen {
+            if let Some(path) = &item.node.path {
+                *per_file.entry(path.as_str()).or_insert(0) += 1;
+            }
+        }
+        assert_eq!(
+            per_file.get("src/router.rs").copied().unwrap_or(0),
+            MAX_SYMBOLS_PER_FILE,
+            "the flooding file should be held to the cap"
+        );
+        assert!(
+            per_file.len() > 1,
+            "capping the flood must leave room for other files, saw {per_file:?}"
+        );
+    }
+
+    #[test]
+    fn the_reading_plan_visits_distinct_files_before_revisiting_one() {
+        // A plan whose six entries all name one file points at one place and calls
+        // itself a reading list. Every ranked file earns a span before any earns a
+        // second, so the plan is a plan.
+        let scored = crowded("src/router.rs", 12, 8);
+        let chosen = select(&scored, 4_000);
+        let plan = reading_plan(&chosen, MAX_NEXT_READS, 40_000, 0.0);
+        assert_eq!(plan.len(), MAX_NEXT_READS, "the plan should be full");
+        let distinct: BTreeSet<&str> = plan.iter().map(|r| r.path.as_str()).collect();
+        assert_eq!(
+            distinct.len(),
+            plan.len(),
+            "plan named {} files across {} entries: {:?}",
+            distinct.len(),
+            plan.len(),
+            plan.iter().map(|r| &r.path).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn an_implementation_outranks_the_test_that_exercises_it() {
+        // A test names the task's vocabulary as densely as the code it exercises, so
+        // it arrives scoring at least as well, and a reader cannot edit it to change
+        // the behaviour. It should still be reachable — hence a penalty, not an
+        // exclusion: at the default weight the test keeps half its score, not none.
+        let symbol = |path: &str| crate::model::Node {
+            id: 1,
+            uid: path.into(),
+            kind: NodeKind::Symbol,
+            name: "requires_approval".into(),
+            path: Some(path.into()),
+            line_start: 1,
+            line_end: 2,
+            lang: None,
+            status: Status::Confirmed,
+            confidence: 1.0,
+            tokens: 10,
+            data: serde_json::Value::Null,
+        };
+        let penalty = RankWeights::default().test_path_penalty;
+        let source = test_path_factor(&symbol("app/order.py"), penalty);
+        let test = test_path_factor(&symbol("app/test_rules.py"), penalty);
+        assert!(
+            test < source,
+            "a test scoring equally with its implementation must lose to it: {test} vs {source}"
+        );
+        assert!(test > 0.0, "a penalty must not become an exclusion");
+    }
+
+    #[test]
+    fn test_detection_matches_path_segments_not_substrings() {
+        // `contest` and `latest` contain "test"; neither is one.
+        for path in [
+            "app/tests/test_order.py",
+            "src/order.test.ts",
+            "pkg/order_test.go",
+            "integration-tests/__fixtures__/promotion/index.ts",
+            "spec/models/order_spec.rb",
+            "src/__mocks__/stripe.ts",
+        ] {
+            assert!(is_test_path(path), "{path} should read as test material");
+        }
+        for path in [
+            "app/contest/entry.py",
+            "src/latest/version.ts",
+            "src/protest/handler.go",
+            "app/order.py",
+        ] {
+            assert!(!is_test_path(path), "{path} is not test material");
+        }
     }
 }
