@@ -20,6 +20,8 @@ use serde::Serialize;
 use reify::context::Context;
 use reify::discover::Discovery;
 use reify::doctor::{self, Diagnosis, Verdict};
+
+use crate::install::{Kind as InstallKind, Plan, State as InstallState, Step as InstallStep};
 use reify::index::IndexReport;
 use reify::llm;
 use reify::model::{Node, Status};
@@ -758,6 +760,92 @@ pub fn preflight(answer: &Preflight, json: bool) -> Result<()> {
     println!("  RISK: {risk} — {}", answer.reason);
     println!("  next: {}", answer.suggested_command);
     Ok(())
+}
+
+/// `reify install`: what was found, and what will be done about it.
+///
+/// Shows the plan and stops unless `--yes`, matching `uninstall`, `uninit` and
+/// `upgrade`. A command that changes a repository's agent configuration without showing
+/// its work first is one people learn not to run.
+pub fn install(plan: &Plan, yes: bool, json: bool) -> Result<()> {
+    if json {
+        return emit_json(plan);
+    }
+    println!("INSTALL  {}", plan.root);
+
+    if plan.steps.is_empty() {
+        // Guessing which agent is present from a directory name that might mean
+        // anything is worse than handing over the block and letting a human place it.
+        println!("\nFound no agent I recognise here.");
+        println!("Nothing was written. Add this to whatever instruction file your tool reads:\n");
+        for line in plan.instruction_block.iter().flat_map(|b| b.lines()) {
+            println!("    {line}");
+        }
+        return Ok(());
+    }
+
+    println!();
+    for step in &plan.steps {
+        println!("  {}", step.agents.join(", "));
+        // Detection has to be checkable, so what the claim rests on is printed with it.
+        println!("    detected because {}", step.evidence.join(", "));
+        println!("    {}", install_action(step, plan.applied));
+    }
+
+    if !plan.detected_elsewhere.is_empty() {
+        println!("\n  Installed on this machine but not configured in this repository,");
+        println!("  so nothing was planned for them:");
+        for agent in &plan.detected_elsewhere {
+            println!("    {agent}");
+        }
+    }
+
+    if plan.mcp {
+        println!(
+            "\n  {}",
+            wrap(
+                "You asked for MCP. Its tool schemas are re-sent on every turn of every \
+                 session, where the shell-command block costs nothing until it is \
+                 called — see docs/integration/claude-code.md. Drop --mcp for the \
+                 cheaper integration.",
+                WIDTH,
+                "  ",
+                2,
+            )
+        );
+    }
+
+    if !plan.has_work() && !plan.applied {
+        println!("\nNothing to do; everything above is already wired.");
+        return Ok(());
+    }
+    if !yes {
+        println!("\nNothing was written. Re-run with --yes to apply.");
+        return Ok(());
+    }
+    println!("\nDone. `reify uninit` removes everything written here.");
+    Ok(())
+}
+
+/// What one step will do, has done, or is not doing — as one readable phrase.
+fn install_action(step: &InstallStep, applied: bool) -> String {
+    if step.state == InstallState::Skipped {
+        return match &step.problem {
+            Some(problem) => format!("skipping {}: {problem}", step.path),
+            None => format!("skipping {}", step.path),
+        };
+    }
+    let what = match step.kind {
+        InstallKind::Mcp => format!("the MCP server entry in {}", step.path),
+        InstallKind::RuleFile => format!("the rule file {}", step.path),
+        InstallKind::Instructions => format!("the instruction block in {}", step.path),
+    };
+    match (step.state, applied) {
+        (InstallState::Planned, _) => format!("will write {what}"),
+        (InstallState::AlreadyPresent, true) => format!("wrote {what}"),
+        (InstallState::AlreadyPresent, false) => format!("already has {what}"),
+        (InstallState::Skipped, _) => unreachable!("handled above"),
+    }
 }
 
 /// `reify doctor`: should this repository use Reify at all?

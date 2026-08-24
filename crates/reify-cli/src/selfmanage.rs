@@ -225,25 +225,58 @@ pub fn uninstall(yes: bool) -> Result<()> {
     Ok(())
 }
 
-/// `reify uninit [--yes]`: remove this repository's store and instruction block.
+/// `reify uninit [--yes]`: remove this repository's store and everything
+/// `reify install` wrote.
+///
+/// The removal targets are derived from the same table `install` plans from, so an agent
+/// cannot be added to one without appearing in the other — otherwise `install` quietly
+/// leaves orphans that only turn up when somebody wonders why their agent still mentions
+/// a tool they removed.
 pub fn uninit(root: &Path, yes: bool) -> Result<()> {
     let store = root.join(reify::index::REIFY_DIR);
     let mut planned: Vec<String> = Vec::new();
-    if store.is_dir() {
-        planned.push(format!("remove {}", store.display()));
-    }
-    let mut instruction_files: Vec<PathBuf> = Vec::new();
-    for name in ["AGENTS.md", "CLAUDE.md"] {
-        let path = root.join(name);
-        if let Ok(text) = std::fs::read_to_string(&path) {
-            if text.contains(crate::AGENT_INSTRUCTIONS) {
-                planned.push(format!("strip the Reify instruction block from {name}"));
-                instruction_files.push(path);
+    let mut edits: Vec<Removal> = Vec::new();
+
+    for (rel, kind) in crate::install::removable_targets() {
+        let path = root.join(&rel);
+        let Ok(text) = std::fs::read_to_string(&path) else {
+            continue;
+        };
+        match kind {
+            crate::install::Kind::Mcp => match crate::install::without_mcp_entry(&text) {
+                Ok(Some(stripped)) => {
+                    planned.push(format!("remove the reify server entry from {rel}"));
+                    edits.push(Removal::Rewrite(path, stripped));
+                }
+                Ok(None) => {}
+                // An unparsable config is left exactly as it is, on the way out as much
+                // as on the way in.
+                Err(e) => planned.push(format!("leave {rel} alone ({e})")),
+            },
+            _ if !text.contains(crate::AGENT_INSTRUCTIONS.trim()) => {}
+            crate::install::Kind::RuleFile => {
+                planned.push(format!("remove {rel}"));
+                edits.push(Removal::Delete(path));
+            }
+            crate::install::Kind::Instructions => {
+                let stripped = strip_block(&text);
+                if stripped.trim().is_empty() {
+                    // Nothing but our own block was ever in it.
+                    planned.push(format!("remove {rel}"));
+                    edits.push(Removal::Delete(path));
+                } else {
+                    planned.push(format!("strip the Reify instruction block from {rel}"));
+                    edits.push(Removal::Rewrite(path, stripped));
+                }
             }
         }
     }
+
+    if store.is_dir() {
+        planned.push(format!("remove {}", store.display()));
+    }
     if planned.is_empty() {
-        println!("nothing to remove: no `.reify/` store or instruction block here");
+        println!("nothing to remove: no `.reify/` store or Reify integration here");
         return Ok(());
     }
     for step in &planned {
@@ -254,16 +287,42 @@ pub fn uninit(root: &Path, yes: bool) -> Result<()> {
         println!("Nothing was removed. Re-run with --yes to apply.");
         return Ok(());
     }
-    for path in instruction_files {
-        let text = std::fs::read_to_string(&path)?;
-        std::fs::write(&path, text.replace(crate::AGENT_INSTRUCTIONS, ""))
-            .with_context(|| format!("rewriting {}", path.display()))?;
+    for edit in edits {
+        match edit {
+            Removal::Rewrite(path, text) => std::fs::write(&path, text)
+                .with_context(|| format!("rewriting {}", path.display()))?,
+            Removal::Delete(path) => std::fs::remove_file(&path)
+                .with_context(|| format!("removing {}", path.display()))?,
+        }
     }
     if store.is_dir() {
         std::fs::remove_dir_all(&store).with_context(|| format!("removing {}", store.display()))?;
     }
     println!("done");
     Ok(())
+}
+
+enum Removal {
+    Rewrite(PathBuf, String),
+    Delete(PathBuf),
+}
+
+/// Take our block out of a file somebody else also writes to.
+///
+/// The full constant is tried first, and it carries the newline that `install` and
+/// `init` push in front of it — so removing it restores the file byte for byte rather
+/// than leaving the blank lines the block was separated by. The trimmed form is the
+/// fallback, for a file where somebody pasted the block by hand.
+fn strip_block(text: &str) -> String {
+    for block in [crate::AGENT_INSTRUCTIONS, crate::AGENT_INSTRUCTIONS.trim()] {
+        if let Some(at) = text.find(block) {
+            let mut out = String::with_capacity(text.len());
+            out.push_str(&text[..at]);
+            out.push_str(&text[at + block.len()..]);
+            return out;
+        }
+    }
+    text.to_string()
 }
 
 #[cfg(test)]

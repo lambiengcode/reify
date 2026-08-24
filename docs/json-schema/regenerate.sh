@@ -11,4 +11,6 @@ reify -C "$REPO" --json impact "requires_approval"               > /tmp/reify-im
 reify -C "$REPO" --json preflight "app/order.py"                 > /tmp/reify-pre.json
 # doctor needs no index; point it at a repository with real history instead.
 reify -C "$REPO" --json doctor                                   > /tmp/reify-doctor.json
+# install without --yes writes nothing, so this is safe to run anywhere.
+reify -C "$REPO" --json install                                  > /tmp/reify-install.json
 echo "Now run the shape extractor in docs/json-schema/ to rebuild README.md"

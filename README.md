@@ -394,8 +394,8 @@ release — through `curl` and `tar` as visible subprocesses, never an embedded 
 client, with the checksum verified before anything is installed; `--check` only asks,
 and `REIFY_OFFLINE=1` refuses the command outright. `reify uninstall --yes` removes the
 binary and nothing else; `reify uninit --yes` removes one repository's `.reify/` store
-and the instruction block `init` wrote. Both show their plan first when run without
-`--yes`.
+and every agent integration `init` or `install` wrote. Both show their plan first when
+run without `--yes`.
 
 <details>
 <summary><strong>Shell completions</strong></summary>
@@ -483,9 +483,10 @@ chmod +x .git/hooks/post-merge && cp .git/hooks/post-merge .git/hooks/post-check
 | `reify report` | System scorecard |
 | `reify status` | Freshness, coverage, and what was skipped |
 | `reify doctor` | Should this repository use Reify at all? Runs before there is an index, and will say no |
+| `reify install [--yes]` | Detect the agents configured here and wire each one. Shows its plan first; `--mcp` opts into MCP instead |
 | `reify llm status \| preview` | Is a model configured, and exactly what would be sent |
 | `reify upgrade [--check]` | Replace this binary with the latest release. The only networked command; refused under `REIFY_OFFLINE=1` |
-| `reify uninstall --yes` \| `uninit --yes` | Remove the binary \| one repository's store and instruction block |
+| `reify uninstall --yes` \| `uninit --yes` | Remove the binary \| one repository's store and everything `install` wrote |
 | `reify serve --mcp` | Model Context Protocol over stdio |
 | `reify completions <shell>` | Completion script |
 

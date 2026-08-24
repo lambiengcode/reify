@@ -244,3 +244,39 @@ git history cannot be read — absent rather than defaulted, so a consumer canno
   "elapsed_ms": "integer"
 }
 ```
+
+## `reify install --json`
+
+The plan, whether or not it was applied. `applied` is false unless `--yes` was passed.
+`kind` is one of `instructions`, `rule_file`, `mcp`; `state` is one of `planned`,
+`already_present`, `skipped`. `problem` is non-null only when `state` is `skipped`, and
+says why the file was left alone. `evidence` is what each detection rests on, so a
+consumer can check the claim rather than trust it. `instruction_block` is non-null only
+when no agent was recognised — it is the text to paste by hand.
+
+```json
+{
+  "schema": "string",
+  "root": "string",
+  "mcp": "boolean",
+  "applied": "boolean",
+  "steps": [
+    {
+      "path": "string",
+      "kind": "string",
+      "agents": [
+        "string"
+      ],
+      "evidence": [
+        "string"
+      ],
+      "state": "string",
+      "problem": "null"
+    }
+  ],
+  "instruction_block": "null",
+  "detected_elsewhere": [
+    "string"
+  ]
+}
+```
