@@ -9,4 +9,6 @@ reify -C "$REPO" --json context "approval for corporate orders" > /tmp/reify-ctx
 reify -C "$REPO" --json why "SalesOrder.requires_approval"       > /tmp/reify-why.json
 reify -C "$REPO" --json impact "requires_approval"               > /tmp/reify-impact.json
 reify -C "$REPO" --json preflight "app/order.py"                 > /tmp/reify-pre.json
+# doctor needs no index; point it at a repository with real history instead.
+reify -C "$REPO" --json doctor                                   > /tmp/reify-doctor.json
 echo "Now run the shape extractor in docs/json-schema/ to rebuild README.md"

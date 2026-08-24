@@ -20,6 +20,29 @@ liability, not marketing.
 | **Documented symbols** | Symbols with a docstring or leading comment, over all symbols. |
 | **Knowledge coverage** | Symbols reachable from at least one concept or document section, over all symbols. Measures how much of the code the knowledge layer can say anything about. |
 
+## `reify doctor`
+
+Every figure is measured over the working tree and the newest 1000 commits. No index is
+read, so these do not change once `reify index` has run.
+
+| Metric | Definition |
+|---|---|
+| **Indexable files** | Files `reify index` would parse. The same walk `reify init` reports, so the two agree by construction. |
+| **Lines** | Lines across those files, printed rounded to the nearest thousand. Includes blanks and comments — it is a size estimate, not a measure of code. |
+| **Commit focus** | Commits touching between 1 and 20 files, over all commits read. 20 is the threshold `gitlog::History::co_changes` already uses to discard a commit as too sweeping to learn from. |
+| **Subject→path locality** | Focused commits whose subject shares a stem-folded meaningful word with a path that commit changed, over all focused commits with a usable subject. Per commit, never pooled: the pooled version was measured on the same four repositories and inverts. |
+| **Usable subject** | A subject that is not a merge and carries at least two meaningful words. Excludes "Merge pull request #123 from…", "Bump version to 4.2.1" and "wip". |
+| **Documents only Reify can read** | Files classified `.docx`, `.doc`, `.odt`, `.rtf`, `.xlsx`, `.pptx` or `.pdf`. Counted across everything walked, indexable or not, because these are binary and discovery records them as skipped. |
+
+The **verdict** is not a metric and is deliberately not a score. It is a rule over the
+figures above, fitted to the four repositories in `benchmarks/REPORT*.md`, and the
+command says so in its own output. A 0-100 "suitability" number blended from four
+heuristics tuned on four repositories is exactly the false precision this page exists to
+forbid.
+
+Thresholds and their evidence are in the module documentation of
+`crates/reify/src/doctor.rs`, next to the code that applies them.
+
 ## Benchmark
 
 | Metric | Definition |

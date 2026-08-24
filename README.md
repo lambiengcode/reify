@@ -482,6 +482,7 @@ chmod +x .git/hooks/post-merge && cp .git/hooks/post-merge .git/hooks/post-check
 | `reify preflight <file>` | A risk header for an editor hook |
 | `reify report` | System scorecard |
 | `reify status` | Freshness, coverage, and what was skipped |
+| `reify doctor` | Should this repository use Reify at all? Runs before there is an index, and will say no |
 | `reify llm status \| preview` | Is a model configured, and exactly what would be sent |
 | `reify upgrade [--check]` | Replace this binary with the latest release. The only networked command; refused under `REIFY_OFFLINE=1` |
 | `reify uninstall --yes` \| `uninit --yes` | Remove the binary \| one repository's store and instruction block |
@@ -645,7 +646,8 @@ which is why every answer comes with a line number instead of a similarity score
 
 **My repo is 3,000 lines. Should I use it?**
 No. Use ripgrep. Under roughly 20k LOC Reify buys you nothing a grep and a scroll wheel
-don't.
+don't. `reify doctor` applies that floor and three other signals to your repository, before
+you index it.
 
 **Does it send my proprietary code anywhere?**
 It cannot. There is no HTTP client in the binary, and a test fails the build if one

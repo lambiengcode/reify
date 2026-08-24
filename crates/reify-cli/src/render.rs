@@ -19,6 +19,7 @@ use serde::Serialize;
 
 use reify::context::Context;
 use reify::discover::Discovery;
+use reify::doctor::{self, Diagnosis, Verdict};
 use reify::index::IndexReport;
 use reify::llm;
 use reify::model::{Node, Status};
@@ -757,6 +758,208 @@ pub fn preflight(answer: &Preflight, json: bool) -> Result<()> {
     println!("  RISK: {risk} — {}", answer.reason);
     println!("  next: {}", answer.suggested_command);
     Ok(())
+}
+
+/// `reify doctor`: should this repository use Reify at all?
+///
+/// Named signals with measured values and a plain-language verdict. Deliberately not a
+/// score: `docs/metrics.md` forbids printing a number that cannot be defined, and a
+/// weighted blend of four heuristics tuned on four repositories is exactly that.
+pub fn doctor(answer: &Diagnosis, json: bool) -> Result<()> {
+    if json {
+        return emit_json(answer);
+    }
+    println!("DOCTOR  {}", answer.root);
+    println!();
+
+    let floor = doctor::floor_text();
+    signal(
+        "scale",
+        &doctor::scale_text(&answer.scale),
+        if answer.verdict == Verdict::TooSmall {
+            format!("below the {floor} floor")
+        } else {
+            format!("above the {floor} floor")
+        },
+    );
+
+    // Below the floor the other signals were never computed, and saying why is more
+    // useful than printing three lines of zeroes.
+    if answer.verdict == Verdict::TooSmall {
+        verdict_line(answer);
+        return Ok(());
+    }
+
+    match &answer.vocabulary {
+        Some(v) => signal(
+            "vocabulary",
+            &format!(
+                "{} of focused commits name a file they changed",
+                doctor::percent(v.locality)
+            ),
+            format!("{} of {} commits", v.commits_local, v.commits_considered),
+        ),
+        None => signal(
+            "vocabulary",
+            "not measurable without git history",
+            String::new(),
+        ),
+    }
+    match &answer.history {
+        Some(h) => {
+            signal(
+                "history",
+                &format!(
+                    "{} commits, {} focused enough to attribute",
+                    h.commits_read,
+                    doctor::percent(h.focus)
+                ),
+                format!("median commit changes {} file(s)", h.median_files_changed),
+            );
+            // Said only when it is not the case. On all five repositories this was
+            // calibrated against it sat at 100%, so printing it always would be noise.
+            if h.usable_share < 0.9 {
+                signal(
+                    "",
+                    &format!(
+                        "only {} carry a subject worth reading",
+                        doctor::percent(h.usable_share)
+                    ),
+                    String::new(),
+                );
+            }
+        }
+        None => signal("history", "could not be read", String::new()),
+    }
+    signal(
+        "documents",
+        &format!(
+            "{} document(s) only Reify can read",
+            answer.documents.unreadable_by_grep
+        ),
+        answer.documents.examples.join(", "),
+    );
+
+    verdict_line(answer);
+    Ok(())
+}
+
+/// One measured signal: name, value, and the note that puts it in context.
+fn signal(name: &str, value: &str, note: String) {
+    let name = if colours_wanted() {
+        format!("{:<12}", name.bold())
+    } else {
+        format!("{name:<12}")
+    };
+    if note.is_empty() {
+        println!("  {name}{value}");
+    } else if colours_wanted() {
+        println!("  {name}{value:<48}{}", note.dimmed());
+    } else {
+        println!("  {name}{value:<48}{note}");
+    }
+}
+
+fn verdict_line(answer: &Diagnosis) {
+    let text = answer.verdict.as_str();
+    let painted = if colours_wanted() {
+        match answer.verdict {
+            Verdict::LikelyWorthIt => text.green().bold().to_string(),
+            Verdict::TooSmall | Verdict::UnlikelyToHelp => text.red().bold().to_string(),
+            Verdict::Marginal => text.yellow().bold().to_string(),
+        }
+    } else {
+        text.to_string()
+    };
+    // The verdict word is part of the first wrapped line, so the wrap has to know how
+    // wide it is — measured on the unpainted text, since colour codes take no columns.
+    let lead = format!("  {text} — ");
+    println!(
+        "\n  {painted} — {}",
+        wrap(&answer.reason, WIDTH, "  ", lead.chars().count())
+    );
+
+    if !answer.what_would_change_it.is_empty() {
+        println!("\n  What would change this:");
+        for item in &answer.what_would_change_it {
+            println!("    - {}", wrap(item, WIDTH, "      ", 6));
+        }
+    }
+    if let Some(c) = doctor::comparable(answer.verdict) {
+        // Named by role rather than by favourability: for a yes the useful comparison
+        // is the repository where Reify did worst, and for a no it is the one where it
+        // did best. Calling both "least favourable" would be wrong half the time.
+        let role = match answer.verdict {
+            Verdict::UnlikelyToHelp => "did best",
+            _ => "did worst",
+        };
+        println!(
+            "\n  {}",
+            wrap(
+                &format!(
+                    "For comparison, the measured repository where Reify {role}: {}, \
+                     where {}. See {}.",
+                    c.name, c.outcome, c.report
+                ),
+                WIDTH,
+                "  ",
+                2,
+            )
+        );
+    }
+    // The verdict is a heuristic over four repositories, and a reader could otherwise
+    // mistake it for a measurement of theirs. The cost is stated for the same reason
+    // the answer is: so nobody has to guess what running it will take.
+    println!(
+        "\n  {}",
+        wrap(
+            &format!(
+                "This is a heuristic fitted to four measured repositories, not a \
+                 measurement of this one — `reify-bench` measures this one. Read the \
+                 working tree and {} in {:.1}s; no index needed, and none was used.",
+                if answer.git_repository {
+                    "the newest 1000 commits"
+                } else {
+                    "no history"
+                },
+                answer.elapsed_ms as f64 / 1000.0,
+            ),
+            WIDTH,
+            "  ",
+            2,
+        )
+    );
+}
+
+/// Terminal width the doctor output is wrapped to.
+///
+/// Fixed rather than read from the terminal: the verdict is the one paragraph that must
+/// be readable, and it must read the same in a pipe, a CI log and a screenshot.
+const WIDTH: usize = 78;
+
+/// Wrap `text` to `width`, indenting continuation lines by `indent`.
+///
+/// `first_column` is how far into the line the caller has already printed, so a verdict
+/// word or a bullet marker is counted against the first line's budget rather than
+/// pushing it past the right edge.
+fn wrap(text: &str, width: usize, indent: &str, first_column: usize) -> String {
+    let mut out = String::new();
+    let mut column = first_column;
+    let mut fresh = true;
+    for word in text.split_whitespace() {
+        if !fresh && column + 1 + word.chars().count() > width {
+            out.push('\n');
+            out.push_str(indent);
+            column = indent.chars().count();
+        } else if !fresh {
+            out.push(' ');
+            column += 1;
+        }
+        out.push_str(word);
+        column += word.chars().count();
+        fresh = false;
+    }
+    out
 }
 
 pub fn concepts(overview: &ConceptOverview, json: bool) -> Result<()> {

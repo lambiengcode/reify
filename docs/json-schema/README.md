@@ -197,3 +197,50 @@ version.
   "suggested_command": "string"
 }
 ```
+
+## `reify doctor --json`
+
+Answers before there is an index, so it reads the working tree and `git log` rather than
+the store. `verdict` is one of `too_small`, `likely_worth_it`, `marginal`,
+`unlikely_to_help`. `vocabulary` and `history` are `null` below the line floor and when
+git history cannot be read — absent rather than defaulted, so a consumer cannot mistake
+"not measured" for "measured zero". Metric definitions: [`../metrics.md`](../metrics.md).
+
+```json
+{
+  "schema": "string",
+  "root": "string",
+  "scale": {
+    "indexable_files": "integer",
+    "code_files": "integer",
+    "lines": "integer"
+  },
+  "git_repository": "boolean",
+  "vocabulary": {
+    "commits_considered": "integer",
+    "commits_local": "integer",
+    "locality": "number"
+  },
+  "history": {
+    "commits_read": "integer",
+    "truncated": "boolean",
+    "usable_subjects": "integer",
+    "usable_share": "number",
+    "focused_commits": "integer",
+    "focus": "number",
+    "median_files_changed": "integer"
+  },
+  "documents": {
+    "unreadable_by_grep": "integer",
+    "examples": [
+      "string"
+    ]
+  },
+  "verdict": "string",
+  "reason": "string",
+  "what_would_change_it": [
+    "string"
+  ],
+  "elapsed_ms": "integer"
+}
+```

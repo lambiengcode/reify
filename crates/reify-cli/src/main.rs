@@ -141,6 +141,12 @@ enum Command {
         path: String,
     },
 
+    /// Should this repository use Reify at all? Answers before you index.
+    ///
+    /// Runs against the working tree and `git log`, never the store, so it works
+    /// before `reify init`. Willing to say no.
+    Doctor,
+
     /// Model-assistance status and prompt inspection.
     Llm {
         #[command(subcommand)]
@@ -308,6 +314,7 @@ fn run() -> Result<()> {
             let store = open_existing(&root)?;
             render::preflight(&query::preflight(&store, path)?, cli.json)
         }
+        Command::Doctor => render::doctor(&reify::doctor::diagnose(&root)?, cli.json),
         Command::Llm { action } => match action {
             LlmAction::Status => render::llm_status(&root, cli.json),
             LlmAction::Preview { task, budget } => {
@@ -550,6 +557,7 @@ mod tests {
             vec!["reify", "--json", "preflight", "a.py"],
             vec!["reify", "--json", "llm", "status"],
             vec!["reify", "--json", "init"],
+            vec!["reify", "--json", "doctor"],
         ] {
             let cli = Cli::try_parse_from(&args).expect("should parse");
             assert!(cli.json, "{args:?}");
