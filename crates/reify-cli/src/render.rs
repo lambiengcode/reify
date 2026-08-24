@@ -4,9 +4,14 @@
 //! terminals, no colour when the output is redirected. Agent output is JSON against a
 //! versioned schema.
 //!
-//! One rule governs both: an epistemic status is always shown next to a claim. A
+//! One rule governs both: a claim is never rendered without its epistemic status. A
 //! renderer that prints an `INFERRED` rule as bare prose is a bug, and there is a test
 //! that says so.
+//!
+//! In the human output that status may be stated once for a whole section when every
+//! row shares it, rather than repeated down the page. The property being protected is
+//! that a reader can always tell a parsed fact from a guess — not that the badge is
+//! printed a fixed number of times. Machine output always carries it per item.
 
 use anyhow::Result;
 use owo_colors::OwoColorize;
@@ -63,6 +68,34 @@ fn heading(text: &str) {
         println!("\n{}", text.bold());
     } else {
         println!("\n{text}");
+    }
+}
+
+/// The one status a whole section shares, if it shares one.
+///
+/// A badge repeated identically down twenty lines carries no information, and an
+/// invariant `[confirmed]` invites exactly the wrong reading: it attests that the
+/// symbol was *parsed from source*, never that it is the right place to change.
+/// Symbols are `CONFIRMED` by construction, so the code section is nearly always
+/// uniform — said once on the heading it is a fact, repeated per line it is noise.
+/// The machine-readable output is untouched; every item still carries its status.
+fn shared_status<T>(items: &[T], status: impl Fn(&T) -> Status) -> Option<Status> {
+    let first = status(items.first()?);
+    items.iter().all(|i| status(i) == first).then_some(first)
+}
+
+/// A heading that names the status its whole section shares.
+fn heading_for(text: &str, shared: Option<Status>) {
+    match shared {
+        Some(status) => {
+            let note = format!("all {}", tag(status));
+            if colours_wanted() {
+                println!("\n{}  {}", text.bold(), note.dimmed());
+            } else {
+                println!("\n{text}  {note}");
+            }
+        }
+        None => heading(text),
     }
 }
 
@@ -237,6 +270,17 @@ pub fn index_report(report: &IndexReport, json: bool) -> Result<()> {
     if report.history_truncated {
         println!("  history walk hit its commit limit; older commits were not read");
     }
+    if let Some(reason) = &report.history_unavailable {
+        // Said plainly, with the cause: everything else indexed, and the user can
+        // decide whether the missing evidence is worth completing the clone for.
+        println!("  history could not be read, so `why` and blast radius lose their");
+        println!("  commit evidence. Everything else indexed normally.");
+        println!("    {}", reason.lines().next().unwrap_or(reason));
+        if reason.contains("lazy fetching disabled") || reason.contains("promisor") {
+            println!("    This is a partial clone missing objects it needs. Complete it with:");
+            println!("      git fetch --refetch origin");
+        }
+    }
     if !report.parse_errors.is_empty() {
         println!(
             "  {} file(s) could not be parsed:",
@@ -320,7 +364,8 @@ pub fn context(compiled: &Context, json: bool) -> Result<()> {
         }
     }
     if !compiled.concepts.is_empty() {
-        heading("Concepts");
+        let shared = shared_status(&compiled.concepts, |c| c.status);
+        heading_for("Concepts", shared);
         for concept in &compiled.concepts {
             let labels = concept
                 .labels
@@ -332,7 +377,10 @@ pub fn context(compiled: &Context, json: bool) -> Result<()> {
                         .join(" · ")
                 })
                 .unwrap_or_default();
-            println!("  {} {}", tag(concept.status), concept.id);
+            match shared {
+                Some(_) => println!("  {}", concept.id),
+                None => println!("  {} {}", tag(concept.status), concept.id),
+            }
             if !labels.is_empty() {
                 println!("      {labels}");
             }
@@ -353,28 +401,36 @@ pub fn context(compiled: &Context, json: bool) -> Result<()> {
         }
     }
     if !compiled.code.is_empty() {
-        heading("Code");
+        let shared = shared_status(&compiled.code, |i| i.status);
+        heading_for("Code", shared);
         for item in &compiled.code {
-            println!(
-                "  {} {}:{}  {}",
-                tag(item.status),
-                item.path,
-                item.lines,
-                item.symbol
-            );
+            match shared {
+                Some(_) => println!("  {}:{}  {}", item.path, item.lines, item.symbol),
+                None => println!(
+                    "  {} {}:{}  {}",
+                    tag(item.status),
+                    item.path,
+                    item.lines,
+                    item.symbol
+                ),
+            }
             println!("      {}", item.why);
         }
     }
     if !compiled.documents.is_empty() {
-        heading("Documents");
+        let shared = shared_status(&compiled.documents, |d| d.status);
+        heading_for("Documents", shared);
         for doc in &compiled.documents {
             let lang = doc.lang.as_deref().unwrap_or("?");
-            println!(
-                "  {} {} [{lang}]  {}",
-                tag(doc.status),
-                doc.location,
-                doc.document
-            );
+            match shared {
+                Some(_) => println!("  {} [{lang}]  {}", doc.location, doc.document),
+                None => println!(
+                    "  {} {} [{lang}]  {}",
+                    tag(doc.status),
+                    doc.location,
+                    doc.document
+                ),
+            }
             println!("      {}", doc.excerpt);
         }
     }
@@ -856,6 +912,27 @@ mod tests {
             assert!(rendered.ends_with(']'), "{status:?} -> {rendered}");
             assert!(rendered.len() > 2);
         }
+    }
+
+    #[test]
+    fn a_sections_status_is_hoisted_only_when_every_row_shares_it() {
+        // Hoisting a status that is not actually shared would attest to a footing the
+        // rows do not have, which is the one thing this renderer may never do.
+        assert_eq!(
+            shared_status(&[Status::Confirmed, Status::Confirmed], |s| *s),
+            Some(Status::Confirmed),
+            "a uniform section states its status once"
+        );
+        assert_eq!(
+            shared_status(&[Status::Confirmed, Status::Inferred], |s| *s),
+            None,
+            "a mixed section must keep its per-row badges"
+        );
+        assert_eq!(
+            shared_status(&[] as &[Status], |s| *s),
+            None,
+            "an empty section has no status to hoist"
+        );
     }
 
     #[test]
