@@ -1,0 +1,2386 @@
+{
+  "repository": "/private/tmp/claude-501/-Users-lambiengcode--treehouse-reify-2e416f-2-reify/a9d50d0b-cce2-4027-a129-e64262e800a7/scratchpad/django",
+  "head": "0b40210e4808937a7c0922e8b7502bff4752faa3",
+  "generated_from_commits": 400,
+  "rejected": [
+    [
+      "cef2346abf8d6e9e61a5a3599fbcf72163e6a6e5",
+      "no file changed by exactly one hunk"
+    ],
+    [
+      "f1949c1f9758947ade984c895ff16bef46f56520",
+      "no file changed by exactly one hunk"
+    ],
+    [
+      "60121939f6b225c7a719dd561e372e1d8e5e2c4a",
+      "no file changed by exactly one hunk"
+    ]
+  ],
+  "tasks": [
+    {
+      "id": "v-d992705f",
+      "commit": "d992705f9eb56199dc474b77af16474e5ce3d2ab",
+      "parent": "504d1f12cd5879177295fecd2ba4da1001a0930f",
+      "date": "2026-08-08",
+      "prompt": "Fixed #37259 -- Restored support for old-signature Model.from_db overrides.",
+      "complete": {
+        "files": [
+          {
+            "path": "django/db/models/query.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 6,
+                "old_len": 7,
+                "changed_lines": [
+                  9
+                ]
+              },
+              {
+                "old_start": 52,
+                "old_len": 6,
+                "changed_lines": [
+                  55
+                ]
+              },
+              {
+                "old_start": 63,
+                "old_len": 6,
+                "changed_lines": [
+                  66
+                ]
+              },
+              {
+                "old_start": 123,
+                "old_len": 6,
+                "changed_lines": [
+                  126
+                ]
+              },
+              {
+                "old_start": 142,
+                "old_len": 11,
+                "changed_lines": [
+                  145,
+                  149
+                ]
+              },
+              {
+                "old_start": 213,
+                "old_len": 13,
+                "changed_lines": [
+                  216,
+                  220,
+                  221,
+                  222
+                ]
+              },
+              {
+                "old_start": 3044,
+                "old_len": 6,
+                "changed_lines": [
+                  3047
+                ]
+              },
+              {
+                "old_start": 3063,
+                "old_len": 11,
+                "changed_lines": [
+                  3066,
+                  3070
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/basic/models.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 61,
+                "old_len": 3,
+                "changed_lines": [
+                  64
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/basic/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 24,
+                "old_len": 6,
+                "changed_lines": [
+                  27
+                ]
+              },
+              {
+                "old_start": 31,
+                "old_len": 6,
+                "changed_lines": [
+                  34
+                ]
+              },
+              {
+                "old_start": 1120,
+                "old_len": 3,
+                "changed_lines": [
+                  1123
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "django/db/models/query.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 6,
+                "old_len": 7,
+                "changed_lines": [
+                  9
+                ]
+              },
+              {
+                "old_start": 52,
+                "old_len": 6,
+                "changed_lines": [
+                  55
+                ]
+              },
+              {
+                "old_start": 63,
+                "old_len": 6,
+                "changed_lines": [
+                  66
+                ]
+              },
+              {
+                "old_start": 123,
+                "old_len": 6,
+                "changed_lines": [
+                  126
+                ]
+              },
+              {
+                "old_start": 142,
+                "old_len": 11,
+                "changed_lines": [
+                  145,
+                  149
+                ]
+              },
+              {
+                "old_start": 213,
+                "old_len": 13,
+                "changed_lines": [
+                  216,
+                  220,
+                  221,
+                  222
+                ]
+              },
+              {
+                "old_start": 3044,
+                "old_len": 6,
+                "changed_lines": [
+                  3047
+                ]
+              },
+              {
+                "old_start": 3063,
+                "old_len": 11,
+                "changed_lines": [
+                  3066,
+                  3070
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/basic/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 24,
+                "old_len": 6,
+                "changed_lines": [
+                  27
+                ]
+              },
+              {
+                "old_start": 31,
+                "old_len": 6,
+                "changed_lines": [
+                  34
+                ]
+              },
+              {
+                "old_start": 1120,
+                "old_len": 3,
+                "changed_lines": [
+                  1123
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "tests/basic/models.py",
+      "omission_line": 64
+    },
+    {
+      "id": "v-be6cf832",
+      "commit": "be6cf832293779d8aeaeddca8c47a37ba1530898",
+      "parent": "c72f5fb4793f2cac66d76e3cbd590499ad85b89e",
+      "date": "2026-08-13",
+      "prompt": "Fixed #37274 -- Allowed transforms in order_by after alias.",
+      "complete": {
+        "files": [
+          {
+            "path": "django/db/models/sql/compiler.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1052,
+                "old_len": 6,
+                "changed_lines": [
+                  1055
+                ]
+              }
+            ]
+          },
+          {
+            "path": "django/db/models/sql/query.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1800,
+                "old_len": 8,
+                "changed_lines": [
+                  1803,
+                  1804
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/annotations/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1481,
+                "old_len": 6,
+                "changed_lines": [
+                  1484
+                ]
+              },
+              {
+                "old_start": 1536,
+                "old_len": 9,
+                "changed_lines": [
+                  1539,
+                  1541
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "django/db/models/sql/compiler.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1052,
+                "old_len": 6,
+                "changed_lines": [
+                  1055
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/annotations/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1481,
+                "old_len": 6,
+                "changed_lines": [
+                  1484
+                ]
+              },
+              {
+                "old_start": 1536,
+                "old_len": 9,
+                "changed_lines": [
+                  1539,
+                  1541
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "django/db/models/sql/query.py",
+      "omission_line": 1803
+    },
+    {
+      "id": "v-c72f5fb4",
+      "commit": "c72f5fb4793f2cac66d76e3cbd590499ad85b89e",
+      "parent": "f7610bda78afb13ee395dfee2445805d8c7ad0f6",
+      "date": "2026-08-14",
+      "prompt": "Fixed #37279 -- Rejected null characters in URLValidator.",
+      "complete": {
+        "files": [
+          {
+            "path": "django/core/validators.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 152,
+                "old_len": 7,
+                "changed_lines": [
+                  155
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/validators/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 265,
+                "old_len": 6,
+                "changed_lines": [
+                  268
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "django/core/validators.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 152,
+                "old_len": 7,
+                "changed_lines": [
+                  155
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "tests/validators/tests.py",
+      "omission_line": 268
+    },
+    {
+      "id": "v-1a001208",
+      "commit": "1a001208b0b9d79b15b27ca04d94f31f3d55d5ea",
+      "parent": "3436cf9bce84bb1f6877ad96819637366b27b719",
+      "date": "2026-08-14",
+      "prompt": "Fixed #37278 -- Made QuerySet.totally_ordered understand aliases to pure Col/ColPairs.",
+      "complete": {
+        "files": [
+          {
+            "path": "django/db/models/query.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 26,
+                "old_len": 7,
+                "changed_lines": [
+                  29
+                ]
+              },
+              {
+                "old_start": 2048,
+                "old_len": 7,
+                "changed_lines": [
+                  2051
+                ]
+              },
+              {
+                "old_start": 2058,
+                "old_len": 7,
+                "changed_lines": [
+                  2061
+                ]
+              },
+              {
+                "old_start": 2068,
+                "old_len": 18,
+                "changed_lines": [
+                  2071,
+                  2072,
+                  2073,
+                  2074,
+                  2075,
+                  2076,
+                  2077,
+                  2078,
+                  2079,
+                  2082
+                ]
+              },
+              {
+                "old_start": 2097,
+                "old_len": 7,
+                "changed_lines": [
+                  2100
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/composite_pk/test_order_by.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 70,
+                "old_len": 3,
+                "changed_lines": [
+                  73
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/ordering/models.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 85,
+                "old_len": 10,
+                "changed_lines": [
+                  88,
+                  92
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/ordering/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 726,
+                "old_len": 6,
+                "changed_lines": [
+                  729
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "django/db/models/query.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 26,
+                "old_len": 7,
+                "changed_lines": [
+                  29
+                ]
+              },
+              {
+                "old_start": 2048,
+                "old_len": 7,
+                "changed_lines": [
+                  2051
+                ]
+              },
+              {
+                "old_start": 2058,
+                "old_len": 7,
+                "changed_lines": [
+                  2061
+                ]
+              },
+              {
+                "old_start": 2068,
+                "old_len": 18,
+                "changed_lines": [
+                  2071,
+                  2072,
+                  2073,
+                  2074,
+                  2075,
+                  2076,
+                  2077,
+                  2078,
+                  2079,
+                  2082
+                ]
+              },
+              {
+                "old_start": 2097,
+                "old_len": 7,
+                "changed_lines": [
+                  2100
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/composite_pk/test_order_by.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 70,
+                "old_len": 3,
+                "changed_lines": [
+                  73
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/ordering/models.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 85,
+                "old_len": 10,
+                "changed_lines": [
+                  88,
+                  92
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "tests/ordering/tests.py",
+      "omission_line": 729
+    },
+    {
+      "id": "v-07d4f69c",
+      "commit": "07d4f69c94a0e32c583b3aee5daf48fd81b4cd69",
+      "parent": "4ee04972e7f9163dbdf5a7c36330e3379187e187",
+      "date": "2026-08-08",
+      "prompt": "Fixed #37260 -- Made alterations between Python on_delete options noops.",
+      "complete": {
+        "files": [
+          {
+            "path": "django/db/models/fields/related.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 601,
+                "old_len": 6,
+                "changed_lines": [
+                  604
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/migrations/test_operations.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 2573,
+                "old_len": 6,
+                "changed_lines": [
+                  2576
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/schema/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 635,
+                "old_len": 10,
+                "changed_lines": [
+                  638,
+                  642
+                ]
+              },
+              {
+                "old_start": 4926,
+                "old_len": 7,
+                "changed_lines": [
+                  4929
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "django/db/models/fields/related.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 601,
+                "old_len": 6,
+                "changed_lines": [
+                  604
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/schema/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 635,
+                "old_len": 10,
+                "changed_lines": [
+                  638,
+                  642
+                ]
+              },
+              {
+                "old_start": 4926,
+                "old_len": 7,
+                "changed_lines": [
+                  4929
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "tests/migrations/test_operations.py",
+      "omission_line": 2576
+    },
+    {
+      "id": "v-febefb17",
+      "commit": "febefb175e03352e5aeb2ed827024bacab96cf16",
+      "parent": "812c08bd4e9da7b74ab9ee0db83da58a6da48d19",
+      "date": "2026-08-14",
+      "prompt": "Fixed #37248 -- Skipped unique validation of a dynamic DatabaseDefault expression.",
+      "complete": {
+        "files": [
+          {
+            "path": "django/db/models/base.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1562,
+                "old_len": 9,
+                "changed_lines": [
+                  1565,
+                  1566,
+                  1567
+                ]
+              }
+            ]
+          },
+          {
+            "path": "django/db/models/constraints.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 5,
+                "old_len": 7,
+                "changed_lines": [
+                  8
+                ]
+              },
+              {
+                "old_start": 605,
+                "old_len": 6,
+                "changed_lines": [
+                  608
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/constraints/models.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1,
+                "old_len": 5,
+                "changed_lines": [
+                  2
+                ]
+              },
+              {
+                "old_start": 175,
+                "old_len": 3,
+                "changed_lines": [
+                  178
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/constraints/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 16,
+                "old_len": 6,
+                "changed_lines": [
+                  19
+                ]
+              },
+              {
+                "old_start": 1503,
+                "old_len": 3,
+                "changed_lines": [
+                  1506
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/validation/models.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 2,
+                "old_len": 7,
+                "changed_lines": [
+                  5
+                ]
+              },
+              {
+                "old_start": 52,
+                "old_len": 6,
+                "changed_lines": [
+                  55
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/validation/test_unique.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 4,
+                "old_len": 17,
+                "changed_lines": [
+                  7,
+                  14,
+                  18
+                ]
+              },
+              {
+                "old_start": 160,
+                "old_len": 6,
+                "changed_lines": [
+                  163
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "django/db/models/constraints.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 5,
+                "old_len": 7,
+                "changed_lines": [
+                  8
+                ]
+              },
+              {
+                "old_start": 605,
+                "old_len": 6,
+                "changed_lines": [
+                  608
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/constraints/models.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1,
+                "old_len": 5,
+                "changed_lines": [
+                  2
+                ]
+              },
+              {
+                "old_start": 175,
+                "old_len": 3,
+                "changed_lines": [
+                  178
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/constraints/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 16,
+                "old_len": 6,
+                "changed_lines": [
+                  19
+                ]
+              },
+              {
+                "old_start": 1503,
+                "old_len": 3,
+                "changed_lines": [
+                  1506
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/validation/models.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 2,
+                "old_len": 7,
+                "changed_lines": [
+                  5
+                ]
+              },
+              {
+                "old_start": 52,
+                "old_len": 6,
+                "changed_lines": [
+                  55
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/validation/test_unique.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 4,
+                "old_len": 17,
+                "changed_lines": [
+                  7,
+                  14,
+                  18
+                ]
+              },
+              {
+                "old_start": 160,
+                "old_len": 6,
+                "changed_lines": [
+                  163
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "django/db/models/base.py",
+      "omission_line": 1565
+    },
+    {
+      "id": "v-082b3df4",
+      "commit": "082b3df4067c3899dd4d57e8c2eca5baea9d07bb",
+      "parent": "6df8fe3bc1879265958b8e59c637a4145995e93c",
+      "date": "2026-08-10",
+      "prompt": "Fixed #37270 -- Fixed incorrect values for second-degree relations in ModelAdmin.list_display.",
+      "complete": {
+        "files": [
+          {
+            "path": "django/contrib/admin/templatetags/admin_list.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 228,
+                "old_len": 7,
+                "changed_lines": [
+                  231
+                ]
+              },
+              {
+                "old_start": 246,
+                "old_len": 11,
+                "changed_lines": [
+                  249,
+                  250,
+                  253
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_changelist/models.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 47,
+                "old_len": 6,
+                "changed_lines": [
+                  50
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_changelist/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1807,
+                "old_len": 6,
+                "changed_lines": [
+                  1810
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "django/contrib/admin/templatetags/admin_list.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 228,
+                "old_len": 7,
+                "changed_lines": [
+                  231
+                ]
+              },
+              {
+                "old_start": 246,
+                "old_len": 11,
+                "changed_lines": [
+                  249,
+                  250,
+                  253
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_changelist/models.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 47,
+                "old_len": 6,
+                "changed_lines": [
+                  50
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "tests/admin_changelist/tests.py",
+      "omission_line": 1810
+    },
+    {
+      "id": "v-6df8fe3b",
+      "commit": "6df8fe3bc1879265958b8e59c637a4145995e93c",
+      "parent": "616e8c52ded7f4c7b00cae5a95f5a5d12a6a39b9",
+      "date": "2026-08-10",
+      "prompt": "Fixed #24580 -- Tested FK values with __html__ in ModelAdmin.list_display.",
+      "complete": {
+        "files": [
+          {
+            "path": "tests/admin_changelist/models.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 23,
+                "old_len": 6,
+                "changed_lines": [
+                  26
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_changelist/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1793,
+                "old_len": 6,
+                "changed_lines": [
+                  1796
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "tests/admin_changelist/models.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 23,
+                "old_len": 6,
+                "changed_lines": [
+                  26
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "tests/admin_changelist/tests.py",
+      "omission_line": 1796
+    },
+    {
+      "id": "v-616e8c52",
+      "commit": "616e8c52ded7f4c7b00cae5a95f5a5d12a6a39b9",
+      "parent": "2b4c88b2ce753a44b5ba867e5e52a20e07b258e6",
+      "date": "2026-08-08",
+      "prompt": "Fixed #37264 -- Handled further malformed _source_model values in admin popups.",
+      "complete": {
+        "files": [
+          {
+            "path": "django/contrib/admin/options.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1594,
+                "old_len": 10,
+                "changed_lines": [
+                  1597,
+                  1599,
+                  1600
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_views/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 576,
+                "old_len": 23,
+                "changed_lines": [
+                  579,
+                  581,
+                  582,
+                  583,
+                  584,
+                  585,
+                  586,
+                  587,
+                  588,
+                  589,
+                  590,
+                  591,
+                  592,
+                  593,
+                  594,
+                  595
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "django/contrib/admin/options.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1594,
+                "old_len": 10,
+                "changed_lines": [
+                  1597,
+                  1599,
+                  1600
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "tests/admin_views/tests.py",
+      "omission_line": 579
+    },
+    {
+      "id": "v-89e82866",
+      "commit": "89e82866dc2746383c336c7b10e050b9da3ae1ef",
+      "parent": "dfc52e53f1d19a2730854d68b602fb4dba8bf0c5",
+      "date": "2026-03-01",
+      "prompt": "Fixed #29969 -- Omitted inlines without add permission on save-as-new.",
+      "complete": {
+        "files": [
+          {
+            "path": "django/contrib/admin/options.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 2646,
+                "old_len": 6,
+                "changed_lines": [
+                  2649
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_views/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 3141,
+                "old_len": 6,
+                "changed_lines": [
+                  3144
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "django/contrib/admin/options.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 2646,
+                "old_len": 6,
+                "changed_lines": [
+                  2649
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "tests/admin_views/tests.py",
+      "omission_line": 3144
+    },
+    {
+      "id": "v-47511a21",
+      "commit": "47511a21026cdd721d8fbf8571cc079bc38bb46d",
+      "parent": "d2e59b77fe18de318a8272c2a7bbc798d84d1d0d",
+      "date": "2026-07-13",
+      "prompt": "Fixed CVE-2026-15920 -- Made display_for_field validate URLs before rendering admin links.",
+      "complete": {
+        "files": [
+          {
+            "path": "django/contrib/admin/utils.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 7,
+                "old_len": 8,
+                "changed_lines": [
+                  10,
+                  11
+                ]
+              },
+              {
+                "old_start": 464,
+                "old_len": 6,
+                "changed_lines": [
+                  467
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_utils/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 240,
+                "old_len": 6,
+                "changed_lines": [
+                  243
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "django/contrib/admin/utils.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 7,
+                "old_len": 8,
+                "changed_lines": [
+                  10,
+                  11
+                ]
+              },
+              {
+                "old_start": 464,
+                "old_len": 6,
+                "changed_lines": [
+                  467
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "tests/admin_utils/tests.py",
+      "omission_line": 243
+    },
+    {
+      "id": "v-27137e65",
+      "commit": "27137e655e442e81095f1f8f77ff3870d9fdf169",
+      "parent": "f1949c1f9758947ade984c895ff16bef46f56520",
+      "date": "2026-07-10",
+      "prompt": "Fixed CVE-2026-15337 -- Mitigated potential DoS in check_for_language.",
+      "complete": {
+        "files": [
+          {
+            "path": "django/test/signals.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 153,
+                "old_len": 7,
+                "changed_lines": [
+                  156
+                ]
+              }
+            ]
+          },
+          {
+            "path": "django/utils/translation/trans_real.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 31,
+                "old_len": 9,
+                "changed_lines": [
+                  34,
+                  35,
+                  36
+                ]
+              },
+              {
+                "old_start": 65,
+                "old_len": 7,
+                "changed_lines": [
+                  68
+                ]
+              },
+              {
+                "old_start": 462,
+                "old_len": 19,
+                "changed_lines": [
+                  465,
+                  472,
+                  473,
+                  477
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/i18n/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 59,
+                "old_len": 7,
+                "changed_lines": [
+                  62
+                ]
+              },
+              {
+                "old_start": 2081,
+                "old_len": 6,
+                "changed_lines": [
+                  2084
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "django/utils/translation/trans_real.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 31,
+                "old_len": 9,
+                "changed_lines": [
+                  34,
+                  35,
+                  36
+                ]
+              },
+              {
+                "old_start": 65,
+                "old_len": 7,
+                "changed_lines": [
+                  68
+                ]
+              },
+              {
+                "old_start": 462,
+                "old_len": 19,
+                "changed_lines": [
+                  465,
+                  472,
+                  473,
+                  477
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/i18n/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 59,
+                "old_len": 7,
+                "changed_lines": [
+                  62
+                ]
+              },
+              {
+                "old_start": 2081,
+                "old_len": 6,
+                "changed_lines": [
+                  2084
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "django/test/signals.py",
+      "omission_line": 156
+    },
+    {
+      "id": "v-94653491",
+      "commit": "9465349120ef8a0b0689e12bcbfd05f3d173ebdf",
+      "parent": "8c83e9c0ea39099b213478a893cbebe9faa837ba",
+      "date": "2026-07-28",
+      "prompt": "Fixed #37238 -- Prevented fallback to python default for a pk with a db_default.",
+      "complete": {
+        "files": [
+          {
+            "path": "django/db/models/base.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1094,
+                "old_len": 7,
+                "changed_lines": [
+                  1097
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/field_defaults/models.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 68,
+                "old_len": 3,
+                "changed_lines": [
+                  71
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/field_defaults/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 23,
+                "old_len": 6,
+                "changed_lines": [
+                  26
+                ]
+              },
+              {
+                "old_start": 137,
+                "old_len": 6,
+                "changed_lines": [
+                  140
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "django/db/models/base.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1094,
+                "old_len": 7,
+                "changed_lines": [
+                  1097
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/field_defaults/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 23,
+                "old_len": 6,
+                "changed_lines": [
+                  26
+                ]
+              },
+              {
+                "old_start": 137,
+                "old_len": 6,
+                "changed_lines": [
+                  140
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "tests/field_defaults/models.py",
+      "omission_line": 71
+    },
+    {
+      "id": "v-ca14173f",
+      "commit": "ca14173f968cf36115f22d6c6785f738de4391ed",
+      "parent": "1c5927f04a853c79ac9b098eab92fb328ff9e4ad",
+      "date": "2026-07-30",
+      "prompt": "Fixed #37240 -- Fixed simplify_regex with multiple unnamed groups.",
+      "complete": {
+        "files": [
+          {
+            "path": "django/urls/utils.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 136,
+                "old_len": 12,
+                "changed_lines": [
+                  139,
+                  142,
+                  143,
+                  144
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/urlpatterns/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 454,
+                "old_len": 6,
+                "changed_lines": [
+                  457
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "django/urls/utils.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 136,
+                "old_len": 12,
+                "changed_lines": [
+                  139,
+                  142,
+                  143,
+                  144
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "tests/urlpatterns/tests.py",
+      "omission_line": 457
+    },
+    {
+      "id": "v-c9ff757a",
+      "commit": "c9ff757a55392b1f50968eb89fe775f6155168d8",
+      "parent": "2936a0a99719e3c3777039a0d6968deecb55c752",
+      "date": "2026-07-27",
+      "prompt": "Fixed #37234 -- Fixed bulk_create for late-saved related primary keys.",
+      "complete": {
+        "files": [
+          {
+            "path": "django/db/models/query.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 747,
+                "old_len": 6,
+                "changed_lines": [
+                  750
+                ]
+              },
+              {
+                "old_start": 757,
+                "old_len": 7,
+                "changed_lines": [
+                  760
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/bulk_create/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 439,
+                "old_len": 6,
+                "changed_lines": [
+                  442
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "django/db/models/query.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 747,
+                "old_len": 6,
+                "changed_lines": [
+                  750
+                ]
+              },
+              {
+                "old_start": 757,
+                "old_len": 7,
+                "changed_lines": [
+                  760
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "tests/bulk_create/tests.py",
+      "omission_line": 442
+    },
+    {
+      "id": "v-2936a0a9",
+      "commit": "2936a0a99719e3c3777039a0d6968deecb55c752",
+      "parent": "e1feeee45ea8bcd4325554c9b94fcd75fcd8dbdc",
+      "date": "2026-01-03",
+      "prompt": "Fixed #27752 -- Fixed ordering by Model.__str__ in the admin.",
+      "complete": {
+        "files": [
+          {
+            "path": "django/contrib/admin/utils.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 372,
+                "old_len": 7,
+                "changed_lines": [
+                  375
+                ]
+              }
+            ]
+          },
+          {
+            "path": "django/contrib/admin/views/main.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 359,
+                "old_len": 7,
+                "changed_lines": [
+                  362
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_utils/models.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 47,
+                "old_len": 6,
+                "changed_lines": [
+                  50
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_utils/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 445,
+                "old_len": 6,
+                "changed_lines": [
+                  448
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_views/models.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 47,
+                "old_len": 6,
+                "changed_lines": [
+                  50
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_views/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 799,
+                "old_len": 6,
+                "changed_lines": [
+                  802
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "django/contrib/admin/utils.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 372,
+                "old_len": 7,
+                "changed_lines": [
+                  375
+                ]
+              }
+            ]
+          },
+          {
+            "path": "django/contrib/admin/views/main.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 359,
+                "old_len": 7,
+                "changed_lines": [
+                  362
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_utils/models.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 47,
+                "old_len": 6,
+                "changed_lines": [
+                  50
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_utils/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 445,
+                "old_len": 6,
+                "changed_lines": [
+                  448
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_views/models.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 47,
+                "old_len": 6,
+                "changed_lines": [
+                  50
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "tests/admin_views/tests.py",
+      "omission_line": 802
+    },
+    {
+      "id": "v-92e1d9e3",
+      "commit": "92e1d9e3619ae5274a64b38f26177064486892f2",
+      "parent": "50e5264a458961134d34d6340a00d9a1b269df7a",
+      "date": "2026-07-27",
+      "prompt": "Fixed #37233 -- Prevented sort controls for unordered __str__ admin columns.",
+      "complete": {
+        "files": [
+          {
+            "path": "django/contrib/admin/templatetags/admin_list.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 116,
+                "old_len": 7,
+                "changed_lines": [
+                  119
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_changelist/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 4,
+                "old_len": 7,
+                "changed_lines": [
+                  7
+                ]
+              },
+              {
+                "old_start": 115,
+                "old_len": 6,
+                "changed_lines": [
+                  118
+                ]
+              },
+              {
+                "old_start": 1726,
+                "old_len": 6,
+                "changed_lines": [
+                  1729
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_views/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 4323,
+                "old_len": 6,
+                "changed_lines": [
+                  4326
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "django/contrib/admin/templatetags/admin_list.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 116,
+                "old_len": 7,
+                "changed_lines": [
+                  119
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_changelist/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 4,
+                "old_len": 7,
+                "changed_lines": [
+                  7
+                ]
+              },
+              {
+                "old_start": 115,
+                "old_len": 6,
+                "changed_lines": [
+                  118
+                ]
+              },
+              {
+                "old_start": 1726,
+                "old_len": 6,
+                "changed_lines": [
+                  1729
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "tests/admin_views/tests.py",
+      "omission_line": 4326
+    },
+    {
+      "id": "v-92470ad3",
+      "commit": "92470ad3742524902b29769d2c822dbe791630db",
+      "parent": "09c8b50bc8e59f7ec2d97df1bfb3fbd3ae0d4522",
+      "date": "2026-07-26",
+      "prompt": "Fixed #37230 -- Fixed a crash for second-degree relations in ModelAdmin.list_display.",
+      "complete": {
+        "files": [
+          {
+            "path": "django/contrib/admin/templatetags/admin_list.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 16,
+                "old_len": 7,
+                "changed_lines": [
+                  19
+                ]
+              },
+              {
+                "old_start": 226,
+                "old_len": 6,
+                "changed_lines": [
+                  229
+                ]
+              }
+            ]
+          },
+          {
+            "path": "django/contrib/admin/utils.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 314,
+                "old_len": 9,
+                "changed_lines": [
+                  317,
+                  318,
+                  319
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_utils/models.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 5,
+                "old_len": 6,
+                "changed_lines": [
+                  8
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_utils/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 164,
+                "old_len": 6,
+                "changed_lines": [
+                  167
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "django/contrib/admin/templatetags/admin_list.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 16,
+                "old_len": 7,
+                "changed_lines": [
+                  19
+                ]
+              },
+              {
+                "old_start": 226,
+                "old_len": 6,
+                "changed_lines": [
+                  229
+                ]
+              }
+            ]
+          },
+          {
+            "path": "django/contrib/admin/utils.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 314,
+                "old_len": 9,
+                "changed_lines": [
+                  317,
+                  318,
+                  319
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_utils/models.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 5,
+                "old_len": 6,
+                "changed_lines": [
+                  8
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "tests/admin_utils/tests.py",
+      "omission_line": 167
+    },
+    {
+      "id": "v-4ea38d54",
+      "commit": "4ea38d54c10e0f44e189605c217a55cdfe9fdde8",
+      "parent": "8a162076e1988ddf9453edfb8329d5df1573dc38",
+      "date": "2026-06-10",
+      "prompt": "Fixed #37160 -- Made admin views raise PermissionDenied consistently.",
+      "complete": {
+        "files": [
+          {
+            "path": "django/contrib/admin/options.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 2563,
+                "old_len": 14,
+                "changed_lines": [
+                  2566,
+                  2571,
+                  2572,
+                  2573
+                ]
+              }
+            ]
+          },
+          {
+            "path": "django/contrib/admin/sites.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 9,
+                "old_len": 7,
+                "changed_lines": [
+                  12
+                ]
+              },
+              {
+                "old_start": 256,
+                "old_len": 10,
+                "changed_lines": [
+                  259,
+                  260,
+                  261,
+                  262
+                ]
+              },
+              {
+                "old_start": 290,
+                "old_len": 7,
+                "changed_lines": [
+                  293
+                ]
+              },
+              {
+                "old_start": 451,
+                "old_len": 6,
+                "changed_lines": [
+                  454
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_views/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 3380,
+                "old_len": 6,
+                "changed_lines": [
+                  3383
+                ]
+              },
+              {
+                "old_start": 3527,
+                "old_len": 6,
+                "changed_lines": [
+                  3530
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "django/contrib/admin/sites.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 9,
+                "old_len": 7,
+                "changed_lines": [
+                  12
+                ]
+              },
+              {
+                "old_start": 256,
+                "old_len": 10,
+                "changed_lines": [
+                  259,
+                  260,
+                  261,
+                  262
+                ]
+              },
+              {
+                "old_start": 290,
+                "old_len": 7,
+                "changed_lines": [
+                  293
+                ]
+              },
+              {
+                "old_start": 451,
+                "old_len": 6,
+                "changed_lines": [
+                  454
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/admin_views/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 3380,
+                "old_len": 6,
+                "changed_lines": [
+                  3383
+                ]
+              },
+              {
+                "old_start": 3527,
+                "old_len": 6,
+                "changed_lines": [
+                  3530
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "django/contrib/admin/options.py",
+      "omission_line": 2566
+    },
+    {
+      "id": "v-6fc81500",
+      "commit": "6fc8150005256db2052b01812d65dff737563a1b",
+      "parent": "2a5da9d00555beef8e5f6307cfcbfc029d45491e",
+      "date": "2026-07-18",
+      "prompt": "Fixed #36027 -- Made error response rendering thread-sensitive.",
+      "complete": {
+        "files": [
+          {
+            "path": "django/contrib/staticfiles/handlers.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 59,
+                "old_len": 7,
+                "changed_lines": [
+                  62
+                ]
+              }
+            ]
+          },
+          {
+            "path": "django/core/handlers/exception.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 43,
+                "old_len": 7,
+                "changed_lines": [
+                  46
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/asgi/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 30,
+                "old_len": 7,
+                "changed_lines": [
+                  33
+                ]
+              },
+              {
+                "old_start": 497,
+                "old_len": 6,
+                "changed_lines": [
+                  500
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/asgi/urls.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 2,
+                "old_len": 6,
+                "changed_lines": [
+                  5
+                ]
+              },
+              {
+                "old_start": 51,
+                "old_len": 6,
+                "changed_lines": [
+                  54
+                ]
+              },
+              {
+                "old_start": 73,
+                "old_len": 5,
+                "changed_lines": [
+                  76
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/staticfiles_tests/test_handlers.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1,
+                "old_len": 6,
+                "changed_lines": [
+                  1,
+                  3
+                ]
+              },
+              {
+                "old_start": 12,
+                "old_len": 6,
+                "changed_lines": [
+                  15
+                ]
+              },
+              {
+                "old_start": 23,
+                "old_len": 11,
+                "changed_lines": [
+                  26,
+                  28,
+                  31
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "django/contrib/staticfiles/handlers.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 59,
+                "old_len": 7,
+                "changed_lines": [
+                  62
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/asgi/tests.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 30,
+                "old_len": 7,
+                "changed_lines": [
+                  33
+                ]
+              },
+              {
+                "old_start": 497,
+                "old_len": 6,
+                "changed_lines": [
+                  500
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/asgi/urls.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 2,
+                "old_len": 6,
+                "changed_lines": [
+                  5
+                ]
+              },
+              {
+                "old_start": 51,
+                "old_len": 6,
+                "changed_lines": [
+                  54
+                ]
+              },
+              {
+                "old_start": 73,
+                "old_len": 5,
+                "changed_lines": [
+                  76
+                ]
+              }
+            ]
+          },
+          {
+            "path": "tests/staticfiles_tests/test_handlers.py",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1,
+                "old_len": 6,
+                "changed_lines": [
+                  1,
+                  3
+                ]
+              },
+              {
+                "old_start": 12,
+                "old_len": 6,
+                "changed_lines": [
+                  15
+                ]
+              },
+              {
+                "old_start": 23,
+                "old_len": 11,
+                "changed_lines": [
+                  26,
+                  28,
+                  31
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "django/core/handlers/exception.py",
+      "omission_line": 46
+    }
+  ]
+}

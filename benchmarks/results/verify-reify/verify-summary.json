@@ -1,0 +1,33 @@
+{
+  "tasks": 4,
+  "omission_recall": 0.5,
+  "omission_recall_ci": [
+    0.15003571,
+    0.84996426
+  ],
+  "omission_recall_attributable": 0.0,
+  "omission_recall_attributable_ci": [
+    0.0,
+    0.48990002
+  ],
+  "reachable_omissions": 3,
+  "omission_recall_reachable": 0.6666667,
+  "omission_recall_reachable_ci": [
+    0.20765498,
+    0.9385097
+  ],
+  "symbol_scorable": 0,
+  "omission_recall_symbol": null,
+  "omission_recall_symbol_ci": null,
+  "false_alarm_rate": 23.5,
+  "commits_with_a_false_alarm": 4,
+  "false_alarm_share_ci": [
+    0.5101,
+    1.0
+  ],
+  "median_findings_per_diff": 19,
+  "median_verify_tokens": 422,
+  "median_verify_latency_ms": 1,
+  "median_index_ms": 151,
+  "diffs_resolving_to_nothing": 0
+}

@@ -1,0 +1,25 @@
+{
+  "after": null,
+  "candidates_rejected": 0,
+  "checker": "symbols changed by this diff, minus symbols present in the diff, where an inbound CALLS edge exists at distance 1, via reify::query::impact",
+  "count": 60,
+  "head": "0b0bcf5cf5fc25f4c7325f108a0474e1d2895cda",
+  "languages": [
+    [
+      "rust",
+      31
+    ],
+    [
+      "python",
+      12
+    ]
+  ],
+  "origin": "git@github.com:lambiengcode/reify.git",
+  "reify_version": "0.2.2",
+  "repository": ".",
+  "scan": 4000,
+  "token_counts": "estimated by reify heuristic-v1",
+  "trials": 4,
+  "until": "870905b",
+  "wall_clock_ms": 867
+}

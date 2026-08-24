@@ -1,0 +1,2881 @@
+{
+  "repository": "/private/tmp/claude-501/-Users-lambiengcode--treehouse-reify-2e416f-2-reify/a9d50d0b-cce2-4027-a129-e64262e800a7/scratchpad/gh-cli",
+  "head": "5d3c4817f1619213951dbf15031bad04acb88392",
+  "generated_from_commits": 399,
+  "rejected": [
+    [
+      "92ae1de0355368b3d6d1c361362dc524fe98498b",
+      "no file changed by exactly one hunk"
+    ],
+    [
+      "5e6aa5ab275ad25a8999871f7f86aeda6349099b",
+      "no file changed by exactly one hunk"
+    ],
+    [
+      "c2ad3b0eb7ead66eec3a8a61239e10a765332ec7",
+      "no file changed by exactly one hunk"
+    ],
+    [
+      "b130a9be5b0f0db2e41ddd82044ef6c256c93625",
+      "no file changed by exactly one hunk"
+    ],
+    [
+      "7b681a4e8b67d203ccdaab5ff54570bdf6ca3669",
+      "fewer than two indexable files"
+    ],
+    [
+      "954ffc37e5931a9621868a50f05c8fb17e288f19",
+      "no file changed by exactly one hunk"
+    ],
+    [
+      "cce391b663aa488b8b4f681616b52dc8f2e3d531",
+      "fewer than two indexable files"
+    ],
+    [
+      "70bb306bd25eb407f90eabefd98824aed62cf519",
+      "no file changed by exactly one hunk"
+    ],
+    [
+      "01bcd474447b5034da20686c838ae4b0cf2b23f5",
+      "no file changed by exactly one hunk"
+    ],
+    [
+      "d63ab8ddd8696194f3fd49a726eb6d60dd3cdfa5",
+      "no file changed by exactly one hunk"
+    ],
+    [
+      "5d77247a5a77b4ee1e9516f83da010dd9a0d08c3",
+      "no file changed by exactly one hunk"
+    ],
+    [
+      "9f2da1186132c0ba891767939c81fb6e785b67dc",
+      "no file changed by exactly one hunk"
+    ],
+    [
+      "da68cb8f6f597cfc3838cf40f89ecc01f4e53233",
+      "fewer than two indexable files"
+    ],
+    [
+      "797effe0295914e03f4b40cb873276da1d3b7e93",
+      "fewer than two indexable files"
+    ],
+    [
+      "7bd67a840456436a1edc0f80dc85687f29b277af",
+      "fewer than two indexable files"
+    ],
+    [
+      "57008e797097e9b275ba7d1849ac750e762743e1",
+      "fewer than two indexable files"
+    ],
+    [
+      "8b73951ca75c6495a776e36da9fb48cc93000866",
+      "fewer than two indexable files"
+    ],
+    [
+      "d3a153872b9774009d620d0f3e12f993a21765eb",
+      "fewer than two indexable files"
+    ],
+    [
+      "51b765381870dbf62390e0f7a297cc57ea771db7",
+      "fewer than two indexable files"
+    ],
+    [
+      "97d1cbd9fc5499a2f804d991b353821e17b19eb7",
+      "no file changed by exactly one hunk"
+    ],
+    [
+      "00fc8c923ab3f321a412e1c89e425c107122f0bb",
+      "no file changed by exactly one hunk"
+    ],
+    [
+      "d9eb0627dceeb49b2943fa992414eb185787d02e",
+      "no file changed by exactly one hunk"
+    ],
+    [
+      "601dd346b00b357a0541239fb80b34c3795e7c33",
+      "no file changed by exactly one hunk"
+    ]
+  ],
+  "tasks": [
+    {
+      "id": "v-e4efbc42",
+      "commit": "e4efbc42ccfb1f50c2b97e7b864eb5fc5bcc97f0",
+      "parent": "046c222048e780a707bacea18fc6dc0d0865c7a5",
+      "date": "2026-08-21",
+      "prompt": "Narrow Copilot newline fix scope",
+      "complete": {
+        "files": [
+          {
+            "path": "pkg/cmd/copilot/copilot.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 156,
+                "old_len": 7,
+                "changed_lines": [
+                  159
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/copilot/copilot_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 620,
+                "old_len": 14,
+                "changed_lines": [
+                  623,
+                  624,
+                  625,
+                  626,
+                  627,
+                  628,
+                  629,
+                  630
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "pkg/cmd/copilot/copilot.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 156,
+                "old_len": 7,
+                "changed_lines": [
+                  159
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "pkg/cmd/copilot/copilot_test.go",
+      "omission_line": 623
+    },
+    {
+      "id": "v-1e04dab8",
+      "commit": "1e04dab89cf10a2eab5b238d27fb1d7cb94b8af4",
+      "parent": "a255baf71d13fe5947a4eb7ad521ffd412d64cee",
+      "date": "2026-08-20",
+      "prompt": "Fix Copilot install warning newlines",
+      "complete": {
+        "files": [
+          {
+            "path": "pkg/cmd/copilot/copilot.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 152,
+                "old_len": 11,
+                "changed_lines": [
+                  155,
+                  159
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/copilot/copilot_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 16,
+                "old_len": 6,
+                "changed_lines": [
+                  19
+                ]
+              },
+              {
+                "old_start": 591,
+                "old_len": 30,
+                "changed_lines": [
+                  594,
+                  595,
+                  596,
+                  597,
+                  598,
+                  601,
+                  602,
+                  603,
+                  604,
+                  605,
+                  607,
+                  608,
+                  609,
+                  610,
+                  611,
+                  612,
+                  614,
+                  615,
+                  616,
+                  617
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "pkg/cmd/copilot/copilot_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 16,
+                "old_len": 6,
+                "changed_lines": [
+                  19
+                ]
+              },
+              {
+                "old_start": 591,
+                "old_len": 30,
+                "changed_lines": [
+                  594,
+                  595,
+                  596,
+                  597,
+                  598,
+                  601,
+                  602,
+                  603,
+                  604,
+                  605,
+                  607,
+                  608,
+                  609,
+                  610,
+                  611,
+                  612,
+                  614,
+                  615,
+                  616,
+                  617
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "pkg/cmd/copilot/copilot.go",
+      "omission_line": 155
+    },
+    {
+      "id": "v-2e9fedd3",
+      "commit": "2e9fedd3aaeb9bc5f044f2d825f565d98083fc56",
+      "parent": "a526307b621c90dca18734bfedaa5533318edd1a",
+      "date": "2026-08-12",
+      "prompt": "Add worktree checkout to issue develop",
+      "complete": {
+        "files": [
+          {
+            "path": "git/client.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 642,
+                "old_len": 6,
+                "changed_lines": [
+                  645
+                ]
+              }
+            ]
+          },
+          {
+            "path": "git/client_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1426,
+                "old_len": 6,
+                "changed_lines": [
+                  1429
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/issue/develop/develop.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 5,
+                "old_len": 6,
+                "changed_lines": [
+                  8
+                ]
+              },
+              {
+                "old_start": 32,
+                "old_len": 6,
+                "changed_lines": [
+                  35
+                ]
+              },
+              {
+                "old_start": 66,
+                "old_len": 6,
+                "changed_lines": [
+                  69
+                ]
+              },
+              {
+                "old_start": 91,
+                "old_len": 6,
+                "changed_lines": [
+                  94
+                ]
+              },
+              {
+                "old_start": 120,
+                "old_len": 6,
+                "changed_lines": [
+                  123
+                ]
+              },
+              {
+                "old_start": 133,
+                "old_len": 6,
+                "changed_lines": [
+                  136
+                ]
+              },
+              {
+                "old_start": 353,
+                "old_len": 16,
+                "changed_lines": [
+                  356,
+                  357,
+                  360,
+                  364,
+                  365
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/issue/develop/develop_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 4,
+                "old_len": 6,
+                "changed_lines": [
+                  7
+                ]
+              },
+              {
+                "old_start": 24,
+                "old_len": 6,
+                "changed_lines": [
+                  27
+                ]
+              },
+              {
+                "old_start": 58,
+                "old_len": 6,
+                "changed_lines": [
+                  61
+                ]
+              },
+              {
+                "old_start": 106,
+                "old_len": 6,
+                "changed_lines": [
+                  109
+                ]
+              },
+              {
+                "old_start": 138,
+                "old_len": 6,
+                "changed_lines": [
+                  141
+                ]
+              },
+              {
+                "old_start": 767,
+                "old_len": 3,
+                "changed_lines": [
+                  770
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "git/client.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 642,
+                "old_len": 6,
+                "changed_lines": [
+                  645
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/issue/develop/develop.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 5,
+                "old_len": 6,
+                "changed_lines": [
+                  8
+                ]
+              },
+              {
+                "old_start": 32,
+                "old_len": 6,
+                "changed_lines": [
+                  35
+                ]
+              },
+              {
+                "old_start": 66,
+                "old_len": 6,
+                "changed_lines": [
+                  69
+                ]
+              },
+              {
+                "old_start": 91,
+                "old_len": 6,
+                "changed_lines": [
+                  94
+                ]
+              },
+              {
+                "old_start": 120,
+                "old_len": 6,
+                "changed_lines": [
+                  123
+                ]
+              },
+              {
+                "old_start": 133,
+                "old_len": 6,
+                "changed_lines": [
+                  136
+                ]
+              },
+              {
+                "old_start": 353,
+                "old_len": 16,
+                "changed_lines": [
+                  356,
+                  357,
+                  360,
+                  364,
+                  365
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/issue/develop/develop_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 4,
+                "old_len": 6,
+                "changed_lines": [
+                  7
+                ]
+              },
+              {
+                "old_start": 24,
+                "old_len": 6,
+                "changed_lines": [
+                  27
+                ]
+              },
+              {
+                "old_start": 58,
+                "old_len": 6,
+                "changed_lines": [
+                  61
+                ]
+              },
+              {
+                "old_start": 106,
+                "old_len": 6,
+                "changed_lines": [
+                  109
+                ]
+              },
+              {
+                "old_start": 138,
+                "old_len": 6,
+                "changed_lines": [
+                  141
+                ]
+              },
+              {
+                "old_start": 767,
+                "old_len": 3,
+                "changed_lines": [
+                  770
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "git/client_test.go",
+      "omission_line": 1429
+    },
+    {
+      "id": "v-a6bcd08d",
+      "commit": "a6bcd08d07d1cbcb17cfce497c0cf261a966f703",
+      "parent": "e83adbc0642994fae7c39a9a012eb34b8c81f4f1",
+      "date": "2026-08-03",
+      "prompt": "Fix item-add output for non-TTY",
+      "complete": {
+        "files": [
+          {
+            "path": "pkg/cmd/project/item-add/item_add.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 124,
+                "old_len": 10,
+                "changed_lines": [
+                  127,
+                  128,
+                  131
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/project/item-add/item_add_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 8,
+                "old_len": 6,
+                "changed_lines": [
+                  11
+                ]
+              },
+              {
+                "old_start": 539,
+                "old_len": 3,
+                "changed_lines": [
+                  542
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "pkg/cmd/project/item-add/item_add_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 8,
+                "old_len": 6,
+                "changed_lines": [
+                  11
+                ]
+              },
+              {
+                "old_start": 539,
+                "old_len": 3,
+                "changed_lines": [
+                  542
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "pkg/cmd/project/item-add/item_add.go",
+      "omission_line": 127
+    },
+    {
+      "id": "v-efe3f165",
+      "commit": "efe3f165dd297c85fff11473dbf586f2d39fbf86",
+      "parent": "ae66a1c02e08366858f3070664f493afbe0cdf18",
+      "date": "2026-07-22",
+      "prompt": "Add named field columns to gh project item-list",
+      "complete": {
+        "files": [
+          {
+            "path": "pkg/cmd/project/item-list/item_list.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 21,
+                "old_len": 6,
+                "changed_lines": [
+                  24
+                ]
+              },
+              {
+                "old_start": 55,
+                "old_len": 6,
+                "changed_lines": [
+                  58
+                ]
+              },
+              {
+                "old_start": 71,
+                "old_len": 6,
+                "changed_lines": [
+                  74
+                ]
+              },
+              {
+                "old_start": 101,
+                "old_len": 6,
+                "changed_lines": [
+                  104
+                ]
+              },
+              {
+                "old_start": 142,
+                "old_len": 15,
+                "changed_lines": [
+                  145,
+                  148,
+                  153
+                ]
+              },
+              {
+                "old_start": 162,
+                "old_len": 8,
+                "changed_lines": [
+                  165,
+                  170
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/project/item-list/item_list_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 61,
+                "old_len": 6,
+                "changed_lines": [
+                  64
+                ]
+              },
+              {
+                "old_start": 95,
+                "old_len": 6,
+                "changed_lines": [
+                  98
+                ]
+              },
+              {
+                "old_start": 734,
+                "old_len": 3,
+                "changed_lines": [
+                  737
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/project/shared/queries/queries.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 6,
+                "old_len": 6,
+                "changed_lines": [
+                  9
+                ]
+              },
+              {
+                "old_start": 472,
+                "old_len": 6,
+                "changed_lines": [
+                  475
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/project/shared/queries/queries_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 680,
+                "old_len": 3,
+                "changed_lines": [
+                  683
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/project/shared/queries/resolve_fields.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 85,
+                "old_len": 6,
+                "changed_lines": [
+                  88
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/project/shared/queries/resolve_fields_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 60,
+                "old_len": 14,
+                "changed_lines": [
+                  63,
+                  70
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "pkg/cmd/project/item-list/item_list.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 21,
+                "old_len": 6,
+                "changed_lines": [
+                  24
+                ]
+              },
+              {
+                "old_start": 55,
+                "old_len": 6,
+                "changed_lines": [
+                  58
+                ]
+              },
+              {
+                "old_start": 71,
+                "old_len": 6,
+                "changed_lines": [
+                  74
+                ]
+              },
+              {
+                "old_start": 101,
+                "old_len": 6,
+                "changed_lines": [
+                  104
+                ]
+              },
+              {
+                "old_start": 142,
+                "old_len": 15,
+                "changed_lines": [
+                  145,
+                  148,
+                  153
+                ]
+              },
+              {
+                "old_start": 162,
+                "old_len": 8,
+                "changed_lines": [
+                  165,
+                  170
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/project/item-list/item_list_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 61,
+                "old_len": 6,
+                "changed_lines": [
+                  64
+                ]
+              },
+              {
+                "old_start": 95,
+                "old_len": 6,
+                "changed_lines": [
+                  98
+                ]
+              },
+              {
+                "old_start": 734,
+                "old_len": 3,
+                "changed_lines": [
+                  737
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/project/shared/queries/queries.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 6,
+                "old_len": 6,
+                "changed_lines": [
+                  9
+                ]
+              },
+              {
+                "old_start": 472,
+                "old_len": 6,
+                "changed_lines": [
+                  475
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/project/shared/queries/queries_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 680,
+                "old_len": 3,
+                "changed_lines": [
+                  683
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/project/shared/queries/resolve_fields.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 85,
+                "old_len": 6,
+                "changed_lines": [
+                  88
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "pkg/cmd/project/shared/queries/resolve_fields_test.go",
+      "omission_line": 63
+    },
+    {
+      "id": "v-688751de",
+      "commit": "688751de2ce8d610ce76cd0608930e7912509ed3",
+      "parent": "a5eea131501c535d0527eb61ade5969bd85d0ff3",
+      "date": "2026-07-22",
+      "prompt": "Harden worktree submodule prefixing and cover cmd.Dir stripping",
+      "complete": {
+        "files": [
+          {
+            "path": "pkg/cmd/pr/checkout/checkout.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 5,
+                "old_len": 6,
+                "changed_lines": [
+                  8
+                ]
+              },
+              {
+                "old_start": 166,
+                "old_len": 8,
+                "changed_lines": [
+                  169,
+                  170
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/pr/checkout/checkout_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1170,
+                "old_len": 3,
+                "changed_lines": [
+                  1173
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "pkg/cmd/pr/checkout/checkout.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 5,
+                "old_len": 6,
+                "changed_lines": [
+                  8
+                ]
+              },
+              {
+                "old_start": 166,
+                "old_len": 8,
+                "changed_lines": [
+                  169,
+                  170
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "pkg/cmd/pr/checkout/checkout_test.go",
+      "omission_line": 1173
+    },
+    {
+      "id": "v-9f14d1ac",
+      "commit": "9f14d1ac675f25a75d4b940dc88e733f06398e76",
+      "parent": "9fc654ee0985d08c2d9076785c6993da885435a4",
+      "date": "2026-07-22",
+      "prompt": "Simplify submodule worktree prefix to inline conditional",
+      "complete": {
+        "files": [
+          {
+            "path": "pkg/cmd/pr/checkout/checkout.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 160,
+                "old_len": 7,
+                "changed_lines": [
+                  163
+                ]
+              },
+              {
+                "old_start": 359,
+                "old_len": 23,
+                "changed_lines": [
+                  362,
+                  363,
+                  364,
+                  365,
+                  366,
+                  367,
+                  368,
+                  369,
+                  370,
+                  371,
+                  372,
+                  373,
+                  374,
+                  375,
+                  376,
+                  377,
+                  378
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/pr/checkout/checkout_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1071,
+                "old_len": 19,
+                "changed_lines": [
+                  1074,
+                  1075,
+                  1076,
+                  1077,
+                  1078,
+                  1079,
+                  1080,
+                  1081,
+                  1082,
+                  1083,
+                  1084,
+                  1085,
+                  1086,
+                  1087,
+                  1088,
+                  1089
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "pkg/cmd/pr/checkout/checkout.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 160,
+                "old_len": 7,
+                "changed_lines": [
+                  163
+                ]
+              },
+              {
+                "old_start": 359,
+                "old_len": 23,
+                "changed_lines": [
+                  362,
+                  363,
+                  364,
+                  365,
+                  366,
+                  367,
+                  368,
+                  369,
+                  370,
+                  371,
+                  372,
+                  373,
+                  374,
+                  375,
+                  376,
+                  377,
+                  378
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "pkg/cmd/pr/checkout/checkout_test.go",
+      "omission_line": 1074
+    },
+    {
+      "id": "v-d5f4bed3",
+      "commit": "d5f4bed3f49dbbc5d5a2e7bb76ba9f25ba7ba574",
+      "parent": "2b970995a3c63b7a7600f242d55d15185a82ed8b",
+      "date": "2026-07-13",
+      "prompt": "Add Grok skill host support",
+      "complete": {
+        "files": [
+          {
+            "path": "internal/skills/registry/registry.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 188,
+                "old_len": 6,
+                "changed_lines": [
+                  191
+                ]
+              }
+            ]
+          },
+          {
+            "path": "internal/skills/registry/registry_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 23,
+                "old_len": 6,
+                "changed_lines": [
+                  26
+                ]
+              },
+              {
+                "old_start": 159,
+                "old_len": 6,
+                "changed_lines": [
+                  162
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/skills/install/install.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 89,
+                "old_len": 7,
+                "changed_lines": [
+                  92
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/skills/update/update.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 80,
+                "old_len": 7,
+                "changed_lines": [
+                  83
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "internal/skills/registry/registry.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 188,
+                "old_len": 6,
+                "changed_lines": [
+                  191
+                ]
+              }
+            ]
+          },
+          {
+            "path": "internal/skills/registry/registry_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 23,
+                "old_len": 6,
+                "changed_lines": [
+                  26
+                ]
+              },
+              {
+                "old_start": 159,
+                "old_len": 6,
+                "changed_lines": [
+                  162
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/skills/install/install.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 89,
+                "old_len": 7,
+                "changed_lines": [
+                  92
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "pkg/cmd/skills/update/update.go",
+      "omission_line": 83
+    },
+    {
+      "id": "v-74e77914",
+      "commit": "74e779140c472bc380ce57978853480805dc16b7",
+      "parent": "6dae3077b89c9858c5778c0b37a116b1091f8782",
+      "date": "2026-07-02",
+      "prompt": "Fix concurrent map writes in codespace port forwarding",
+      "complete": {
+        "files": [
+          {
+            "path": "internal/codespaces/connection/connection.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 30,
+                "old_len": 6,
+                "changed_lines": [
+                  33
+                ]
+              }
+            ]
+          },
+          {
+            "path": "internal/codespaces/portforwarder/port_forwarder.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 36,
+                "old_len": 7,
+                "changed_lines": [
+                  39
+                ]
+              },
+              {
+                "old_start": 54,
+                "old_len": 7,
+                "changed_lines": [
+                  57
+                ]
+              },
+              {
+                "old_start": 108,
+                "old_len": 6,
+                "changed_lines": [
+                  111
+                ]
+              },
+              {
+                "old_start": 166,
+                "old_len": 18,
+                "changed_lines": [
+                  169,
+                  170,
+                  171,
+                  172,
+                  173,
+                  174,
+                  175,
+                  176,
+                  177,
+                  178,
+                  179,
+                  180
+                ]
+              },
+              {
+                "old_start": 243,
+                "old_len": 6,
+                "changed_lines": [
+                  246
+                ]
+              },
+              {
+                "old_start": 253,
+                "old_len": 22,
+                "changed_lines": [
+                  256,
+                  258,
+                  263,
+                  269,
+                  272
+                ]
+              }
+            ]
+          },
+          {
+            "path": "internal/codespaces/portforwarder/port_forwarder_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 7,
+                "old_len": 6,
+                "changed_lines": [
+                  10
+                ]
+              },
+              {
+                "old_start": 31,
+                "old_len": 26,
+                "changed_lines": [
+                  34,
+                  35,
+                  36,
+                  40,
+                  41,
+                  42,
+                  46,
+                  47,
+                  48,
+                  49,
+                  50,
+                  51,
+                  52,
+                  53
+                ]
+              },
+              {
+                "old_start": 96,
+                "old_len": 9,
+                "changed_lines": [
+                  99,
+                  100,
+                  101
+                ]
+              },
+              {
+                "old_start": 131,
+                "old_len": 9,
+                "changed_lines": [
+                  134,
+                  135,
+                  136
+                ]
+              },
+              {
+                "old_start": 163,
+                "old_len": 39,
+                "changed_lines": [
+                  166,
+                  167,
+                  168,
+                  171,
+                  172,
+                  173,
+                  176,
+                  177,
+                  178,
+                  181,
+                  183,
+                  184,
+                  185,
+                  188,
+                  189,
+                  190,
+                  192,
+                  193,
+                  196,
+                  197,
+                  199
+                ]
+              },
+              {
+                "old_start": 230,
+                "old_len": 38,
+                "changed_lines": [
+                  233,
+                  234,
+                  235,
+                  238,
+                  239,
+                  240,
+                  243,
+                  244,
+                  245,
+                  249,
+                  251,
+                  252,
+                  253,
+                  256,
+                  257,
+                  258,
+                  259,
+                  260,
+                  261,
+                  262,
+                  263,
+                  264,
+                  265,
+                  266
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "internal/codespaces/portforwarder/port_forwarder.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 36,
+                "old_len": 7,
+                "changed_lines": [
+                  39
+                ]
+              },
+              {
+                "old_start": 54,
+                "old_len": 7,
+                "changed_lines": [
+                  57
+                ]
+              },
+              {
+                "old_start": 108,
+                "old_len": 6,
+                "changed_lines": [
+                  111
+                ]
+              },
+              {
+                "old_start": 166,
+                "old_len": 18,
+                "changed_lines": [
+                  169,
+                  170,
+                  171,
+                  172,
+                  173,
+                  174,
+                  175,
+                  176,
+                  177,
+                  178,
+                  179,
+                  180
+                ]
+              },
+              {
+                "old_start": 243,
+                "old_len": 6,
+                "changed_lines": [
+                  246
+                ]
+              },
+              {
+                "old_start": 253,
+                "old_len": 22,
+                "changed_lines": [
+                  256,
+                  258,
+                  263,
+                  269,
+                  272
+                ]
+              }
+            ]
+          },
+          {
+            "path": "internal/codespaces/portforwarder/port_forwarder_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 7,
+                "old_len": 6,
+                "changed_lines": [
+                  10
+                ]
+              },
+              {
+                "old_start": 31,
+                "old_len": 26,
+                "changed_lines": [
+                  34,
+                  35,
+                  36,
+                  40,
+                  41,
+                  42,
+                  46,
+                  47,
+                  48,
+                  49,
+                  50,
+                  51,
+                  52,
+                  53
+                ]
+              },
+              {
+                "old_start": 96,
+                "old_len": 9,
+                "changed_lines": [
+                  99,
+                  100,
+                  101
+                ]
+              },
+              {
+                "old_start": 131,
+                "old_len": 9,
+                "changed_lines": [
+                  134,
+                  135,
+                  136
+                ]
+              },
+              {
+                "old_start": 163,
+                "old_len": 39,
+                "changed_lines": [
+                  166,
+                  167,
+                  168,
+                  171,
+                  172,
+                  173,
+                  176,
+                  177,
+                  178,
+                  181,
+                  183,
+                  184,
+                  185,
+                  188,
+                  189,
+                  190,
+                  192,
+                  193,
+                  196,
+                  197,
+                  199
+                ]
+              },
+              {
+                "old_start": 230,
+                "old_len": 38,
+                "changed_lines": [
+                  233,
+                  234,
+                  235,
+                  238,
+                  239,
+                  240,
+                  243,
+                  244,
+                  245,
+                  249,
+                  251,
+                  252,
+                  253,
+                  256,
+                  257,
+                  258,
+                  259,
+                  260,
+                  261,
+                  262,
+                  263,
+                  264,
+                  265,
+                  266
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "internal/codespaces/connection/connection.go",
+      "omission_line": 33
+    },
+    {
+      "id": "v-f1d11210",
+      "commit": "f1d112104821b055bb0c5656f2989f9213db71f6",
+      "parent": "326faaac8b5c3b736ddc6bfa573cc97dc6452a24",
+      "date": "2026-07-02",
+      "prompt": "honor --dir without agent prompt",
+      "complete": {
+        "files": [
+          {
+            "path": "pkg/cmd/skills/install/install.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 915,
+                "old_len": 6,
+                "changed_lines": [
+                  918
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/skills/install/install_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 473,
+                "old_len": 6,
+                "changed_lines": [
+                  476
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "pkg/cmd/skills/install/install.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 915,
+                "old_len": 6,
+                "changed_lines": [
+                  918
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "pkg/cmd/skills/install/install_test.go",
+      "omission_line": 476
+    },
+    {
+      "id": "v-751dc5e0",
+      "commit": "751dc5e0383f08d1d6a211c97d0479aedb39726b",
+      "parent": "dd26eb39b04db5bd282509787d2b8fbff11ba694",
+      "date": "2026-06-24",
+      "prompt": "don't let a failed draft lookup mask a found release",
+      "complete": {
+        "files": [
+          {
+            "path": "pkg/cmd/release/download/download_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 218,
+                "old_len": 6,
+                "changed_lines": [
+                  221
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/release/shared/fetch.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 201,
+                "old_len": 15,
+                "changed_lines": [
+                  204,
+                  205,
+                  206,
+                  207,
+                  208,
+                  211,
+                  212
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "pkg/cmd/release/download/download_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 218,
+                "old_len": 6,
+                "changed_lines": [
+                  221
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "pkg/cmd/release/shared/fetch.go",
+      "omission_line": 204
+    },
+    {
+      "id": "v-517dae6a",
+      "commit": "517dae6a938d4efe73f1219873ebcc74cf4febe1",
+      "parent": "70bb306bd25eb407f90eabefd98824aed62cf519",
+      "date": "2026-06-18",
+      "prompt": "install universal agent to ~/.agents/skills",
+      "complete": {
+        "files": [
+          {
+            "path": "internal/skills/registry/registry.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 299,
+                "old_len": 7,
+                "changed_lines": [
+                  302
+                ]
+              }
+            ]
+          },
+          {
+            "path": "internal/skills/registry/registry_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 125,
+                "old_len": 6,
+                "changed_lines": [
+                  128
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "internal/skills/registry/registry.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 299,
+                "old_len": 7,
+                "changed_lines": [
+                  302
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "internal/skills/registry/registry_test.go",
+      "omission_line": 128
+    },
+    {
+      "id": "v-8d2b059e",
+      "commit": "8d2b059e07f71c17068f2286617f23286e05e0c0",
+      "parent": "869c044391ba73f1adca31f52d4b025430006242",
+      "date": "2026-06-10",
+      "prompt": "fix: error when --comments is used with a comment argument",
+      "complete": {
+        "files": [
+          {
+            "path": "pkg/cmd/discussion/view/view.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 174,
+                "old_len": 6,
+                "changed_lines": [
+                  177
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/discussion/view/view_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 190,
+                "old_len": 14,
+                "changed_lines": [
+                  193,
+                  194,
+                  195,
+                  196,
+                  197,
+                  198,
+                  199,
+                  200
+                ]
+              },
+              {
+                "old_start": 881,
+                "old_len": 7,
+                "changed_lines": [
+                  884
+                ]
+              },
+              {
+                "old_start": 910,
+                "old_len": 7,
+                "changed_lines": [
+                  913
+                ]
+              },
+              {
+                "old_start": 940,
+                "old_len": 7,
+                "changed_lines": [
+                  943
+                ]
+              },
+              {
+                "old_start": 1003,
+                "old_len": 7,
+                "changed_lines": [
+                  1006
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "pkg/cmd/discussion/view/view_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 190,
+                "old_len": 14,
+                "changed_lines": [
+                  193,
+                  194,
+                  195,
+                  196,
+                  197,
+                  198,
+                  199,
+                  200
+                ]
+              },
+              {
+                "old_start": 881,
+                "old_len": 7,
+                "changed_lines": [
+                  884
+                ]
+              },
+              {
+                "old_start": 910,
+                "old_len": 7,
+                "changed_lines": [
+                  913
+                ]
+              },
+              {
+                "old_start": 940,
+                "old_len": 7,
+                "changed_lines": [
+                  943
+                ]
+              },
+              {
+                "old_start": 1003,
+                "old_len": 7,
+                "changed_lines": [
+                  1006
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "pkg/cmd/discussion/view/view.go",
+      "omission_line": 177
+    },
+    {
+      "id": "v-2618999b",
+      "commit": "2618999bcb6c85d4554638937dc80c322a76d593",
+      "parent": "4166ecf2cada209714af79387a5243b334af764b",
+      "date": "2026-06-06",
+      "prompt": "feat: add comment manipulation methods",
+      "complete": {
+        "files": [
+          {
+            "path": "pkg/cmd/discussion/client/client.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 22,
+                "old_len": 4,
+                "changed_lines": [
+                  25
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/discussion/client/client_impl.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1075,
+                "old_len": 3,
+                "changed_lines": [
+                  1078
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/discussion/client/client_impl_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 3599,
+                "old_len": 3,
+                "changed_lines": [
+                  3602
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/discussion/client/client_mock.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 18,
+                "old_len": 12,
+                "changed_lines": [
+                  21,
+                  24,
+                  27
+                ]
+              },
+              {
+                "old_start": 45,
+                "old_len": 6,
+                "changed_lines": [
+                  48
+                ]
+              },
+              {
+                "old_start": 52,
+                "old_len": 12,
+                "changed_lines": [
+                  55,
+                  58,
+                  61
+                ]
+              },
+              {
+                "old_start": 79,
+                "old_len": 8,
+                "changed_lines": [
+                  82,
+                  84
+                ]
+              },
+              {
+                "old_start": 88,
+                "old_len": 6,
+                "changed_lines": [
+                  91
+                ]
+              },
+              {
+                "old_start": 95,
+                "old_len": 6,
+                "changed_lines": [
+                  98
+                ]
+              },
+              {
+                "old_start": 162,
+                "old_len": 9,
+                "changed_lines": [
+                  165,
+                  167
+                ]
+              },
+              {
+                "old_start": 172,
+                "old_len": 6,
+                "changed_lines": [
+                  175
+                ]
+              },
+              {
+                "old_start": 210,
+                "old_len": 6,
+                "changed_lines": [
+                  213
+                ]
+              },
+              {
+                "old_start": 246,
+                "old_len": 6,
+                "changed_lines": [
+                  249
+                ]
+              },
+              {
+                "old_start": 533,
+                "old_len": 3,
+                "changed_lines": [
+                  536
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "pkg/cmd/discussion/client/client.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 22,
+                "old_len": 4,
+                "changed_lines": [
+                  25
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/discussion/client/client_impl.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1075,
+                "old_len": 3,
+                "changed_lines": [
+                  1078
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/discussion/client/client_mock.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 18,
+                "old_len": 12,
+                "changed_lines": [
+                  21,
+                  24,
+                  27
+                ]
+              },
+              {
+                "old_start": 45,
+                "old_len": 6,
+                "changed_lines": [
+                  48
+                ]
+              },
+              {
+                "old_start": 52,
+                "old_len": 12,
+                "changed_lines": [
+                  55,
+                  58,
+                  61
+                ]
+              },
+              {
+                "old_start": 79,
+                "old_len": 8,
+                "changed_lines": [
+                  82,
+                  84
+                ]
+              },
+              {
+                "old_start": 88,
+                "old_len": 6,
+                "changed_lines": [
+                  91
+                ]
+              },
+              {
+                "old_start": 95,
+                "old_len": 6,
+                "changed_lines": [
+                  98
+                ]
+              },
+              {
+                "old_start": 162,
+                "old_len": 9,
+                "changed_lines": [
+                  165,
+                  167
+                ]
+              },
+              {
+                "old_start": 172,
+                "old_len": 6,
+                "changed_lines": [
+                  175
+                ]
+              },
+              {
+                "old_start": 210,
+                "old_len": 6,
+                "changed_lines": [
+                  213
+                ]
+              },
+              {
+                "old_start": 246,
+                "old_len": 6,
+                "changed_lines": [
+                  249
+                ]
+              },
+              {
+                "old_start": 533,
+                "old_len": 3,
+                "changed_lines": [
+                  536
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "pkg/cmd/discussion/client/client_impl_test.go",
+      "omission_line": 3602
+    },
+    {
+      "id": "v-e2d150da",
+      "commit": "e2d150da420b8bf84f3097f6fad3bbb715ea1cb4",
+      "parent": "9d413e769a3604194364421db34bcc0128696d09",
+      "date": "2026-06-09",
+      "prompt": "remove redundant error wrapping on ListCategories",
+      "complete": {
+        "files": [
+          {
+            "path": "pkg/cmd/discussion/create/create.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 113,
+                "old_len": 7,
+                "changed_lines": [
+                  116
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/discussion/create/create_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 242,
+                "old_len": 7,
+                "changed_lines": [
+                  245
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/discussion/edit/edit.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 175,
+                "old_len": 7,
+                "changed_lines": [
+                  178
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "pkg/cmd/discussion/create/create.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 113,
+                "old_len": 7,
+                "changed_lines": [
+                  116
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/discussion/create/create_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 242,
+                "old_len": 7,
+                "changed_lines": [
+                  245
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "pkg/cmd/discussion/edit/edit.go",
+      "omission_line": 178
+    },
+    {
+      "id": "v-c1f3c1a1",
+      "commit": "c1f3c1a164ab67436d525769adbce0fd67dd5e70",
+      "parent": "e61df0721a01641e15c463a8cbb829fa40242eec",
+      "date": "2026-06-08",
+      "prompt": "add missing repo flag override",
+      "complete": {
+        "files": [
+          {
+            "path": "pkg/cmd/discussion/list/list.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 129,
+                "old_len": 6,
+                "changed_lines": [
+                  132
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/discussion/view/view.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 189,
+                "old_len": 6,
+                "changed_lines": [
+                  192
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "pkg/cmd/discussion/list/list.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 129,
+                "old_len": 6,
+                "changed_lines": [
+                  132
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "pkg/cmd/discussion/view/view.go",
+      "omission_line": 192
+    },
+    {
+      "id": "v-b1029009",
+      "commit": "b1029009dbfbcf4240472097e12614dbc3cdcd19",
+      "parent": "d6a089d5ce30e5b09bac22338f7949ef7ebbd36f",
+      "date": "2026-06-05",
+      "prompt": "handle partial failure on create/update label mutations",
+      "complete": {
+        "files": [
+          {
+            "path": "pkg/cmd/discussion/client/client.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 16,
+                "old_len": 6,
+                "changed_lines": [
+                  19
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/discussion/client/client_impl.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1,
+                "old_len": 6,
+                "changed_lines": [
+                  4
+                ]
+              },
+              {
+                "old_start": 925,
+                "old_len": 6,
+                "changed_lines": [
+                  928
+                ]
+              },
+              {
+                "old_start": 957,
+                "old_len": 12,
+                "changed_lines": [
+                  960,
+                  963,
+                  965
+                ]
+              },
+              {
+                "old_start": 974,
+                "old_len": 9,
+                "changed_lines": [
+                  977,
+                  980
+                ]
+              },
+              {
+                "old_start": 1021,
+                "old_len": 12,
+                "changed_lines": [
+                  1024,
+                  1027,
+                  1029
+                ]
+              },
+              {
+                "old_start": 1038,
+                "old_len": 5,
+                "changed_lines": [
+                  1041
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/discussion/client/client_impl_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 2813,
+                "old_len": 7,
+                "changed_lines": [
+                  2816
+                ]
+              },
+              {
+                "old_start": 2866,
+                "old_len": 7,
+                "changed_lines": [
+                  2869
+                ]
+              },
+              {
+                "old_start": 2885,
+                "old_len": 6,
+                "changed_lines": [
+                  2888
+                ]
+              },
+              {
+                "old_start": 3509,
+                "old_len": 6,
+                "changed_lines": [
+                  3512
+                ]
+              },
+              {
+                "old_start": 3526,
+                "old_len": 6,
+                "changed_lines": [
+                  3529
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/discussion/create/create.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 188,
+                "old_len": 6,
+                "changed_lines": [
+                  191
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/discussion/edit/edit.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 210,
+                "old_len": 6,
+                "changed_lines": [
+                  213
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "pkg/cmd/discussion/client/client.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 16,
+                "old_len": 6,
+                "changed_lines": [
+                  19
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/discussion/client/client_impl.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1,
+                "old_len": 6,
+                "changed_lines": [
+                  4
+                ]
+              },
+              {
+                "old_start": 925,
+                "old_len": 6,
+                "changed_lines": [
+                  928
+                ]
+              },
+              {
+                "old_start": 957,
+                "old_len": 12,
+                "changed_lines": [
+                  960,
+                  963,
+                  965
+                ]
+              },
+              {
+                "old_start": 974,
+                "old_len": 9,
+                "changed_lines": [
+                  977,
+                  980
+                ]
+              },
+              {
+                "old_start": 1021,
+                "old_len": 12,
+                "changed_lines": [
+                  1024,
+                  1027,
+                  1029
+                ]
+              },
+              {
+                "old_start": 1038,
+                "old_len": 5,
+                "changed_lines": [
+                  1041
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/discussion/client/client_impl_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 2813,
+                "old_len": 7,
+                "changed_lines": [
+                  2816
+                ]
+              },
+              {
+                "old_start": 2866,
+                "old_len": 7,
+                "changed_lines": [
+                  2869
+                ]
+              },
+              {
+                "old_start": 2885,
+                "old_len": 6,
+                "changed_lines": [
+                  2888
+                ]
+              },
+              {
+                "old_start": 3509,
+                "old_len": 6,
+                "changed_lines": [
+                  3512
+                ]
+              },
+              {
+                "old_start": 3526,
+                "old_len": 6,
+                "changed_lines": [
+                  3529
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/discussion/create/create.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 188,
+                "old_len": 6,
+                "changed_lines": [
+                  191
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "pkg/cmd/discussion/edit/edit.go",
+      "omission_line": 213
+    },
+    {
+      "id": "v-16a20347",
+      "commit": "16a20347dd33b8f67abd8990ab0940d35f522233",
+      "parent": "55808753070c023c45b40592fbfc624d8f03a759",
+      "date": "2026-05-20",
+      "prompt": "fix warning message to make it clear",
+      "complete": {
+        "files": [
+          {
+            "path": "pkg/cmd/skills/update/update.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 338,
+                "old_len": 7,
+                "changed_lines": [
+                  341
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/skills/update/update_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 508,
+                "old_len": 7,
+                "changed_lines": [
+                  511
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "pkg/cmd/skills/update/update.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 338,
+                "old_len": 7,
+                "changed_lines": [
+                  341
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "pkg/cmd/skills/update/update_test.go",
+      "omission_line": 511
+    },
+    {
+      "id": "v-fb748cb2",
+      "commit": "fb748cb2bf3a434ff12f5268c9983a65310c6520",
+      "parent": "00fc8c923ab3f321a412e1c89e425c107122f0bb",
+      "date": "2026-05-19",
+      "prompt": "add logic to preview too",
+      "complete": {
+        "files": [
+          {
+            "path": "internal/skills/discovery/discovery.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 390,
+                "old_len": 6,
+                "changed_lines": [
+                  393
+                ]
+              }
+            ]
+          },
+          {
+            "path": "internal/skills/discovery/discovery_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1526,
+                "old_len": 6,
+                "changed_lines": [
+                  1529
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/skills/install/install.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 551,
+                "old_len": 23,
+                "changed_lines": [
+                  554,
+                  555,
+                  556,
+                  557,
+                  558,
+                  559,
+                  560,
+                  561,
+                  562,
+                  563,
+                  564,
+                  565,
+                  566,
+                  567,
+                  568,
+                  569,
+                  570
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/skills/preview/preview.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 69,
+                "old_len": 6,
+                "changed_lines": [
+                  72
+                ]
+              },
+              {
+                "old_start": 82,
+                "old_len": 6,
+                "changed_lines": [
+                  85
+                ]
+              },
+              {
+                "old_start": 153,
+                "old_len": 25,
+                "changed_lines": [
+                  156,
+                  157,
+                  158,
+                  159,
+                  160,
+                  161,
+                  163,
+                  164,
+                  165,
+                  166,
+                  168,
+                  169,
+                  170,
+                  172,
+                  173,
+                  174
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/skills/preview/preview_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 261,
+                "old_len": 6,
+                "changed_lines": [
+                  264
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "internal/skills/discovery/discovery.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 390,
+                "old_len": 6,
+                "changed_lines": [
+                  393
+                ]
+              }
+            ]
+          },
+          {
+            "path": "internal/skills/discovery/discovery_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1526,
+                "old_len": 6,
+                "changed_lines": [
+                  1529
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/skills/install/install.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 551,
+                "old_len": 23,
+                "changed_lines": [
+                  554,
+                  555,
+                  556,
+                  557,
+                  558,
+                  559,
+                  560,
+                  561,
+                  562,
+                  563,
+                  564,
+                  565,
+                  566,
+                  567,
+                  568,
+                  569,
+                  570
+                ]
+              }
+            ]
+          },
+          {
+            "path": "pkg/cmd/skills/preview/preview.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 69,
+                "old_len": 6,
+                "changed_lines": [
+                  72
+                ]
+              },
+              {
+                "old_start": 82,
+                "old_len": 6,
+                "changed_lines": [
+                  85
+                ]
+              },
+              {
+                "old_start": 153,
+                "old_len": 25,
+                "changed_lines": [
+                  156,
+                  157,
+                  158,
+                  159,
+                  160,
+                  161,
+                  163,
+                  164,
+                  165,
+                  166,
+                  168,
+                  169,
+                  170,
+                  172,
+                  173,
+                  174
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "pkg/cmd/skills/preview/preview_test.go",
+      "omission_line": 264
+    },
+    {
+      "id": "v-a44721d2",
+      "commit": "a44721d233be9a2f6f0b5ee5c4f71274acb8d296",
+      "parent": "9c4184de6f8c208a11e4329b90fa9844efd728e9",
+      "date": "2026-05-07",
+      "prompt": "Add explicit build tags to platform-specific echo test files",
+      "complete": {
+        "files": [
+          {
+            "path": "internal/prompter/echo_darwin_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1,
+                "old_len": 3,
+                "changed_lines": [
+                  1
+                ]
+              }
+            ]
+          },
+          {
+            "path": "internal/prompter/echo_linux_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1,
+                "old_len": 3,
+                "changed_lines": [
+                  1
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "truncated": {
+        "files": [
+          {
+            "path": "internal/prompter/echo_darwin_test.go",
+            "created": false,
+            "hunks": [
+              {
+                "old_start": 1,
+                "old_len": 3,
+                "changed_lines": [
+                  1
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "omission_file": "internal/prompter/echo_linux_test.go",
+      "omission_line": 1
+    }
+  ]
+}
