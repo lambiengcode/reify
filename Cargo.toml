@@ -8,8 +8,10 @@ edition = "2021"
 license = "Apache-2.0"
 description = "A local knowledge engine that gives AI coding agents the smallest context they need to change mature business systems correctly."
 repository = "https://github.com/lambiengcode/reify"
-homepage = "https://github.com/lambiengcode/reify"
-documentation = "https://docs.rs/reify"
+homepage = "https://lambiengcode.github.io/reify/"
+# Not docs.rs/reify: the `reify` name on crates.io belongs to an unrelated crate
+# published in 2021, so that URL sends readers to somebody else's software.
+documentation = "https://lambiengcode.github.io/reify/docs.html"
 readme = "README.md"
 keywords = ["ai", "agents", "code-search", "knowledge-graph", "codebase"]
 categories = ["development-tools", "command-line-utilities"]

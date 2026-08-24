@@ -15,6 +15,8 @@ use std::process::Command;
 
 const REPO: &str = "lambiengcode/reify";
 const CURRENT: &str = env!("CARGO_PKG_VERSION");
+/// The binary's filename inside a release archive.
+const BINARY: &str = if cfg!(windows) { "reify.exe" } else { "reify" };
 
 /// The release target this build can upgrade to, or why it cannot.
 fn release_target() -> Result<&'static str> {
@@ -23,6 +25,7 @@ fn release_target() -> Result<&'static str> {
         ("macos", "x86_64") => Ok("x86_64-apple-darwin"),
         ("linux", "aarch64") => Ok("aarch64-unknown-linux-gnu"),
         ("linux", "x86_64") => Ok("x86_64-unknown-linux-gnu"),
+        ("windows", "x86_64") => Ok("x86_64-pc-windows-msvc"),
         (os, arch) => bail!(
             "no prebuilt binary for {os}/{arch}; upgrade from source instead:\n  \
              cargo install --git https://github.com/{REPO} reify-cli"
@@ -164,16 +167,37 @@ fn install_release(tag: &str, target: &str, stage: &Path, exe: &Path) -> Result<
         .context("running tar")?;
     anyhow::ensure!(status.success(), "tar could not unpack the release");
 
-    let fresh = stage.join(&name).join("reify");
+    let fresh = stage.join(&name).join(BINARY);
     anyhow::ensure!(fresh.is_file(), "the release archive holds no reify binary");
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
         std::fs::set_permissions(&fresh, std::fs::Permissions::from_mode(0o755))?;
     }
-    std::fs::rename(&fresh, exe)
-        .with_context(|| format!("replacing {} (is it writable?)", exe.display()))?;
-    Ok(())
+    // Windows holds an open handle on the running image, so the new binary cannot be
+    // renamed over it — but the running one *can* be renamed aside, which frees the
+    // path. The displaced file is left for the next run to clear: deleting it while
+    // it is still mapped fails, and failing an upgrade over housekeeping would be
+    // worse than one stale file.
+    #[cfg(windows)]
+    {
+        let displaced = exe.with_extension("old");
+        let _ = std::fs::remove_file(&displaced);
+        std::fs::rename(exe, &displaced)
+            .with_context(|| format!("moving {} aside", exe.display()))?;
+        if let Err(err) = std::fs::rename(&fresh, exe) {
+            // Put the working binary back rather than leaving the user with none.
+            let _ = std::fs::rename(&displaced, exe);
+            return Err(err).with_context(|| format!("replacing {}", exe.display()));
+        }
+        return Ok(());
+    }
+    #[cfg(not(windows))]
+    {
+        std::fs::rename(&fresh, exe)
+            .with_context(|| format!("replacing {} (is it writable?)", exe.display()))?;
+        Ok(())
+    }
 }
 
 fn hex(bytes: &[u8]) -> String {
