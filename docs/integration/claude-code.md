@@ -28,9 +28,10 @@ is reducing context, paying a per-turn tax to deliver it would be self-defeating
 reify serve --mcp
 ```
 
-Three tools — `reify_context`, `reify_why`, `reify_impact` — and that is the whole
-surface, deliberately. `mcp::tests::the_tool_schemas_stay_small_enough_to_be_worth_sending`
-asserts the schemas cost under 600 tokens.
+Six tools — `reify_context`, `reify_why`, `reify_impact`, `reify_explain`,
+`reify_flow`, `reify_conflicts` — and that is the whole surface, deliberately.
+`mcp::tests::the_tool_schemas_stay_small_enough_to_be_worth_sending` asserts the
+schemas cost under 600 tokens, which all six still fit inside.
 
 ## Level 2 — a preflight hook
 
