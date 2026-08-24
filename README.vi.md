@@ -18,7 +18,7 @@
   <a href="https://github.com/lambiengcode/reify/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/lambiengcode/reify?style=flat-square&color=blue" /></a>
   <a href="https://lambiengcode.github.io/reify/"><img alt="Documentation" src="https://img.shields.io/badge/docs-lambiengcode.github.io-2da44e?style=flat-square" /></a>
   <a href="LICENSE"><img alt="Apache-2.0" src="https://img.shields.io/github/license/lambiengcode/reify?style=flat-square&color=blue" /></a>
-  <a href="#swebench"><img alt="SWE-bench retrieval 84.6%" src="https://img.shields.io/badge/SWE--bench%20retrieval-84.6%25-blueviolet?style=flat-square" /></a>
+  <a href="#swebench"><img alt="SWE-bench retrieval 87.0%" src="https://img.shields.io/badge/SWE--bench%20retrieval-87.0%25-blueviolet?style=flat-square" /></a>
   <a href="#privacy"><img alt="network calls: 0" src="https://img.shields.io/badge/network%20calls-0-success?style=flat-square" /></a>
 </p>
 
@@ -27,11 +27,11 @@
   <a href="#other-agents"><img alt="Cursor" src="https://img.shields.io/badge/Cursor-supported-2da44e?style=flat-square" /></a>
   <a href="#other-agents"><img alt="Codex" src="https://img.shields.io/badge/Codex-supported-2da44e?style=flat-square" /></a>
   <a href="#other-agents"><img alt="OpenCode" src="https://img.shields.io/badge/OpenCode-supported-2da44e?style=flat-square" /></a>
-  <a href="#mcp"><img alt="MCP" src="https://img.shields.io/badge/MCP-3%20tools-2da44e?style=flat-square" /></a>
+  <a href="#mcp"><img alt="MCP" src="https://img.shields.io/badge/MCP-6%20tools-2da44e?style=flat-square" /></a>
 </p>
 
 <p align="center">
-  <strong>Trên SWE-bench Verified, Reify đặt đúng file cần sửa trước mặt mô hình 84,6% số lần — grep chỉ được 6,6% &middot; 500 issue thật, benchmark của người khác &middot; không bao giờ mở socket</strong><br>
+  <strong>Trên SWE-bench Verified, Reify đặt đúng file cần sửa trước mặt mô hình 87,0% số lần — grep chỉ được 6,6% &middot; 500 issue thật, benchmark của người khác &middot; không bao giờ mở socket</strong><br>
   <sub>Một mô hình thật, 142 task lấy từ commit đã merge thật ở ERPNext, OFBiz, OpenMRS và Medusa; mỗi index được dựng tại một commit <em>trước khi</em> những thay đổi đó tồn tại. Đó là <em>truy xuất</em>: đúng file, đặt trước mặt mô hình. Còn về tính đúng đắn của bản vá đầu-cuối, hiện một baseline BM25 giải quyết được <em>nhiều</em> issue hơn Reify, và <a href="#swebench">mục nói điều đó</a> cũng nổi bật đúng như mục này. <a href="benchmarks/REPORT.md">Bản viết đầy đủ</a> &middot; <a href="#reproducing-the-benchmark">tự chạy lại</a>.</sub>
 </p>
 
@@ -70,7 +70,7 @@ repository, cả hai đều in kế hoạch trước. Nối từng agent, hook v
 - **Số liệu:** [SWE-bench Verified](#swebench) · [bốn repository](#numbers) · [chỗ nó không chạy được](#where-it-doesnt-work)
 - **Dùng nó:** [cài đặt](#install) · [nối vào agent](#other-agents) · [các lệnh](#commands) · [quyền riêng tư](#privacy)
 - **Bên dưới:** [cách hoạt động](#how-it-works) · [nó đọc gì](#what-it-reads) · [đa ngôn ngữ](#multilingual) · [kiến trúc](#architecture)
-- [Câu hỏi thường gặp](#faq) · [phát triển](#development) · [lộ trình](#roadmap) · [giấy phép](#license)
+- [Câu hỏi thường gặp](#faq) · [phát triển](#development) · [giấy phép](#license)
 
 ## <a id="the-one-person-problem"></a>Vấn đề phụ thuộc một người
 
@@ -169,22 +169,22 @@ thông thường; đáp án đúng là tập file mà bản vá được chấp 
 |---|--:|--:|--:|--:|
 | grep, content | 6.6% <sub>[4.7–9.1]</sub> | 0.06 | 5.6% | 3,998 |
 | grep, paths | 9.0% <sub>[6.8–11.8]</sub> | 0.06 | 7.8% | 3,996 |
-| **reify**, một vòng | **66.0%** <sub>[61.7–70.0]</sub> | 0.43 | 59.0% | **3,466** |
-| **reify**, ba vòng | **84.6%** <sub>[81.2–87.5]</sub> | 0.45 | 77.0% | 9,174 |
+| **reify**, một vòng | **72.6%** <sub>[68.5–76.3]</sub> | 0.42 | 65.4% | **3,670** |
+| **reify**, ba vòng | **87.0%** <sub>[83.8–89.7]</sub> | 0.43 | 81.4% | 9,549 |
 
-**Một vòng Reify duy nhất thắng grep trên 310 instance và thua 13 — trong khi tiêu ít
-token hơn** (3.466 so với 3.998). Ba vòng thắng 395–5 (McNemar chính xác
-p ≈ 7 × 10⁻¹¹⁰). Đây không phải phép đo sát nút, và nó là con số sạch nhất trong tài
+**Một vòng Reify duy nhất thắng grep trên 342 instance và thua 12 — trong khi tiêu ít
+token hơn** (3.670 so với 3.998). Ba vòng thắng 406–4 (McNemar chính xác
+p ≈ 9 × 10⁻¹¹⁵). Đây không phải phép đo sát nút, và nó là con số sạch nhất trong tài
 liệu này chính bởi vì đề bài, repository lẫn đáp án đều đến từ nơi khác.
 
 Theo từng repository, ba vòng so với grep nội dung:
 
 | | grep | reify ×3 | | | grep | reify ×3 |
 |---|--:|--:|---|---|--:|--:|
-| django (n=231) | 6% | **88%** | | astropy (n=22) | 0% | **77%** |
-| sympy (n=75) | 7% | **77%** | | xarray (n=22) | 9% | **91%** |
-| sphinx (n=44) | 7% | **75%** | | pytest (n=19) | 26% | **84%** |
-| matplotlib (n=34) | 0% | **91%** | | pylint (n=10) | 10% | **60%** |
+| django (n=231) | 6% | **90%** | | astropy (n=22) | 0% | **77%** |
+| sympy (n=75) | 7% | **79%** | | xarray (n=22) | 9% | **95%** |
+| sphinx (n=44) | 7% | **80%** | | pytest (n=19) | 26% | **95%** |
+| matplotlib (n=34) | 0% | **97%** | | pylint (n=10) | 10% | **60%** |
 | scikit-learn (n=32) | 9% | **88%** | | requests (n=8) | 0% | **100%** |
 
 **Điều này chứng minh gì và không chứng minh gì.** Nó đo *truy xuất* — liệu những file
@@ -197,26 +197,38 @@ hình, không ảnh hưởng tới việc một bộ truy xuất đề xuất fi
 [`benchmarks/swe/`](benchmarks/swe/).
 
 
-### Đầu-cuối: hoà, và cái giá để đến được đó
+### Đầu-cuối: đang dẫn trước, nhưng chưa được chứng minh
 
 Truy xuất không phải tuyên bố cuối cùng — giải quyết được issue mới là. Cùng benchmark
 đó, chạy qua chính giao thức của bài báo SWE-bench (một mô hình, một ngân sách, bộ truy
 xuất là khác biệt duy nhất), mọi bản vá do **bộ chấm chính thức của SWE-bench** phán quyết:
 
-| giải quyết được issue, 63 instance chấm ở cả hai nhánh | | |
+| giải quyết được issue, 101 instance chấm ở cả hai nhánh | | |
 |---|--:|---|
-| BM25 | 23,8% | |
-| **Reify** | **23,8%** | 6–6, p = 1,0 |
+| BM25 | 67,3% | 68 giải quyết được, 1 bản vá rỗng |
+| **Reify** | **73,3%** | 74 giải quyết được, 2 bản vá rỗng |
+| | | 12–6, McNemar chính xác **p = 0,24** |
 
-Hoà — và cần nói thẳng, vì lần thử đầu tiên là **thua**: 11,1% so với 18,1%. Điều thú vị
-nằm ở chỗ đã khép lại khoảng cách đó bằng cách nào.
+**Hãy đọc p-value trước khi đọc phần trăm.** Reify giải quyết được nhiều hơn sáu issue và
+thắng gấp đôi số lần bất đồng — nhưng ở cỡ mẫu này đó chưa phải kết quả có ý nghĩa thống
+kê. Cách tóm tắt trung thực là *đang dẫn trước và chưa được chứng minh*, không phải một
+chiến thắng.
 
-Reify tìm đúng file thường xuyên hơn hẳn (77% so với 60% của BM25) mà mô hình vẫn làm tệ
-hơn. Dựng lại đúng những prompt đó cho thấy lý do: một cửa sổ ngữ cảnh được đổ đầy bằng
-nguyên cả file theo thứ tự xếp hạng sẽ tiêu hết vào thứ đứng đầu, và cách xếp hạng của
-Reify mù trước kích thước file, trong khi BM25 có chuẩn hoá độ dài ngay trong công thức.
-**File đúng đã được tìm ra rồi không bao giờ được cho xem** — chỉ hiện diện trong 27% số
-prompt, so với 40% của BM25.
+<sub>**Các con số tuyệt đối này không so sánh được với những con số từng công bố ở đây.**
+Lần chạy đó dùng DeepSeek; lần này dùng Claude Sonnet, vì tài khoản DeepSeek đã hết số dư
+giữa chừng. Một mô hình mạnh hơn nâng cả hai nhánh — lần trước mỗi bên khoảng 24%. Thứ
+sống sót qua việc đổi mô hình là phép so sánh *theo cặp*, vì cả hai nhánh luôn trả lời
+cùng một instance bằng cùng một mô hình. Kết quả thô từng instance:
+[`benchmarks/swe/results/stage2-endtoend.json`](benchmarks/swe/results/stage2-endtoend.json).</sub>
+
+Không phải lúc nào cũng dẫn trước. Lần thử đầu tiên là **thua**, và điều thú vị nằm ở chỗ
+đã khép lại khoảng cách đó bằng cách nào.
+
+Reify tìm đúng file thường xuyên hơn hẳn mà mô hình vẫn làm tệ hơn. Dựng lại đúng những
+prompt đó cho thấy lý do: một cửa sổ ngữ cảnh được đổ đầy bằng nguyên cả file theo thứ tự
+xếp hạng sẽ tiêu hết vào thứ đứng đầu, và thứ tự đó mù trước kích thước file, trong khi
+BM25 có chuẩn hoá độ dài ngay trong công thức. **File đúng đã được tìm ra rồi không bao
+giờ được cho xem** — chỉ hiện diện trong 27% số prompt, so với 40% của BM25.
 
 `reify context --for-edit` sửa từ gốc: các vùng được nới ra thành định nghĩa trọn vẹn,
 phần import của file được đưa vào một lần, các vùng chồng nhau được gộp, ngân sách vẫn
@@ -228,8 +240,11 @@ cứng. Không còn mất gì ở cửa sổ nữa:
 | Reify, nguyên file | 76,7% | 26,7% |
 | **Reify `--for-edit`** | **80,0%** | **56,7%** |
 
-Hai cách sửa đã bị **bác bỏ dựa trên bằng chứng**: giới hạn theo từng file làm mọi thứ tệ
-hơn (một file bị cắt cụt thì cũng không sửa được), và xếp hạng theo chi phí làm giảm truy
+Việc giới hạn phần cửa sổ mà một file được chiếm đã từng bị **bác bỏ dựa trên bằng chứng**,
+rồi sau đó mới được áp dụng ở dạng có hiệu quả. Cắt cụt *nội dung* file làm mọi thứ tệ hơn,
+vì một file bị cắt cụt thì cũng không sửa được. Giới hạn số *ký hiệu* mà một file đóng góp
+vào phần được chọn — ở phía trên cửa sổ, giữ nguyên vẹn từng vùng — mới là thứ cải thiện
+truy xuất, và đó là thứ đang được ship. Xếp hạng theo chi phí thì bị bác bỏ hẳn: nó làm giảm truy
 xuất bảy điểm mà chẳng đem lại gì khi các vùng đã khiến kích thước file không còn quan trọng.
 
 Vậy: Reify thắng rõ ràng ở truy xuất và hoà ở kết quả vá cuối cùng. Ràng buộc còn lại nằm
@@ -481,7 +496,7 @@ Treat INFERRED claims as leads to verify, not facts.
 reify serve --mcp
 ```
 
-Ba công cụ — `reify_context`, `reify_why`, `reify_impact` — và ba là toàn bộ bề mặt. Schema của một MCP server bị gửi lại mỗi lượt của mỗi phiên, nên một công cụ sinh ra để tiết kiệm ngữ cảnh thì không nên thu tiền thuê chỗ để giao hàng. Một test khẳng định các schema tốn dưới 600 token.
+Sáu công cụ — `reify_context`, `reify_why`, `reify_impact`, `reify_explain`, `reify_flow` và `reify_conflicts` — và sáu là toàn bộ bề mặt. Schema của một MCP server bị gửi lại mỗi lượt của mỗi phiên, nên một công cụ sinh ra để tiết kiệm ngữ cảnh thì không nên thu tiền thuê chỗ để giao hàng. Một test khẳng định các schema tốn dưới 600 token.
 
 ### <a id="optional-a-model"></a>Tuỳ chọn: dùng một mô hình
 
@@ -571,7 +586,7 @@ ERPNext, 5.064 file, laptop chip M 8 nhân.
 | index lại, sửa một file | 0,7 giây |
 | `reify context` | 57 ms |
 | `reify impact` | 0,2 ms |
-| `reify why` | 205 ms — do gọi tiến trình con `git log -L`; khoảng 5 ms nếu bỏ nó |
+| `reify why` | 87 ms trung vị, 168 ms tệ nhất — do gọi tiến trình con `git log -L`; khoảng 5 ms nếu bỏ nó |
 | bộ nhớ đỉnh, index đầy đủ | 224 MB |
 | dung lượng kho | 47 MB (33% của cây làm việc 144 MB) |
 
@@ -656,27 +671,13 @@ Không. Dùng ripgrep đi. Dưới khoảng 20 nghìn dòng code, Reify không c
 Không thể. Trong binary không có HTTP client nào, và một test sẽ làm hỏng build nếu có một cái xuất hiện. Nếu bạn cấu hình nhà cung cấp mô hình, đó là lệnh do bạn chọn, và `reify llm preview` cho bạn xem chính xác từng byte trước.
 
 **Sao `reify why` chậm hơn mọi lệnh khác?**
-Nó gọi ra `git log -L` để lấy lịch sử theo dòng chính xác. 205 ms khi có, khoảng 5 ms khi không. Vẫn nằm trong danh sách cần cải thiện.
+Nó gọi ra `git log -L` để lấy lịch sử theo dòng chính xác. 87 ms khi có, khoảng 5 ms khi không. Vẫn nằm trong danh sách cần cải thiện.
 
 **Lệnh conflicts không tìm thấy gì trong repo của tôi. Nó hỏng à?**
 Chắc là không. Việc phát hiện đòi hỏi năm điều kiện cùng đúng một lúc và được thiên lệch mạnh về phía im lặng, bởi vì một bộ phát hiện mâu thuẫn hay báo động giả sẽ bị tắt ngay tuần thứ hai và mang theo cả những cảnh báo đúng của nó. Nó tìm thấy 0 trên ERPNext — repo gần như không có văn bản đặc tả — và đúng 1 trên fixture, nơi có một cái được cài sẵn.
 
 **"Reify" nghĩa là gì?**
 Là biến một thứ trừu tượng thành cụ thể. Kiến thức vốn luôn ở đó; chỉ là nó chưa từng là một file.
-
-## <a id="roadmap"></a>Lộ trình
-
-Đợt cải tiến đầu tiên đã xong. Tiên nghiệm từ lịch sử (mỗi commit đã merge là một ví dụ
-có nhãn: message ≈ ticket, file thay đổi = đáp án), cạnh nối test với code, tinh chỉnh
-lặp vòng và một repository thứ tư đều đã lên; phần fit trọng số trượt khâu kiểm định
-trên tập giữ riêng và đã được khôi phục về mặc định đúng theo cam kết đăng ký trước; và
-bảng điểm dừng ở một trên bảy mục tiêu, mỗi con số được in ngay cạnh ngưỡng của nó. Bài
-toán còn mở là trường hợp TypeScript hiện đại, nơi chưa có gì lấp được khoảng cách từ
-vựng giữa cách người ta mô tả thay đổi giao diện và cách code viết ra chúng.
-
-## <a id="status"></a>Trạng thái
-
-Còn sớm, và có đo đạc. Những điểm chưa đạt, đều được ghi rõ chứ không giấu: kho lưu trữ chiếm 33% cây làm việc so với mục tiêu 5%, `reify why` mất 205 ms so với mục tiêu 20 ms, và Windows chưa được kiểm thử.
 
 ## <a id="license"></a>Giấy phép
 

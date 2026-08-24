@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Stage 2: retrieval-augmented patch generation on SWE-bench Verified.
+"""Stage 2 (edit mode): the reify arm feeds REGIONS, the bm25 arm whole files.
 
 The SWE-bench paper's own protocol: one model, one budget, and the *retriever* is the
 only thing that changes between arms. Arm `reify` fills the context from
@@ -8,12 +8,14 @@ both truncated to the same character budget. The model returns SEARCH/REPLACE ed
 (far more reliably applied than a hand-written unified diff), which are applied to the
 tree so `git diff` produces the prediction the official harness will judge.
 
-Usage: stage2b.py <repo_dir> <instances.jsonl> <out_dir>
+Usage: stage2.py <repo_dir> <instances.jsonl> <out_dir>
+Model: $STAGE2_MODEL (default sonnet), passed to `claude -p`.
 """
-import json, math, pathlib, re, subprocess, sys, time
+import json, math, os, pathlib, re, subprocess, sys, time
 from collections import Counter
 
 R = "/Users/lambiengcode/Documents/reify/projects/reify/target/release"
+MODEL = os.environ.get("STAGE2_MODEL", "sonnet")
 CTX_CHARS = 48_000  # ~12k tokens of retrieved code, per arm, identical for both
 
 repo_dir = pathlib.Path(sys.argv[1]).resolve()
@@ -71,18 +73,51 @@ def bm25_files(problem, k=8):
     scored.sort(key=lambda x: (-x[0], x[1]))
     return [p for _, p in scored[:k]]
 
-def reify_files(problem, k=8):
-    r = sh([f"{R}/reify", "context", problem[:4000], "--budget", "4000", "--json"],
-           cwd=repo_dir, timeout=300)
+def reify_regions(problem):
+    """Reify in edit mode: (path, start, end) regions padded to whole definitions.
+
+    This is what `reify context` actually produces. Feeding whole files instead is what
+    cost the earlier run: one large file consumed the window and the file that mattered
+    never arrived at the model at all.
+    """
+    r = sh([f"{R}/reify", "context", problem[:4000], "--budget", "4000",
+            "--for-edit", "--json"], cwd=repo_dir, timeout=300)
     if r.returncode:
         return []
     data = json.loads(r.stdout)
-    seen, out = set(), []
+    out, seen = [], set()
     for item in data.get("next_reads", []) + data.get("code", []):
-        p = item.get("path", "")
-        if p and p not in seen and (repo_dir / p).is_file():
-            seen.add(p); out.append(p)
-    return out[:k]
+        p_, lines = item.get("path", ""), item.get("lines", "")
+        if not p_ or "-" not in lines or not (repo_dir / p_).is_file():
+            continue
+        try:
+            a, b = (int(x) for x in lines.split("-", 1))
+        except ValueError:
+            continue
+        if (p_, a, b) in seen:
+            continue
+        seen.add((p_, a, b)); out.append((p_, a, b))
+    return out
+
+
+def region_block(regions):
+    """Assemble the prompt from regions, each charged for its own size."""
+    parts, used = [], 0
+    for path, a, b in regions:
+        try:
+            lines = (repo_dir / path).read_text(errors="ignore").split("\n")
+        except OSError:
+            continue
+        a = max(1, a); b = min(len(lines), b)
+        if a > b:
+            continue
+        chunk = "\n".join(f"{i:5d}| {lines[i-1]}" for i in range(a, b + 1))
+        if used + len(chunk) > CTX_CHARS:
+            break
+        parts.append(f"### File: {path}  (lines {a}-{b})\n```python\n{chunk}\n```")
+        used += len(chunk)
+    return "\n\n".join(parts), used
+
 
 def context_block(files):
     """Same character budget for both arms, so the model's cost is matched."""
@@ -160,9 +195,20 @@ def apply_edits(reply):
     return applied
 
 def ask(prompt):
-    r = subprocess.run(["deepseek-axi", "ask", prompt], capture_output=True,
-                       text=True, timeout=900)
+    """One model, both arms.
+
+    Claude replaces DeepSeek here only because the DeepSeek account ran out of balance
+    mid-project. The arms still differ in nothing but the retriever, so the paired
+    comparison stands on its own — but absolute numbers are NOT comparable to the
+    earlier DeepSeek run and must never be presented as if the published tie moved.
+
+    The model is a parameter because a half-Opus, half-Sonnet set would confound the
+    aggregate: every instance in one run must be answered by the same model.
+    """
+    r = subprocess.run(["claude", "-p", prompt, "--model", MODEL],
+                       capture_output=True, text=True, timeout=1800)
     return r.stdout if r.returncode == 0 else ""
+
 
 done_file = out_root / "done.txt"
 done = set(done_file.read_text().split()) if done_file.exists() else set()
@@ -176,14 +222,15 @@ for i, inst in enumerate(sorted(instances, key=lambda r: r.get("created_at") or 
     try:
         reset(inst["base_commit"])
         sh([f"{R}/reify", "index", "-C", str(repo_dir)], timeout=2400)
-        picks = {"reify": reify_files(inst["problem_statement"]),
-                 "bm25": bm25_files(inst["problem_statement"])}
+        reify_pick = reify_regions(inst["problem_statement"])
+        bm25_pick = bm25_files(inst["problem_statement"])
         stats = {}
         # Alternate which arm the provider sees first, so cache warmth cannot favour one.
         order = ["reify", "bm25"] if i % 2 == 0 else ["bm25", "reify"]
         for arm in order:
             reset(inst["base_commit"])
-            ctx, used = context_block(picks[arm])
+            ctx, used = (region_block(reify_pick) if arm == "reify"
+                         else context_block(bm25_pick))
             prompt = PROMPT.format(repo=inst["repo"], context=ctx,
                                    problem=inst["problem_statement"][:8000])
             reply = ask(prompt)
@@ -198,9 +245,10 @@ for i, inst in enumerate(sorted(instances, key=lambda r: r.get("created_at") or 
             diff = sh(["git", "diff"], cwd=repo_dir).stdout
             with open(out_root / f"preds-{arm}.jsonl", "a") as f:
                 f.write(json.dumps({"instance_id": iid,
-                                    "model_name_or_path": f"deepseek+{arm}",
+                                    "model_name_or_path": f"{MODEL}+{arm}",
                                     "model_patch": diff}) + "\n")
-            stats[arm] = (len(picks[arm]), used, n, len(diff))
+            stats[arm] = (len(reify_pick) if arm == "reify" else len(bm25_pick),
+                          used, n, len(diff))
         reset(inst["base_commit"])
         with open(done_file, "a") as f:
             f.write(iid + "\n")

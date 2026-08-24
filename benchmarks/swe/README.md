@@ -28,12 +28,12 @@ baseline over the same repository. The model returns SEARCH/REPLACE edit blocks,
 are applied so `git diff` yields a prediction the official harness can judge.
 
 ```bash
-python3 stage2c.py <repo_dir> <shard.jsonl> <out_dir>   # generate patches, both arms
+STAGE2_MODEL=sonnet python3 stage2.py <repo_dir> <shard.jsonl> <out_dir>  # both arms
 ./eval_batched.sh                                       # grade them, batched
 python3 diagnose2.py                                    # paired result + why
 ```
 
-`stage2c.py` numbers every line of the retrieved context and asks for line-range
+`stage2.py` numbers every line of the retrieved context and asks for line-range
 replacements. That detail is load-bearing: asked for exact SEARCH text instead, the model
 reproduces these famous repositories from memory and ~45% of patches fail to apply. With
 line ranges it is ~1%.

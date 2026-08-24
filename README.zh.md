@@ -18,7 +18,7 @@
   <a href="https://github.com/lambiengcode/reify/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/lambiengcode/reify?style=flat-square&color=blue" /></a>
   <a href="https://lambiengcode.github.io/reify/"><img alt="Documentation" src="https://img.shields.io/badge/docs-lambiengcode.github.io-2da44e?style=flat-square" /></a>
   <a href="LICENSE"><img alt="Apache-2.0" src="https://img.shields.io/github/license/lambiengcode/reify?style=flat-square&color=blue" /></a>
-  <a href="#swebench"><img alt="SWE-bench retrieval 84.6%" src="https://img.shields.io/badge/SWE--bench%20retrieval-84.6%25-blueviolet?style=flat-square" /></a>
+  <a href="#swebench"><img alt="SWE-bench retrieval 87.0%" src="https://img.shields.io/badge/SWE--bench%20retrieval-87.0%25-blueviolet?style=flat-square" /></a>
   <a href="#privacy"><img alt="network calls: 0" src="https://img.shields.io/badge/network%20calls-0-success?style=flat-square" /></a>
 </p>
 
@@ -27,11 +27,11 @@
   <a href="#other-agents"><img alt="Cursor" src="https://img.shields.io/badge/Cursor-supported-2da44e?style=flat-square" /></a>
   <a href="#other-agents"><img alt="Codex" src="https://img.shields.io/badge/Codex-supported-2da44e?style=flat-square" /></a>
   <a href="#other-agents"><img alt="OpenCode" src="https://img.shields.io/badge/OpenCode-supported-2da44e?style=flat-square" /></a>
-  <a href="#mcp"><img alt="MCP" src="https://img.shields.io/badge/MCP-3%20tools-2da44e?style=flat-square" /></a>
+  <a href="#mcp"><img alt="MCP" src="https://img.shields.io/badge/MCP-6%20tools-2da44e?style=flat-square" /></a>
 </p>
 
 <p align="center">
-  <strong>在 SWE-bench Verified 上，Reify 有 84.6% 的概率把必须改动的文件送到模型面前 —— grep 只有 6.6% &middot; 500 个真实 issue，别人的基准 &middot; 从不打开任何 socket</strong><br>
+  <strong>在 SWE-bench Verified 上，Reify 有 87.0% 的概率把必须改动的文件送到模型面前 —— grep 只有 6.6% &middot; 500 个真实 issue，别人的基准 &middot; 从不打开任何 socket</strong><br>
   <sub>真实模型，142 个任务，全部取自 ERPNext、OFBiz、OpenMRS 和 Medusa 中真实合并的提交；每个索引都构建在这些改动<em>尚不存在</em>的提交上。那是<em>检索</em>：把正确的文件送到模型面前。而在端到端的补丁正确性上，目前一个 BM25 基线解决的 issue <em>比</em> Reify 更多，<a href="#swebench">说明这一点的那一节</a>与本节同样醒目。<a href="benchmarks/REPORT.md">完整报告</a> &middot; <a href="#reproducing-the-benchmark">自行复现</a>。</sub>
 </p>
 
@@ -70,7 +70,7 @@ reify context "你即将进行的改动" --toon
 - **数据：** [SWE-bench Verified](#swebench) · [四个代码库](#numbers) · [它失效的地方](#where-it-doesnt-work)
 - **使用：** [安装](#install) · [接入 agent](#other-agents) · [命令](#commands) · [隐私](#privacy)
 - **底层：** [工作原理](#how-it-works) · [它能读什么](#what-it-reads) · [多语言](#multilingual) · [架构](#architecture)
-- [常见问题](#faq) · [开发](#development) · [路线图](#roadmap) · [许可证](#license)
+- [常见问题](#faq) · [开发](#development) · [许可证](#license)
 
 ## <a id="the-one-person-problem"></a>只有一个人懂的问题
 
@@ -163,11 +163,11 @@ $ reify why erpnext/selling/doctype/sales_order/sales_order.py:812
 |---|--:|--:|--:|--:|
 | grep, content | 6.6% <sub>[4.7–9.1]</sub> | 0.06 | 5.6% | 3,998 |
 | grep, paths | 9.0% <sub>[6.8–11.8]</sub> | 0.06 | 7.8% | 3,996 |
-| **reify**, 单轮 | **66.0%** <sub>[61.7–70.0]</sub> | 0.43 | 59.0% | **3,466** |
-| **reify**, 三轮 | **84.6%** <sub>[81.2–87.5]</sub> | 0.45 | 77.0% | 9,174 |
+| **reify**, 单轮 | **72.6%** <sub>[68.5–76.3]</sub> | 0.42 | 65.4% | **3,670** |
+| **reify**, 三轮 | **87.0%** <sub>[83.8–89.7]</sub> | 0.43 | 81.4% | 9,549 |
 
-**单轮 Reify 在 310 个实例上胜过 grep，仅在 13 个上落败 —— 而且花的 token 更少**
-（3,466 对 3,998）。三轮则是 395 比 5（精确 McNemar 检验 p ≈ 7 × 10⁻¹¹⁰）。这不是一次
+**单轮 Reify 在 342 个实例上胜过 grep，仅在 12 个上落败 —— 而且花的 token 更少**
+（3,670 对 3,998）。三轮则是 406 比 4（精确 McNemar 检验 p ≈ 9 × 10⁻¹¹⁵）。这不是一次
 势均力敌的测量，而且它是本文档中最干净的数字，正因为任务、代码库和标准答案全都来自
 别处。
 
@@ -175,10 +175,10 @@ $ reify why erpnext/selling/doctype/sales_order/sales_order.py:812
 
 | | grep | reify ×3 | | | grep | reify ×3 |
 |---|--:|--:|---|---|--:|--:|
-| django (n=231) | 6% | **88%** | | astropy (n=22) | 0% | **77%** |
-| sympy (n=75) | 7% | **77%** | | xarray (n=22) | 9% | **91%** |
-| sphinx (n=44) | 7% | **75%** | | pytest (n=19) | 26% | **84%** |
-| matplotlib (n=34) | 0% | **91%** | | pylint (n=10) | 10% | **60%** |
+| django (n=231) | 6% | **90%** | | astropy (n=22) | 0% | **77%** |
+| sympy (n=75) | 7% | **79%** | | xarray (n=22) | 9% | **95%** |
+| sphinx (n=44) | 7% | **80%** | | pytest (n=19) | 26% | **95%** |
+| matplotlib (n=34) | 0% | **97%** | | pylint (n=10) | 10% | **60%** |
 | scikit-learn (n=32) | 9% | **88%** | | requests (n=8) | 0% | **100%** |
 
 **它证明了什么，没证明什么。** 它测的是*检索* —— 必须改动的文件是否被送到模型面前 ——
@@ -188,23 +188,33 @@ $ reify why erpnext/selling/doctype/sales_order/sales_order.py:812
 [`benchmarks/swe/`](benchmarks/swe/) 中的驱动脚本复现。
 
 
-### 端到端：打平，以及走到这一步的代价
+### 端到端：领先，但尚未被证明
 
 检索不是最终的主张 —— 解决 issue 才是。同一份基准，跑在 SWE-bench 论文自己的协议上
 （一个模型、一份预算，检索器是唯一变量），每个补丁都由 **SWE-bench 官方评测器**判定：
 
-| 解决了 issue，两组都判定过的 63 个实例 | | |
+| 解决了 issue，两组都判定过的 101 个实例 | | |
 |---|--:|---|
-| BM25 | 23.8% | |
-| **Reify** | **23.8%** | 6–6，p = 1.0 |
+| BM25 | 67.3% | 解决 68 个，1 个空补丁 |
+| **Reify** | **73.3%** | 解决 74 个，2 个空补丁 |
+| | | 12–6，精确 McNemar **p = 0.24** |
 
-打平 —— 而且必须说清楚，因为第一次尝试是**落败**：11.1% 对 18.1%。有意思的是它是怎么被
-追平的。
+**先看 p 值，再看百分比。** Reify 多解决了六个 issue，在双方结果不一致的实例上赢的次数
+是输的两倍 —— 但在这个样本量下，这还不是统计显著的结果。诚实的说法是*领先且尚未被证明*，
+而不是一场胜利。
 
-Reify 找到正确文件的频率高得多（77% 对 BM25 的 60%），模型却表现更差。重建那些 prompt
-后原因很清楚：一个按排名顺序用整份文件填满的上下文窗口，会把额度全花在排第一的东西上，
-而 Reify 的排名对文件大小视而不见，BM25 的公式里却自带长度归一化。**正确的文件被检索到
-了，然后从未被展示** —— 只出现在 27% 的 prompt 中，而 BM25 是 40%。
+<sub>**这些绝对数字无法与本文档此前公布的数字相比。** 那次用的是 DeepSeek；这次用的是
+Claude Sonnet，因为 DeepSeek 账户中途余额耗尽。更强的模型会同时抬高两组 —— 上一次两边
+都在 24% 左右。换模型之后仍然成立的是*配对*比较，因为两组永远用同一个模型回答同一个实例。
+逐实例的原始结果：
+[`benchmarks/swe/results/stage2-endtoend.json`](benchmarks/swe/results/stage2-endtoend.json)。</sub>
+
+它并非一直领先。第一次尝试是**落败**，有意思的是它是怎么被追平的。
+
+Reify 找到正确文件的频率高得多，模型却表现更差。重建那些 prompt 后原因很清楚：一个按排名
+顺序用整份文件填满的上下文窗口，会把额度全花在排第一的东西上，而那个顺序对文件大小视而
+不见，BM25 的公式里却自带长度归一化。**正确的文件被检索到了，然后从未被展示** —— 只出现
+在 27% 的 prompt 中，而 BM25 是 40%。
 
 `reify context --for-edit` 从源头解决：区域扩展到完整定义、文件的 import 只包含一次、
 重叠区域合并、预算依然是硬约束。检索到的东西不再在窗口处丢失：
@@ -215,11 +225,13 @@ Reify 找到正确文件的频率高得多（77% 对 BM25 的 60%），模型却
 | Reify，整份文件 | 76.7% | 26.7% |
 | **Reify `--for-edit`** | **80.0%** | **56.7%** |
 
-有两种修法**依据证据被否决**：按文件设上限反而更糟（被截断的文件同样无法编辑），而
-成本感知排名让检索下降七个百分点，且在区域化让文件大小失去意义之后毫无收益。
+限制单个文件能占据多少窗口，早期曾**依据证据被否决**，后来才以真正有效的形式被采纳。截断
+文件*内容*会让情况更糟，因为被截断的文件同样无法编辑。限制单个文件向选择结果贡献多少个
+*符号* —— 在窗口之上、且每个区域保持完整 —— 才是真正改善检索的做法，也是今天所发布的版本。
+成本感知排名则被彻底否决：它让检索下降七个百分点，且在区域化让文件大小失去意义之后毫无收益。
 
-所以：Reify 在检索上明显胜出，在最终补丁成功率上打平。剩下的瓶颈在写补丁的循环，而不在
-上下文 —— 两组都卡在 24% 附近。
+所以：Reify 在检索上明显胜出，在最终补丁成功率上领先但结论不充分。剩下的瓶颈在写补丁的
+循环，而不在上下文 —— 两组都还有约四分之一的 issue 未能解决，尽管该改的文件就在 prompt 里。
 
 ## <a id="numbers"></a>数据：在四个刻意挑难的代码库上
 
@@ -473,7 +485,8 @@ Treat INFERRED claims as leads to verify, not facts.
 reify serve --mcp
 ```
 
-三个工具 —— `reify_context`、`reify_why`、`reify_impact` —— 三个就是全部接口。MCP 服务端
+六个工具 —— `reify_context`、`reify_why`、`reify_impact`、`reify_explain`、
+`reify_flow`、`reify_conflicts` —— 六个就是全部接口。MCP 服务端
 的 schema 会在每个会话的每一轮被重新发送，所以一个为了节省上下文而生的工具，不该为了
 送货再收一笔租金。有测试断言这些 schema 的开销低于 600 个 token。
 
@@ -667,19 +680,6 @@ Fixture 位于 [`fixtures/minierp`](fixtures/) —— 一个小型业务系统�
 
 **"reify" 是什么意思？**
 把抽象之物变得具体。这些知识一直都在，只是从来没成为一个文件。
-
-## <a id="roadmap"></a>路线图
-
-第一轮改进已经完成。历史先验（每个已合并的提交都是一个带标注的样本：提交信息 ≈ 工单，
-改动文件 = 答案）、测试到代码的边、迭代式精修，以及第四个代码库都已落地；权重拟合没有
-通过留出验证，按其事前登记被回退；记分卡停在七项目标中达成一项，每个数字都印在它的门槛
-旁边。尚未解决的问题是现代 TypeScript 的情形：人们描述界面改动的说法，和代码里的写法
-之间，那道词汇鸿沟目前还没有任何东西能填上。
-
-## <a id="status"></a>项目状态
-
-尚早，但有实测。已知的未达标项，全部写明而非掩埋：存储占工作区的 33%，目标是 5%；
-`reify why` 耗时 205 毫秒，目标是 20 毫秒；Windows 尚未测试。
 
 ## <a id="license"></a>许可证
 

@@ -18,7 +18,7 @@
   <a href="https://github.com/lambiengcode/reify/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/lambiengcode/reify?style=flat-square&color=blue" /></a>
   <a href="https://lambiengcode.github.io/reify/"><img alt="Documentation" src="https://img.shields.io/badge/docs-lambiengcode.github.io-2da44e?style=flat-square" /></a>
   <a href="LICENSE"><img alt="Apache-2.0" src="https://img.shields.io/github/license/lambiengcode/reify?style=flat-square&color=blue" /></a>
-  <a href="#swe-bench-verified"><img alt="SWE-bench retrieval 84.6%" src="https://img.shields.io/badge/SWE--bench%20retrieval-84.6%25-blueviolet?style=flat-square" /></a>
+  <a href="#swe-bench-verified"><img alt="SWE-bench retrieval 87.0%" src="https://img.shields.io/badge/SWE--bench%20retrieval-87.0%25-blueviolet?style=flat-square" /></a>
   <a href="#privacy"><img alt="network calls: 0" src="https://img.shields.io/badge/network%20calls-0-success?style=flat-square" /></a>
 </p>
 
@@ -27,12 +27,12 @@
   <a href="#wire-it-into-your-agent"><img alt="Cursor" src="https://img.shields.io/badge/Cursor-supported-2da44e?style=flat-square" /></a>
   <a href="#wire-it-into-your-agent"><img alt="Codex" src="https://img.shields.io/badge/Codex-supported-2da44e?style=flat-square" /></a>
   <a href="#wire-it-into-your-agent"><img alt="OpenCode" src="https://img.shields.io/badge/OpenCode-supported-2da44e?style=flat-square" /></a>
-  <a href="#wire-it-into-your-agent"><img alt="MCP" src="https://img.shields.io/badge/MCP-3%20tools-2da44e?style=flat-square" /></a>
+  <a href="#wire-it-into-your-agent"><img alt="MCP" src="https://img.shields.io/badge/MCP-6%20tools-2da44e?style=flat-square" /></a>
 </p>
 
 <p align="center">
-  <strong>On SWE-bench Verified, Reify puts the file that had to change in front of the model 84.6% of the time — grep manages 6.6% &middot; 500 real issues, someone else's benchmark &middot; never opens a socket</strong><br>
-  <sub>A real model on 142 tasks from real merged commits across ERPNext, OFBiz, OpenMRS and Medusa, each index built at a commit <em>before</em> those changes existed. That is <em>retrieval</em>: the right file, in front of the model. On end-to-end patch correctness a BM25 baseline currently resolves <em>more</em> issues than Reify does, and <a href="#end-to-end-a-tie-and-what-it-took-to-get-there">the section saying so</a> is as prominent as this one. <a href="benchmarks/REPORT.md">Full writeup</a> &middot; <a href="#reproducing-the-benchmark">reproduce it</a>.</sub>
+  <strong>On SWE-bench Verified, Reify puts the file that had to change in front of the model 87.0% of the time — grep manages 6.6% &middot; 500 real issues, someone else's benchmark &middot; never opens a socket</strong><br>
+  <sub>A real model on 142 tasks from real merged commits across ERPNext, OFBiz, OpenMRS and Medusa, each index built at a commit <em>before</em> those changes existed. That is <em>retrieval</em>: the right file, in front of the model. On end-to-end patch correctness Reify is <em>ahead of</em> a BM25 baseline but not significantly so, and <a href="#end-to-end-ahead-but-not-yet-proven">the section saying so</a> is as prominent as this one. <a href="benchmarks/REPORT.md">Full writeup</a> &middot; <a href="#reproducing-the-benchmark">reproduce it</a>.</sub>
 </p>
 
 <p align="center">
@@ -49,12 +49,13 @@
 curl -fsSL https://raw.githubusercontent.com/lambiengcode/reify/main/install.sh | sh
 cd your-repository
 reify init --write-agent-instructions   # wires your agent through AGENTS.md / CLAUDE.md
-reify index                             # 4.6 s for 5,000 files; 0.7 s after one edit
+reify index                             # 4.2 s for 5,000 files; 0.5 s after one edit
 reify context "the change you are about to make" --toon
 ```
 
 <sub>One static binary — no daemon, no config, no API key, and every release ships a
-SHA-256 checksum that `reify upgrade` verifies before installing. Changed your mind?
+SHA-256 checksum that both the installer above and `reify upgrade` verify before
+anything is unpacked. Changed your mind?
 `reify uninstall` removes the binary and `reify uninit` cleans one repository, both
 showing their plan first. Per-agent wiring, hooks and MCP: <a href="#install">Install</a>.</sub>
 
@@ -67,39 +68,10 @@ showing their plan first. Per-agent wiring, hooks and MCP: <a href="#install">In
 **Contents**
 
 - [Two minutes to first answer](#two-minutes-to-first-answer) · [the one-person problem](#the-one-person-problem) · [what it gives you](#what-it-actually-gives-you) · [before / after](#before--after)
-- **Numbers:** [SWE-bench Verified](#swe-bench-verified) · [end to end](#end-to-end-a-tie-and-what-it-took-to-get-there) · [four repositories](#four-repositories-chosen-to-hurt) · [where it doesn't work](#where-it-doesnt-work)
+- **Numbers:** [SWE-bench Verified](#swe-bench-verified) · [end to end](#end-to-end-ahead-but-not-yet-proven) · [four repositories](#four-repositories-chosen-to-hurt) · [where it doesn't work](#where-it-doesnt-work)
 - **Using it:** [install](#install) · [wire it into your agent](#wire-it-into-your-agent) · [commands](#commands) · [privacy](#privacy)
 - **Under it:** [how it works](#how-it-works) · [what it reads](#what-it-reads) · [multilingual](#multilingual) · [architecture](#architecture) · [reproducing the benchmark](#reproducing-the-benchmark)
-- [FAQ](#faq) · [development](#development) · [roadmap](#roadmap) · [status](#status) · [license](#license)
-
-## Two minutes to first answer
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/lambiengcode/reify/main/install.sh | sh
-cd your-repository
-reify init --write-agent-instructions   # wires your agent through AGENTS.md / CLAUDE.md
-reify index                             # 4.6 s for 5,000 files; 0.7 s after one edit
-reify context "the change you are about to make" --toon
-```
-
-<sub>One static binary — no daemon, no config, no API key, and every release ships a
-SHA-256 checksum that `reify upgrade` verifies before installing. Changed your mind?
-`reify uninstall` removes the binary and `reify uninit` cleans one repository, both
-showing their plan first. Per-agent wiring, hooks and MCP: <a href="#install">Install</a>.</sub>
-
-<p align="center">
-  <strong>English</strong> &middot; <a href="README.vi.md">Tiếng Việt</a> &middot; <a href="README.zh.md">简体中文</a>
-</p>
-
----
-
-**Contents**
-
-- [Two minutes to first answer](#two-minutes-to-first-answer) · [the one-person problem](#the-one-person-problem) · [what it gives you](#what-it-actually-gives-you) · [before / after](#before--after)
-- **Numbers:** [SWE-bench Verified](#swe-bench-verified) · [end to end](#end-to-end-a-tie-and-what-it-took-to-get-there) · [four repositories](#four-repositories-chosen-to-hurt) · [where it doesn't work](#where-it-doesnt-work)
-- **Using it:** [install](#install) · [wire it into your agent](#wire-it-into-your-agent) · [commands](#commands) · [privacy](#privacy)
-- **Under it:** [how it works](#how-it-works) · [what it reads](#what-it-reads) · [multilingual](#multilingual) · [architecture](#architecture) · [reproducing the benchmark](#reproducing-the-benchmark)
-- [FAQ](#faq) · [development](#development) · [roadmap](#roadmap) · [status](#status) · [license](#license)
+- [FAQ](#faq) · [development](#development) · [license](#license)
 
 ## The one-person problem
 
@@ -182,12 +154,12 @@ the right answer is the set of files the accepted fix actually touched.
 |---|--:|--:|--:|--:|
 | grep, content | 6.6% <sub>[4.7–9.1]</sub> | 0.06 | 5.6% | 3,998 |
 | grep, paths | 9.0% <sub>[6.8–11.8]</sub> | 0.06 | 7.8% | 3,996 |
-| **reify**, one round | **66.0%** <sub>[61.7–70.0]</sub> | 0.43 | 59.0% | **3,466** |
-| **reify**, three rounds | **84.6%** <sub>[81.2–87.5]</sub> | 0.45 | 77.0% | 9,174 |
+| **reify**, one round | **72.6%** <sub>[68.5–76.3]</sub> | 0.42 | 65.4% | **3,670** |
+| **reify**, three rounds | **87.0%** <sub>[83.8–89.7]</sub> | 0.43 | 81.4% | 9,549 |
 
-**A single round of Reify beats grep on 310 instances and loses on 13 — while spending
-fewer tokens** (3,466 against 3,998). Three rounds win 395 to 5 (exact McNemar
-p ≈ 7 × 10⁻¹¹⁰). This is not a close measurement, and it is the cleanest number in this
+**A single round of Reify beats grep on 342 instances and loses on 12 — while spending
+fewer tokens** (3,670 against 3,998). Three rounds win 406 to 4 (exact McNemar
+p ≈ 9 × 10⁻¹¹⁵). This is not a close measurement, and it is the cleanest number in this
 README precisely because the tasks, the repositories and the ground truth all came from
 somewhere else.
 
@@ -195,10 +167,10 @@ Per repository, three rounds against content-grep:
 
 | | grep | reify ×3 | | | grep | reify ×3 |
 |---|--:|--:|---|---|--:|--:|
-| django (n=231) | 6% | **88%** | | astropy (n=22) | 0% | **77%** |
-| sympy (n=75) | 7% | **77%** | | xarray (n=22) | 9% | **91%** |
-| sphinx (n=44) | 7% | **75%** | | pytest (n=19) | 26% | **84%** |
-| matplotlib (n=34) | 0% | **91%** | | pylint (n=10) | 10% | **60%** |
+| django (n=231) | 6% | **90%** | | astropy (n=22) | 0% | **77%** |
+| sympy (n=75) | 7% | **79%** | | xarray (n=22) | 9% | **95%** |
+| sphinx (n=44) | 7% | **80%** | | pytest (n=19) | 26% | **95%** |
+| matplotlib (n=34) | 0% | **97%** | | pylint (n=10) | 10% | **60%** |
 | scikit-learn (n=32) | 9% | **88%** | | requests (n=8) | 0% | **100%** |
 
 **What this does and does not show.** It measures retrieval — whether the files that
@@ -210,25 +182,39 @@ retriever offers, and every arm here ran against the same index at the same comm
 Reproduce it with the driver in [`benchmarks/swe/`](benchmarks/swe/).
 
 
-### End to end: a tie, and what it took to get there
+### End to end: ahead, but not yet proven
 
 Retrieval is not the final claim — resolving the issue is. The same benchmark, run
 through the SWE-bench paper's own protocol (one model, one budget, the retriever as the
 only difference), with every patch judged by the **official SWE-bench harness**:
 
-| resolved the issue, 63 instances graded under both arms | | |
+| resolved the issue, 101 instances graded under both arms | | |
 |---|--:|---|
-| BM25 | 23.8% | |
-| **Reify** | **23.8%** | paired 6–6, p = 1.0 |
+| BM25 | 67.3% | 68 resolved, 1 empty patch |
+| **Reify** | **73.3%** | 74 resolved, 2 empty patches |
+| | | paired 12–6, exact McNemar **p = 0.24** |
 
-A tie — and worth stating plainly, because the first attempt was a **loss**: 11.1%
-against 18.1%. What closed it is the interesting part.
+**Read that p-value before the percentages.** Reify resolved six more issues and won
+twice as many disagreements as it lost — but at this sample size that is not a
+statistically significant result. The honest summary is *ahead and not yet proven*, not
+a win. Two hundred more instances would settle it; today's evidence supports "Reify does
+not cost you anything end to end, and probably helps", nothing stronger.
 
-Reify retrieved the right file far more often (77% against BM25's 60%) and the model
-still did worse. Rebuilding the exact prompts showed why: a context window filled with
-whole files in rank order spends itself on whatever ranks first, and Reify's ranking is
-blind to file size where BM25's has length normalisation built in. **The gold file was
-retrieved and then never shown** — visible in only 27% of prompts against BM25's 40%.
+<sub>**These absolute rates are not comparable to earlier ones published here.** That run
+used DeepSeek; this one uses Claude Sonnet, because the DeepSeek account ran out of
+balance mid-project. A stronger model lifts both arms — the earlier run resolved about
+24% on each side. What survives a model change is the *paired* comparison, because both
+arms always answer the same instance with the same model, and that is what the table
+above reports. Raw per-instance outcomes: [`benchmarks/swe/results/stage2-endtoend.json`](benchmarks/swe/results/stage2-endtoend.json).</sub>
+
+It has not always been ahead. The first attempt was a **loss**, and what closed the gap
+is the interesting part.
+
+Reify retrieved the right file far more often and the model still did worse. Rebuilding
+the exact prompts showed why: a context window filled with whole files in rank order
+spends itself on whatever ranks first, and file-rank order is blind to file size where
+BM25 has length normalisation built in. **The gold file was retrieved and then never
+shown** — visible in only 27% of prompts against BM25's 40%.
 
 `reify context --for-edit` fixes that at the source: regions padded to whole
 definitions, the file's imports included once, overlapping regions merged, budget still
@@ -240,14 +226,18 @@ hard. Nothing retrieved is lost at the window any more:
 | Reify, whole files | 76.7% | 26.7% |
 | **Reify `--for-edit`** | **80.0%** | **56.7%** |
 
-Two fixes were tried and **rejected on evidence**: a per-file cap made visibility worse
-(a truncated file is not editable either), and cost-aware ranking cut retrieval by seven
-points while buying nothing once regions made file size irrelevant.
+Capping how much of the window a single file may claim was tried early, **rejected on
+evidence**, and only later adopted in the form that works. Truncating a file's *content*
+made things worse, because a truncated file is not editable either. Capping how many
+*symbols* one file contributes to the selection — upstream of the window, leaving each
+region whole — is what improved retrieval, and it is what ships today. Cost-aware
+ranking was tried and rejected outright: it cut retrieval by seven points while buying
+nothing once regions made file size irrelevant.
 
-So: Reify wins retrieval decisively and ties on final patch success. The remaining
-constraint is the patch-writing loop, not the context — both arms cap near 24%, and
-about a fifth of attempts produce no usable edit at all. Beating BM25 *significantly* on
-resolution would need Reify to win two of every three disagreements; today it wins half.
+So: Reify wins retrieval decisively and is ahead, inconclusively, on final patch
+success. The remaining constraint is the patch-writing loop rather than the context —
+both arms leave roughly a quarter of issues unresolved with the file that had to change
+sitting in the prompt.
 
 ## Four repositories chosen to hurt
 
@@ -392,7 +382,8 @@ Three things that only break once you leave Latin script, each of which broke he
 curl -fsSL https://raw.githubusercontent.com/lambiengcode/reify/main/install.sh | sh
 ```
 
-Prebuilt binaries for macOS (Apple Silicon and Intel) and Linux (x86_64 and aarch64).
+Prebuilt binaries for macOS (Apple Silicon and Intel), Linux (x86_64 and aarch64)
+and Windows (x86_64).
 Or build from source:
 
 ```bash
@@ -443,10 +434,11 @@ Run `reify impact "<symbol>"` before changing anything shared.
 Treat INFERRED claims as leads to verify, not facts.
 ```
 
-**MCP**, if you prefer it: `reify serve --mcp` exposes three tools — `reify_context`,
-`reify_why`, `reify_impact` — and three is the whole surface. A server's schemas are
-re-sent every turn of every session, so a tool built to save context should not charge
-rent to deliver it; a test asserts they cost under 600 tokens.
+**MCP**, if you prefer it: `reify serve --mcp` exposes six tools — `reify_context`,
+`reify_why`, `reify_impact`, `reify_explain`, `reify_flow` and `reify_conflicts` — and
+six is the whole surface. A server's schemas are re-sent every turn of every session,
+so a tool built to save context should not charge rent to deliver it; a test asserts
+they cost under 600 tokens, which six still fit inside.
 
 **A model is optional and off** until you name a command in `.reify/llm.toml`
 (`command = ["ollama", "run", "llama3"]`). Reify writes the prompt to its stdin. See
@@ -666,20 +658,6 @@ appears. `reify upgrade` is the one command that reaches the network, through `c
 Probably not. Detection requires five conditions at once and is biased hard toward silence,
 because a conflict detector that cries wolf gets switched off in week two and takes its
 true positives with it.
-
-## Roadmap
-
-The first improvement pass is done. The history prior (every merged
-commit is a labelled example: message ≈ ticket, changed files = answer), test-to-code
-edges, iterative refinement and a fourth repository all shipped; the weight fit failed
-its held-out validation and was reverted per its own pre-registration; and the
-scorecard stands at one of seven targets met, each number printed next to its bar. The
-open problem is the modern-TypeScript case, where nothing yet closes the vocabulary
-gap between how people describe UI changes and how the code spells them.
-
-## Status
-
-Early, and measured. Known misses, all documented rather than buried: the store is 33% of the working tree against a 5% target, `reify why` is 205 ms against 20 ms, and Windows is untested.
 
 ## License
 

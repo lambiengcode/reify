@@ -4,6 +4,117 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project adheres to semantic versioning once it reaches 1.0; before then, minor
 versions may break the store schema, and `reify index --force` rebuilds it.
 
+## [Unreleased]
+
+### Fixed
+- **One file could take the whole answer.** Relevance spreads along edges, so every
+  member of a file that matched the task loosely arrived holding a plausible score and
+  nothing bounded how many of them were admitted. Measured on Medusa, a task about
+  applying a discount twice filled 13 of 20 slots with one HTTP router and one
+  arithmetic helper, and the promotion service that actually had to change ranked
+  eighteenth. No file may now claim more than four symbol slots.
+- **The reading plan collapsed onto a single file.** `next_reads` drained each ranked
+  file in turn, so the top file consumed every slot: two of three sampled Medusa tasks
+  produced six entries naming one file. Spans are now drawn a file at a time in rounds,
+  so every ranked file earns one before any earns a second.
+- Tests, fixtures and mocks outranked the code they exercise. A test names the domain
+  vocabulary as densely as its implementation and a reader cannot edit it to change
+  behaviour; on Medusa a promotion spec *and* its fixture both outranked the promotion
+  service. They now give up half their score — a penalty, not an exclusion, because
+  "fix the failing test for X" is a real task. Tunable as `test_path_penalty`.
+- `install.sh` did not verify the checksum it advertised. The `curl | sh` path now
+  checks the published SHA-256 before unpacking, which is what `reify upgrade` already
+  did; a mismatch installs nothing.
+- The README shipped its quickstart, language switcher and table of contents twice.
+- The Roadmap and Status sections are gone from all three READMEs. Both were prose that
+  needed hand-editing every release to stay true, and the Status section had already
+  drifted — it still quoted `reify why` at 205 ms three versions after the measurement
+  changed. What they said that is durable lives in the benchmark reports and this file.
+- `Cargo.toml` pointed `documentation` at `docs.rs/reify`, which belongs to an
+  unrelated crate published in 2021.
+
+### Added
+- **Windows x86_64 binaries.** `reify upgrade` works there too: Windows keeps a handle
+  on the running image, so the old binary is renamed aside rather than overwritten, and
+  restored if the replacement fails. `install.sh` recognises Git Bash, MSYS2 and Cygwin.
+- Three more MCP tools — `reify_explain`, `reify_flow`, `reify_conflicts` — because
+  those are the capabilities no other retriever offers and MCP is how most clients
+  reach Reify at all. All six schemas still cost under the 600-token ceiling the
+  original three were held to, which is still asserted by a test. `reify_preflight` was
+  considered and left out: it answers the same question as `reify_why` for an agent.
+
+### Changed
+- Retrieval measured before and after on all three brownfield repositories, same
+  machine, same task sets. **Hit rate improved in every repository and both
+  conditions**; grep baselines are byte-identical, which is the control.
+
+  | three rounds | before | after |
+  |---|--:|--:|
+  | medusa (TypeScript, n=40) | 27.5% | **42.5%** |
+  | openmrs (Java, n=22) | 54.5% | **59.1%** |
+  | ofbiz (Java, n=40) | 77.5% | **85.0%** |
+
+  Stated plainly because it is a trade: mean reciprocal rank rose on medusa
+  (0.097 → 0.136) and fell on openmrs (0.278 → 0.208) and ofbiz (0.461 → 0.392).
+  Spreading the top slots across more files means that when the right file was already
+  ranked first it now shares the window. That is the intended direction — a file never
+  offered cannot be used, while a file at rank six is still in the context — and it is
+  the failure the end-to-end SWE-bench run diagnosed: retrieval was already ahead and
+  the model still did no better, because of what the window contained and in what
+  order.
+- **SWE-bench Verified re-run in full, all 500 instances**, and every published
+  retrieval figure moved up. Both grep baselines came back byte-identical to the
+  previous run, which is the control.
+
+  | retrieval, n=500 | before | after |
+  |---|--:|--:|
+  | reify, one round | 66.0% | **72.6%** |
+  | reify, three rounds | 84.6% | **87.0%** |
+  | one round, offered *every* touched file | 59.0% | **65.4%** |
+  | three rounds, offered *every* touched file | 77.0% | **81.4%** |
+
+  Paired against content-grep, one round now wins 342 and loses 12 (was 310 / 13);
+  three rounds win 406 and lose 4 (was 395 / 5), exact McNemar p ≈ 9 × 10⁻¹¹⁵. Six of
+  twelve repositories improved and none regressed — the largest are pytest 84% → 95%,
+  matplotlib 91% → 97% and sphinx 75% → 80%. MRR moved the other way, 0.45 → 0.43 at
+  three rounds, for the reason given above. Median tokens rose from 3,466 to 3,670 at
+  one round, still below content-grep's 3,998.
+
+- **Stage 2, the end-to-end result, re-run and now ahead** — 101 instances graded under
+  both arms by the official SWE-bench harness, up from 63.
+
+  | resolved | | |
+  |---|--:|---|
+  | BM25 | 67.3% | 68 resolved, 1 empty patch |
+  | **Reify** | **73.3%** | 74 resolved, 2 empty patches |
+  | | | paired 12–6, exact McNemar **p = 0.24** |
+
+  Reify resolves six more issues and wins twice as many disagreements as it loses, but
+  at this sample size that is **not statistically significant**: the honest reading is
+  *ahead and not yet proven*, and the README says so before it says the percentages.
+  The previous run was a tie, and the one before that a loss.
+
+  These absolute rates are **not** comparable to the 23.8% published earlier. That run
+  used DeepSeek, whose account ran out of balance mid-project; this one uses Claude
+  Sonnet, and a stronger model lifts both arms. What survives a model change is the
+  paired comparison, because both arms always answer the same instance with the same
+  model. Per-instance outcomes are committed in
+  `benchmarks/swe/results/stage2-endtoend.json`.
+
+### Fixed (reproduction)
+- The committed stage-2 driver was **not the script that produced the published
+  numbers**. `benchmarks/swe/stage2c.py` fed the model whole files; the run behind the
+  figures used `reify context --for-edit` regions, which is the entire reason the
+  earlier loss became a tie. Anyone following the repository's own instructions would
+  have failed to reproduce its own results. Replaced by `benchmarks/swe/stage2.py`,
+  which is the driver that produced the numbers above, with the model as a parameter.
+- An epistemic status shared by every row of a section is stated once on the section
+  heading instead of repeated down the page. Symbols are `CONFIRMED` by construction,
+  so `[confirmed]` appeared on all twenty code rows of every answer, where it carried
+  no information and invited the wrong reading — it attests that a symbol was parsed
+  from source, never that it is the right place to change. A section with mixed
+  statuses still badges every row, and machine-readable output is unchanged.
+
 ## [0.2.2] - 2026-08-22
 
 ### Fixed

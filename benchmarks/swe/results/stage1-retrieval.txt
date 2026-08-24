@@ -3,19 +3,19 @@ SWE-bench Verified retrieval — 500 instances, budget 4000 tok
 condition         hit (any gold file offered)    MRR  full recall
 B-content-grep       6.6% [4.7%-9.1%] n=500    0.06        5.6%
 C-path-grep          9.0% [6.8%-11.8%] n=500    0.06        7.8%
-R-reify             66.0% [61.7%-70.0%] n=500    0.43       59.0%
-R-reify-iter3       84.6% [81.2%-87.5%] n=500    0.45       77.0%
+R-reify             72.6% [68.5%-76.3%] n=500    0.42       65.4%
+R-reify-iter3       87.0% [83.8%-89.7%] n=500    0.43       81.4%
 
 per-repo, reify×3 vs grep (hit rate):
   astropy        grep    0%  reify×3   77%  (n=22)
-  django         grep    6%  reify×3   88%  (n=231)
-  matplotlib     grep    0%  reify×3   91%  (n=34)
+  django         grep    6%  reify×3   90%  (n=231)
+  matplotlib     grep    0%  reify×3   97%  (n=34)
   mwaskom        grep    0%  reify×3  100%  (n=2)
   pallets        grep    0%  reify×3  100%  (n=1)
   psf            grep    0%  reify×3  100%  (n=8)
-  pydata         grep    9%  reify×3   91%  (n=22)
+  pydata         grep    9%  reify×3   95%  (n=22)
   pylint-dev     grep   10%  reify×3   60%  (n=10)
-  pytest-dev     grep   26%  reify×3   84%  (n=19)
+  pytest-dev     grep   26%  reify×3   95%  (n=19)
   scikit-learn   grep    9%  reify×3   88%  (n=32)
-  sphinx-doc     grep    7%  reify×3   75%  (n=44)
-  sympy          grep    7%  reify×3   77%  (n=75)
+  sphinx-doc     grep    7%  reify×3   80%  (n=44)
+  sympy          grep    7%  reify×3   79%  (n=75)

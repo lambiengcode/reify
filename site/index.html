@@ -6,7 +6,7 @@
 <title>Reify — a local knowledge engine for AI coding agents</title>
 <meta name="description" content="Reify compiles a brownfield codebase — source, SQL, business documents and git history — into a queryable knowledge graph, and hands your agent the smallest cited context it needs. Runs entirely offline.">
 <meta property="og:title" content="Reify — a local knowledge engine for AI coding agents">
-<meta property="og:description" content="On SWE-bench Verified it puts the file that had to change in front of the model 84.6% of the time. grep manages 6.6%. Never opens a socket.">
+<meta property="og:description" content="On SWE-bench Verified it puts the file that had to change in front of the model 87.0% of the time. grep manages 6.6%. Never opens a socket.">
 <meta property="og:image" content="assets/social-preview.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/favicon.ico">
@@ -60,21 +60,22 @@
     </p>
 
     <div class="numbers">
-      <div class="up"><b>84.6%</b><span>Reify offered a file the fix touched</span></div>
+      <div class="up"><b>87.0%</b><span>Reify offered a file the fix touched</span></div>
       <div><b>6.6%</b><span>grep, same budget</span></div>
       <div class="up"><b>12 / 12</b><span>repositories where Reify wins</span></div>
       <div class="up"><b>0</b><span>network calls, asserted in CI</span></div>
     </div>
 
     <div class="bars">
-      <div class="bar-row"><span>reify</span><span class="track"><i class="fill" style="width:84.6%"></i></span><i>84.6%</i></div>
+      <div class="bar-row"><span>reify</span><span class="track"><i class="fill" style="width:87.0%"></i></span><i>87.0%</i></div>
       <div class="bar-row"><span class="c-dim">grep</span><span class="track"><i class="fill grey" style="width:6.6%"></i></span><i class="c-dim">6.6%</i></div>
     </div>
 
     <p style="margin-top:30px">
       Retrieval is not the same as resolution, and the README says so with equal
-      prominence: end to end, Reify and a BM25 baseline currently resolve the same
-      number of issues. <a href="https://github.com/lambiengcode/reify#swe-bench-verified">The full write-up</a>
+      prominence: end to end, Reify resolves 73.3% against a BM25 baseline's 67.3% —
+      ahead, but at 101 instances not yet a statistically significant lead.
+      <a href="https://github.com/lambiengcode/reify#swe-bench-verified">The full write-up</a>
       shows both, including the arms that failed.
     </p>
   </div>
@@ -109,7 +110,7 @@
       </div>
       <div class="card">
         <h3>reify serve</h3>
-        <p>The Model Context Protocol over stdio, three tools, for agents that speak it.</p>
+        <p>The Model Context Protocol over stdio, six tools, for agents that speak it.</p>
       </div>
     </div>
   </div>
