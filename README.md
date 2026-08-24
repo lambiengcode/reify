@@ -48,7 +48,8 @@
 ```bash
 curl -fsSL https://raw.githubusercontent.com/lambiengcode/reify/main/install.sh | sh
 cd your-repository
-reify init --write-agent-instructions   # wires your agent through AGENTS.md / CLAUDE.md
+reify doctor                            # should you even use this? it will say no
+reify install --yes                     # detects your agents and wires each one
 reify index                             # 4.2 s for 5,000 files; 0.5 s after one edit
 reify context "the change you are about to make" --toon
 ```
@@ -388,6 +389,19 @@ Or build from source:
 ```bash
 cargo install --path crates/reify-cli
 ```
+
+Then, in the repository you want it for:
+
+```bash
+reify doctor            # is this repository one Reify helps? it is willing to say no
+reify install           # shows what it found and what it would wire; --yes applies it
+```
+
+`install` detects the agents actually configured in the repository — `AGENTS.md`,
+`CLAUDE.md`, `.cursor/`, `.clinerules/` and the rest — and wires each one the
+[cheapest way that works](#wire-it-into-your-agent). An agent installed on the machine
+but not configured here is reported, not written to, and nothing outside the repository
+is touched. `--mcp` opts into MCP instead, and says what that costs before it writes.
 
 **Stay current, leave cleanly.** `reify upgrade` replaces the binary with the latest
 release — through `curl` and `tar` as visible subprocesses, never an embedded HTTP
