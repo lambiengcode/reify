@@ -532,7 +532,18 @@ pub fn impact(answer: &ImpactAnswer, json: bool) -> Result<()> {
         }
     }
     if !answer.affected.is_empty() {
-        heading("Affected");
+        // A file every module imports has hundreds of dependants. Printing all of them
+        // spends an agent's budget to say one thing — "a lot" — so the count leads and
+        // the nearest few are the evidence for it.
+        let shown = answer.affected.len();
+        if answer.affected_total > shown {
+            heading(&format!(
+                "Affected  {} total, {shown} nearest shown",
+                answer.affected_total
+            ));
+        } else {
+            heading(&format!("Affected  {shown}"));
+        }
         for item in &answer.affected {
             println!(
                 "  {} {}  {}  ({}, {} hop{})",

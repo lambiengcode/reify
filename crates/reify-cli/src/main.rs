@@ -96,7 +96,7 @@ enum Command {
 
     /// What breaks if this changes.
     Impact {
-        /// A symbol name or a description of the change.
+        /// A symbol name, a file path, or a description of the change.
         query: String,
     },
 

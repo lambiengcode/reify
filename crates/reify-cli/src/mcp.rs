@@ -117,12 +117,13 @@ fn tool_definitions() -> Vec<Value> {
         json!({
             "name": "reify_impact",
             "description":
-                "List what depends on a symbol, including through shared database tables \
-                 where no call edge exists. Call this before changing shared logic.",
+                "List what depends on a symbol or a file — callers, importers, and \
+                 coupling through shared database tables where no call edge exists. \
+                 Call this before changing shared logic.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "query": {"type": "string", "description": "A symbol name or a described change"}
+                    "query": {"type": "string", "description": "A symbol name, a file path, or a described change"}
                 },
                 "required": ["query"]
             }
