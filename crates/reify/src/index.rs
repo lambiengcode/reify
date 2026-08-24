@@ -189,6 +189,12 @@ pub struct IndexReport {
     pub unresolved_refs: usize,
     pub history_rebuilt: bool,
     pub history_truncated: bool,
+    /// Why history could not be read, when it could not be read at all.
+    ///
+    /// Distinct from `history_truncated`, which means the walk stopped early but
+    /// returned commits. This means there are none, and the answer is poorer for it —
+    /// so it is reported rather than left for the user to notice a missing section.
+    pub history_unavailable: Option<String>,
     pub parse_errors: Vec<String>,
     /// Wall-clock milliseconds per stage, in the order they ran.
     ///
@@ -615,7 +621,23 @@ pub fn index(store: &mut Store, opts: &IndexOptions) -> Result<IndexReport> {
         stages.begin("reading history");
         report.history_rebuilt = true;
         store.forget_history()?;
-        let history = gitlog::history(&opts.root, opts.max_commits)?;
+        // History is evidence, not scaffolding: without it the index is poorer but
+        // every symbol, document, rule and edge is still there. Aborting the whole
+        // index because git could not answer throws all of that away over one stage.
+        //
+        // This is not hypothetical. A `--filter=blob:none` clone is the ordinary way
+        // to clone a large repository, and query-time git runs with
+        // `GIT_NO_LAZY_FETCH=1` so the offline promise covers the whole process tree.
+        // Together those mean any history walk needing an uncached blob fails — which,
+        // on a blobless clone at an older commit, is the common case rather than the
+        // exception. The neighbouring `bodies` call already degrades this way.
+        let history = match gitlog::history(&opts.root, opts.max_commits) {
+            Ok(history) => history,
+            Err(err) => {
+                report.history_unavailable = Some(format!("{err:#}"));
+                gitlog::History::default()
+            }
+        };
         report.history_truncated = history.truncated;
         store.commit(stage_history(&history, &present))?;
         // Bodies join the prior behind a structural leakage wall: this stage only

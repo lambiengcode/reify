@@ -365,3 +365,78 @@ fn a_reference_resolves_when_another_file_later_defines_it() {
 
     let _ = fs::remove_dir_all(&dir);
 }
+
+/// A repository whose history git cannot read must still produce a usable index.
+///
+/// This is the blobless-clone case, reproduced without a network: `--filter=blob:none`
+/// is the ordinary way to clone a large repository, query-time git runs with
+/// `GIT_NO_LAZY_FETCH=1` so the offline promise covers the whole process tree, and
+/// together those make any history walk needing an uncached object fail. Before this
+/// was handled, that failure took the entire index with it — the user got exit 1 and
+/// no store, having lost every symbol, document and edge over one optional stage.
+///
+/// Simulated here by deleting the commit object after committing: `.git/HEAD` still
+/// resolves, so indexing reaches the history stage, and `git log` then fails exactly
+/// as it does when a promisor remote cannot supply an object.
+#[test]
+fn an_unreadable_history_degrades_instead_of_failing_the_whole_index() {
+    use std::fs;
+    let dir = std::env::temp_dir().join(format!(
+        "reify-nohist-{}-{:?}",
+        std::process::id(),
+        std::thread::current().id()
+    ));
+    let _ = fs::remove_dir_all(&dir);
+    fs::create_dir_all(&dir).unwrap();
+    let git = |args: &[&str]| {
+        std::process::Command::new("git")
+            .args(args)
+            .current_dir(&dir)
+            .env("GIT_AUTHOR_NAME", "t")
+            .env("GIT_AUTHOR_EMAIL", "t@t")
+            .env("GIT_COMMITTER_NAME", "t")
+            .env("GIT_COMMITTER_EMAIL", "t@t")
+            .output()
+            .unwrap()
+    };
+    if !git(&["init", "-q"]).status.success() {
+        return; // no git available; nothing to assert
+    }
+    fs::write(
+        dir.join("order.py"),
+        "def apply_discount(total):\n    return total * 0.9\n",
+    )
+    .unwrap();
+    git(&["add", "."]);
+    git(&["commit", "-q", "-m", "first"]);
+
+    // Remove the commit object HEAD names. `git log` now fails; `.git/HEAD` does not.
+    let head = String::from_utf8(git(&["rev-parse", "HEAD"]).stdout).unwrap();
+    let head = head.trim();
+    let object = dir.join(".git/objects").join(&head[..2]).join(&head[2..]);
+    let _ = fs::remove_file(&object);
+    let _ = fs::remove_dir_all(dir.join(".git/objects/pack"));
+
+    let mut store = Store::in_memory().expect("in-memory store");
+    let report = index(&mut store, &IndexOptions::new(dir.clone()))
+        .expect("an unreadable history must not fail the index");
+
+    assert!(
+        report.history_unavailable.is_some(),
+        "the failure must be reported, not swallowed"
+    );
+    assert!(
+        report.files_parsed > 0,
+        "the code must still be indexed: {report:?}"
+    );
+
+    assert!(
+        !store
+            .symbols_named("apply_discount")
+            .expect("lookup")
+            .is_empty(),
+        "the symbol must survive a history failure"
+    );
+
+    let _ = fs::remove_dir_all(&dir);
+}
