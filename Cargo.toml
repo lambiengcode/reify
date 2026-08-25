@@ -3,7 +3,7 @@ resolver = "2"
 members = ["crates/reify", "crates/reify-cli", "crates/reify-bench"]
 
 [workspace.package]
-version = "0.2.2"
+version = "0.2.3"
 edition = "2021"
 license = "Apache-2.0"
 description = "A local knowledge engine that gives AI coding agents the smallest context they need to change mature business systems correctly."

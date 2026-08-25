@@ -4,9 +4,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project adheres to semantic versioning once it reaches 1.0; before then, minor
 versions may break the store schema, and `reify index --force` rebuilds it.
 
-## [Unreleased]
+## [0.2.3] - 2026-08-25
 
 ### Fixed
+- **The index lock did nothing on Windows.** `process_is_alive` was implemented for
+  unix and stubbed to `false` everywhere else. For the *current* process that means
+  every lock looks stale, so the lock reclaims itself and stops excluding anything:
+  two `reify index` runs could proceed against the same store. Windows users of 0.2.2
+  have this; there is no configuration that avoids it, and upgrading is the fix.
+  Implemented with `OpenProcess` + `WaitForSingleObject`, declared by hand for one
+  question asked once, the same way `kill` already was. The remaining
+  `not(any(unix, windows))` arm now returns `true`: without a liveness check the lock
+  cannot be trusted, and refusing to reclaim a lock costs one user less than letting
+  two indexers share a store costs everyone.
 - **One file could take the whole answer.** Relevance spreads along edges, so every
   member of a file that matched the task loosely arrived holding a plausible score and
   nothing bounded how many of them were admitted. Measured on Medusa, a task about
@@ -34,6 +44,16 @@ versions may break the store schema, and `reify index --force` rebuilds it.
   unrelated crate published in 2021.
 
 ### Added
+- **Windows and macOS are tested in CI.** Releases shipped binaries for both and no job
+  had ever executed either, so a portability break would have reached users before it
+  reached us. A `platform` job now runs the full suite and an end-to-end CLI smoke on
+  `windows-latest` and `macos-latest`; `check` stays on Linux and keeps what does not
+  vary by platform — formatting, clippy, and the network-egress gate that needs
+  iptables. It found the lock bug above in its first run, by failing to recognise its
+  own process as alive. Two details are handled rather than discovered later: Windows
+  checkouts convert LF to CRLF, so `core.autocrlf false` is set *before* checkout; and
+  the smoke step runs under bash, because PowerShell propagates only the last command's
+  exit code and a failing `init` would otherwise leave the step green.
 - **Windows x86_64 binaries.** `reify upgrade` works there too: Windows keeps a handle
   on the running image, so the old binary is renamed aside rather than overwritten, and
   restored if the replacement fails. `install.sh` recognises Git Bash, MSYS2 and Cygwin.
