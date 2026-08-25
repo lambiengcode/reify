@@ -43,7 +43,14 @@
   <main class="doc">
 
     <h2 id="install">Install</h2>
-    <p>Prebuilt binaries for macOS (Apple Silicon and Intel) and Linux (x86_64 and aarch64).</p>
+    <p>
+      Prebuilt binaries for macOS (Apple Silicon and Intel), Linux (x86_64 and aarch64)
+      and Windows (x86_64). On Windows the command above works in Git Bash, MSYS2 or
+      WSL; from PowerShell, take the <code>x86_64-pc-windows-msvc</code> archive from
+      the latest release, verify its <code>.sha256</code>, and put
+      <code>reify.exe</code> on your <code>PATH</code>. Every platform runs the full
+      test suite in CI.
+    </p>
     <div class="term">
       <div class="term-head"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
 <pre><span class="c-prompt">❯</span> <span class="c-cmd">curl</span> -fsSL https://raw.githubusercontent.com/lambiengcode/reify/main/install.sh | sh</pre>

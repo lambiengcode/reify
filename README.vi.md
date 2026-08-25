@@ -20,6 +20,7 @@
   <a href="LICENSE"><img alt="Apache-2.0" src="https://img.shields.io/github/license/lambiengcode/reify?style=flat-square&color=blue" /></a>
   <a href="#swebench"><img alt="SWE-bench retrieval 87.0%" src="https://img.shields.io/badge/SWE--bench%20retrieval-87.0%25-blueviolet?style=flat-square" /></a>
   <a href="#privacy"><img alt="network calls: 0" src="https://img.shields.io/badge/network%20calls-0-success?style=flat-square" /></a>
+  <a href="#install"><img alt="platforms: macOS, Linux, Windows" src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-supported-2da44e?style=flat-square" /></a>
 </p>
 
 <p align="center">
@@ -403,7 +404,16 @@ Ba thứ chỉ vỡ khi bạn rời khỏi hệ chữ Latinh, và cả ba đều
 curl -fsSL https://raw.githubusercontent.com/lambiengcode/reify/main/install.sh | sh
 ```
 
-Có sẵn binary dựng trước cho macOS (Apple Silicon và Intel) và Linux (x86_64 và aarch64).
+Có sẵn binary dựng trước cho **macOS** (Apple Silicon và Intel), **Linux** (x86_64 và
+aarch64) và **Windows** (x86_64). Trên Windows, dòng lệnh trên chạy được nguyên vẹn
+trong Git Bash, MSYS2 hoặc WSL; từ PowerShell, hãy tải archive `x86_64-pc-windows-msvc`
+ở [bản phát hành mới nhất](https://github.com/lambiengcode/reify/releases/latest), kiểm
+tra `.sha256` của nó, rồi đặt `reify.exe` vào một thư mục nằm trong `PATH`.
+
+Mọi nền tảng trong số đó đều chạy toàn bộ test suite trên CI, và CLI được chạy thử
+đầu-cuối trên từng nền tảng — không phát hành binary cho một nền tảng mà chưa có gì
+từng chạy trên đó.
+
 Hoặc build từ mã nguồn:
 
 ```bash

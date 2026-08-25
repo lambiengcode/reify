@@ -20,6 +20,7 @@
   <a href="LICENSE"><img alt="Apache-2.0" src="https://img.shields.io/github/license/lambiengcode/reify?style=flat-square&color=blue" /></a>
   <a href="#swe-bench-verified"><img alt="SWE-bench retrieval 87.0%" src="https://img.shields.io/badge/SWE--bench%20retrieval-87.0%25-blueviolet?style=flat-square" /></a>
   <a href="#privacy"><img alt="network calls: 0" src="https://img.shields.io/badge/network%20calls-0-success?style=flat-square" /></a>
+  <a href="#install"><img alt="platforms: macOS, Linux, Windows" src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-supported-2da44e?style=flat-square" /></a>
 </p>
 
 <p align="center">
@@ -382,8 +383,15 @@ Three things that only break once you leave Latin script, each of which broke he
 curl -fsSL https://raw.githubusercontent.com/lambiengcode/reify/main/install.sh | sh
 ```
 
-Prebuilt binaries for macOS (Apple Silicon and Intel), Linux (x86_64 and aarch64)
-and Windows (x86_64).
+Prebuilt binaries for **macOS** (Apple Silicon and Intel), **Linux** (x86_64 and
+aarch64) and **Windows** (x86_64). On Windows the line above works as written in Git
+Bash, MSYS2 or WSL; from PowerShell, take the `x86_64-pc-windows-msvc` archive from
+[the latest release](https://github.com/lambiengcode/reify/releases/latest), verify its
+`.sha256`, and put `reify.exe` somewhere on your `PATH`.
+
+Every one of those platforms runs the full test suite in CI, and the CLI is exercised
+end to end on each — a binary is not published for a platform nothing has executed.
+
 Or build from source:
 
 ```bash
