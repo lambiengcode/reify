@@ -96,9 +96,11 @@ impl Drop for IndexLock {
 
 /// Is a process with this id running?
 ///
-/// `kill(pid, 0)` is the portable POSIX existence check. On other platforms this
-/// returns `false`, which errs toward reclaiming a lock rather than deadlocking a
-/// repository — the safer failure for an advisory lock.
+/// The lock is only as good as this answer. A liveness check that always says "no"
+/// does not err on the safe side — it makes every lock look stale, so the lock stops
+/// excluding anything and two indexers write the same store. That is what the
+/// `not(unix)` stub used to do, and CI on Windows found it by failing to recognise
+/// its own process as alive.
 #[cfg(unix)]
 fn process_is_alive(pid: u32) -> bool {
     // SAFETY: `kill` with signal 0 performs no action; it only reports whether the
@@ -112,9 +114,57 @@ extern "C" {
     fn libc_kill(pid: i32, sig: i32) -> i32;
 }
 
-#[cfg(not(unix))]
+/// Win32's answer to `kill(pid, 0)`.
+///
+/// Declared by hand rather than pulling in a Windows crate, for one question asked
+/// once — the same reason `kill` is declared above rather than taking a libc
+/// dependency.
+#[cfg(windows)]
+mod win32 {
+    pub type Handle = *mut core::ffi::c_void;
+    extern "system" {
+        pub fn OpenProcess(access: u32, inherit: i32, pid: u32) -> Handle;
+        pub fn WaitForSingleObject(handle: Handle, millis: u32) -> u32;
+        pub fn CloseHandle(handle: Handle) -> i32;
+    }
+}
+
+#[cfg(windows)]
+fn process_is_alive(pid: u32) -> bool {
+    /// The narrowest right to ask "does this exist"; granted across integrity levels
+    /// where `PROCESS_QUERY_INFORMATION` is not.
+    const QUERY_LIMITED_INFORMATION: u32 = 0x1000;
+    /// Required to wait on the handle at all. Omitting it does not make the wait
+    /// stricter — it makes it fail with `WAIT_FAILED`, which reads as "not running"
+    /// and silently restores the bug this function exists to fix.
+    const SYNCHRONIZE: u32 = 0x0010_0000;
+    /// The handle is not signalled, so the process has not exited.
+    const WAIT_TIMEOUT: u32 = 258;
+
+    // SAFETY: `OpenProcess` returns null rather than an invalid handle on failure, and
+    // the handle is closed on every path that obtained one.
+    unsafe {
+        let handle = win32::OpenProcess(SYNCHRONIZE | QUERY_LIMITED_INFORMATION, 0, pid);
+        if handle.is_null() {
+            // No such process, or one this user may not query. Either way, treating
+            // the lock as reclaimable is the behaviour a dead owner should get.
+            return false;
+        }
+        // Waiting zero milliseconds asks the question without blocking. Preferred over
+        // `GetExitCodeProcess`, which reports the sentinel 259 for a running process
+        // and cannot distinguish it from one that genuinely exited with 259.
+        let state = win32::WaitForSingleObject(handle, 0);
+        win32::CloseHandle(handle);
+        state == WAIT_TIMEOUT
+    }
+}
+
+/// Any other platform. Deliberately pessimistic: without a liveness check the lock
+/// cannot be trusted, so it refuses to reclaim rather than silently allowing two
+/// indexers to share a store.
+#[cfg(not(any(unix, windows)))]
 fn process_is_alive(_pid: u32) -> bool {
-    false
+    true
 }
 
 #[cfg(test)]

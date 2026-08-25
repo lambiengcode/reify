@@ -20,6 +20,7 @@
   <a href="LICENSE"><img alt="Apache-2.0" src="https://img.shields.io/github/license/lambiengcode/reify?style=flat-square&color=blue" /></a>
   <a href="#swebench"><img alt="SWE-bench retrieval 87.0%" src="https://img.shields.io/badge/SWE--bench%20retrieval-87.0%25-blueviolet?style=flat-square" /></a>
   <a href="#privacy"><img alt="network calls: 0" src="https://img.shields.io/badge/network%20calls-0-success?style=flat-square" /></a>
+  <a href="#install"><img alt="platforms: macOS, Linux, Windows" src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-supported-2da44e?style=flat-square" /></a>
 </p>
 
 <p align="center">
@@ -390,7 +391,14 @@ C/C++、Kotlin，外加 SQL。每一种都有一个测试断言它能产出容�
 curl -fsSL https://raw.githubusercontent.com/lambiengcode/reify/main/install.sh | sh
 ```
 
-提供 macOS（Apple Silicon 与 Intel）和 Linux（x86_64 与 aarch64）的预编译二进制。
+提供 **macOS**（Apple Silicon 与 Intel）、**Linux**（x86_64 与 aarch64）和 **Windows**
+（x86_64）的预编译二进制。在 Windows 上，上面这行命令在 Git Bash、MSYS2 或 WSL 中可以
+原样运行；若使用 PowerShell，请从[最新发布](https://github.com/lambiengcode/reify/releases/latest)
+下载 `x86_64-pc-windows-msvc` 压缩包，校验其 `.sha256`，再把 `reify.exe` 放到 `PATH` 中。
+
+以上每个平台都会在 CI 上跑完整的测试套件，并逐一做端到端的 CLI 验证 —— 不会为一个从未
+被执行过的平台发布二进制。
+
 也可以从源码构建：
 
 ```bash
