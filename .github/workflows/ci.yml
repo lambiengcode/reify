@@ -38,6 +38,48 @@ jobs:
           cargo test --all --offline
           sudo iptables -F OUTPUT || true
 
+  # Every platform a release ships a binary for is tested here.
+  #
+  # `check` above stays on Linux and owns the things that do not vary by platform —
+  # formatting, clippy, and the network-egress gate, which needs iptables. This job
+  # owns what does vary: path handling, the temporary directory, line endings, and
+  # whether the CLI actually runs. Releases shipped Windows and macOS binaries that no
+  # job had ever executed; a portability break would have reached users first.
+  platform:
+    name: test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    steps:
+      # Before checkout, deliberately: Windows runners convert LF to CRLF on the way
+      # in, which would mean testing fixtures no user's repository actually contains
+      # and shifting every byte offset the index records. Configuring git afterwards
+      # would be too late.
+      - name: Check out with the line endings as committed
+        if: runner.os == 'Windows'
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Test
+        run: cargo test --all
+
+      # The unit tests can pass while the binary cannot start. This is the same
+      # end-to-end path `bench-smoke` runs on Linux, reduced to what proves the CLI
+      # works on this platform at all.
+      - name: The CLI runs end to end
+        # bash, not the Windows default: PowerShell only propagates the *last*
+        # command's exit code, so a failing `init` here would pass the step silently.
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo run --release -p reify-cli -- -C fixtures/minierp init
+          cargo run --release -p reify-cli -- -C fixtures/minierp index
+          cargo run --release -p reify-cli -- -C fixtures/minierp --json context "strategic account discount"
+
   deny:
     runs-on: ubuntu-latest
     steps:
