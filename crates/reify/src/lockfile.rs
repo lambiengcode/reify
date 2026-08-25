@@ -134,13 +134,17 @@ fn process_is_alive(pid: u32) -> bool {
     /// The narrowest right to ask "does this exist"; granted across integrity levels
     /// where `PROCESS_QUERY_INFORMATION` is not.
     const QUERY_LIMITED_INFORMATION: u32 = 0x1000;
+    /// Required to wait on the handle at all. Omitting it does not make the wait
+    /// stricter — it makes it fail with `WAIT_FAILED`, which reads as "not running"
+    /// and silently restores the bug this function exists to fix.
+    const SYNCHRONIZE: u32 = 0x0010_0000;
     /// The handle is not signalled, so the process has not exited.
     const WAIT_TIMEOUT: u32 = 258;
 
     // SAFETY: `OpenProcess` returns null rather than an invalid handle on failure, and
     // the handle is closed on every path that obtained one.
     unsafe {
-        let handle = win32::OpenProcess(QUERY_LIMITED_INFORMATION, 0, pid);
+        let handle = win32::OpenProcess(SYNCHRONIZE | QUERY_LIMITED_INFORMATION, 0, pid);
         if handle.is_null() {
             // No such process, or one this user may not query. Either way, treating
             // the lock as reclaimable is the behaviour a dead owner should get.
