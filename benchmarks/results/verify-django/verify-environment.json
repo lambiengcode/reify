@@ -1,0 +1,25 @@
+{
+  "after": null,
+  "candidates_rejected": 3,
+  "checker": "symbols changed by this diff, minus symbols present in the diff, where an inbound CALLS edge exists at distance 1, via reify::query::impact",
+  "count": 20,
+  "head": "0b40210e4808937a7c0922e8b7502bff4752faa3",
+  "languages": [
+    [
+      "python",
+      2014
+    ],
+    [
+      "javascript",
+      16
+    ]
+  ],
+  "origin": "git@github.com:django/django",
+  "reify_version": "0.2.2",
+  "repository": "/private/tmp/claude-501/-Users-lambiengcode--treehouse-reify-2e416f-2-reify/a9d50d0b-cce2-4027-a129-e64262e800a7/scratchpad/django",
+  "scan": 400,
+  "token_counts": "estimated by reify heuristic-v1",
+  "trials": 20,
+  "until": null,
+  "wall_clock_ms": 96781
+}

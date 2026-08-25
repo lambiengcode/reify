@@ -48,16 +48,16 @@
 ```bash
 curl -fsSL https://raw.githubusercontent.com/lambiengcode/reify/main/install.sh | sh
 cd your-repository
-reify init --write-agent-instructions   # wires your agent through AGENTS.md / CLAUDE.md
+reify doctor                            # should you even use this? it will say no
+reify install --yes                     # detects your agents and wires each one
 reify index                             # 4.2 s for 5,000 files; 0.5 s after one edit
 reify context "the change you are about to make" --toon
 ```
 
 <sub>One static binary — no daemon, no config, no API key, and every release ships a
 SHA-256 checksum that both the installer above and `reify upgrade` verify before
-anything is unpacked. Changed your mind?
-`reify uninstall` removes the binary and `reify uninit` cleans one repository, both
-showing their plan first. Per-agent wiring, hooks and MCP: <a href="#install">Install</a>.</sub>
+anything is unpacked. Per-agent wiring, hooks, MCP and how to leave cleanly:
+<a href="#install">Install</a>.</sub>
 
 <p align="center">
   <strong>English</strong> &middot; <a href="README.vi.md">Tiếng Việt</a> &middot; <a href="README.zh.md">简体中文</a>
@@ -390,20 +390,26 @@ Or build from source:
 cargo install --path crates/reify-cli
 ```
 
-Then, in any repository:
+Then, in the repository you want it for:
 
 ```bash
-reify init      # tells you what it will and won't index, and why
-reify index     # 4.6s for 5,000 files; 0.7s after you edit one
+reify doctor            # is this repository one Reify helps? it is willing to say no
+reify install           # shows what it found and what it would wire; --yes applies it
 ```
+
+`install` detects the agents actually configured in the repository — `AGENTS.md`,
+`CLAUDE.md`, `.cursor/`, `.clinerules/` and the rest — and wires each one the
+[cheapest way that works](#wire-it-into-your-agent). An agent installed on the machine
+but not configured here is reported, not written to, and nothing outside the repository
+is touched. `--mcp` opts into MCP instead, and says what that costs before it writes.
 
 **Stay current, leave cleanly.** `reify upgrade` replaces the binary with the latest
 release — through `curl` and `tar` as visible subprocesses, never an embedded HTTP
 client, with the checksum verified before anything is installed; `--check` only asks,
 and `REIFY_OFFLINE=1` refuses the command outright. `reify uninstall --yes` removes the
 binary and nothing else; `reify uninit --yes` removes one repository's `.reify/` store
-and the instruction block `init` wrote. Both show their plan first when run without
-`--yes`.
+and every agent integration `init` or `install` wrote. Both show their plan first when
+run without `--yes`.
 
 <details>
 <summary><strong>Shell completions</strong></summary>
@@ -422,16 +428,20 @@ reify completions fish > ~/.config/fish/completions/reify.fish
 reify init --write-agent-instructions
 ```
 
-Appends a six-line block to `AGENTS.md` or `CLAUDE.md`. No protocol, no server, no
-per-turn schema tax — this is the level the benchmark measured. For tools that read a
-different file (`.cursorrules`, `CONVENTIONS.md`, `.windsurfrules`, `.clinerules/`),
-paste the same four lines:
+Appends this block to `AGENTS.md` or `CLAUDE.md`. No protocol, no server, no per-turn
+schema tax — this is the level the benchmark measured. For tools that read a different
+file (`.cursorrules`, `CONVENTIONS.md`, `.windsurfrules`, `.clinerules/`), paste it
+there instead:
 
 ```markdown
-Before changing code here, run `reify context "<what you are about to do>" --toon`.
+## Before changing code in this repository
+
+Run `reify context "<what you are about to do>" --toon` and read its output first.
 Run `reify why <file>:<line>` before modifying unfamiliar logic.
 Run `reify impact "<symbol>"` before changing anything shared.
-Treat INFERRED claims as leads to verify, not facts.
+
+Claims marked `INFERRED` are leads to verify against their citation, not facts.
+If `conflicts` is non-empty, resolve the disagreement before changing behaviour.
 ```
 
 **MCP**, if you prefer it: `reify serve --mcp` exposes six tools — `reify_context`,
@@ -445,11 +455,7 @@ they cost under 600 tokens, which six still fit inside.
 [Privacy](#privacy) for why that is a command and not an HTTP client.
 
 <details>
-<summary><strong>Shell completions, and a pre-edit risk hook</strong></summary>
-
-```bash
-reify completions zsh > ~/.zfunc/_reify     # also bash, fish
-```
+<summary><strong>A pre-edit risk hook, and keeping the index fresh</strong></summary>
 
 Inject a risk header before every edit, under 300 tokens, asserted by a test because it
 runs on every edit. Non-blocking by default: a hook that blocks edits gets uninstalled,
@@ -481,7 +487,7 @@ chmod +x .git/hooks/post-merge && cp .git/hooks/post-merge .git/hooks/post-check
 |---|---|
 | `reify context "<task>"` | The minimum knowledge for a change, plus a reading plan. **The one that matters.** `--toon` emits the agent format |
 | `reify why <file>:<line>` | What this is, what calls it, what data it touches, what changed it |
-| `reify impact "<symbol>"` | What depends on it — including through the database, where no call edge exists |
+| `reify impact "<symbol\|file>"` | What depends on it — callers, importers, and coupling through the database where no call edge exists |
 | `reify explain "<term>"` | A business concept across every language, table and file it appears in |
 | `reify flow "<process>"` | The call sequence that carries out a business process |
 | `reify conflicts` | Documentation that disagrees with the code |
@@ -490,9 +496,11 @@ chmod +x .git/hooks/post-merge && cp .git/hooks/post-merge .git/hooks/post-check
 | `reify preflight <file>` | A risk header for an editor hook |
 | `reify report` | System scorecard |
 | `reify status` | Freshness, coverage, and what was skipped |
+| `reify doctor` | Should this repository use Reify at all? Runs before there is an index, and will say no |
+| `reify install [--yes]` | Detect the agents configured here and wire each one. Shows its plan first; `--mcp` opts into MCP instead |
 | `reify llm status \| preview` | Is a model configured, and exactly what would be sent |
 | `reify upgrade [--check]` | Replace this binary with the latest release. The only networked command; refused under `REIFY_OFFLINE=1` |
-| `reify uninstall --yes` \| `uninit --yes` | Remove the binary \| one repository's store and instruction block |
+| `reify uninstall --yes` \| `uninit --yes` | Remove the binary \| one repository's store and everything `install` wrote |
 | `reify serve --mcp` | Model Context Protocol over stdio |
 | `reify completions <shell>` | Completion script |
 
@@ -557,32 +565,19 @@ ERPNext, 5,064 files, 8-core M-series laptop.
 | peak memory, full index | 224 MB |
 | store size | 47 MB (33% of a 144 MB working tree) |
 
-A full index took **78 seconds** until the full-text index was keyed by node id. `uid` is `UNINDEXED` in FTS5, so `DELETE ... WHERE uid = ?` scanned the whole table once per node — quadratic, and invisible until it was timed per stage. Editing one file took **5.9 seconds** until the repository-wide stages learned to skip when their inputs are provably unchanged.
+Those numbers are the end of a long optimisation, not a first draft: a full index took
+**78 seconds** and a one-file reindex **5.9 seconds** before the stages learned to skip
+work whose inputs are provably unchanged. `REIFY_TIMING=1 reify index` prints the
+per-stage breakdown that found every one of them, and [CHANGELOG.md](CHANGELOG.md) has
+the before-and-after for each.
 
-Reindexing was **2× slower** until two things stopped being done repository-wide for
-a one-line edit. Discovery read and hashed all 5,285 files on every run — 222 ms of
-reading to find the handful that moved — and now `stat`s past anything whose size and
-modification time are unchanged, hashing the rest across all cores. Reference
-resolution reloaded and re-resolved all **144,309** references, 167 ms to resolve and
-145 ms to commit, regardless of how little changed; it now re-resolves only references
-whose *name* the edit added or removed, plus those inside the edited files, which is
-provably the whole affected set. Measured against the previous build on the same
-machine: full index 6.75 s → 4.25 s, no-op reindex 256 ms → 101 ms, one file edited
-974 ms → 486 ms.
-
-`reify why` was **1.5 seconds** on a blobless clone, and returned a *worse* answer than
-it does now. `git log -L` needs the file's blob at every revision it walks, and on a
-partial clone those blobs are not local — so git was silently fetching them from the
-remote, one query costing 29.5 s of network and 0.07 s of work. The subprocess now runs
-with `GIT_NO_LAZY_FETCH=1`: git answers from local objects or fails, and either way the
-command returns in milliseconds. Eleven of twelve sampled symbols used to hit the
-timeout; none do.
-
-That fix is also why the privacy claim below is true of the whole process tree rather
-than just this binary. Reify never opened a socket; the git it spawned did.
-
-`REIFY_TIMING=1 reify index` prints the per-stage breakdown that found every one of
-these.
+One of those fixes is load-bearing for the privacy claim below rather than for speed.
+`reify why` runs `git log -L`, which needs the file's blob at every revision it walks —
+and on a blobless clone those blobs are not local, so git was silently **fetching them
+from the remote**: 29.5 s of network for 0.07 s of work. Every `git` invocation now sets
+`GIT_NO_LAZY_FETCH=1`, so it answers from local objects or fails. Reify never opened a
+socket; the git it spawned did. That is why the guarantee below is stated over the whole
+process tree and not just this binary.
 
 ## Reproducing the benchmark
 
@@ -607,6 +602,25 @@ reify-bench chart  --results "Mine=results/" --out assets/
 ```
 
 The task set is frozen before any condition runs. The report includes a **"Where Reify lost"** section listing every task the baseline won, and it is a required part of the document rather than an optional one.
+
+### The benchmark that killed a feature
+
+`reify verify` — a post-flight check that reads an agent's diff and reports what the
+patch missed — was measured before it was written. The harness withholds one hunk from
+a real merged commit, asks the graph what the patch missed, then runs the *complete*
+commit through the same query, where every finding is a false positive by construction.
+Model-free, deterministic, 116s for three repositories.
+
+```bash
+reify-bench verify-eval   --repo <repo> --out results/verify-<name> --until <sha>
+reify-bench verify-report --results "name=results/verify-<name>" --out benchmarks/REPORT-verify.md
+```
+
+It failed its pre-registered condition on all three: the graph finds the omitted file
+often enough — `omission_recall` 0.40 on Go, 0.50 on Rust, 0.10 on Python — but reports
+4.4 to 23.5 findings against commits that are already complete. A `CALLS` edge says a
+caller exists; it does not say the caller needed changing. **The feature was not
+built.** [Full writeup](benchmarks/REPORT-verify.md).
 
 ## Development
 
@@ -647,7 +661,8 @@ which is why every answer comes with a line number instead of a similarity score
 
 **My repo is 3,000 lines. Should I use it?**
 No. Use ripgrep. Under roughly 20k LOC Reify buys you nothing a grep and a scroll wheel
-don't.
+don't. `reify doctor` applies that floor and three other signals to your repository, before
+you index it.
 
 **Does it send my proprietary code anywhere?**
 It cannot. There is no HTTP client in the binary, and a test fails the build if one

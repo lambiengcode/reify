@@ -38,7 +38,21 @@ Claims marked INFERRED are leads to verify, not facts.
 If `conflicts` is non-empty, resolve the disagreement before changing behaviour.
 ```
 
-## Codex, Cursor, OpenCode, Aider, Pi
+## Codex, Cursor, Windsurf, Cline, Copilot, OpenCode, Aider, Pi
 
-No adapter needed. Put the block above in whatever instruction file the tool reads
-(`AGENTS.md`, `.cursorrules`, `CONVENTIONS.md`). The CLI is the interface.
+No adapter needed. `reify install` finds which of these this repository is configured for
+and writes the block into each one's own file — a dedicated rule file where the tool has
+a rules directory (`.cursor/rules/`, `.windsurf/rules/`, `.clinerules/`), an append where
+it reads a single file (`AGENTS.md`, `.cursorrules`, `.github/copilot-instructions.md`,
+`CONVENTIONS.md`). It shows the plan and stops unless `--yes`.
+
+Detection needs evidence **in the repository**. A tool installed on your machine but not
+configured here is listed and left alone: `~/.cursor` says you have Cursor, not that this
+repository is worked on with it, and creating a `.cursorrules` on that basis would be a
+guess. Where nothing is recognised, `install` prints the block for you to place.
+
+Everything it writes is inside the repository, so `reify uninit` reverses all of it. That
+is also why no machine-wide MCP config is touched: a per-repository uninstall cannot
+safely undo a machine-wide registration.
+
+The CLI is the interface; put the block above anywhere yourself if you prefer.

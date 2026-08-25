@@ -3,10 +3,15 @@
 Four levels, cheapest first. **Start at level 0** — it works today, costs nothing until
 used, and is what the benchmark measured.
 
+`reify install` picks the right level for whichever agents this repository is actually
+configured for and shows its plan before writing anything; `reify install --yes` applies
+it. It installs level 0 by default, for the reason below. `reify uninit` removes
+everything it wrote.
+
 ## Level 0 — a shell command (recommended)
 
-`reify init` finds your `AGENTS.md` or `CLAUDE.md` and tells you what to add.
-`reify init --write-agent-instructions` appends it for you:
+`reify install` writes it into whatever files the agents here already read.
+`reify init --write-agent-instructions` appends it to one file:
 
 ```markdown
 ## Before changing code in this repo
@@ -25,8 +30,14 @@ is reducing context, paying a per-turn tax to deliver it would be self-defeating
 ## Level 1 — MCP, if your client cannot run a shell command
 
 ```bash
-reify serve --mcp
+reify install --mcp --yes    # merges the server entry into .mcp.json
+reify serve --mcp            # or register it by hand
 ```
+
+`--mcp` is an opt-in to the per-turn cost above, and `install` says so before writing.
+It merges into an existing `.mcp.json` rather than replacing it: unrelated servers, their
+environment blocks and the file's formatting survive untouched, and a config that does
+not parse is reported and skipped rather than overwritten.
 
 Six tools — `reify_context`, `reify_why`, `reify_impact`, `reify_explain`,
 `reify_flow`, `reify_conflicts` — and that is the whole surface, deliberately.

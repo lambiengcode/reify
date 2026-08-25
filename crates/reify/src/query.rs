@@ -229,7 +229,12 @@ pub struct ImpactAnswer {
     pub schema: &'static str,
     pub query: String,
     pub origins: Vec<Citation>,
+    /// Everything found to depend on the origins. Truncated for presentation;
+    /// `affected_total` is what was actually found.
     pub affected: Vec<Affected>,
+    /// How many dependants were found before the list was truncated. Naming sixty of
+    /// two hundred is a sample, and calling it the answer would be a lie about scope.
+    pub affected_total: usize,
     pub tables: Vec<Citation>,
     pub co_changing_files: Vec<Citation>,
     pub unknowns: Vec<String>,
@@ -247,6 +252,7 @@ pub fn impact(store: &Store, query: &str) -> Result<ImpactAnswer> {
         query: query.to_string(),
         origins: origins.iter().map(citation).collect(),
         affected: Vec::new(),
+        affected_total: 0,
         tables: Vec::new(),
         co_changing_files: Vec::new(),
         unknowns: Vec::new(),
@@ -258,30 +264,52 @@ pub fn impact(store: &Store, query: &str) -> Result<ImpactAnswer> {
         return Ok(answer);
     }
 
-    let origin_ids: HashSet<i64> = origins.iter().map(|n| n.id).collect();
-    let mut seen: HashSet<i64> = origin_ids.clone();
-    let mut frontier: Vec<(Node, u32, String)> = origins
-        .iter()
-        .cloned()
-        .map(|n| (n, 0, String::new()))
-        .collect();
-
-    while let Some((node, depth, _)) = frontier.pop() {
-        if depth >= IMPACT_MAX_DEPTH || answer.affected.len() >= IMPACT_MAX_NODES {
+    // A file argument is the common case from an editor hook, and a file is not the
+    // node dependencies attach to: `CALLS` edges land on symbols, `IMPORTS` on files.
+    // Seeding a file's symbols alongside the file itself is what makes `impact <file>`
+    // agree with `preflight <file>` instead of contradicting it.
+    let mut seeds: Vec<Node> = origins.clone();
+    for origin in &origins {
+        if origin.kind != NodeKind::File {
             continue;
         }
-        // Callers depend on this symbol.
-        for (dependant, _, confidence) in
-            store.neighbors(node.id, Direction::In, &[EdgeKind::Calls])?
-        {
+        if let Some(path) = &origin.path {
+            seeds.extend(store.symbols_in_file(path)?);
+        }
+    }
+    let origin_ids: HashSet<i64> = seeds.iter().map(|n| n.id).collect();
+    let mut seen: HashSet<i64> = origin_ids.clone();
+    let mut frontier: Vec<(Node, u32, String)> =
+        seeds.into_iter().map(|n| (n, 0, String::new())).collect();
+
+    while let Some((node, depth, _)) = frontier.pop() {
+        if depth >= IMPACT_MAX_DEPTH {
+            continue;
+        }
+        // Past the display budget, keep counting but stop widening: the marginal
+        // second-hop name costs tokens without changing what an engineer decides.
+        let widen = answer.affected.len() < IMPACT_MAX_NODES;
+        // Callers depend on this symbol; importers depend on this file.
+        for (dependant, edge, confidence) in store.neighbors(
+            node.id,
+            Direction::In,
+            &[EdgeKind::Calls, EdgeKind::Imports],
+        )? {
             if !seen.insert(dependant.id) {
                 continue;
             }
-            let reason = format!("calls {}", node.name);
+            let verb = if edge == EdgeKind::Imports {
+                "imports"
+            } else {
+                "calls"
+            };
+            let reason = format!("{verb} {}", node.name);
             answer
                 .affected
                 .push(affected(&dependant, depth + 1, reason, confidence));
-            frontier.push((dependant, depth + 1, String::new()));
+            if widen {
+                frontier.push((dependant, depth + 1, String::new()));
+            }
         }
         // Data coupling: anything else touching a table this symbol writes.
         for (table, _, _) in store.neighbors(
@@ -332,6 +360,7 @@ pub fn impact(store: &Store, query: &str) -> Result<ImpactAnswer> {
             .then(b.confidence.total_cmp(&a.confidence))
             .then(a.location.cmp(&b.location))
     });
+    answer.affected_total = answer.affected.len();
     answer.affected.truncate(IMPACT_MAX_NODES);
 
     if answer.affected.is_empty() {
@@ -1308,6 +1337,41 @@ class SalesOrder:
         let a = serde_json::to_string(&impact(&store, "requires_approval").unwrap()).unwrap();
         let b = serde_json::to_string(&impact(&store, "requires_approval").unwrap()).unwrap();
         assert_eq!(a, b);
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn impact_on_a_file_never_reports_less_than_preflight_on_the_same_file() {
+        // Two commands contradicting each other about one file is worse than either
+        // being silent: an agent acts on the answer it was given. `impact` counts
+        // intra-file callers that `preflight` deliberately excludes, so it may report
+        // more — never fewer.
+        let (store, root) = indexed();
+        let mut checked = 0;
+        for file in store.nodes_of_kind(NodeKind::File).unwrap() {
+            let path = file.path.as_deref().unwrap_or(&file.name);
+            let expected = preflight(&store, path).unwrap().dependants;
+            let found = impact(&store, path).unwrap().affected_total;
+            assert!(
+                found >= expected,
+                "impact({path}) found {found} affected, preflight found {expected} dependants"
+            );
+            checked += 1;
+        }
+        assert!(checked > 0, "the fixture corpus indexed no files");
+
+        // The invariant above is satisfiable by file-level imports alone, so pin the
+        // thing that actually broke: a file argument must reach the symbols that call
+        // into it, the way a symbol argument does.
+        let answer = impact(&store, "app/order.py").unwrap();
+        assert!(
+            answer
+                .affected
+                .iter()
+                .any(|a| a.reason.starts_with("calls")),
+            "a file's callers must be reported, not only its importers: {:?}",
+            answer.affected
+        );
         let _ = fs::remove_dir_all(&root);
     }
 

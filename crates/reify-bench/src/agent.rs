@@ -57,9 +57,14 @@ pub struct AgentOutcome {
 ///
 /// Identical across conditions except for the CONTEXT block, so any difference in
 /// outcome is attributable to the context and not to the wording of the question.
-pub fn prompt(task: &Task, context_block: &str) -> String {
+///
+/// `repository` comes from the task set rather than from a literal. It was a literal
+/// — `ERPNext` — until 2026-08-24, which meant every Medusa, OFBiz and OpenMRS run
+/// told the model it was working on a different codebase than the one it was asked
+/// about. See the dated notes at the top of the three affected reports.
+pub fn prompt(repository: &str, task: &Task, context_block: &str) -> String {
     format!(
-        "You are helping a developer change a large existing codebase (ERPNext).\n\
+        "You are helping a developer change a large existing codebase ({repository}).\n\
          \n\
          TASK: {}\n\
          \n\
@@ -111,11 +116,12 @@ pub fn oracle_block(task: &Task) -> String {
 pub fn run(
     provider: &Provider,
     root: &Path,
+    repository: &str,
     task: &Task,
     condition: &str,
     context_block: &str,
 ) -> AgentOutcome {
-    let text = prompt(task, context_block);
+    let text = prompt(repository, task, context_block);
     let started = std::time::Instant::now();
     let mut outcome = AgentOutcome {
         task: task.id.clone(),
@@ -268,8 +274,8 @@ mod tests {
 
     #[test]
     fn the_prompt_differs_between_conditions_only_in_its_context() {
-        let a = prompt(&task(), "context A");
-        let b = prompt(&task(), "context B");
+        let a = prompt("erpnext", &task(), "context A");
+        let b = prompt("erpnext", &task(), "context B");
         let strip = |s: &str| s.replace("context A", "@").replace("context B", "@");
         assert_eq!(
             strip(&a),
@@ -279,8 +285,24 @@ mod tests {
     }
 
     #[test]
+    fn the_prompt_names_the_repository_the_task_came_from() {
+        // Until 2026-08-24 this was the literal `ERPNext`, so three published
+        // model-in-the-loop tables asked about one codebase while naming another.
+        let set = crate::tasks::TaskSet {
+            repository: ".bench/medusa".into(),
+            head: "a".repeat(40),
+            generated_from_commits: 1,
+            base: None,
+            tasks: vec![task()],
+        };
+        let text = prompt(set.repository_name(), &task(), "context");
+        assert!(text.contains("medusa"), "{text}");
+        assert!(!text.contains("ERPNext"), "{text}");
+    }
+
+    #[test]
     fn an_empty_context_is_stated_rather_than_left_blank() {
-        assert!(prompt(&task(), "").contains("(none provided)"));
+        assert!(prompt("erpnext", &task(), "").contains("(none provided)"));
     }
 
     #[test]

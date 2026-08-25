@@ -688,7 +688,10 @@ fn subject_vocabulary(name: &str) -> BTreeSet<String> {
 fn classify_phrase(phrase: &str) -> Option<(String, Polarity)> {
     let lowered = phrase.to_lowercase();
     for subject in SUBJECTS {
-        if !subject.terms.iter().any(|t| lowered.contains(t)) {
+        // Word-boundaried, like the polarity test below. A raw substring match reads
+        // `must-revalidate` as the `validation` subject, because `validate` sits inside
+        // `revalidate` — and a cache header then arrives as a business rule at 0.97.
+        if !subject.terms.iter().any(|t| contains_word(&lowered, t)) {
             continue;
         }
         let signals = |words: &[&str], shared: &[&str]| {
@@ -840,6 +843,23 @@ mod tests {
     fn prose_about_nothing_business_shaped_classifies_as_nothing() {
         assert_eq!(classify_phrase("the cache is warmed on startup"), None);
         assert_eq!(classify_phrase("returns a list of rows"), None);
+    }
+
+    #[test]
+    fn a_subject_term_inside_a_longer_word_is_not_that_subject() {
+        // `validate` sits inside `revalidate`, and `must` supplies the polarity, so a
+        // substring subject test mined an HTTP cache header as a validation rule at
+        // 0.97 confidence. The subject must be word-boundaried like the polarity is.
+        assert_eq!(classify_phrase("adds a must-revalidate header"), None);
+        // A genuine claim is untouched.
+        assert_eq!(
+            classify_phrase("orders must require approval"),
+            Some(("approval".into(), Polarity::Require))
+        );
+        assert_eq!(
+            classify_phrase("the service rejects an order that fails validation"),
+            Some(("validation".into(), Polarity::Require))
+        );
     }
 
     #[test]

@@ -19,6 +19,9 @@ use serde::Serialize;
 
 use reify::context::Context;
 use reify::discover::Discovery;
+use reify::doctor::{self, Diagnosis, Verdict};
+
+use crate::install::{Kind as InstallKind, Plan, State as InstallState, Step as InstallStep};
 use reify::index::IndexReport;
 use reify::llm;
 use reify::model::{Node, Status};
@@ -532,7 +535,18 @@ pub fn impact(answer: &ImpactAnswer, json: bool) -> Result<()> {
         }
     }
     if !answer.affected.is_empty() {
-        heading("Affected");
+        // A file every module imports has hundreds of dependants. Printing all of them
+        // spends an agent's budget to say one thing — "a lot" — so the count leads and
+        // the nearest few are the evidence for it.
+        let shown = answer.affected.len();
+        if answer.affected_total > shown {
+            heading(&format!(
+                "Affected  {} total, {shown} nearest shown",
+                answer.affected_total
+            ));
+        } else {
+            heading(&format!("Affected  {shown}"));
+        }
         for item in &answer.affected {
             println!(
                 "  {} {}  {}  ({}, {} hop{})",
@@ -746,6 +760,294 @@ pub fn preflight(answer: &Preflight, json: bool) -> Result<()> {
     println!("  RISK: {risk} — {}", answer.reason);
     println!("  next: {}", answer.suggested_command);
     Ok(())
+}
+
+/// `reify install`: what was found, and what will be done about it.
+///
+/// Shows the plan and stops unless `--yes`, matching `uninstall`, `uninit` and
+/// `upgrade`. A command that changes a repository's agent configuration without showing
+/// its work first is one people learn not to run.
+pub fn install(plan: &Plan, yes: bool, json: bool) -> Result<()> {
+    if json {
+        return emit_json(plan);
+    }
+    println!("INSTALL  {}", plan.root);
+
+    if plan.steps.is_empty() {
+        // Guessing which agent is present from a directory name that might mean
+        // anything is worse than handing over the block and letting a human place it.
+        println!("\nFound no agent I recognise here.");
+        println!("Nothing was written. Add this to whatever instruction file your tool reads:\n");
+        for line in plan.instruction_block.iter().flat_map(|b| b.lines()) {
+            println!("    {line}");
+        }
+        return Ok(());
+    }
+
+    println!();
+    for step in &plan.steps {
+        println!("  {}", step.agents.join(", "));
+        // Detection has to be checkable, so what the claim rests on is printed with it.
+        println!("    detected because {}", step.evidence.join(", "));
+        println!("    {}", install_action(step, plan.applied));
+    }
+
+    if !plan.detected_elsewhere.is_empty() {
+        println!("\n  Installed on this machine but not configured in this repository,");
+        println!("  so nothing was planned for them:");
+        for agent in &plan.detected_elsewhere {
+            println!("    {agent}");
+        }
+    }
+
+    if plan.mcp {
+        println!(
+            "\n  {}",
+            wrap(
+                "You asked for MCP. Its tool schemas are re-sent on every turn of every \
+                 session, where the shell-command block costs nothing until it is \
+                 called — see docs/integration/claude-code.md. Drop --mcp for the \
+                 cheaper integration.",
+                WIDTH,
+                "  ",
+                2,
+            )
+        );
+    }
+
+    if !plan.has_work() && !plan.applied {
+        println!("\nNothing to do; everything above is already wired.");
+        return Ok(());
+    }
+    if !yes {
+        println!("\nNothing was written. Re-run with --yes to apply.");
+        return Ok(());
+    }
+    println!("\nDone. `reify uninit` removes everything written here.");
+    Ok(())
+}
+
+/// What one step will do, has done, or is not doing — as one readable phrase.
+fn install_action(step: &InstallStep, applied: bool) -> String {
+    if step.state == InstallState::Skipped {
+        return match &step.problem {
+            Some(problem) => format!("skipping {}: {problem}", step.path),
+            None => format!("skipping {}", step.path),
+        };
+    }
+    let what = match step.kind {
+        InstallKind::Mcp => format!("the MCP server entry in {}", step.path),
+        InstallKind::RuleFile => format!("the rule file {}", step.path),
+        InstallKind::Instructions => format!("the instruction block in {}", step.path),
+    };
+    match (step.state, applied) {
+        (InstallState::Planned, _) => format!("will write {what}"),
+        (InstallState::AlreadyPresent, true) => format!("wrote {what}"),
+        (InstallState::AlreadyPresent, false) => format!("already has {what}"),
+        (InstallState::Skipped, _) => unreachable!("handled above"),
+    }
+}
+
+/// `reify doctor`: should this repository use Reify at all?
+///
+/// Named signals with measured values and a plain-language verdict. Deliberately not a
+/// score: `docs/metrics.md` forbids printing a number that cannot be defined, and a
+/// weighted blend of four heuristics tuned on four repositories is exactly that.
+pub fn doctor(answer: &Diagnosis, json: bool) -> Result<()> {
+    if json {
+        return emit_json(answer);
+    }
+    println!("DOCTOR  {}", answer.root);
+    println!();
+
+    let floor = doctor::floor_text();
+    signal(
+        "scale",
+        &doctor::scale_text(&answer.scale),
+        if answer.verdict == Verdict::TooSmall {
+            format!("below the {floor} floor")
+        } else {
+            format!("above the {floor} floor")
+        },
+    );
+
+    // Below the floor the other signals were never computed, and saying why is more
+    // useful than printing three lines of zeroes.
+    if answer.verdict == Verdict::TooSmall {
+        verdict_line(answer);
+        return Ok(());
+    }
+
+    match &answer.vocabulary {
+        Some(v) => signal(
+            "vocabulary",
+            &format!(
+                "{} of focused commits name a file they changed",
+                doctor::percent(v.locality)
+            ),
+            format!("{} of {} commits", v.commits_local, v.commits_considered),
+        ),
+        None => signal(
+            "vocabulary",
+            "not measurable without git history",
+            String::new(),
+        ),
+    }
+    match &answer.history {
+        Some(h) => {
+            signal(
+                "history",
+                &format!(
+                    "{} commits, {} focused enough to attribute",
+                    h.commits_read,
+                    doctor::percent(h.focus)
+                ),
+                format!("median commit changes {} file(s)", h.median_files_changed),
+            );
+            // Said only when it is not the case. On all five repositories this was
+            // calibrated against it sat at 100%, so printing it always would be noise.
+            if h.usable_share < 0.9 {
+                signal(
+                    "",
+                    &format!(
+                        "only {} carry a subject worth reading",
+                        doctor::percent(h.usable_share)
+                    ),
+                    String::new(),
+                );
+            }
+        }
+        None => signal("history", "could not be read", String::new()),
+    }
+    signal(
+        "documents",
+        &format!(
+            "{} document(s) only Reify can read",
+            answer.documents.unreadable_by_grep
+        ),
+        answer.documents.examples.join(", "),
+    );
+
+    verdict_line(answer);
+    Ok(())
+}
+
+/// One measured signal: name, value, and the note that puts it in context.
+fn signal(name: &str, value: &str, note: String) {
+    let name = if colours_wanted() {
+        format!("{:<12}", name.bold())
+    } else {
+        format!("{name:<12}")
+    };
+    if note.is_empty() {
+        println!("  {name}{value}");
+    } else if colours_wanted() {
+        println!("  {name}{value:<48}{}", note.dimmed());
+    } else {
+        println!("  {name}{value:<48}{note}");
+    }
+}
+
+fn verdict_line(answer: &Diagnosis) {
+    let text = answer.verdict.as_str();
+    let painted = if colours_wanted() {
+        match answer.verdict {
+            Verdict::LikelyWorthIt => text.green().bold().to_string(),
+            Verdict::TooSmall | Verdict::UnlikelyToHelp => text.red().bold().to_string(),
+            Verdict::Marginal => text.yellow().bold().to_string(),
+        }
+    } else {
+        text.to_string()
+    };
+    // The verdict word is part of the first wrapped line, so the wrap has to know how
+    // wide it is — measured on the unpainted text, since colour codes take no columns.
+    let lead = format!("  {text} — ");
+    println!(
+        "\n  {painted} — {}",
+        wrap(&answer.reason, WIDTH, "  ", lead.chars().count())
+    );
+
+    if !answer.what_would_change_it.is_empty() {
+        println!("\n  What would change this:");
+        for item in &answer.what_would_change_it {
+            println!("    - {}", wrap(item, WIDTH, "      ", 6));
+        }
+    }
+    if let Some(c) = doctor::comparable(answer.verdict) {
+        // Named by role rather than by favourability: for a yes the useful comparison
+        // is the repository where Reify did worst, and for a no it is the one where it
+        // did best. Calling both "least favourable" would be wrong half the time.
+        let role = match answer.verdict {
+            Verdict::UnlikelyToHelp => "did best",
+            _ => "did worst",
+        };
+        println!(
+            "\n  {}",
+            wrap(
+                &format!(
+                    "For comparison, the measured repository where Reify {role}: {}, \
+                     where {}. See {}.",
+                    c.name, c.outcome, c.report
+                ),
+                WIDTH,
+                "  ",
+                2,
+            )
+        );
+    }
+    // The verdict is a heuristic over four repositories, and a reader could otherwise
+    // mistake it for a measurement of theirs. The cost is stated for the same reason
+    // the answer is: so nobody has to guess what running it will take.
+    println!(
+        "\n  {}",
+        wrap(
+            &format!(
+                "This is a heuristic fitted to four measured repositories, not a \
+                 measurement of this one — `reify-bench` measures this one. Read the \
+                 working tree and {} in {:.1}s; no index needed, and none was used.",
+                if answer.git_repository {
+                    "the newest 1000 commits"
+                } else {
+                    "no history"
+                },
+                answer.elapsed_ms as f64 / 1000.0,
+            ),
+            WIDTH,
+            "  ",
+            2,
+        )
+    );
+}
+
+/// Terminal width the doctor output is wrapped to.
+///
+/// Fixed rather than read from the terminal: the verdict is the one paragraph that must
+/// be readable, and it must read the same in a pipe, a CI log and a screenshot.
+const WIDTH: usize = 78;
+
+/// Wrap `text` to `width`, indenting continuation lines by `indent`.
+///
+/// `first_column` is how far into the line the caller has already printed, so a verdict
+/// word or a bullet marker is counted against the first line's budget rather than
+/// pushing it past the right edge.
+fn wrap(text: &str, width: usize, indent: &str, first_column: usize) -> String {
+    let mut out = String::new();
+    let mut column = first_column;
+    let mut fresh = true;
+    for word in text.split_whitespace() {
+        if !fresh && column + 1 + word.chars().count() > width {
+            out.push('\n');
+            out.push_str(indent);
+            column = indent.chars().count();
+        } else if !fresh {
+            out.push(' ');
+            column += 1;
+        }
+        out.push_str(word);
+        column += word.chars().count();
+        fresh = false;
+    }
+    out
 }
 
 pub fn concepts(overview: &ConceptOverview, json: bool) -> Result<()> {

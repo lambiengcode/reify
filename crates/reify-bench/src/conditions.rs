@@ -14,8 +14,12 @@ use std::collections::{BTreeSet, HashMap};
 
 use reify::concepts::meaningful_words;
 use reify::context::{self, ContextOptions};
-use reify::store::Store;
+use reify::model::{EdgeKind, Node};
+use reify::query;
+use reify::store::{Direction, Store};
 use reify::tokens;
+
+use crate::tasks;
 
 /// A condition's answer: an ordered list of files, and what it cost to produce.
 #[derive(Debug, Clone, Serialize)]
@@ -345,6 +349,170 @@ pub fn rank_audit(
     })
 }
 
+// ---- the checker under test -------------------------------------------------
+//
+// `reify verify` does not exist. What exists is the graph it would have to stand on,
+// and that is what is measured here: *symbols changed by this diff, minus symbols
+// present in the diff, where an inbound `CALLS` edge exists*. The query runs through
+// the same `impact` machinery `reify impact` uses, so a number measured here is a
+// number about the shipped substrate rather than about a checker written to be
+// measured.
+//
+// Only `CALLS` edges at distance 1 count. `impact` also propagates two hops and
+// crosses into the data layer; both are legitimate for "what breaks if I change
+// this" and neither is what "the patch forgot to update a call site" means. Widening
+// the query would raise recall and raise the false-alarm rate with it, which is the
+// trade this benchmark exists to measure rather than to pre-empt.
+
+/// One thing the change touched that has a dependant the change did not touch.
+#[derive(Debug, Clone, Serialize)]
+pub struct Finding {
+    /// `path:line` of the dependant, as `reify impact` cites it.
+    pub location: String,
+    pub path: String,
+    /// The dependant's name.
+    pub what: String,
+    /// The changed symbol it depends on, in words an engineer can check.
+    pub reason: String,
+}
+
+/// What the checker produced for one diff, and what it cost.
+#[derive(Debug, Clone, Serialize)]
+pub struct Findings {
+    pub findings: Vec<Finding>,
+    /// Symbols the diff changes, `path:line`. The minuend of the query, reported so a
+    /// zero-finding result can be told apart from a diff that resolved to nothing.
+    pub changed_symbols: Vec<String>,
+    /// Tokens the findings output itself would cost the agent that reads it.
+    pub answer_tokens: u32,
+    /// Wall clock for the query alone. Indexing is a one-off the real feature would
+    /// not repeat per check, and is timed separately.
+    pub elapsed_ms: u128,
+}
+
+impl Findings {
+    /// The findings as an agent would be shown them; the string `answer_tokens` counts.
+    pub fn render(&self) -> String {
+        if self.findings.is_empty() {
+            return "reify verify: nothing in the graph says this patch is incomplete\n".into();
+        }
+        let mut out = format!(
+            "reify verify: {} not updated by this patch\n",
+            self.findings.len()
+        );
+        for finding in &self.findings {
+            out.push_str(&format!(
+                "  {}  {} — {}\n",
+                finding.location, finding.what, finding.reason
+            ));
+        }
+        out
+    }
+}
+
+/// Does any symbol in `path` **call** a symbol in another file?
+///
+/// The ceiling on this whole construction. Every finding is a caller, so a file whose
+/// symbols call nothing outside themselves can never be cited, however good the query
+/// gets. The direction matters and is easy to get backwards: what is called *into*
+/// the file is irrelevant here.
+///
+/// Measured rather than assumed, because "the query needs work" and "there is no edge
+/// to find" are different conclusions and only one of them is fixable by writing
+/// `reify verify`.
+pub fn can_be_cited(store: &Store, path: &str) -> Result<bool> {
+    for symbol in store.symbols_in_file(path)? {
+        for (callee, _, _) in store.neighbors(symbol.id, Direction::Out, &[EdgeKind::Calls])? {
+            if callee.path.as_deref() != Some(path) {
+                return Ok(true);
+            }
+        }
+    }
+    Ok(false)
+}
+
+/// Run the checker over one patch, against an index built at the patch's parent.
+pub fn missing_callers(store: &Store, patch: &tasks::Patch) -> Result<Findings> {
+    let started = std::time::Instant::now();
+
+    // Every symbol whose span overlaps a changed line. This is the exclusion set:
+    // a symbol the patch already edits is not something the patch forgot.
+    let mut touched: BTreeSet<String> = BTreeSet::new();
+    // The innermost symbol at each changed line. These are the origins — the same
+    // rule `store.symbol_at` applies, batched so a long hunk costs one query.
+    let mut origins: Vec<Node> = Vec::new();
+    let mut seen: BTreeSet<i64> = BTreeSet::new();
+
+    for file in &patch.files {
+        if file.created {
+            continue;
+        }
+        let symbols = store.symbols_in_file(&file.path)?;
+        if symbols.is_empty() {
+            continue;
+        }
+        for hunk in &file.hunks {
+            for &line in &hunk.changed_lines {
+                let mut innermost: Option<&Node> = None;
+                for symbol in &symbols {
+                    if symbol.line_start > line || symbol.line_end < line {
+                        continue;
+                    }
+                    touched.insert(symbol.location());
+                    let narrower = innermost.is_none_or(|best| {
+                        symbol.line_end - symbol.line_start < best.line_end - best.line_start
+                    });
+                    if narrower {
+                        innermost = Some(symbol);
+                    }
+                }
+                if let Some(symbol) = innermost {
+                    if seen.insert(symbol.id) {
+                        origins.push(symbol.clone());
+                    }
+                }
+            }
+        }
+    }
+
+    let mut findings: Vec<Finding> = Vec::new();
+    let mut cited: BTreeSet<String> = BTreeSet::new();
+    for origin in &origins {
+        let answer = query::impact(store, &origin.location())?;
+        for affected in answer.affected {
+            // Distance 1 and a call: the edge the query is defined on. Data coupling
+            // and callers-of-callers are `impact`'s job, not this checker's.
+            if affected.distance != 1 || !affected.reason.starts_with("calls ") {
+                continue;
+            }
+            if touched.contains(&affected.location) || !cited.insert(affected.location.clone()) {
+                continue;
+            }
+            let path = affected
+                .location
+                .rsplit_once(':')
+                .map_or(affected.location.as_str(), |(path, _)| path)
+                .to_string();
+            findings.push(Finding {
+                location: affected.location,
+                path,
+                what: affected.what,
+                reason: affected.reason,
+            });
+        }
+    }
+    findings.sort_by(|a, b| a.location.cmp(&b.location));
+
+    let mut result = Findings {
+        findings,
+        changed_symbols: origins.iter().map(|n| n.location()).collect(),
+        answer_tokens: 0,
+        elapsed_ms: started.elapsed().as_millis(),
+    };
+    result.answer_tokens = tokens::estimate(&result.render());
+    Ok(result)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -369,6 +537,111 @@ mod tests {
                 ),
             ],
         }
+    }
+
+    /// Three symbols: `caller` and `sibling` both call `target`, all in different
+    /// files, plus one symbol nothing calls.
+    fn graph() -> Store {
+        use reify::model::{uid, EdgeKind, NewEdge, NewNode, NodeKind, Status};
+        use reify::store::Batch;
+
+        let symbol = |path: &str, name: &str, start: u32, end: u32| {
+            let mut node = NewNode::new(uid::symbol(path, name), NodeKind::Symbol, name);
+            node.path = Some(path.to_string());
+            node.line_start = start;
+            node.line_end = end;
+            node
+        };
+        let mut batch = Batch::default();
+        batch.node(symbol("app/pricing.py", "target", 10, 20));
+        batch.node(symbol("app/orders.py", "caller", 5, 15));
+        batch.node(symbol("app/report.py", "sibling", 30, 40));
+        batch.node(symbol("app/lonely.py", "lonely", 1, 4));
+        for from in ["app/orders.py#caller", "app/report.py#sibling"] {
+            let (path, name) = from.split_once('#').unwrap();
+            batch.edge(NewEdge::new(
+                uid::symbol(path, name),
+                uid::symbol("app/pricing.py", "target"),
+                EdgeKind::Calls,
+                Status::Confirmed,
+                1.0,
+            ));
+        }
+        let mut store = Store::in_memory().unwrap();
+        store.commit(batch).unwrap();
+        store
+    }
+
+    fn patch(files: &[(&str, u32)]) -> tasks::Patch {
+        tasks::Patch {
+            files: files
+                .iter()
+                .map(|(path, line)| tasks::FilePatch {
+                    path: path.to_string(),
+                    created: false,
+                    hunks: vec![tasks::Hunk {
+                        old_start: *line,
+                        old_len: 1,
+                        changed_lines: vec![*line],
+                    }],
+                })
+                .collect(),
+        }
+    }
+
+    #[test]
+    fn a_caller_the_patch_did_not_touch_is_a_finding() {
+        let found = missing_callers(&graph(), &patch(&[("app/pricing.py", 12)])).unwrap();
+        let cited: Vec<&str> = found.findings.iter().map(|f| f.path.as_str()).collect();
+        assert_eq!(cited, vec!["app/orders.py", "app/report.py"]);
+        assert_eq!(found.changed_symbols, vec!["app/pricing.py:10"]);
+    }
+
+    #[test]
+    fn a_caller_the_patch_did_touch_is_not_a_finding() {
+        // This is the whole subtrahend: a symbol the patch already edits is not
+        // something the patch forgot. Without it every complete commit would be
+        // reported as incomplete.
+        let found = missing_callers(
+            &graph(),
+            &patch(&[("app/pricing.py", 12), ("app/orders.py", 7)]),
+        )
+        .unwrap();
+        let cited: Vec<&str> = found.findings.iter().map(|f| f.path.as_str()).collect();
+        assert_eq!(cited, vec!["app/report.py"]);
+    }
+
+    #[test]
+    fn a_complete_change_leaves_nothing_to_report() {
+        let found = missing_callers(
+            &graph(),
+            &patch(&[
+                ("app/pricing.py", 12),
+                ("app/orders.py", 7),
+                ("app/report.py", 33),
+            ]),
+        )
+        .unwrap();
+        assert!(found.findings.is_empty(), "{:?}", found.findings);
+        assert!(found.render().contains("nothing"));
+    }
+
+    #[test]
+    fn a_diff_that_resolves_to_no_symbol_reports_nothing_rather_than_guessing() {
+        let found = missing_callers(&graph(), &patch(&[("app/pricing.py", 900)])).unwrap();
+        assert!(found.changed_symbols.is_empty());
+        assert!(found.findings.is_empty());
+    }
+
+    #[test]
+    fn only_a_file_that_calls_out_of_itself_can_ever_be_cited() {
+        // The ceiling on the held-out-hunk construction, and the direction is easy to
+        // get backwards: `pricing.py` is called *by* two files and calls nothing, so no
+        // caller-based checker can cite it.
+        let store = graph();
+        assert!(can_be_cited(&store, "app/orders.py").unwrap());
+        assert!(!can_be_cited(&store, "app/pricing.py").unwrap());
+        assert!(!can_be_cited(&store, "app/lonely.py").unwrap());
     }
 
     #[test]

@@ -5,6 +5,7 @@
 //! no network call at all in this build, which is asserted by a test rather than
 //! promised in a README.
 
+mod install;
 mod mcp;
 mod render;
 mod selfmanage;
@@ -96,7 +97,7 @@ enum Command {
 
     /// What breaks if this changes.
     Impact {
-        /// A symbol name or a description of the change.
+        /// A symbol name, a file path, or a description of the change.
         query: String,
     },
 
@@ -140,6 +141,28 @@ enum Command {
         /// The file about to be changed.
         path: String,
     },
+
+    /// Detect the agents present here and wire each the integration it should have.
+    ///
+    /// Shows the plan and stops, unless `--yes`. Reversible with `reify uninit`.
+    Install {
+        /// Actually write it; without this flag, only the plan is shown.
+        #[arg(long)]
+        yes: bool,
+        /// Register the MCP server instead of the shell-command instruction block.
+        ///
+        /// `docs/integration/` recommends the instruction block: an MCP server's tool
+        /// schemas are re-sent every turn of every session, and a CLI costs nothing
+        /// until it is called. Use this for a client that cannot run a shell command.
+        #[arg(long)]
+        mcp: bool,
+    },
+
+    /// Should this repository use Reify at all? Answers before you index.
+    ///
+    /// Runs against the working tree and `git log`, never the store, so it works
+    /// before `reify init`. Willing to say no.
+    Doctor,
 
     /// Model-assistance status and prompt inspection.
     Llm {
@@ -308,6 +331,14 @@ fn run() -> Result<()> {
             let store = open_existing(&root)?;
             render::preflight(&query::preflight(&store, path)?, cli.json)
         }
+        Command::Install { yes, mcp } => {
+            let mut plan = install::plan(&root, *mcp)?;
+            if *yes && plan.has_work() {
+                install::apply(&root, &mut plan)?;
+            }
+            render::install(&plan, *yes, cli.json)
+        }
+        Command::Doctor => render::doctor(&reify::doctor::diagnose(&root)?, cli.json),
         Command::Llm { action } => match action {
             LlmAction::Status => render::llm_status(&root, cli.json),
             LlmAction::Preview { task, budget } => {
@@ -550,6 +581,8 @@ mod tests {
             vec!["reify", "--json", "preflight", "a.py"],
             vec!["reify", "--json", "llm", "status"],
             vec!["reify", "--json", "init"],
+            vec!["reify", "--json", "doctor"],
+            vec!["reify", "--json", "install"],
         ] {
             let cli = Cli::try_parse_from(&args).expect("should parse");
             assert!(cli.json, "{args:?}");

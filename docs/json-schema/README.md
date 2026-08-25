@@ -197,3 +197,86 @@ version.
   "suggested_command": "string"
 }
 ```
+
+## `reify doctor --json`
+
+Answers before there is an index, so it reads the working tree and `git log` rather than
+the store. `verdict` is one of `too_small`, `likely_worth_it`, `marginal`,
+`unlikely_to_help`. `vocabulary` and `history` are `null` below the line floor and when
+git history cannot be read — absent rather than defaulted, so a consumer cannot mistake
+"not measured" for "measured zero". Metric definitions: [`../metrics.md`](../metrics.md).
+
+```json
+{
+  "schema": "string",
+  "root": "string",
+  "scale": {
+    "indexable_files": "integer",
+    "code_files": "integer",
+    "lines": "integer"
+  },
+  "git_repository": "boolean",
+  "vocabulary": {
+    "commits_considered": "integer",
+    "commits_local": "integer",
+    "locality": "number"
+  },
+  "history": {
+    "commits_read": "integer",
+    "truncated": "boolean",
+    "usable_subjects": "integer",
+    "usable_share": "number",
+    "focused_commits": "integer",
+    "focus": "number",
+    "median_files_changed": "integer"
+  },
+  "documents": {
+    "unreadable_by_grep": "integer",
+    "examples": [
+      "string"
+    ]
+  },
+  "verdict": "string",
+  "reason": "string",
+  "what_would_change_it": [
+    "string"
+  ],
+  "elapsed_ms": "integer"
+}
+```
+
+## `reify install --json`
+
+The plan, whether or not it was applied. `applied` is false unless `--yes` was passed.
+`kind` is one of `instructions`, `rule_file`, `mcp`; `state` is one of `planned`,
+`already_present`, `skipped`. `problem` is non-null only when `state` is `skipped`, and
+says why the file was left alone. `evidence` is what each detection rests on, so a
+consumer can check the claim rather than trust it. `instruction_block` is non-null only
+when no agent was recognised — it is the text to paste by hand.
+
+```json
+{
+  "schema": "string",
+  "root": "string",
+  "mcp": "boolean",
+  "applied": "boolean",
+  "steps": [
+    {
+      "path": "string",
+      "kind": "string",
+      "agents": [
+        "string"
+      ],
+      "evidence": [
+        "string"
+      ],
+      "state": "string",
+      "problem": "null"
+    }
+  ],
+  "instruction_block": "null",
+  "detected_elsewhere": [
+    "string"
+  ]
+}
+```

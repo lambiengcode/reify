@@ -141,6 +141,40 @@ enum Command {
         #[arg(long)]
         out: PathBuf,
     },
+    /// Held-out-hunk evaluation: does the graph notice an incomplete patch?
+    ///
+    /// Model-free, deterministic, and free to run. It exists to decide whether
+    /// `reify verify` is worth building, against the pre-registered condition in
+    /// `metrics::VERIFY_RECALL_FLOOR`.
+    VerifyEval {
+        #[arg(long)]
+        repo: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long, default_value_t = 20)]
+        count: usize,
+        #[arg(long, default_value_t = 4_000)]
+        scan: usize,
+        /// Only take trials from commits after this revision.
+        #[arg(long)]
+        after: Option<String>,
+        /// Only take trials from commits strictly older than this revision.
+        #[arg(long)]
+        until: Option<String>,
+        /// Where parent trees are extracted. Defaults to a temporary directory, which
+        /// is removed when the run finishes.
+        #[arg(long)]
+        work: Option<PathBuf>,
+    },
+    /// Render the held-out-hunk report from one or more `verify-eval` result
+    /// directories.
+    VerifyReport {
+        /// Result directories, as `Label=path`, in the order they should appear.
+        #[arg(long = "results", value_name = "LABEL=DIR", num_args = 1..)]
+        results: Vec<String>,
+        #[arg(long)]
+        out: PathBuf,
+    },
     /// Render a report from raw results.
     Report {
         #[arg(long = "in")]
@@ -223,6 +257,24 @@ fn run() -> Result<()> {
         } => audit(&repo, &tasks, budget),
         Command::Fit { train, out, budget } => fit(&train, &out, budget),
         Command::Chart { results, out } => charts(&results, &out),
+        Command::VerifyEval {
+            repo,
+            out,
+            count,
+            scan,
+            after,
+            until,
+            work,
+        } => verify_eval(
+            &repo,
+            &out,
+            count,
+            scan,
+            after.as_deref(),
+            until.as_deref(),
+            work.as_deref(),
+        ),
+        Command::VerifyReport { results, out } => verify_report(&results, &out),
         Command::Report { input, out } => report(&input, &out),
     }
 }
@@ -555,8 +607,10 @@ fn agent_experiments(
 ) -> Result<()> {
     let wanted = |name: &str| arms.is_empty() || arms.iter().any(|a| a == name);
     let set: tasks::TaskSet = read_json(task_file)?;
+    let name = set.repository_name().to_string();
+    let name = name.as_str();
     let provider = agent::provider_or_explain(repo)?;
-    eprintln!("provider: {}", provider.label);
+    eprintln!("provider: {}  repository: {name}", provider.label);
 
     let store_path = repo
         .join(reify::index::REIFY_DIR)
@@ -573,7 +627,7 @@ fn agent_experiments(
 
         // E6: memorisation control. No context at all.
         if wanted("N-no-context") {
-            outcomes.push(agent::run(&provider, repo, task, "N-no-context", ""));
+            outcomes.push(agent::run(&provider, repo, name, task, "N-no-context", ""));
         }
 
         // E1: the budget-matched lexical baseline.
@@ -582,6 +636,7 @@ fn agent_experiments(
             outcomes.push(agent::run(
                 &provider,
                 repo,
+                name,
                 task,
                 "B-content-grep",
                 &agent::files_block(&grep),
@@ -594,6 +649,7 @@ fn agent_experiments(
             outcomes.push(agent::run(
                 &provider,
                 repo,
+                name,
                 task,
                 "R-reify",
                 &agent::files_block(&compiled),
@@ -612,6 +668,7 @@ fn agent_experiments(
             outcomes.push(agent::run(
                 &provider,
                 repo,
+                name,
                 task,
                 "R-shuffled",
                 &agent::files_block(&shuffled),
@@ -623,6 +680,7 @@ fn agent_experiments(
             outcomes.push(agent::run(
                 &provider,
                 repo,
+                name,
                 task,
                 "O-oracle",
                 &agent::oracle_block(task),
@@ -637,6 +695,7 @@ fn agent_experiments(
             outcomes.push(agent::run(
                 &provider,
                 repo,
+                name,
                 task,
                 "R-reify-iter3",
                 &agent::files_block(&iterated),
@@ -647,6 +706,7 @@ fn agent_experiments(
             outcomes.push(agent::run(
                 &provider,
                 repo,
+                name,
                 task,
                 "B-content-grep-x3",
                 &agent::files_block(&grep_wide),
@@ -679,6 +739,7 @@ fn agent_experiments(
         &out.join("agent-environment.json"),
         &serde_json::json!({
             "provider": provider.label,
+            "repository": name,
             "tasks": chosen.len(),
             "budget_tokens": budget,
             "conditions": names,
@@ -814,6 +875,607 @@ fn execute(
             "code_files_in_corpus": corpus.len(),
         }),
     )?;
+    eprintln!("wrote {}", out.display());
+    Ok(())
+}
+
+/// Held-out-hunk evaluation: can the graph tell that a patch is incomplete?
+///
+/// Model-free and deterministic. For each qualifying merged commit the parent tree is
+/// extracted and indexed, the change is fed to the checker twice — once with one file's
+/// only hunk withheld, once complete — and the two runs answer two different questions:
+/// does a finding cite the withheld hunk, and how many findings does a change that is
+/// complete by construction still attract.
+fn verify_eval(
+    repo: &Path,
+    out: &Path,
+    count: usize,
+    scan: usize,
+    after: Option<&str>,
+    until: Option<&str>,
+    work: Option<&Path>,
+) -> Result<()> {
+    let started = std::time::Instant::now();
+    let set = tasks::generate_truncated(
+        repo,
+        count,
+        scan,
+        after,
+        until,
+        &std::collections::BTreeSet::new(),
+    )?;
+    anyhow::ensure!(
+        !set.tasks.is_empty(),
+        "no commit in the scanned history could be truncated; {} candidates were \
+         rejected, the commonest reason being `{}`",
+        set.rejected.len(),
+        set.rejected
+            .first()
+            .map(|(_, why)| why.as_str())
+            .unwrap_or("none recorded"),
+    );
+    eprintln!(
+        "{} trials from {} commits ({} passed every retrieval filter but could not be \
+         truncated)",
+        set.tasks.len(),
+        set.generated_from_commits,
+        set.rejected.len()
+    );
+
+    let scratch = work.map(Path::to_path_buf).unwrap_or_else(|| {
+        std::env::temp_dir().join(format!("reify-verify-eval-{}", std::process::id()))
+    });
+    let tree = scratch.join("tree");
+
+    let mut outcomes: Vec<metrics::VerifyOutcome> = Vec::new();
+    // Taken from the first trial's index and kept: what the repository is written in
+    // is a property of the repository, not of the label someone passes to the report.
+    let mut languages: Vec<(String, usize)> = Vec::new();
+    for (i, task) in set.tasks.iter().enumerate() {
+        eprint!("\r  trial {}/{}   ", i + 1, set.tasks.len());
+        let indexing = std::time::Instant::now();
+        extract_tree(repo, &task.parent, &tree)?;
+        let mut store = Store::open(
+            tree.join(reify::index::REIFY_DIR)
+                .join(reify::index::STORE_FILE),
+        )?;
+        reify::index::index(&mut store, &reify::index::IndexOptions::new(&tree))?;
+        let index_ms = indexing.elapsed().as_millis();
+        if languages.is_empty() {
+            let mut rows = store.coverage_by_language()?;
+            rows.sort_by_key(|row| std::cmp::Reverse(row.1));
+            languages = rows.into_iter().take(3).map(|(l, n, _)| (l, n)).collect();
+        }
+
+        // Resolved at the parent, where the withheld change has not happened yet — the
+        // same state the checker sees, so a symbol that does not exist there is
+        // honestly unscorable rather than quietly credited.
+        let omission_symbol = store
+            .symbol_at(&task.omission_file, task.omission_line)?
+            .map(|node| node.location());
+        let truncated = conditions::missing_callers(&store, &task.truncated)?;
+        let complete = conditions::missing_callers(&store, &task.complete)?;
+        outcomes.push(metrics::score_verify(
+            task,
+            omission_symbol,
+            conditions::can_be_cited(&store, &task.omission_file)?,
+            &truncated,
+            &complete,
+            index_ms,
+        ));
+    }
+    eprintln!();
+    let _ = std::fs::remove_dir_all(&scratch);
+
+    let summary = metrics::summarise_verify(&outcomes);
+    std::fs::create_dir_all(out)?;
+    write_json(&out.join("verify-outcomes.json"), &outcomes)?;
+    write_json(&out.join("verify-summary.json"), &summary)?;
+    write_json(&out.join("verify-tasks.json"), &set)?;
+    write_json(
+        &out.join("verify-environment.json"),
+        &serde_json::json!({
+            "reify_version": env!("CARGO_PKG_VERSION"),
+            "repository": set.repository,
+            // The local path is wherever the run happened, which is no help to anyone
+            // reproducing it. The remote is.
+            "origin": origin(repo),
+            "head": set.head,
+            "languages": languages,
+            // The selection window, so a committed result can be re-run exactly even
+            // after the branch it was taken from has moved on.
+            "count": count,
+            "scan": scan,
+            "after": after,
+            "until": until,
+            "trials": set.tasks.len(),
+            "candidates_rejected": set.rejected.len(),
+            "checker": "symbols changed by this diff, minus symbols present in the diff, \
+                        where an inbound CALLS edge exists at distance 1, via reify::query::impact",
+            "wall_clock_ms": started.elapsed().as_millis(),
+            "token_counts": "estimated by reify heuristic-v1",
+        }),
+    )?;
+
+    eprintln!("\n{}", render_verify(&summary));
+    eprintln!(
+        "wrote {} ({:.1}s wall clock)",
+        out.display(),
+        started.elapsed().as_secs_f32()
+    );
+    Ok(())
+}
+
+/// The summary as a human reads it, verdict first.
+fn render_verify(s: &metrics::VerifySummary) -> String {
+    let mut text = String::new();
+    text.push_str(&format!(
+        "{:<28} {:.2}  (95% CI {:.2}–{:.2}, {}/{} trials)\n",
+        "omission_recall",
+        s.omission_recall,
+        s.omission_recall_ci.0,
+        s.omission_recall_ci.1,
+        (s.omission_recall * s.tasks as f32).round() as usize,
+        s.tasks,
+    ));
+    text.push_str(&format!(
+        "{:<28} {:.2}  (95% CI {:.2}–{:.2}) — citations the complete commit does not \
+         also produce\n",
+        "  of which attributable",
+        s.omission_recall_attributable,
+        s.omission_recall_attributable_ci.0,
+        s.omission_recall_attributable_ci.1,
+    ));
+    match (s.omission_recall_reachable, s.omission_recall_reachable_ci) {
+        (Some(recall), Some(ci)) => text.push_str(&format!(
+            "{:<28} {recall:.2}  (95% CI {:.2}–{:.2}, {}/{} omitted files call into \
+             another file at all — the ceiling on any call-graph checker)\n",
+            "  where citable at all", ci.0, ci.1, s.reachable_omissions, s.tasks
+        )),
+        _ => text.push_str(&format!(
+            "{:<28} —     (no omitted file calls into another file; the ceiling on \
+             any call-graph checker here is zero)\n",
+            "  where citable at all"
+        )),
+    }
+    match (s.omission_recall_symbol, s.omission_recall_symbol_ci) {
+        (Some(recall), Some(ci)) => text.push_str(&format!(
+            "{:<28} {recall:.2}  (95% CI {:.2}–{:.2}, {} scorable)\n",
+            "omission_recall_symbol", ci.0, ci.1, s.symbol_scorable
+        )),
+        _ => text.push_str(&format!(
+            "{:<28} —     (no trial's omission fell inside an indexed symbol)\n",
+            "omission_recall_symbol"
+        )),
+    }
+    text.push_str(&format!(
+        "{:<28} {:.2}  per complete commit ({}/{} commits noisy, 95% CI {:.2}–{:.2})\n",
+        "false_alarm_rate",
+        s.false_alarm_rate,
+        s.commits_with_a_false_alarm,
+        s.tasks,
+        s.false_alarm_share_ci.0,
+        s.false_alarm_share_ci.1,
+    ));
+    text.push_str(&format!(
+        "{:<28} {}\n",
+        "findings_per_diff (median)", s.median_findings_per_diff
+    ));
+    text.push_str(&format!(
+        "{:<28} {}\n",
+        "verify_tokens (median)", s.median_verify_tokens
+    ));
+    text.push_str(&format!(
+        "{:<28} {}\n",
+        "verify_latency_ms (median)", s.median_verify_latency_ms
+    ));
+    text.push_str(&format!(
+        "{:<28} {}  (extract + index one parent tree; not part of the query)\n",
+        "index_ms (median)", s.median_index_ms
+    ));
+    if s.diffs_resolving_to_nothing > 0 {
+        text.push_str(&format!(
+            "{:<28} {} of {} truncated diffs resolved to no indexed symbol at all\n",
+            "unresolved", s.diffs_resolving_to_nothing, s.tasks
+        ));
+    }
+    text.push_str(&format!(
+        "\npre-registered verdict: {}\n  {}\n",
+        match s.verdict() {
+            metrics::Verdict::Build => "BUILD `reify verify` on this substrate",
+            metrics::Verdict::DoNotBuild => "DO NOT BUILD `reify verify` on this substrate",
+        },
+        s.why()
+    ));
+    text
+}
+
+/// The repository's `origin` remote, so a committed result names something a reader
+/// can clone rather than the temporary directory it happened to be run in.
+fn origin(repo: &Path) -> Option<String> {
+    let output = std::process::Command::new("git")
+        .args(["remote", "get-url", "origin"])
+        .current_dir(repo)
+        .output()
+        .ok()?;
+    output
+        .status
+        .success()
+        .then(|| String::from_utf8_lossy(&output.stdout).trim().to_string())
+}
+
+/// Extract a commit's tree into `into`, replacing whatever was there.
+///
+/// `git archive` rather than a worktree: a worktree registers itself in the shared
+/// git directory, and this harness must not leave anything behind in the repository
+/// it is measuring. The cost is a full index per trial, which is reported.
+fn extract_tree(repo: &Path, sha: &str, into: &Path) -> Result<()> {
+    use std::process::{Command, Stdio};
+    if into.exists() {
+        std::fs::remove_dir_all(into).with_context(|| format!("clearing {}", into.display()))?;
+    }
+    std::fs::create_dir_all(into)?;
+    let mut archive = Command::new("git")
+        .args(["archive", "--format=tar", sha])
+        .current_dir(repo)
+        .stdout(Stdio::piped())
+        .spawn()
+        .context("running git archive")?;
+    let stdout = archive
+        .stdout
+        .take()
+        .ok_or_else(|| anyhow::anyhow!("git archive produced no output"))?;
+    let extracted = Command::new("tar")
+        .arg("-x")
+        .arg("-C")
+        .arg(into)
+        .stdin(Stdio::from(stdout))
+        .status()
+        .context("running tar to extract a parent tree")?;
+    let archived = archive.wait()?;
+    anyhow::ensure!(
+        archived.success() && extracted.success(),
+        "cannot extract the tree at {sha}"
+    );
+    Ok(())
+}
+
+/// Render the held-out-hunk report across every repository that was run.
+///
+/// Generated from `verify-summary.json` for the same reason the retrieval report is:
+/// a table that can drift from its data is a picture, not a measurement. The per-trial
+/// appendix is included so the selection rule's effects are visible rather than
+/// described — every omitted file is named.
+fn verify_report(results: &[String], out: &Path) -> Result<()> {
+    struct Run {
+        label: String,
+        summary: metrics::VerifySummary,
+        environment: serde_json::Value,
+        outcomes: Vec<metrics::VerifyOutcome>,
+    }
+
+    let mut runs = Vec::new();
+    for spec in results {
+        let (label, dir) = spec
+            .split_once('=')
+            .ok_or_else(|| anyhow::anyhow!("expected LABEL=DIR, got `{spec}`"))?;
+        let dir = Path::new(dir);
+        runs.push(Run {
+            label: label.to_string(),
+            summary: read_json(&dir.join("verify-summary.json"))?,
+            environment: read_json(&dir.join("verify-environment.json"))?,
+            outcomes: read_json(&dir.join("verify-outcomes.json"))?,
+        });
+    }
+    anyhow::ensure!(!runs.is_empty(), "no results given");
+
+    let mut md = String::from("# Can the graph tell that a patch is incomplete?\n\n");
+    md.push_str(
+        "Generated by `reify-bench verify-report`. Every number is computed from the \
+         `verify-summary.json` files named below; nothing is entered by hand.\n\n\
+         This benchmark exists to decide one thing: whether `reify verify` — a \
+         post-flight check that reads an agent's diff and reports what the patch \
+         missed — is worth building on Reify's call graph. It is model-free, \
+         deterministic, and costs nothing per run.\n\n",
+    );
+
+    md.push_str("## Construction\n\n");
+    md.push_str(
+        "For each merged commit that passes the retrieval benchmark's filters and \
+         touches at least two indexable files:\n\n\
+         1. the parent tree is extracted and indexed, so the change is absent from the \
+            index by construction;\n\
+         2. one file's **only** hunk is withheld — the *omission*. Removing it removes \
+            that file from the patch entirely, so a citation of it cannot be an echo of \
+            a hunk still present. Among the files with exactly one hunk, the last by \
+            path order is chosen; the choice is arbitrary, fixed, and made before any \
+            checker runs;\n\
+         3. the truncated patch goes to the checker;\n\
+         4. **the same commit goes to the checker complete.** A merged commit is \
+            complete by definition, so every finding there is a false positive. This \
+            control is not optional: without it the metric would reward a checker that \
+            simply shouts.\n\n\
+         The checker is not `reify verify`, which does not exist. It is the shipped \
+         graph query — *symbols changed by this diff, minus symbols present in the \
+         diff, where an inbound `CALLS` edge exists at distance 1* — reached through \
+         `reify::query::impact`. That deliberately measures the **substrate**, which is \
+         the number the decision needs.\n\n",
+    );
+
+    md.push_str("## Pre-registered falsification condition\n\n");
+    md.push_str(&format!(
+        "> If `omission_recall` on this substrate is below **{VERIFY_RECALL_FLOOR:.2}**, \
+         or `false_alarm_rate` is above **{VERIFY_FALSE_ALARM_CEILING:.1} per commit**, \
+         the `reify verify` feature does not get built on this substrate.\n\n\
+         Stated in `crates/reify-bench/src/metrics.rs` before the first run and not \
+         moved since. A result that kills the feature is a result.\n\n",
+        VERIFY_RECALL_FLOOR = metrics::VERIFY_RECALL_FLOOR,
+        VERIFY_FALSE_ALARM_CEILING = metrics::VERIFY_FALSE_ALARM_CEILING,
+    ));
+
+    md.push_str("## Results\n\n| Metric |");
+    for run in &runs {
+        md.push_str(&format!(" {} |", run.label));
+    }
+    md.push_str("\n|---|");
+    for _ in &runs {
+        md.push_str("---:|");
+    }
+    md.push('\n');
+    let row = |label: &str, f: &dyn Fn(&Run) -> String| {
+        let mut line = format!("| {label} |");
+        for run in &runs {
+            line.push_str(&format!(" {} |", f(run)));
+        }
+        line.push('\n');
+        line
+    };
+    md.push_str(&row("Most indexed language", &|r| {
+        r.environment["languages"][0][0]
+            .as_str()
+            .unwrap_or("—")
+            .to_string()
+    }));
+    md.push_str(&row("Trials", &|r| r.summary.tasks.to_string()));
+    md.push_str(&row("`omission_recall`", &|r| {
+        format!(
+            "**{:.2}** ({:.2}–{:.2})",
+            r.summary.omission_recall,
+            r.summary.omission_recall_ci.0,
+            r.summary.omission_recall_ci.1
+        )
+    }));
+    md.push_str(&row("…attributable to the omission", &|r| {
+        format!(
+            "{:.2} ({:.2}–{:.2})",
+            r.summary.omission_recall_attributable,
+            r.summary.omission_recall_attributable_ci.0,
+            r.summary.omission_recall_attributable_ci.1
+        )
+    }));
+    md.push_str(&row("`omission_recall_symbol`", &|r| match (
+        r.summary.omission_recall_symbol,
+        r.summary.omission_recall_symbol_ci,
+    ) {
+        (Some(v), Some(ci)) => format!(
+            "{v:.2} ({:.2}–{:.2}) over {}",
+            ci.0, ci.1, r.summary.symbol_scorable
+        ),
+        _ => "— (0 scorable)".into(),
+    }));
+    md.push_str(&row("Omitted files a caller query *could* cite", &|r| {
+        format!("{}/{}", r.summary.reachable_omissions, r.summary.tasks)
+    }));
+    md.push_str(&row("`false_alarm_rate` (per complete commit)", &|r| {
+        format!("**{:.1}**", r.summary.false_alarm_rate)
+    }));
+    md.push_str(&row("Complete commits with ≥1 false alarm", &|r| {
+        format!(
+            "{}/{} ({:.2}–{:.2})",
+            r.summary.commits_with_a_false_alarm,
+            r.summary.tasks,
+            r.summary.false_alarm_share_ci.0,
+            r.summary.false_alarm_share_ci.1
+        )
+    }));
+    md.push_str(&row("`findings_per_diff` (median)", &|r| {
+        r.summary.median_findings_per_diff.to_string()
+    }));
+    md.push_str(&row("`verify_tokens` (median)", &|r| {
+        r.summary.median_verify_tokens.to_string()
+    }));
+    md.push_str(&row("`verify_latency_ms` (median)", &|r| {
+        r.summary.median_verify_latency_ms.to_string()
+    }));
+    md.push_str(&row("Index per trial, ms (median)", &|r| {
+        r.summary.median_index_ms.to_string()
+    }));
+    md.push_str(&row("Whole run, wall clock", &|r| {
+        format!(
+            "{:.0}s",
+            r.environment["wall_clock_ms"].as_f64().unwrap_or(0.0) / 1000.0
+        )
+    }));
+    md.push_str(&row(
+        "Pre-registered verdict",
+        &|r| match r.summary.verdict() {
+            metrics::Verdict::Build => "build".into(),
+            metrics::Verdict::DoNotBuild => "**do not build**".into(),
+        },
+    ));
+
+    md.push_str("\n## What the numbers say\n\n");
+    for run in &runs {
+        md.push_str(&format!("**{}** — {}\n\n", run.label, run.summary.why()));
+    }
+    let all_fail = runs
+        .iter()
+        .all(|r| r.summary.verdict() == metrics::Verdict::DoNotBuild);
+    md.push_str(if all_fail {
+        "Every repository fails the pre-registered condition, so **`reify verify` does \
+         not get built on this substrate**. The condition was written down before the \
+         first run precisely so this outcome could not be argued away afterwards.\n\n"
+    } else {
+        "At least one repository clears the pre-registered condition. Read the \
+         confidence intervals before treating that as settled.\n\n"
+    });
+
+    // Which half of the condition actually fails, counted rather than asserted: the
+    // interesting question is not "did it fail" but "on what".
+    let failed_recall = runs
+        .iter()
+        .filter(|r| r.summary.omission_recall < metrics::VERIFY_RECALL_FLOOR)
+        .count();
+    let failed_noise = runs
+        .iter()
+        .filter(|r| r.summary.false_alarm_rate > metrics::VERIFY_FALSE_ALARM_CEILING)
+        .count();
+    md.push_str(&format!(
+        "**It fails on noise, not on blindness.** {failed_noise} of {} repositories \
+         exceed the false-alarm ceiling; {failed_recall} of {} fall below the recall \
+         floor (a repository can fail both). The graph does find the omitted file often enough to be interesting; \
+         what it cannot do is stay quiet about a patch that is already complete.\n\n",
+        runs.len(),
+        runs.len(),
+    ));
+
+    md.push_str(
+        "**The negative control takes most of the headline back.** `omission_recall` \
+         counts a citation of the omitted file whether or not the complete commit is \
+         cited too. The attributable row counts only citations the complete commit does \
+         *not* produce, and it is the smaller number in every repository here. The gap \
+         is the checker citing a file it would have cited anyway — which is not \
+         detection, however it reads next to the label.\n\n",
+    );
+
+    // The ceiling either binds or it does not, and which one decides whether a better
+    // query could help. Asserting the wrong one would be worse than saying nothing.
+    let tightest = runs
+        .iter()
+        .map(|r| r.summary.reachable_omissions as f32 / r.summary.tasks.max(1) as f32)
+        .fold(f32::INFINITY, f32::min);
+    md.push_str(&format!(
+        "**The ceiling is not what binds.** A finding is a caller, so the omitted file \
+         can only be cited if something in it calls out of itself. In the least \
+         favourable repository here that holds for {:.0}% of omissions, so the edges \
+         mostly exist and `omission_recall` is not capped by their absence. The gap \
+         between that row and the recall row is a *ranking* gap, not a coverage one.\n\n",
+        tightest * 100.0
+    ));
+
+    md.push_str(
+        "**The noise is structural, not marginal.** `false_alarm_rate` is findings per \
+         commit that is complete by construction. A `CALLS` edge says a caller exists; \
+         it does not say the caller needed changing. Nothing in the graph distinguishes \
+         a changed signature from an edit inside a body, so every caller of every \
+         touched symbol is a candidate. That is a property of the edge, and no \
+         rewriting of the query around the same edge removes it.\n\n",
+    );
+
+    md.push_str("## Cost and determinism\n\n");
+    md.push_str(&format!(
+        "No model, no network, no provider key: the whole run is a git extract, an \
+         index and a graph query. Total wall clock for everything in this report is \
+         **{:.0}s**, dominated by re-indexing one parent tree per trial. The query \
+         itself is the `verify_latency_ms` row — single-digit milliseconds.\n\n\
+         Each run is deterministic given a fixed `HEAD`: task selection, the omission \
+         rule and the query contain no randomness and no tunable threshold. A run \
+         against a repository whose history is still moving — this one, for instance — \
+         should pin the window with `--until <sha>`, or the trial set moves with the \
+         branch.\n\n\
+         ```bash\n\
+         reify-bench verify-eval --repo <repo> --out results/verify-<name> --until <sha>\n\
+         reify-bench verify-report --results \"name=results/verify-<name>\" --out benchmarks/REPORT-verify.md\n\
+         ```\n\n",
+        runs
+            .iter()
+            .map(|r| r.environment["wall_clock_ms"].as_f64().unwrap_or(0.0))
+            .sum::<f64>()
+            / 1000.0
+    ));
+
+    md.push_str("## Limitations\n\n");
+    md.push_str(
+        "1. **Small samples.** The intervals are wide and are printed beside every \
+            rate. Where two repositories differ by less than their intervals, they have \
+            not been shown to differ.\n\
+         2. **The omission-selection rule has a direction.** \"Last by path order, among \
+            files with exactly one hunk\" is arbitrary but not neutral: in a repository \
+            laid out as `src/` and `tests/`, path order lands on `tests/`. Counted \
+            across every run here, TEST_SHARE omissions sit under a path segment \
+            named `test` or `tests`. The rule was fixed before any run and has not been \
+            changed since; every omitted file is named in the appendix, so the effect is \
+            checkable rather than described.\n\
+         3. **`CALLS` at distance 1 only.** `impact` also propagates two hops and crosses \
+            into the data layer. Widening the query would raise recall and raise the \
+            false-alarm rate with it — the trade this benchmark measures rather than \
+            pre-empts.\n\
+         4. **A checker, not the feature.** `reify verify` could use a signature diff, \
+            type information, or the model. This measures the substrate those would all \
+            stand on.\n\
+         5. **Parent trees are extracted with `git archive`**, so the indexed tree has no \
+            git history and no co-change edges. The checker uses neither; a checker that \
+            did would need re-measuring.\n\
+         6. **Ground truth is one commit's hunks.** A change that could correctly have \
+            been made elsewhere scores as a miss.\n\
+         7. **`impact`'s own bounds are inherited, not bypassed.** It stops at 60 \
+            affected nodes and walks depth-first to two hops, so on a widely-called \
+            symbol some direct callers can be crowded out by second-hop ones. That is \
+            the shipped query's behaviour and measuring around it would measure \
+            something that does not exist.\n\n",
+    );
+
+    let (mut in_tests, mut trials) = (0usize, 0usize);
+    for run in &runs {
+        for outcome in &run.outcomes {
+            trials += 1;
+            if outcome
+                .omission_file
+                .split('/')
+                .any(|part| part == "test" || part == "tests")
+            {
+                in_tests += 1;
+            }
+        }
+    }
+    let md = md.replace("TEST_SHARE", &format!("{in_tests} of {trials}"));
+
+    let mut md = md;
+    md.push_str("## Appendix: every trial\n\n");
+    md.push_str(
+        "`could cite` is whether the omitted file calls out of itself at all — the \
+         ceiling for that trial. `cited` is findings on the truncated patch, `noise` is \
+         findings on the same commit complete.\n\n",
+    );
+    for run in &runs {
+        md.push_str(&format!(
+            "### {} (`{}`, commit `{}`)\n\n",
+            run.label,
+            run.environment["origin"]
+                .as_str()
+                .or_else(|| run.environment["repository"].as_str())
+                .unwrap_or("?"),
+            run.environment["head"].as_str().unwrap_or("?"),
+        ));
+        md.push_str("| Trial | Omitted file | could cite | hit | attributable | cited | noise |\n");
+        md.push_str("|---|---|---|---|---|---:|---:|\n");
+        let tick = |yes: bool| if yes { "yes" } else { "no" };
+        for outcome in &run.outcomes {
+            md.push_str(&format!(
+                "| `{}` | `{}` | {} | {} | {} | {} | {} |\n",
+                outcome.task,
+                outcome.omission_file,
+                tick(outcome.omission_file_reachable),
+                tick(outcome.file_hit),
+                tick(outcome.file_hit_attributable),
+                outcome.findings,
+                outcome.false_alarms,
+            ));
+        }
+        md.push('\n');
+    }
+
+    std::fs::write(out, md).with_context(|| format!("writing {}", out.display()))?;
     eprintln!("wrote {}", out.display());
     Ok(())
 }

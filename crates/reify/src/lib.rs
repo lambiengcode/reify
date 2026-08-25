@@ -1,6 +1,7 @@
 pub mod concepts;
 pub mod context;
 pub mod discover;
+pub mod doctor;
 pub mod extract;
 pub mod gitlog;
 pub mod index;
